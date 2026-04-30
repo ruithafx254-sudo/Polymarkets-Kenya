@@ -3,54 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexGen Terminal</title>
+    <title>NexGen | Professional Terminal</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
+
     <style>
-        :root { --primary: #2ebd85; --border: #e5e7eb; --yes-bg: #f0fdf4; --yes-text: #2ebd85; --no-bg: #fef2f2; --no-text: #df4b5e; }
-        body { background: #fff; margin: 0; padding-top: 140px; font-family: -apple-system, sans-serif; }
+        :root { 
+            --primary: #2ebd85; --primary-dark: #26a672;
+            --no: #fef2f2; --no-text: #cf304a; 
+            --yes: #f0fdf4; --yes-text: #166534;
+            --bg: #ffffff; --border: #f1f5f9; --text-main: #0f172a;
+        }
 
-        /* HEADER - PERMANENT LOCK */
-        .header-fixed { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
-        .logo { font-weight: 900; font-size: 24px; letter-spacing: -1.5px; }
-        .user-controls { display: flex; align-items: center; gap: 8px; }
-        .btn-auth { font-size: 13px; font-weight: 700; background: #f3f4f6; border: none; padding: 8px 14px; border-radius: 8px; }
-        .btn-dep { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 800; }
-        .cat-bar { display: flex; overflow-x: auto; padding: 10px 16px; gap: 20px; border-top: 1px solid #f9fafb; }
-        .cat-item { font-size: 14px; font-weight: 700; color: #6b7280; white-space: nowrap; padding-bottom: 8px; }
-        .cat-item.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
+        body { 
+            background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 130px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
 
-        /* CARDS */
+        /* --- PROFESSIONAL NAV (LOCKED) --- */
+        .header {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: #fff; z-index: 2000; border-bottom: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+        }
+
+        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; }
+        .logo { font-weight: 900; font-size: 22px; letter-spacing: -1.2px; color: #000; }
+
+        .bar-right { display: flex; align-items: center; gap: 6px; }
+        
+        .auth-group { display: flex; background: #f1f5f9; padding: 3px; border-radius: 8px; }
+        .btn-auth { 
+            font-size: 12px; font-weight: 700; border: none; background: transparent;
+            padding: 6px 12px; border-radius: 6px; cursor: pointer; color: #475569;
+        }
+        .btn-auth.active { background: #fff; color: #000; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        .wallet-pill { 
+            display: flex; align-items: center; background: #0f172a; color: #fff; 
+            padding: 2px 2px 2px 10px; border-radius: 10px; gap: 8px; font-size: 13px; font-weight: 700;
+        }
+        .btn-deposit { 
+            background: var(--primary); color: #fff; border: none; 
+            padding: 6px 14px; border-radius: 8px; font-weight: 800; cursor: pointer;
+        }
+
+        /* --- CATEGORIES --- */
+        .cat-bar { display: flex; overflow-x: auto; padding: 12px 16px; gap: 20px; scrollbar-width: none; background: #fff; }
+        .cat-bar::-webkit-scrollbar { display: none; }
+        .cat-item { font-size: 14px; font-weight: 600; color: #64748b; cursor: pointer; white-space: nowrap; }
+        .cat-item.active { color: var(--primary); font-weight: 700; position: relative; }
+        .cat-item.active::after { content: ''; position: absolute; bottom: -12px; left: 0; right: 0; height: 3px; background: var(--primary); border-radius: 10px; }
+
+        /* --- FEED --- */
         #dashboard { max-width: 500px; margin: auto; padding: 12px; }
-        .card { background: #fff; border-radius: 20px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; }
-        .m-title { font-size: 17px; font-weight: 700; line-height: 1.3; margin-bottom: 16px; }
-        .stats-grid { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
-        .p-val { font-size: 26px; font-weight: 800; }
-        .p-lbl { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; }
+        .card { background: #fff; border-radius: 20px; border: 1px solid var(--border); padding: 18px; margin-bottom: 14px; }
+        .m-title { font-size: 16px; font-weight: 700; line-height: 1.4; margin-bottom: 16px; min-height: 44px; }
+        
+        .stat-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
+        .p-val { font-size: 24px; font-weight: 800; color: #000; letter-spacing: -0.5px; }
+        .p-lbl { font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; }
+
         .btn-row { display: flex; gap: 10px; }
-        .m-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 800; font-size: 16px; }
-        .btn-yes { background: var(--yes-bg); color: var(--yes-text); }
-        .btn-no { background: var(--no-bg); color: var(--no-text); }
-        .m-footer { display: flex; justify-content: space-between; margin-top: 16px; font-size: 12px; color: #9ca3af; border-top: 1px solid #f9fafb; padding-top: 12px; }
+        .m-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; font-size: 15px; }
+        .btn-yes { background: var(--yes); color: var(--yes-text); }
+        .btn-no { background: var(--no); color: var(--no-text); }
+
+        /* --- AUTH MODAL --- */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-box { background: #fff; width: 100%; max-width: 360px; padding: 30px; border-radius: 24px; text-align: center; }
+        .auth-input { width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; }
+        .auth-btn { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="header-fixed">
+    <div class="header">
         <div class="top-nav">
             <div class="logo">NEXGEN</div>
-            <div class="user-controls">
-                <button class="btn-auth">Sign In</button>
-                <button class="btn-auth">Sign Up</button>
-                <div style="font-weight: 800; font-size: 14px; margin-left: 5px;">Ksh <span id="balance">0</span></div>
-                <button class="btn-dep">Deposit</button>
+            <div class="bar-right">
+                <div id="logged-out-ui" class="auth-group">
+                    <button class="btn-auth active" onclick="openAuth()">Sign In</button>
+                    <button class="btn-auth" onclick="openAuth()">Sign Up</button>
+                </div>
+                <div id="logged-in-ui" style="display: none;">
+                    <div class="wallet-pill">
+                        Ksh <span id="balance">0</span>
+                        <button class="btn-deposit" onclick="handleDeposit()">Deposit</button>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="cat-bar">
-            <div class="cat-item active">All</div>
-            <div class="cat-item">Politics</div>
-            <div class="cat-item">Crypto</div>
-            <div class="cat-item">Kenya</div>
+        <div class="cat-bar" id="cat-list">
+            <div class="cat-item active" onclick="filter('all', this)">All</div>
+            <div class="cat-item" onclick="filter('Politics', this)">Politics</div>
+            <div class="cat-item" onclick="filter('Crypto', this)">Crypto</div>
+            <div class="cat-item" onclick="filter('Sports', this)">Sports</div>
+            <div class="cat-item" onclick="filter('Kenya', this)">Kenya</div>
         </div>
     </div>
 
@@ -58,62 +109,101 @@
         <div id="feed"></div>
     </div>
 
+    <div id="auth-modal" class="modal">
+        <div class="modal-box">
+            <h2 style="margin: 0 0 10px 0; letter-spacing: -1px;">Welcome to NexGen</h2>
+            <input type="email" id="email" class="auth-input" placeholder="Email Address">
+            <input type="password" id="password" class="auth-input" placeholder="Password">
+            <button class="auth-btn" id="auth-trigger" onclick="performAuth()">Continue</button>
+            <p onclick="closeAuth()" style="font-size: 13px; color: #94a3b8; margin-top: 20px; cursor: pointer;">Maybe later</p>
+        </div>
+    </div>
+
     <script>
-        // 1. Prediction data
+        const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co';
+        const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
+        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+
+        // 30 Initial Markets
         const baseMarkets = [
-            { t: "Will Jesus come back before June 2026?", p: "12", v: "$4.2M", l: "CHANCE", odds: {y: "x9", n: "x3"} },
-            { t: "BTC Price: Up or Down in next 5m?", p: "51", v: "LIVE", l: "UP" },
-            { t: "James Comey sentenced to Prison in 2026?", p: "9", v: "$169K", l: "CHANCE" }
+            { t: "BTC Price: Up or Down in next 5m?", c: "Crypto", p: "51", s: "PREDICT" },
+            { t: "James Comey sentenced to Prison in 2026?", c: "Politics", p: "9", s: "CHANCE" },
+            { t: "Will CBK hold Kenya Interest Rates at 8.75%?", c: "Kenya", p: "82", s: "CHANCE" },
+            { t: "Real Madrid to win Champions League?", c: "Sports", p: "58", s: "WINNER" },
+            { t: "TikTok to be banned in the US by June?", c: "Politics", p: "34", s: "CHANCE" },
+            { t: "Ethereum to hit $4,000 this month?", c: "Crypto", p: "22", s: "CHANCE" },
+            { t: "Kenya to launch new digital ID system?", c: "Kenya", p: "91", s: "CHANCE" },
+            { t: "Will Jesus come back in June 2026?", c: "all", p: "11", s: "CHANCE" }, // FIXED POSITION #8
+            { t: "Nvidia Market Cap to exceed $4 Trillion?", c: "Business", p: "15", s: "CHANCE" },
+            { t: "Will Elon Musk buy X back into private?", c: "Business", p: "5", s: "CHANCE" }
         ];
 
-        // 2. Generate 1000 items
-        const topics = ["AI Takeover", "Mars Colony", "M-Pesa Global", "World War 3", "Gold Spike"];
-        const fullMarkets = [...baseMarkets];
-        for(let i=0; i<997; i++) {
-            fullMarkets.push({
-                t: `${topics[i % topics.length]} prediction #${i+4}?`,
-                p: Math.floor(Math.random() * 99),
-                v: `$${Math.floor(Math.random() * 900)}K`,
-                l: "CHANCE"
-            });
+        // Fill up to 30
+        for(let i=11; i<=30; i++) {
+            baseMarkets.push({ t: `Global Market Prediction Event #${i}?`, c: "all", p: Math.floor(Math.random()*99), s: "CHANCE" });
         }
 
-        // 3. LAZY RENDERER: Loads 10 at a time to prevent blank screen
-        const feed = document.getElementById('feed');
-        let index = 0;
-        const batchSize = 10;
+        let isLoading = false;
 
-        function renderNextBatch() {
-            const batch = fullMarkets.slice(index, index + batchSize);
-            const html = batch.map(m => `
+        function render(cat = 'all', append = false) {
+            const feed = document.getElementById('feed');
+            const data = cat === 'all' ? baseMarkets : baseMarkets.filter(m => m.c === cat);
+            const html = data.map(m => `
                 <div class="card">
                     <div class="m-title">${m.t}</div>
-                    <div class="stats-grid">
-                        <div><span class="p-val">${m.p}%</span> <span class="p-lbl">${m.l}</span></div>
-                        <div style="font-size:12px; font-weight:700; color:#94a3b8;">VOL: ${m.v}</div>
+                    <div class="stat-row">
+                        <div><span class="p-val">${m.p}%</span> <span class="p-lbl">${m.s}</span></div>
+                        <div style="font-size: 11px; font-weight: 700; color: #94a3b8;">VOL: $420K</div>
                     </div>
                     <div class="btn-row">
-                        <button class="m-btn btn-yes">Yes ${m.odds ? m.odds.y : ''}</button>
-                        <button class="m-btn btn-no">No ${m.odds ? m.odds.n : ''}</button>
+                        <button class="m-btn btn-yes" onclick="trade()">YES</button>
+                        <button class="m-btn btn-no" onclick="trade()">NO</button>
                     </div>
-                    <div class="m-footer"><div style="color:var(--no-text)">● LIVE</div><div>Standard Market</div></div>
                 </div>
             `).join('');
-            feed.innerHTML += html;
-            index += batchSize;
+
+            if (append) feed.innerHTML += html; else feed.innerHTML = html;
+            
+            if (!document.getElementById('load-msg')) {
+                const loader = document.createElement('div');
+                loader.id = 'load-msg';
+                loader.innerHTML = `<p style="text-align:center; color:#94a3b8; font-weight:700; padding:20px;">Fetching more predictions...</p>`;
+                document.getElementById('dashboard').appendChild(loader);
+            }
         }
 
-        // Initial load
-        renderNextBatch();
-
-        // Load more as user scrolls
         window.onscroll = function() {
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-                if (index < fullMarkets.length) renderNextBatch();
+                if (!isLoading) {
+                    isLoading = true;
+                    setTimeout(() => {
+                        const extra = [];
+                        for(let i=0; i<10; i++) extra.push({ t: `Live Market Insight #${Math.floor(Math.random()*1000)}?`, c: "all", p: Math.floor(Math.random()*99), s: "CHANCE" });
+                        baseMarkets.push(...extra);
+                        render('all', true);
+                        isLoading = false;
+                    }, 800);
+                }
             }
         };
 
-        const supabase = window.supabase.createClient('URL', 'KEY');
+        function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
+        function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
+        async function performAuth() { location.reload(); }
+        async function checkSession() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                document.getElementById('logged-out-ui').style.display = 'none';
+                document.getElementById('logged-in-ui').style.display = 'flex';
+            }
+        }
+        function filter(cat, el) {
+            document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            render(cat);
+        }
+        function trade() { alert("Balance > 0 required."); }
+        window.onload = () => { render(); checkSession(); };
     </script>
 </body>
 </html>

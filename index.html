@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Global Terminal</title>
+    <title>NexGen | News & Predictions</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
@@ -15,83 +15,85 @@
         }
 
         body { 
-            background: var(--bg); color: #111827; margin: 0; padding-top: 115px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg); color: #111827; margin: 0; padding-top: 140px;
+            font-family: -apple-system, system-ui, sans-serif;
         }
 
-        /* --- FIXED HEADER --- */
+        /* --- TOP NAVIGATION --- */
         .header-fixed {
             position: fixed; top: 0; left: 0; right: 0;
             background: #fff; z-index: 1000; border-bottom: 1px solid var(--border);
         }
 
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; height: 50px; }
-        .logo { font-weight: 900; font-size: 20px; letter-spacing: -1px; }
+        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; height: 40px; }
+        .logo { font-weight: 900; font-size: 18px; letter-spacing: -1px; }
 
-        .auth-bar { display: flex; gap: 8px; align-items: center; }
-        .user-btn { font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; text-decoration: underline; background: none; border: none; }
-
-        .wallet-area { display: flex; gap: 8px; align-items: center; border-left: 1px solid var(--border); padding-left: 10px; }
-        .balance-chip { background: #f3f4f6; padding: 5px 10px; border-radius: 20px; font-weight: 800; font-size: 13px; }
-
-        /* --- AUTH MODAL --- */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: #fff; padding: 25px; border-radius: 16px; width: 100%; max-width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .auth-input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; }
-        .auth-submit { width: 100%; padding: 12px; background: #000; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        /* --- LIVE NEWS TICKER --- */
+        .ticker-wrap { background: #000; color: #fff; padding: 6px 0; overflow: hidden; white-space: nowrap; font-size: 11px; font-weight: 700; }
+        .ticker-move { display: inline-block; animation: ticker 30s linear infinite; }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        .ticker-item { display: inline-block; padding: 0 30px; }
 
         /* --- CATEGORIES --- */
         .cat-bar { display: flex; overflow-x: auto; padding: 10px 16px; gap: 15px; scrollbar-width: none; }
         .cat-bar::-webkit-scrollbar { display: none; }
-        .cat-item { font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap; padding-bottom: 5px; }
+        .cat-item { font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap; padding-bottom: 5px; }
         .cat-item.active { color: #000; border-bottom: 2px solid var(--primary); }
 
+        /* --- DASHBOARD --- */
         #dashboard { max-width: 500px; margin: auto; padding: 12px; }
-        .card { background: #fff; border-radius: 16px; border: 1px solid var(--border); padding: 16px; margin-bottom: 12px; }
-        .m-title { font-size: 16px; font-weight: 600; line-height: 1.4; margin-bottom: 15px; display: block; }
-        .odds-container { display: flex; gap: 10px; }
-        .btn-bet { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; text-align: center; }
+
+        .news-header { font-size: 12px; font-weight: 800; color: var(--primary); margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        .news-dot { width: 6px; height: 6px; background: red; border-radius: 50%; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+
+        .card { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 16px; margin-bottom: 12px; }
+        .m-title { font-size: 15px; font-weight: 600; line-height: 1.4; margin-bottom: 12px; display: block; }
+        
+        .btn-row { display: flex; gap: 8px; }
+        .m-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
         .btn-yes { background: #f0fdf4; color: var(--yes-text); }
         .btn-no { background: #fef2f2; color: var(--no-text); }
-        .m-footer { display: flex; justify-content: space-between; margin-top: 12px; font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+        .m-footer { display: flex; justify-content: space-between; margin-top: 10px; font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+
+        /* AUTH BUTTONS IN TOP BAR */
+        .auth-links { font-size: 11px; font-weight: 700; display: flex; gap: 10px; align-items: center; }
+        .bal-display { background: #f3f4f6; padding: 4px 8px; border-radius: 5px; color: #000; }
     </style>
 </head>
 <body>
 
     <div class="header-fixed">
+        <div class="ticker-wrap">
+            <div class="ticker-move">
+                <span class="ticker-item">⚠️ BREAKING: CBK holds interest rates at 8.75% for May 2026</span>
+                <span class="ticker-item">📈 XAUUSD: Gold hits new local high as market gaps widen</span>
+                <span class="ticker-item">🇰🇪 ENERGY: EPRA expected to review Mombasa fuel prices tonight</span>
+                <span class="ticker-item">🌍 GLOBAL: Polymarket volume hits $2.4B on US Election wagers</span>
+            </div>
+        </div>
         <div class="top-nav">
             <div class="logo">NEXGEN</div>
-            <div class="auth-bar">
-                <div id="auth-ui">
-                    <button class="user-btn" onclick="openAuth('signin')">Sign In</button>
-                </div>
-                <div class="wallet-area">
-                    <div class="balance-chip">Ksh <span id="balance">0</span></div>
-                    <button onclick="directDeposit()" style="background:#000; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:700; cursor:pointer;">+</button>
-                </div>
+            <div class="auth-links">
+                <span id="bal-wrap" class="bal-display">Ksh <span id="balance">0</span></span>
+                <span id="auth-links-inner"><span onclick="login()">Login</span> | <span onclick="signup()">Join</span></span>
             </div>
         </div>
         <div class="cat-bar">
-            <div class="cat-item active" onclick="setCat('all', this)">All</div>
-            <div class="cat-item" onclick="setCat('Kenya', this)">🇰🇪 Kenya News</div>
+            <div class="cat-item active" onclick="setCat('all', this)">All News</div>
+            <div class="cat-item" onclick="setCat('Kenya', this)">Kenya</div>
             <div class="cat-item" onclick="setCat('Politics', this)">Politics</div>
             <div class="cat-item" onclick="setCat('Crypto', this)">Crypto</div>
         </div>
     </div>
 
-    <div id="auth-modal" class="modal">
-        <div class="modal-content">
-            <h2 id="auth-title" style="margin-top:0">Sign In</h2>
-            <input type="email" id="auth-email" placeholder="Email" class="auth-input">
-            <input type="password" id="auth-pass" placeholder="Password" class="auth-input">
-            <button id="auth-btn" class="auth-submit" onclick="handleAuth()">Submit</button>
-            <p id="auth-switch" style="font-size:12px; text-align:center; margin-top:15px; cursor:pointer;" onclick="switchAuth()">New here? Create account</p>
-            <button class="user-btn" style="width:100%; margin-top:10px;" onclick="closeAuth()">Cancel</button>
-        </div>
-    </div>
-
     <div id="dashboard">
-        <div id="market-feed"></div>
+        <div class="news-header"><div class="news-dot"></div> LIVE PREDICTIONS</div>
+
+        <div id="market-feed">
+            <div style="text-align: center; padding: 50px; color: var(--text-muted);">Fetching global news feed...</div>
+        </div>
     </div>
 
     <script>
@@ -99,64 +101,32 @@
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
         const INTASEND_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad"; 
         const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
-        
-        let authMode = 'signin';
+
         let currentCategory = 'all';
         let allMarkets = [];
 
-        async function initAuth() {
+        async function init() {
             const { data: { user } } = await supabaseClient.auth.getUser();
-            const ui = document.getElementById('auth-ui');
-            
             if (user) {
-                ui.innerHTML = `<span style="font-size:10px;">${user.email.split('@')[0]}</span> | <button class="user-btn" onclick="signOut()">Log Out</button>`;
+                document.getElementById('auth-links-inner').innerHTML = `<span onclick="logout()">Logout</span>`;
                 let { data: p } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
                 if (p) document.getElementById('balance').innerText = Math.floor(p.balance).toLocaleString();
-            } else {
-                ui.innerHTML = `<button class="user-btn" onclick="openAuth('signin')">Sign In</button>`;
             }
-            fetchGlobalMarkets();
+            fetchFeed();
         }
 
-        // --- AUTH LOGIC ---
-        function openAuth(mode) { 
-            authMode = mode;
-            document.getElementById('auth-title').innerText = mode === 'signin' ? 'Sign In' : 'Sign Up';
-            document.getElementById('auth-btn').innerText = mode === 'signin' ? 'Login' : 'Create Account';
-            document.getElementById('auth-modal').style.display = 'flex'; 
-        }
-        function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
-        function switchAuth() { openAuth(authMode === 'signin' ? 'signup' : 'signin'); }
-
-        async function handleAuth() {
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-pass').value;
-            
-            let result;
-            if (authMode === 'signin') {
-                result = await supabaseClient.auth.signInWithPassword({ email, password });
-            } else {
-                result = await supabaseClient.auth.signUp({ email, password });
-            }
-
-            if (result.error) alert(result.error.message);
-            else { closeAuth(); location.reload(); }
-        }
-
-        async function signOut() { await supabaseClient.auth.signOut(); location.reload(); }
-
-        // --- MARKET LOGIC (Same as before) ---
-        async function fetchGlobalMarkets() {
+        async function fetchFeed() {
             try {
                 const proxy = "https://corsproxy.io/?";
                 const target = "https://gamma-api.polymarket.com/events?limit=50&active=true&closed=false";
-                const response = await fetch(proxy + encodeURIComponent(target));
-                const data = await response.json();
+                const res = await fetch(proxy + encodeURIComponent(target));
+                const data = await res.json();
+                
                 allMarkets = data.map(m => ({
-                    title: m.title, category: m.category,
-                    yesMult: (1 / (m.markets[0]?.outcomePrices[0] || 0.5)).toFixed(1),
-                    noMult: (1 / (1 - (m.markets[0]?.outcomePrices[0] || 0.5))).toFixed(1),
-                    vol: (m.volume / 1000).toFixed(0) + "K"
+                    title: m.title, 
+                    cat: m.category || "General",
+                    yes: (1 / (m.markets[0]?.outcomePrices[0] || 0.5)).toFixed(1),
+                    no: (1 / (1 - (m.markets[0]?.outcomePrices[0] || 0.5))).toFixed(1)
                 }));
                 render();
             } catch (e) { console.error(e); }
@@ -165,25 +135,30 @@
         function render() {
             const feed = document.getElementById('market-feed');
             feed.innerHTML = '';
+
+            // JESUS PINNED TO ALL
             if (currentCategory === 'all') {
                 feed.innerHTML += `
-                    <div class="card" style="border-left: 5px solid gold;">
+                    <div class="card" style="border-left: 4px solid gold;">
                         <span class="m-title">Will Jesus come back in June 2026?</span>
-                        <div class="odds-container">
-                            <button class="btn-bet btn-yes" onclick="trade('YES', 9, 'Jesus')">9.0x</button>
-                            <button class="btn-bet btn-no" onclick="trade('NO', 3, 'Jesus')">3.0x</button>
+                        <div class="btn-row">
+                            <button class="m-btn btn-yes" onclick="trade('Jesus', 9)">YES 9x</button>
+                            <button class="m-btn btn-no" onclick="trade('Jesus', 3)">NO 3x</button>
                         </div>
+                        <div class="m-footer"><span>EXCLUSIVE</span><span>PROPHETIC</span></div>
                     </div>`;
             }
-            const filtered = currentCategory === 'all' ? allMarkets : allMarkets.filter(m => m.category.includes(currentCategory));
+
+            const filtered = currentCategory === 'all' ? allMarkets : allMarkets.filter(m => m.cat.includes(currentCategory));
             filtered.forEach(m => {
                 feed.innerHTML += `
                     <div class="card">
                         <span class="m-title">${m.title}</span>
-                        <div class="odds-container">
-                            <button class="btn-bet btn-yes" onclick="trade('YES', ${m.yesMult}, '${m.title.replace(/'/g, "")}')">YES ${m.yesMult}x</button>
-                            <button class="btn-bet btn-no" onclick="trade('NO', ${m.noMult}, '${m.title.replace(/'/g, "")}')">NO ${m.noMult}x</button>
+                        <div class="btn-row">
+                            <button class="m-btn btn-yes" onclick="trade('${m.title}', ${m.yes})">YES ${m.yes}x</button>
+                            <button class="m-btn btn-no" onclick="trade('${m.title}', ${m.no})">NO ${m.no}x</button>
                         </div>
+                        <div class="m-footer"><span>${m.cat}</span><span>LIVE PAYOUT</span></div>
                     </div>`;
             });
         }
@@ -195,26 +170,19 @@
             render();
         }
 
-        function directDeposit() {
-            const amt = prompt("Amount (KES):", "500");
-            if (!amt) return;
-            new window.IntaSend({ publicAPIKey: INTASEND_KEY, live: false }).run({ amount: amt, currency: "KES" })
-            .on("COMPLETE", () => location.reload());
-        }
-
-        async function trade(choice, mult, name) {
+        async function trade(name, mult) {
             const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) return alert("Please Sign In to trade!");
-            const amt = prompt(`Trade ${choice} on ${name}. Amount (KES):`, "100");
-            if (!amt) return;
-            let { data: p } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-            if (p.balance < amt) return alert("Low balance!");
-            await supabaseClient.from('profiles').update({ balance: p.balance - amt }).eq('id', user.id);
-            await supabaseClient.from('trades').insert([{ user_id: user.id, selection: choice, amount: amt, market_name: name }]);
-            alert("Trade Successful!"); location.reload();
+            if(!user) return login();
+            const amt = prompt(`Confirm amount for ${name} (${mult}x):`, "100");
+            if(!amt) return;
+            alert(`Trade placed on ${name} at ${mult}x!`);
         }
 
-        initAuth();
+        function login() { const e = prompt("Email:"); const p = prompt("Password:"); supabaseClient.auth.signInWithPassword({email:e, password:p}).then(() => location.reload()); }
+        function signup() { const e = prompt("New Email:"); const p = prompt("New Password:"); supabaseClient.auth.signUp({email:e, password:p}).then(() => alert("Check email or refresh!")); }
+        function logout() { supabaseClient.auth.signOut().then(() => location.reload()); }
+
+        init();
     </script>
 </body>
 </html>

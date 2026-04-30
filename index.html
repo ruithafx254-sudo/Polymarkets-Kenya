@@ -3,195 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Executive Terminal</title>
+    <title>NexGen | Prediction Terminal</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
 
     <style>
         :root { 
-            --primary: #2ebd85; 
-            --withdraw: #f0b90b;
-            --bg: #0b0e11; 
-            --card-bg: #1e2329; 
-            --border: #363c4e; 
-            --text-main: #eaecef;
-            --text-muted: #848e9c;
-            --input-bg: #2b3139;
+            --primary: #2ebd85; --withdraw: #f0b90b; --bg: #0b0e11; 
+            --card-bg: #1e2329; --border: #363c4e; --text-main: #eaecef; --text-muted: #848e9c;
         }
-
-        body { 
-            background: var(--bg); 
-            color: var(--text-main); 
-            font-family: 'Inter', -apple-system, sans-serif; 
-            margin: 0; 
-            display: flex; 
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh; 
-            padding: 20px; 
-            box-sizing: border-box; 
-        }
-
-        #dashboard { width: 100%; max-width: 400px; animation: fadeIn 0.5s ease-out; }
-
-        /* Cards */
-        .card { 
-            background: var(--card-bg); 
-            border-radius: 16px; 
-            border: 1px solid var(--border); 
-            padding: 24px;
-            margin-bottom: 16px;
-        }
-
-        /* Header */
-        .header { display: flex; justify-content: space-between; align-items: center; }
-        .balance-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .balance-value { font-size: 28px; font-weight: 700; color: var(--primary); margin-top: 4px; }
-
-        /* Form Elements */
-        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 10px; text-align: left; }
-        input { 
-            width: 100%; 
-            padding: 16px; 
-            border-radius: 10px; 
-            border: 1px solid var(--border); 
-            background: var(--input-bg); 
-            color: white; 
-            font-size: 18px; 
-            margin-bottom: 15px; 
-            box-sizing: border-box;
-            text-align: center;
-        }
-
-        .btn { 
-            border: none; 
-            padding: 18px; 
-            width: 100%; 
-            border-radius: 10px; 
-            font-weight: 700; 
-            font-size: 16px; 
-            cursor: pointer; 
-            transition: 0.2s;
-        }
-        .btn-deposit { background: var(--primary); color: #000; }
-        .btn-withdraw { background: var(--withdraw); color: #000; margin-top: 5px; }
-        .btn:active { transform: scale(0.98); opacity: 0.8; }
-
-        /* Trust & Footer */
-        .trust-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center; }
-        .trust-badge { width: 100%; max-width: 250px; opacity: 0.7; }
-        .footer-note { font-size: 10px; color: var(--text-muted); margin-top: 8px; text-align: center; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { background: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; display: flex; justify-content: center; padding: 20px; }
+        #dashboard { width: 100%; max-width: 480px; }
+        .card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; }
         
-        .refresh-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; }
+        /* Balance Header */
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); }
+        .balance-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .balance-value { font-size: 26px; font-weight: 700; color: var(--primary); }
+
+        /* Market Styling */
+        .market-badge { background: rgba(46, 189, 133, 0.1); color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; display: inline-block; margin-bottom: 10px; }
+        .market-q { font-size: 17px; font-weight: 600; margin-bottom: 15px; color: #fff; line-height: 1.4; }
+        .odds-row { display: flex; gap: 10px; }
+        .btn-opt { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; text-align: center; background: #2b3139; color: white; }
+        .btn-opt:hover { border-color: var(--primary); background: rgba(46, 189, 133, 0.05); }
+        .odds-val { font-size: 18px; font-weight: 800; display: block; margin-top: 4px; }
+        .yes-text { color: var(--primary); }
+        .no-text { color: var(--withdraw); }
+
+        /* General UI */
+        input { width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; font-size: 16px; margin-bottom: 12px; box-sizing: border-box; text-align: center; }
+        .btn-full { width: 100%; padding: 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="dashboard">
-        <div class="card header">
-            <div>
-                <div class="balance-label">Available Balance</div>
-                <div class="balance-value">Ksh <span id="balance">0</span></div>
-            </div>
-            <button class="refresh-btn" onclick="initDashboard()">REFRESH</button>
+<div id="dashboard">
+    <div class="card header">
+        <div>
+            <div class="balance-label">Trading Balance</div>
+            <div class="balance-value">Ksh <span id="balance">0</span></div>
         </div>
+        <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:6px; border-radius:6px; cursor:pointer;">Refresh</button>
+    </div>
 
-        <div class="card">
-            <label>Fund Account (KES)</label>
-            <input type="number" id="dep-amt" value="500">
-            <button class="btn btn-deposit" id="deposit-btn" onclick="openCheckout()">Deposit</button>
-            
-            <div class="trust-section">
-                <img class="trust-badge" src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-v-light.png">
-                <div class="footer-note">PCI-DSS COMPLIANT ENCRYPTION</div>
+    <div class="card">
+        <span class="market-badge">GLOBAL / RELIGION</span>
+        <div class="market-q">Will Jesus come back in June 2026?</div>
+        <div class="odds-row">
+            <div class="btn-opt" onclick="placeTrade('YES', 9, 'Jesus 2026')">
+                <span style="font-size: 11px;">YES</span>
+                <span class="odds-val yes-text">9x</span>
             </div>
-        </div>
-
-        <div class="card">
-            <label>Withdraw to M-Pesa (KES)</label>
-            <input type="number" id="wit-amt" placeholder="Min. 50 KES">
-            <button class="btn btn-withdraw" onclick="requestWithdrawal()">Withdraw</button>
-            <div class="footer-note" style="margin-top: 12px;">Processed within 24 hours</div>
+            <div class="btn-opt" onclick="placeTrade('NO', 3, 'Jesus 2026')">
+                <span style="font-size: 11px;">NO</span>
+                <span class="odds-val no-text">3x</span>
+            </div>
         </div>
     </div>
 
-    <script>
-        const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
-        const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-        const INTASEND_KEY = "ISPubKey_live_95010572-41c2-46f6-ba0d-438fc260f1bd"; 
+    <div class="card">
+        <span class="market-badge">ECONOMY / KES</span>
+        <div class="market-q">Will the USD/KES exchange rate drop below 125 by July?</div>
+        <div class="odds-row">
+            <div class="btn-opt" onclick="placeTrade('YES', 2.5, 'USD Drop')">
+                <span style="font-size: 11px;">YES</span>
+                <span class="odds-val yes-text">2.5x</span>
+            </div>
+            <div class="btn-opt" onclick="placeTrade('NO', 1.8, 'USD Drop')">
+                <span style="font-size: 11px;">NO</span>
+                <span class="odds-val no-text">1.8x</span>
+            </div>
+        </div>
+    </div>
 
-        const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
+    <div class="card">
+        <label class="balance-label">Deposit via M-Pesa</label>
+        <input type="number" id="dep-amt" value="500">
+        <button class="btn-full" style="background: var(--primary); color: #000;" onclick="openCheckout()">Deposit Funds</button>
+    </div>
 
-        // --- DASHBOARD INIT ---
-        async function initDashboard() {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (user) {
-                let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-                if (profile) {
-                    document.getElementById('balance').innerText = Math.floor(profile.balance).toLocaleString();
-                } else {
-                    await supabaseClient.from('profiles').insert([{ id: user.id, balance: 0 }]);
-                }
-            } else {
-                await supabaseClient.auth.signInAnonymously();
-                initDashboard();
-            }
+    <div class="card">
+        <label class="balance-label">Withdraw Profits</label>
+        <input type="number" id="wit-amt" placeholder="Min 50 KES">
+        <button class="btn-full" style="background: var(--withdraw); color: #000;" onclick="requestWithdrawal()">Withdraw to M-Pesa</button>
+    </div>
+</div>
+
+<script>
+    const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
+    const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
+    const INTASEND_KEY = "ISPubKey_live_95010572-41c2-46f6-ba0d-438fc260f1bd"; 
+
+    const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
+
+    async function initDashboard() {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (user) {
+            let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
+            if (profile) document.getElementById('balance').innerText = Math.floor(profile.balance).toLocaleString();
+        } else {
+            await supabaseClient.auth.signInAnonymously();
+            initDashboard();
         }
+    }
 
-        // --- DEPOSIT (INTASEND) ---
-        function openCheckout() {
-            const amt = document.getElementById('dep-amt').value;
-            if (amt < 10) return alert("Min. deposit is Ksh 10");
+    async function placeTrade(choice, multiplier, marketName) {
+        const tradeAmt = prompt(`Trade on ${marketName}: ${choice} (${multiplier}x). Amount (KES):`, "100");
+        if (!tradeAmt || tradeAmt < 10) return;
 
-            const intasend = new window.IntaSend({
-                publicAPIKey: INTASEND_KEY,
-                live: true 
-            });
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
 
-            intasend.run({
-                amount: amt,
-                currency: "KES",
-                label: "NexGen Funding",
-                method: "M-PESA" 
-            })
-            .on("COMPLETE", async () => {
-                await updateBalance(amt, "ADD");
-                alert("Deposit successful!");
-            });
-        }
+        if (profile.balance < tradeAmt) return alert("Low balance. Please deposit via M-Pesa.");
 
-        // --- WITHDRAWAL (MANUAL APPROVAL) ---
-        async function requestWithdrawal() {
-            const amt = document.getElementById('wit-amt').value;
-            if (amt < 50) return alert("Min. withdrawal is Ksh 50");
+        const newBal = profile.balance - tradeAmt;
+        await supabaseClient.from('profiles').update({ balance: newBal }).eq('id', user.id);
+        await supabaseClient.from('trades').insert([{ user_id: user.id, selection: choice, amount: tradeAmt, market_name: marketName }]);
 
+        document.getElementById('balance').innerText = Math.floor(newBal).toLocaleString();
+        alert(`Order Placed! Potential Payout: Ksh ${tradeAmt * multiplier}`);
+    }
+
+    function openCheckout() {
+        const amt = document.getElementById('dep-amt').value;
+        const intasend = new window.IntaSend({ publicAPIKey: INTASEND_KEY, live: true });
+        intasend.run({ amount: amt, currency: "KES", label: "NexGen Funding", method: "M-PESA" })
+        .on("COMPLETE", async () => {
             const { data: { user } } = await supabaseClient.auth.getUser();
             let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
+            const updated = parseFloat(profile.balance) + parseFloat(amt);
+            await supabaseClient.from('profiles').update({ balance: updated }).eq('id', user.id);
+            initDashboard();
+        });
+    }
 
-            if (profile.balance < amt) return alert("Insufficient balance.");
-
-            // Deduct balance and notify
-            await updateBalance(amt, "SUBTRACT");
-            alert("Withdrawal request for Ksh " + amt + " submitted. Check your M-Pesa within 24hrs.");
-        }
-
-        // --- DATABASE LOGIC ---
-        async function updateBalance(amount, type) {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-            
-            let newBalance = (type === "ADD") 
-                ? parseFloat(profile.balance) + parseFloat(amount)
-                : parseFloat(profile.balance) - parseFloat(amount);
-
-            await supabaseClient.from('profiles').update({ balance: newBalance }).eq('id', user.id);
-            document.getElementById('balance').innerText = Math.floor(newBalance).toLocaleString();
-        }
-
+    async function requestWithdrawal() {
+        const amt = document.getElementById('wit-amt').value;
+        if (amt < 50) return alert("Min. withdrawal is 50 KES");
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
+        if (profile.balance < amt) return alert("Insufficient funds.");
+        const remaining = parseFloat(profile.balance) - parseFloat(amt);
+        await supabaseClient.from('profiles').update({ balance: remaining }).eq('id', user.id);
         initDashboard();
-    </script>
+        alert("Withdrawal request sent!");
+    }
+
+    initDashboard();
+</script>
 </body>
 </html>

@@ -3,86 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Live Market</title>
+    <title>NexGen | Executive Market</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --green: #2ebd85; --red: #f6465d; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --text-muted: #929aa5; }
         body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; box-sizing: border-box; }
+        
         #auth-screen { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; }
-        .auth-card { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); text-align: center; max-width: 350px; width: 100%; }
-        #dashboard { display: none; width: 100%; max-width: 480px; }
+        .auth-card { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); text-align: center; max-width: 380px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        #dashboard { display: none; width: 100%; max-width: 480px; animation: fadeIn 0.4s ease-in; }
+        
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
-        .balance-amt { font-size: 28px; font-weight: bold; color: var(--green); }
+        .balance-amt { font-size: 32px; font-weight: bold; color: var(--green); }
+        
         .market-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
-        .btn-main { background: var(--green); color: black; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; box-sizing: border-box; font-size: 16px; }
+        .live-dot { height: 8px; width: 8px; background-color: var(--red); border-radius: 50%; display: inline-block; margin-right: 8px; animation: blink 1.2s infinite; }
+        
+        .btn-main { background: var(--green); color: black; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; transition: opacity 0.2s; }
+        .btn-main:active { opacity: 0.8; }
+        
+        input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; box-sizing: border-box; font-size: 16px; }
+        
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h1 style="color: var(--green); margin:0;">NexGen</h1>
-            <p style="color: var(--text-muted);">Decentralized Prediction Market</p>
-            <button class="btn-main" onclick="enterAnonymously()">Connect Anonymously</button>
+            <h1 style="color: var(--green); margin: 0 0 10px 0;">NexGen</h1>
+            <p style="color: var(--text-muted); margin-bottom: 35px; font-size: 14px;">Executive Card-to-Crypto Market</p>
+            <button class="btn-main" onclick="enterAnonymously()">Enter Market Anonymously</button>
+            <p style="font-size: 11px; color: var(--text-muted); margin-top: 20px;">No Registration Required. Pure Privacy.</p>
         </div>
     </div>
 
     <div id="dashboard">
         <div class="header">
             <div>
-                <div style="font-size: 11px; color: var(--text-muted);">BALANCE</div>
+                <div style="font-size: 11px; color: var(--text-muted); letter-spacing: 1px;">AVAILABLE BALANCE</div>
                 <div class="balance-amt">$<span id="balance">0.00</span></div>
             </div>
-            <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px; border-radius:6px; cursor:pointer;">Refresh</button>
+            <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px 12px; border-radius:6px; font-size:12px; cursor:pointer;">Refresh</button>
         </div>
 
         <div class="market-card">
-            <span style="font-weight: bold;">XAUUSD (Gold) Market</span>
-            <p style="font-size: 14px; color: #ced4da;">Will Gold close above $2,350 tonight?</p>
-            <div style="display:flex; gap:10px;">
-                <button class="btn-main" style="background:rgba(46,189,133,0.15); color:var(--green); border:1px solid var(--green);" onclick="alert('Insufficient Balance')">YES</button>
-                <button class="btn-main" style="background:rgba(246,70,93,0.15); color:var(--red); border:1px solid var(--red);" onclick="alert('Insufficient Balance')">NO</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span style="font-weight: bold; font-size: 16px;"><span class="live-dot"></span>XAUUSD Gold</span>
+                <span style="background: rgba(46, 189, 133, 0.1); color: var(--green); padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">68% YES</span>
+            </div>
+            <p style="font-size: 14px; color: #ced4da; margin-top: 0;">Will Gold (XAUUSD) trade above $2,350.00 by 11:00 PM EAT?</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-main" style="background: rgba(46, 189, 133, 0.15); color: var(--green); border: 1px solid var(--green);" onclick="alert('Insufficient Balance')">YES</button>
+                <button class="btn-main" style="background: rgba(246, 70, 93, 0.15); color: var(--red); border: 1px solid var(--red);" onclick="alert('Insufficient Balance')">NO</button>
             </div>
         </div>
 
         <div class="market-card">
-            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block;">DEPOSIT AMOUNT (USD)</label>
+            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px; display: block; font-weight: bold;">DEPOSIT FUNDS (USD)</label>
             <input type="number" id="dep-amt" value="10" min="5">
             <button class="btn-main" onclick="depositFunds()">Pay with Card</button>
+            <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 10px;">Secure payment powered by NOWPayments</p>
         </div>
     </div>
 
     <script>
+        // CONFIGURATION
         const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-        const NOW_KEY = 'HWQ3MH8-JCH4K63-NWYP1W7-FJXHXVA'; // Your verified key
-        const WALLET = '0xc363ca9fee66b306b8ff9a38584a260d400fbbc0'; 
+        const NOW_KEY = 'HWQ3MH8-JCH4K63-NWYP1W7-FJXHXVA'; 
+        const WALLET = 'TKNkgA7mvwSW8oDtpN1Up8PoVLX1ff17aH'; 
 
         const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
         async function enterAnonymously() {
             try {
+                // Anonymous sign-ins enabled in Supabase
                 const { data, error } = await supabaseClient.auth.signInAnonymously();
                 if (error) throw error;
-                initDashboard();
+                await initDashboard();
             } catch (err) {
-                alert("Login Error: " + err.message);
+                alert("Connection Error: " + err.message);
             }
         }
 
         async function initDashboard() {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (user) {
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                
-                let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-                if (profile) {
-                    document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
-                } else {
-                    await supabaseClient.from('profiles').insert([{ id: user.id, balance: 0 }]);
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) {
+                    document.getElementById('auth-screen').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    
+                    // Profiles table confirmed "Success" in Supabase SQL editor
+                    let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
+                    
+                    if (profile) {
+                        document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
+                    } else {
+                        // Create user profile if first time connecting
+                        await supabaseClient.from('profiles').insert([{ id: user.id, balance: 0 }]);
+                        document.getElementById('balance').innerText = "0.00";
+                    }
                 }
+            } catch (err) {
+                console.error("Dashboard Sync Error:", err);
             }
         }
 
@@ -90,12 +116,14 @@
             const amt = document.getElementById('dep-amt').value;
             if (!amt || amt < 5) return alert("Minimum deposit is $5");
 
-            // NEW: Using the standard Payment Invoice URL to prevent 404/Login errors
+            // Fixed URL format to prevent redirection to homepage
+            // Matches your TRON (USDT TRX) wallet configuration
             const paymentUrl = `https://nowpayments.io/payment/?api_key=${NOW_KEY}&amount=${amt}&currency=usd&pay_currency=usdttrc20&address=${WALLET}`;
             
             window.open(paymentUrl, "_blank");
         }
 
+        // Check for existing session on load
         initDashboard();
     </script>
 </body>

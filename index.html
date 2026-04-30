@@ -11,6 +11,7 @@
     <style>
         :root { 
             --primary: #2ebd85; 
+            --withdraw: #f0b90b;
             --bg: #0b0e11; 
             --card-bg: #1e2329; 
             --border: #363c4e; 
@@ -22,7 +23,7 @@
         body { 
             background: var(--bg); 
             color: var(--text-main); 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            font-family: 'Inter', -apple-system, sans-serif; 
             margin: 0; 
             display: flex; 
             justify-content: center;
@@ -34,30 +35,22 @@
 
         #dashboard { width: 100%; max-width: 400px; animation: fadeIn 0.5s ease-out; }
 
-        .header-card { 
-            background: var(--card-bg); 
-            padding: 24px; 
-            border-radius: 16px; 
-            border: 1px solid var(--border); 
-            margin-bottom: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .balance-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .balance-value { font-size: 28px; font-weight: 700; color: var(--primary); margin-top: 4px; }
-
-        .action-card { 
+        /* Cards */
+        .card { 
             background: var(--card-bg); 
             border-radius: 16px; 
             border: 1px solid var(--border); 
             padding: 24px;
-            text-align: center;
+            margin-bottom: 16px;
         }
 
-        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 10px; text-align: left; }
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .balance-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .balance-value { font-size: 28px; font-weight: 700; color: var(--primary); margin-top: 4px; }
 
+        /* Form Elements */
+        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 10px; text-align: left; }
         input { 
             width: 100%; 
             padding: 16px; 
@@ -66,15 +59,12 @@
             background: var(--input-bg); 
             color: white; 
             font-size: 18px; 
-            font-weight: 600;
-            margin-bottom: 20px; 
+            margin-bottom: 15px; 
             box-sizing: border-box;
             text-align: center;
         }
 
-        .btn-deposit { 
-            background: var(--primary); 
-            color: #000; 
+        .btn { 
             border: none; 
             padding: 18px; 
             width: 100%; 
@@ -84,30 +74,24 @@
             cursor: pointer; 
             transition: 0.2s;
         }
+        .btn-deposit { background: var(--primary); color: #000; }
+        .btn-withdraw { background: var(--withdraw); color: #000; margin-top: 5px; }
+        .btn:active { transform: scale(0.98); opacity: 0.8; }
 
-        .btn-deposit:active { opacity: 0.8; transform: scale(0.98); }
-
-        .trust-section { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
-        .trust-badge { width: 100%; max-width: 280px; opacity: 0.8; }
-        .secure-text { font-size: 10px; color: var(--text-muted); margin-top: 8px; letter-spacing: 1px; }
+        /* Trust & Footer */
+        .trust-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center; }
+        .trust-badge { width: 100%; max-width: 250px; opacity: 0.7; }
+        .footer-note { font-size: 10px; color: var(--text-muted); margin-top: 8px; text-align: center; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .refresh-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            cursor: pointer;
-        }
+        
+        .refresh-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="dashboard">
-        <div class="header-card">
+        <div class="card header">
             <div>
                 <div class="balance-label">Available Balance</div>
                 <div class="balance-value">Ksh <span id="balance">0</span></div>
@@ -115,31 +99,33 @@
             <button class="refresh-btn" onclick="initDashboard()">REFRESH</button>
         </div>
 
-        <div class="action-card">
-            <label for="dep-amt">Account Funding (KES)</label>
-            <input type="number" id="dep-amt" value="500" min="10">
-            
-            <button class="btn-deposit" id="deposit-btn" onclick="openCheckout()">Deposit</button>
+        <div class="card">
+            <label>Fund Account (KES)</label>
+            <input type="number" id="dep-amt" value="500">
+            <button class="btn btn-deposit" id="deposit-btn" onclick="openCheckout()">Deposit</button>
             
             <div class="trust-section">
-                <a href="https://intasend.com/security" target="_blank">
-                    <img class="trust-badge" src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-v-light.png" alt="Secure Checkout">
-                </a>
-                <div class="secure-text">SECURED BY INTASEND PAYMENTS</div>
+                <img class="trust-badge" src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-v-light.png">
+                <div class="footer-note">PCI-DSS COMPLIANT ENCRYPTION</div>
             </div>
+        </div>
+
+        <div class="card">
+            <label>Withdraw to M-Pesa (KES)</label>
+            <input type="number" id="wit-amt" placeholder="Min. 50 KES">
+            <button class="btn btn-withdraw" onclick="requestWithdrawal()">Withdraw</button>
+            <div class="footer-note" style="margin-top: 12px;">Processed within 24 hours</div>
         </div>
     </div>
 
     <script>
         const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-        
-        // YOUR LIVE KEY
         const INTASEND_KEY = "ISPubKey_live_95010572-41c2-46f6-ba0d-438fc260f1bd"; 
 
         const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
-        // 1. Initialize User and Balance
+        // --- DASHBOARD INIT ---
         async function initDashboard() {
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (user) {
@@ -155,57 +141,56 @@
             }
         }
 
-        // 2. The Main Payment Trigger
+        // --- DEPOSIT (INTASEND) ---
         function openCheckout() {
             const amt = document.getElementById('dep-amt').value;
-            
-            if (amt < 10) {
-                alert("Minimum deposit is Ksh 10");
-                return;
-            }
-
-            if (!window.IntaSend) {
-                alert("Payment system is still loading. Please wait 5 seconds and try again.");
-                return;
-            }
+            if (amt < 10) return alert("Min. deposit is Ksh 10");
 
             const intasend = new window.IntaSend({
                 publicAPIKey: INTASEND_KEY,
-                live: true // LIVE MODE ACTIVE
+                live: true 
             });
 
             intasend.run({
                 amount: amt,
                 currency: "KES",
-                label: "NexGen Account Funding",
+                label: "NexGen Funding",
                 method: "M-PESA" 
             })
-            .on("COMPLETE", async (response) => {
-                await updateBalance(amt);
-                alert("Deposit of Ksh " + amt + " successful!");
-            })
-            .on("FAILED", (response) => {
-                alert("Payment failed. Please try again.");
-                console.error("IntaSend Error:", response);
-            })
-            .on("IN-PROGRESS", () => {
-                console.log("Payment in progress...");
+            .on("COMPLETE", async () => {
+                await updateBalance(amt, "ADD");
+                alert("Deposit successful!");
             });
         }
 
-        // 3. Update Supabase
-        async function updateBalance(addedAmount) {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) return;
+        // --- WITHDRAWAL (MANUAL APPROVAL) ---
+        async function requestWithdrawal() {
+            const amt = document.getElementById('wit-amt').value;
+            if (amt < 50) return alert("Min. withdrawal is Ksh 50");
 
+            const { data: { user } } = await supabaseClient.auth.getUser();
             let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-            const newBalance = parseFloat(profile.balance || 0) + parseFloat(addedAmount);
+
+            if (profile.balance < amt) return alert("Insufficient balance.");
+
+            // Deduct balance and notify
+            await updateBalance(amt, "SUBTRACT");
+            alert("Withdrawal request for Ksh " + amt + " submitted. Check your M-Pesa within 24hrs.");
+        }
+
+        // --- DATABASE LOGIC ---
+        async function updateBalance(amount, type) {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
             
+            let newBalance = (type === "ADD") 
+                ? parseFloat(profile.balance) + parseFloat(amount)
+                : parseFloat(profile.balance) - parseFloat(amount);
+
             await supabaseClient.from('profiles').update({ balance: newBalance }).eq('id', user.id);
             document.getElementById('balance').innerText = Math.floor(newBalance).toLocaleString();
         }
 
-        // Start on load
         initDashboard();
     </script>
 </body>

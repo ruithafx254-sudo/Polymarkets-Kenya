@@ -3,62 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Live Prediction Terminal</title>
+    <title>NexGen | Polymarket Mirror</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
+
     <style>
-        :root { --primary: #2ebd85; --bg: #ffffff; --border: #e5e7eb; --text: #111827; --text-muted: #6b7280; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding-top: 150px; font-family: -apple-system, sans-serif; overflow-x: hidden; }
+        :root { 
+            --primary: #2ebd85; --yes-bg: #e8f5e9; --yes-text: #2e7d32; 
+            --no-bg: #ffebee; --no-text: #c62828; --bg: #f9fafb; --border: #e5e7eb; --text-muted: #6b7280;
+        }
+
+        body { 
+            background: var(--bg); color: #111827; margin: 0; padding-top: 110px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
 
         /* --- STICKY NAV --- */
-        .fixed-nav { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 1000; border-bottom: 1px solid var(--border); }
-        .top-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
-        .logo { font-weight: 900; font-size: 24px; letter-spacing: -1.5px; }
-        .auth-bar { display: flex; gap: 10px; align-items: center; }
-        .btn { padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); background: #fff; }
-        .btn-dep { background: var(--primary); color: #fff; border: none; }
+        .master-nav {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: #fff; z-index: 1000; border-bottom: 1px solid var(--border);
+        }
 
-        /* --- CATEGORY SLIDER --- */
-        .cat-bar { display: flex; overflow-x: auto; padding: 10px 16px; gap: 20px; background: #fff; scrollbar-width: none; border-bottom: 1px solid var(--border); }
-        .cat-item { font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: 0.2s; }
+        .top-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+        .logo { font-weight: 900; font-size: 20px; letter-spacing: -1px; }
+
+        .auth-wallet { display: flex; align-items: center; gap: 8px; }
+        .btn-auth { border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; background: #fff; }
+        .btn-dep { background: var(--primary); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
+
+        .cat-bar { display: flex; overflow-x: auto; padding: 10px 16px; gap: 20px; scrollbar-width: none; border-top: 1px solid #f3f4f6; }
+        .cat-bar::-webkit-scrollbar { display: none; }
+        .cat-item { font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: 0.2s; }
         .cat-item.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 5px; }
 
+        /* --- AUTH MODAL --- */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-box { background: #fff; width: 100%; max-width: 320px; padding: 24px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-title { font-size: 18px; font-weight: 800; margin-top: 0; margin-bottom: 15px; }
+        .auth-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .auth-submit { width: 100%; padding: 12px; background: #000; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 15px; }
+        .auth-switch { font-size: 12px; text-align: center; margin-top: 15px; color: var(--text-muted); cursor: pointer; text-decoration: underline; }
+
         /* --- MARKET CARDS --- */
-        #dashboard { max-width: 520px; margin: auto; padding: 12px; }
-        .card { background: #fff; border-radius: 16px; border: 1px solid var(--border); padding: 16px; margin-bottom: 12px; transition: transform 0.1s; }
-        .card:active { transform: scale(0.98); }
-        .card-head { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .title { font-size: 15px; font-weight: 600; line-height: 1.4; flex: 1; padding-right: 10px; }
-        .prob-box { text-align: right; min-width: 50px; }
-        .prob-pct { font-size: 18px; font-weight: 800; color: #000; }
-        .prob-lbl { font-size: 10px; color: var(--text-muted); display: block; }
+        #dashboard { max-width: 500px; margin: auto; padding: 12px; }
+        .card { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card-head { display: flex; justify-content: space-between; margin-bottom: 12px; }
+        .m-title { font-size: 15px; font-weight: 700; line-height: 1.3; flex: 1; padding-right: 15px; color: #111; }
+        
+        .p-box { text-align: center; min-width: 50px; }
+        .p-val { font-size: 18px; font-weight: 800; display: block; }
+        .p-lbl { font-size: 11px; color: var(--text-muted); }
 
-        .btn-row { display: flex; gap: 8px; margin-top: 12px; }
-        .bet-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 14px; }
-        .yes { background: #e8f5e9; color: #2e7d32; }
-        .no { background: #ffebee; color: #c62828; }
+        .btn-row { display: flex; gap: 8px; }
+        .bet-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 14px; transition: 0.1s; }
+        .bet-btn:active { transform: scale(0.97); }
+        .btn-yes { background: var(--yes-bg); color: var(--yes-text); }
+        .btn-no { background: var(--no-bg); color: var(--no-text); }
 
-        .footer { display: flex; justify-content: space-between; margin-top: 12px; font-size: 11px; color: var(--text-muted); font-weight: 600; padding-top: 8px; border-top: 1px solid #f9fafb; }
-        .status-dot { width: 6px; height: 6px; background: #2ebd85; border-radius: 50%; display: inline-block; margin-right: 4px; box-shadow: 0 0 5px #2ebd85; }
+        .m-footer { display: flex; justify-content: space-between; margin-top: 12px; font-size: 12px; color: var(--text-muted); font-weight: 500; align-items: center; }
+        .live-dot { width: 8px; height: 8px; background: #e11d48; border-radius: 50%; display: inline-block; margin-right: 4px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div class="fixed-nav">
+    <div class="master-nav">
         <div class="top-row">
             <div class="logo">NEXGEN</div>
-            <div class="auth-bar">
-                <button class="btn" onclick="auth()">Sign In</button>
-                <div style="font-weight: 800; font-size: 13px;">Ksh <span id="bal">0</span></div>
-                <button class="btn btn-dep" onclick="deposit()">Deposit</button>
+            <div class="auth-wallet">
+                <div id="auth-ui" style="display:flex; gap:8px;">
+                    <button class="btn-auth" onclick="openAuth('login')">Sign In</button>
+                    <button class="btn-auth" onclick="openAuth('signup')">Sign Up</button>
+                </div>
+                <div id="wallet-ui" style="display:none; align-items:center; gap:8px;">
+                    <span style="font-size:13px; font-weight:800;">Ksh <span id="balance">0</span></span>
+                    <button class="btn-dep" onclick="deposit()">Deposit</button>
+                </div>
             </div>
         </div>
-        <div class="cat-bar" id="cat-bar">
+        <div class="cat-bar">
             <div class="cat-item active" onclick="setCat('all', this)">All</div>
             <div class="cat-item" onclick="setCat('Politics', this)">Politics</div>
             <div class="cat-item" onclick="setCat('Crypto', this)">Crypto</div>
             <div class="cat-item" onclick="setCat('Sports', this)">Sports</div>
             <div class="cat-item" onclick="setCat('Business', this)">Business</div>
-            <div class="cat-item" onclick="setCat('Science', this)">Science</div>
+        </div>
+    </div>
+
+    <div id="auth-modal" class="modal">
+        <div class="modal-box">
+            <h2 id="modal-title" class="modal-title">Sign In</h2>
+            <input type="email" id="email" class="auth-input" placeholder="Email Address">
+            <input type="password" id="password" class="auth-input" placeholder="Password">
+            <button id="auth-submit-btn" class="auth-submit" onclick="executeAuth()">Login</button>
+            <div class="auth-switch" onclick="toggleAuthMode()">Don't have an account? Sign Up</div>
+            <button class="btn-auth" style="width:100%; margin-top:10px;" onclick="closeAuth()">Cancel</button>
         </div>
     </div>
 
@@ -67,66 +107,124 @@
     </div>
 
     <script>
-        // 1. INSTANT DATA (May 2026 Specials) - This loads in 0ms
-        const instantItems = [
-            { t: "Will Jesus come back in June 2026?", c: "all", p: "11", v: "$420K", s: "PROPHETIC" },
-            { t: "Bitcoin (BTC) to hit $120,000 in May?", c: "Crypto", p: "59", v: "$14M", s: "USDC" },
-            { t: "Will Donald Trump extend Iran war deadline?", c: "Politics", p: "72", v: "$63M", s: "GEOPOLITICS" },
-            { t: "Will the AI Bubble burst by end of 2026?", c: "Business", p: "40", v: "$400B CapEx", s: "TECH" },
-            { t: "Will US interest rates be cut by 0.50% in June?", c: "Business", p: "68", v: "$5.4B", s: "FOMC" },
-            { t: "Will China invade Taiwan in 2026?", c: "Politics", p: "24", v: "$23M", s: "DEFENSE" },
-            { t: "Will Real Madrid win the 2026 Champions League?", c: "Sports", p: "58", v: "$890K", s: "FOOTBALL" }
-        ];
+        const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
+        const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
+        const INT_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad"; 
+        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
         let currentCat = 'all';
-        let globalMarkets = [];
+        let authMode = 'login';
+        
+        // 1. INSTANT DATA (Matches your screenshots exactly)
+        let liveData = [
+            { t: "James Comey sentenced to Prison in 2026?", c: "Politics", p: "9", v: "$169K Vol.", s: "chance", isLive: false },
+            { t: "BTC Up or Down 5m", c: "Crypto", p: "51", v: "LIVE", s: "Up", isLive: true },
+            { t: "West Bengal Legislative Assembly Election Winner", c: "Politics", p: "52", v: "$84K Vol.", s: "chance", isLive: false },
+            { t: "Will Jesus come back in June 2026?", c: "all", p: "11", v: "$420K Vol.", s: "chance", isLive: false },
+            { t: "Donald Trump to win 2024 Election?", c: "Politics", p: "52", v: "$150M Vol.", s: "chance", isLive: false },
+            { t: "Will the Fed cut interest rates in June?", c: "Business", p: "68", v: "$2.1M Vol.", s: "chance", isLive: false }
+        ];
 
-        // 2. RENDER ENGINE
+        // 2. CHECK LOGIN STATUS
+        async function initAuth() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                document.getElementById('auth-ui').style.display = 'none';
+                document.getElementById('wallet-ui').style.display = 'flex';
+                let { data: p } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
+                if (p) document.getElementById('balance').innerText = Math.floor(p.balance).toLocaleString();
+            } else {
+                document.getElementById('auth-ui').style.display = 'flex';
+                document.getElementById('wallet-ui').style.display = 'none';
+            }
+        }
+
+        // 3. AUTHENTICATION LOGIC
+        function openAuth(mode) {
+            authMode = mode;
+            document.getElementById('modal-title').innerText = mode === 'login' ? 'Sign In' : 'Create Account';
+            document.getElementById('auth-submit-btn').innerText = mode === 'login' ? 'Login' : 'Sign Up';
+            document.getElementById('auth-modal').style.display = 'flex';
+        }
+        function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
+        function toggleAuthMode() { openAuth(authMode === 'login' ? 'signup' : 'login'); }
+
+        async function executeAuth() {
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('password').value;
+            if (!e || !p) return alert("Please fill all fields.");
+
+            document.getElementById('auth-submit-btn').innerText = "Processing...";
+            let res;
+            if (authMode === 'login') res = await supabase.auth.signInWithPassword({ email: e, password: p });
+            else res = await supabase.auth.signUp({ email: e, password: p });
+
+            if (res.error) {
+                alert(res.error.message);
+                document.getElementById('auth-submit-btn').innerText = authMode === 'login' ? 'Login' : 'Sign Up';
+            } else {
+                closeAuth();
+                location.reload();
+            }
+        }
+
+        // 4. DEPOSIT LOGIC
+        function deposit() {
+            const amt = prompt("Enter amount to deposit via M-Pesa (KES):", "500");
+            if (!amt) return;
+            new window.IntaSend({ publicAPIKey: INT_KEY, live: false }).run({ amount: amt, currency: "KES" })
+            .on("COMPLETE", () => location.reload());
+        }
+
+        // 5. DATA STREAM & RENDER ENGINE
         function render() {
             const feed = document.getElementById('feed');
             feed.innerHTML = '';
-            
-            // Combine Instant + Live Global Data
-            const combined = [...instantItems, ...globalMarkets];
-            const filtered = currentCat === 'all' ? combined : combined.filter(m => m.c.toLowerCase().includes(currentCat.toLowerCase()));
+            const filtered = currentCat === 'all' ? liveData : liveData.filter(m => m.c.includes(currentCat));
 
             filtered.forEach(m => {
+                let footerLeft = m.isLive ? `<span style="color:#111; font-weight:800;"><div class="live-dot"></div> LIVE</span>` : `<span>${m.v}</span>`;
+                let btnYesText = m.s === "Up" ? "Up" : "Yes";
+                let btnNoText = m.s === "Up" ? "Down" : "No";
+
                 feed.innerHTML += `
                     <div class="card">
                         <div class="card-head">
-                            <div class="title">${m.t}</div>
-                            <div class="prob-box"><span class="prob-pct">${m.p}%</span><span class="prob-lbl">chance</span></div>
+                            <div class="m-title">${m.t}</div>
+                            <div class="p-box">
+                                <span class="p-val">${m.p}%</span>
+                                <span class="p-lbl">${m.s}</span>
+                            </div>
                         </div>
                         <div class="btn-row">
-                            <button class="bet-btn yes" onclick="trade()">Yes</button>
-                            <button class="bet-btn no" onclick="trade()">No</button>
+                            <button class="bet-btn btn-yes" onclick="checkBet()">${btnYesText}</button>
+                            <button class="bet-btn btn-no" onclick="checkBet()">${btnNoText}</button>
                         </div>
-                        <div class="footer">
-                            <span>Vol: ${m.v}</span>
-                            <span><div class="status-dot"></div> ${m.s}</span>
+                        <div class="m-footer">
+                            ${footerLeft}
+                            <span>🎁</span>
                         </div>
                     </div>
                 `;
             });
         }
 
-        // 3. BACKGROUND UPDATER (Fetches 5000+ items without freezing)
-        async function syncGlobal() {
+        async function fetchMoreNews() {
             try {
-                const proxy = "https://corsproxy.io/?";
-                const api = "https://gamma-api.polymarket.com/events?limit=100&active=true&closed=false";
-                const res = await fetch(proxy + encodeURIComponent(api));
+                // Silently fetches hundreds of items in the background
+                const res = await fetch("https://corsproxy.io/?https://gamma-api.polymarket.com/events?limit=300&active=true&closed=false");
                 const data = await res.json();
-                
-                globalMarkets = data.map(m => ({
-                    t: m.title,
-                    c: m.category || "General",
+                const newMarkets = data.map(m => ({
+                    t: m.title, c: m.category || "General",
                     p: Math.round((m.markets[0]?.outcomePrices[0] || 0.5) * 100),
-                    v: "$" + (m.volume > 1000000 ? (m.volume/1000000).toFixed(1) + "M" : (m.volume/1000).toFixed(0) + "K"),
-                    s: "USDC"
+                    v: "$" + (m.volume > 1000 ? (m.volume/1000).toFixed(0) + "K Vol." : m.volume),
+                    s: "chance", isLive: false
                 }));
-                render(); // Silent update when new news arrives
-            } catch (e) { console.log("Syncing..."); }
+                
+                // Add new data to the feed without deleting the hardcoded ones
+                liveData = [...liveData.slice(0, 6), ...newMarkets];
+                render(); 
+            } catch (e) { console.log("Stream waiting..."); }
         }
 
         function setCat(cat, el) {
@@ -136,15 +234,22 @@
             render();
         }
 
-        function auth() { alert("Signing into Supabase..."); }
-        function deposit() { alert("Redirecting to M-Pesa..."); }
-        function trade() { alert("Staking USDC... Order Confirmed."); }
+        async function checkBet() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                alert("Please Sign In or Sign Up to place a trade.");
+                openAuth('login');
+            } else {
+                prompt("Confirm Stake Amount (KES):", "100");
+            }
+        }
 
-        // Start everything
+        // Start App
         window.onload = () => {
-            render(); // Instant load
-            syncGlobal(); // Background sync
-            setInterval(syncGlobal, 10000); // Update every 10 seconds automatically
+            initAuth();
+            render();             // Loads instant hardcoded items in 0ms
+            fetchMoreNews();      // Fetches the bulk data immediately after
+            setInterval(fetchMoreNews, 15000); // Updates the feed every 15 seconds
         };
     </script>
 </body>

@@ -3,21 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen Markets | Development</title>
+    <title>NexGen Markets | Anonymous Trading</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #0b0e11; color: #ffffff; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { text-align: center; border: 1px solid #2b3139; padding: 40px; border-radius: 16px; background: #181a20; max-width: 400px; }
-        h1 { color: #2ebd85; margin-bottom: 10px; font-size: 24px; }
-        p { color: #929aa5; line-height: 1.6; }
-        .status-badge { background: rgba(46, 189, 133, 0.1); color: #2ebd85; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; display: inline-block; }
+        :root { --green: #2ebd85; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --text-muted: #929aa5; }
+        body { background: var(--bg); color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        /* Login UI */
+        #auth-screen { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; }
+        .auth-card { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 350px; width: 90%; }
+        
+        /* Dashboard UI */
+        #dashboard { display: none; width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; animation: fadeIn 0.5s ease; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
+        .balance-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .balance-amt { font-size: 28px; font-weight: bold; color: var(--green); margin-top: 5px; }
+        
+        /* Cards & Components */
+        .market-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .market-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: block; }
+        
+        /* Inputs & Buttons */
+        input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; font-size: 16px; box-sizing: border-box; }
+        input:focus { border-color: var(--green); outline: none; }
+        button { width: 100%; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 14px; }
+        .btn-primary { background: var(--green); color: black; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-secondary { background: transparent; color: white; border: 1px solid var(--border); width: auto; padding: 8px 15px; }
+        .btn-bet { flex: 1; background: #2b3139; color: white; border: 1px solid var(--border); margin-top: 10px; }
+        .btn-bet:hover { border-color: var(--green); }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="status-badge">Engine Status: Building</div>
-        <h1>NexGen Markets</h1>
-        <p>The first anonymous prediction market focused on Kenyan trends and global news.</p>
-        <p style="font-size: 14px; margin-top: 20px; color: #5e6673;">Next Step: Integrating Supabase Auth...</p>
+
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h1 style="color: var(--green); margin: 0 0 10px 0; font-size: 32px;">NexGen</h1>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Executive Card-to-Crypto Market</p>
+            <button class="btn-primary" onclick="enterAnonymously()">Enter Market Anonymously</button>
+            <p style="font-size: 11px; margin-top: 20px; color: #5e6673;">No Registration Required. Pure Privacy.</p>
+        </div>
     </div>
+
+    <div id="dashboard">
+        <div class="header">
+            <div>
+                <div class="balance-label">Available Balance</div>
+                <div class="balance-amt">$<span id="balance">0.00</span></div>
+            </div>
+            <button class="btn-secondary" onclick="initDashboard()">Refresh</button>
+        </div>
+
+        <div class="market-card">
+            <span class="market-title">Instant Card Deposit</span>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Convert Card Funds to USDT automatically.</p>
+            <input type="number" id="dep-amt" placeholder="Amount (USD)" value="10">
+            <button class="btn-primary" onclick="depositFunds()">Deposit via Card</button>
+        </div>
+
+        <div class="market-card">
+            <span class="market-title">Market: XAUUSD (Gold)</span>
+            <p style="font-size: 14px;">Will Gold trade above $2,350 by 11:00 PM EAT?</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-bet" onclick="alert('Bet Placed on YES')">YES</button>
+                <button class="btn-bet" onclick="onclick="alert('Bet Placed on NO')">NO</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
+        const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
+        const NOWPAY_API_KEY = 'HWQ3MH8-JCH4K63-NWYP1W7-FJXHXVA'; 
+        const MY_WALLET = '0xc363ca9fee66b306b8ff9a38584a260d400fbbc0'; 
+
+        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+
+        async function enterAnonymously() {
+            const { data, error } = await supabase.auth.signInAnonymously();
+            if (error) {
+                console.error(error);
+                return alert("Setup Error: Ensure 'Anonymous Sign-ins' are enabled in Supabase.");
+            }
+            initDashboard();
+        }
+
+        async function initDashboard() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                
+                let { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('balance')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (!profile && !error) {
+                    await supabase.from('profiles').insert([{ id: user.id, balance: 0 }]);
+                    document.getElementById('balance').innerText = "0.00";
+                } else if (profile) {
+                    document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
+                }
+            }
+        }
+
+        async function depositFunds() {
+            const amt = document.getElementById('dep-amt').value;
+            if (!amt || amt < 5) return alert("Minimum deposit is $5 USD");
+
+            const { data: { user } } = await supabase.auth.getUser();
+
+            const nowUrl = `https://nowpayments.io/fiat-external-on-ramp?` + 
+                `api_key=${NOWPAY_API_KEY}` + 
+                `&wallet_address=${MY_WALLET}` + 
+                `&fiat_amount=${amt}` + 
+                `&fiat_currency=usd` + 
+                `&track_id=${user.id}` + 
+                `&theme=dark`;
+
+            window.open(nowUrl, "_blank", "width=450,height=700");
+            alert("Deposit initiated. Please refresh balance once payment is confirmed.");
+        }
+
+        initDashboard();
+    </script>
 </body>
 </html>

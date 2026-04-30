@@ -38,7 +38,6 @@
             animation: fadeIn 0.5s ease-out; 
         }
 
-        /* Balance Header */
         .header-card { 
             background: var(--card-bg); 
             padding: 24px; 
@@ -53,7 +52,6 @@
         .balance-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
         .balance-value { font-size: 28px; font-weight: 700; color: var(--primary); margin-top: 4px; }
 
-        /* Action Card */
         .action-card { 
             background: var(--card-bg); 
             border-radius: 16px; 
@@ -74,7 +72,7 @@
             font-weight: 600;
             margin-bottom: 20px; 
             box-sizing: border-box;
-            transition: border-color 0.2s;
+            text-align: center;
         }
 
         input:focus { border-color: var(--primary); outline: none; }
@@ -89,12 +87,8 @@
             font-weight: 700; 
             font-size: 16px; 
             cursor: pointer; 
-            transition: transform 0.1s, opacity 0.2s;
         }
 
-        .btn-deposit:active { transform: scale(0.98); opacity: 0.9; }
-
-        /* Professional Badge Styling */
         .trust-section {
             margin-top: 24px;
             padding-top: 20px;
@@ -102,14 +96,13 @@
             text-align: center;
         }
 
-        .trust-badge { width: 100%; max-width: 280px; filter: grayscale(20%); opacity: 0.8; }
+        .trust-badge { width: 100%; max-width: 280px; opacity: 0.8; }
         .secure-link { 
             display: block; 
             color: var(--text-muted); 
             text-decoration: none; 
             font-size: 11px; 
             margin-top: 8px;
-            letter-spacing: 0.5px;
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -137,7 +130,7 @@
         </div>
 
         <div class="action-card">
-            <label for="dep-amt">Amount to fund (KES)</label>
+            <label for="dep-amt">Enter Deposit Amount (KES)</label>
             <input type="number" id="dep-amt" value="500" min="10">
             
             <button class="btn-deposit" onclick="openCheckout()">Deposit</button>
@@ -156,12 +149,13 @@
     <script>
         const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-        const INTASEND_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad"; 
+        
+        // YOUR LIVE KEY APPLIED
+        const INTASEND_KEY = "ISPubKey_live_95010572-41c2-46f6-ba0d-438fc260f1bd"; 
 
         const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
         async function initDashboard() {
-            // Check auth (assuming user is already logged in via your previous flow)
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (user) {
                 let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
@@ -169,7 +163,6 @@
                     document.getElementById('balance').innerText = Math.floor(profile.balance).toLocaleString();
                 }
             } else {
-                // If no user, trigger the sign-in
                 await supabaseClient.auth.signInAnonymously();
                 initDashboard();
             }
@@ -179,20 +172,24 @@
             const amt = document.getElementById('dep-amt').value;
             if (amt < 10) return alert("Minimum deposit is 10 KES");
 
+            // INITIALIZING LIVE INSTANCE
             const intasend = new window.IntaSend({
                 publicAPIKey: INTASEND_KEY,
-                live: false 
+                live: true 
             });
 
             intasend.run({
                 amount: amt,
                 currency: "KES",
-                label: "NexGen Account Funding",
+                label: "NexGen Funding",
                 method: "M-PESA" 
             })
             .on("COMPLETE", async (response) => {
                 await updateBalance(amt);
                 alert("Deposit of Ksh " + amt + " processed successfully.");
+            })
+            .on("FAILED", (response) => {
+                console.log("Payment Failed:", response);
             });
         }
 

@@ -3,40 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Prediction Market</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.js"></script>
+    <title>NexGen | Polymarket</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --green: #2ebd85; --red: #f6465d; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --text-muted: #929aa5; }
-        body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
+        body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 10px; }
         #auth-screen { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; }
-        .auth-card { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); text-align: center; max-width: 350px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
-        #dashboard { display: none; width: 100%; max-width: 480px; padding: 15px; box-sizing: border-box; }
-        
+        .auth-card { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); text-align: center; max-width: 350px; width: 95%; }
+        #dashboard { display: none; width: 100%; max-width: 480px; animation: fadeIn 0.5s ease; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
         .balance-amt { font-size: 28px; font-weight: bold; color: var(--green); }
-        .live-dot { height: 8px; width: 8px; background-color: var(--red); border-radius: 50%; display: inline-block; margin-right: 5px; animation: blink 1s infinite; }
-        
         .market-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
-        .market-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
-        .chance-pill { background: rgba(46, 189, 133, 0.1); color: var(--green); padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-        
+        .live-dot { height: 8px; width: 8px; background-color: var(--red); border-radius: 50%; display: inline-block; margin-right: 5px; animation: blink 1s infinite; }
         .bet-row { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-yes { flex: 1; background: rgba(46, 189, 133, 0.15); color: var(--green); border: 1px solid var(--green); padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; }
-        .btn-no { flex: 1; background: rgba(246, 70, 93, 0.15); color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; }
-        
+        .btn-yes { flex: 1; background: rgba(46, 189, 133, 0.1); color: var(--green); border: 1px solid var(--green); padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; }
+        .btn-no { flex: 1; background: rgba(246, 70, 93, 0.1); color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; }
         input { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; box-sizing: border-box; }
         .btn-main { background: var(--green); color: black; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
-
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h1 style="color: var(--green); margin:0;">NexGen</h1>
+            <h1 style="color: var(--green);">NexGen</h1>
             <p style="color: var(--text-muted); margin-bottom: 30px;">Anonymous Prediction Market</p>
             <button class="btn-main" onclick="enterAnonymously()">Connect Anonymously</button>
         </div>
@@ -45,91 +37,71 @@
     <div id="dashboard">
         <div class="header">
             <div>
-                <div style="font-size: 11px; color: var(--text-muted); letter-spacing: 1px;">AVAILABLE BALANCE</div>
+                <div style="font-size: 11px; color: var(--text-muted);">WALLET BALANCE</div>
                 <div class="balance-amt">$<span id="balance">0.00</span></div>
             </div>
-            <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px 12px; border-radius:6px; cursor:pointer; font-size:12px;">Refresh</button>
+            <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px; border-radius:6px;">Refresh</button>
         </div>
 
         <div class="market-card">
-            <div class="market-header">
-                <span style="font-weight: bold;"><span class="live-dot"></span>XAUUSD Gold Price</span>
-                <span class="chance-pill">68% Yes</span>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span style="font-weight: bold;"><span class="live-dot"></span>Gold (XAUUSD)</span>
+                <span style="color: var(--green); font-size: 12px; font-weight: bold;">68% YES</span>
             </div>
-            <p style="font-size: 14px; color: #ced4da;">Will Gold trade above $2,355.00 by midnight?</p>
-            
+            <p style="font-size: 14px; color: #ced4da;">Will Gold stay above $2,350 tonight?</p>
             <div class="bet-row">
-                <div class="btn-yes" onclick="handleBet('YES')">YES<br><span style="font-size:11px; opacity:0.8;">$0.68</span></div>
-                <div class="btn-no" onclick="handleBet('NO')">NO<br><span style="font-size:11px; opacity:0.8;">$0.32</span></div>
+                <div class="btn-yes" onclick="alert('Insufficient Balance')">YES<br><small>$0.68</small></div>
+                <div class="btn-no" onclick="alert('Insufficient Balance')">NO<br><small>$0.32</small></div>
             </div>
         </div>
 
         <div class="market-card">
-            <span style="display:block; margin-bottom:12px; font-weight:bold; font-size:14px;">Instant Deposit</span>
             <input type="number" id="dep-amt" placeholder="Amount (USD)" value="10">
-            <button class="btn-main" onclick="depositFunds()">Add Funds</button>
+            <button class="btn-main" onclick="depositFunds()">Deposit via Card</button>
         </div>
     </div>
 
     <script>
-        // Use your verified credentials
         const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-        const NOW_KEY = 'HWQ3MH8-JCH4K63-NWYP1W7-FJXHXVA'; 
+        const NOW_KEY = 'HWQ3MH8-JCH4K63-NWYP1W7-FJXHXVA'; // From your screenshot
         const WALLET = '0xc363ca9fee66b306b8ff9a38584a260d400fbbc0'; 
 
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+        const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
         async function enterAnonymously() {
             try {
-                const { data, error } = await supabase.auth.signInAnonymously();
+                // Modified syntax to ensure compatibility with mobile libraries
+                const { data, error } = await supabaseClient.auth.signInAnonymously();
                 if (error) throw error;
-                await initDashboard();
+                initDashboard();
             } catch (err) {
                 alert("Login Error: " + err.message);
             }
         }
 
         async function initDashboard() {
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user) {
-                    document.getElementById('auth-screen').style.display = 'none';
-                    document.getElementById('dashboard').style.display = 'block';
-                    
-                    let { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
-                    
-                    if (!profile) {
-                        await supabase.from('profiles').insert([{ id: user.id, balance: 0 }]);
-                        document.getElementById('balance').innerText = "0.00";
-                    } else {
-                        document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
-                    }
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                
+                let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
+                if (profile) {
+                    document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
                 }
-            } catch (err) {
-                console.error("Sync Error:", err);
-            }
-        }
-
-        function handleBet(side) {
-            const bal = parseFloat(document.getElementById('balance').innerText);
-            if (bal <= 0) {
-                alert("Insufficient funds. Please add balance to place a " + side + " bet.");
-            } else {
-                alert("Order submitted for " + side + " at current market price.");
             }
         }
 
         async function depositFunds() {
             const amt = document.getElementById('dep-amt').value;
-            const { data: { user } } = await supabase.auth.getUser();
-            if(!user) return alert("Please connect first.");
-            
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if(!user) return;
+            // NowPayments Integration
             const url = `https://nowpayments.io/fiat-external-on-ramp?api_key=${NOW_KEY}&wallet_address=${WALLET}&fiat_amount=${amt}&fiat_currency=usd&track_id=${user.id}&theme=dark`;
             window.open(url, "_blank");
         }
 
-        // Run on startup
         initDashboard();
     </script>
 </body>

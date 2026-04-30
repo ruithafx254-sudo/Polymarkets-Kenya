@@ -2,195 +2,136 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexGen | Master Terminal</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexGen | Live</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
-
     <style>
-        :root { --primary: #2ebd85; --bg: #f9fafb; --border: #e5e7eb; --text: #111827; --yes: #2e7d32; --no: #cf304a; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding-top: 110px; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        :root { --primary: #2ebd85; --bg: #f9fafb; --border: #e5e7eb; }
+        body { background: var(--bg); color: #111; margin: 0; padding-top: 100px; font-family: sans-serif; }
 
-        /* --- FIXED INTERFACE --- */
-        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; }
-        .logo { font-weight: 900; font-size: 20px; letter-spacing: -1px; }
-        .wallet-ui { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; }
-        .btn-dep { background: var(--primary); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 800; cursor: pointer; }
+        /* --- HEADER & NAVIGATION --- */
+        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; border-bottom: 1px solid var(--border); z-index: 10; }
+        .top-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; }
+        .logo { font-weight: 900; font-size: 22px; letter-spacing: -1px; }
+        .wallet { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 13px; }
+        .btn-dep { background: var(--primary); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
 
-        .cat-bar { display: flex; overflow-x: auto; padding: 10px 16px; gap: 18px; border-top: 1px solid #f3f4f6; scrollbar-width: none; }
-        .cat-item { font-size: 14px; font-weight: 600; color: #6b7280; cursor: pointer; white-space: nowrap; }
-        .cat-item.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 4px; }
+        .nav-tabs { display: flex; overflow-x: auto; padding: 10px; gap: 15px; border-top: 1px solid #eee; }
+        .tab { font-size: 14px; font-weight: 600; color: #668; cursor: pointer; white-space: nowrap; }
+        .tab.active { color: #000; border-bottom: 2px solid #000; }
 
-        /* --- INSTANT CARDS --- */
-        #dashboard { max-width: 500px; margin: auto; padding: 12px; min-height: 100vh; }
-        .card { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 16px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: 0.1s; }
-        .card-top { display: flex; justify-content: space-between; margin-bottom: 12px; }
-        .m-title { font-size: 15px; font-weight: 700; line-height: 1.3; flex: 1; padding-right: 12px; }
-        .p-box { text-align: center; }
-        .p-val { font-size: 18px; font-weight: 800; display: block; color: #000; }
-        .p-lbl { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
-
+        /* --- MARKET CARDS --- */
+        .container { max-width: 480px; margin: auto; padding: 10px; }
+        .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        .card-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; line-height: 1.3; }
+        .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .pct { font-size: 20px; font-weight: 800; }
         .btn-row { display: flex; gap: 8px; }
-        .m-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 14px; }
-        .btn-yes { background: #e8f5e9; color: var(--yes); }
-        .btn-no { background: #fef2f2; color: var(--no); }
-
-        .m-footer { display: flex; justify-content: space-between; margin-top: 12px; font-size: 11px; color: #9ca3af; font-weight: 600; border-top: 1px solid #f9fafb; padding-top: 8px; }
-        .live-tag { color: #e11d48; display: flex; align-items: center; gap: 4px; }
-        .dot { width: 6px; height: 6px; background: currentColor; border-radius: 50%; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .yes { background: #e8f5e9; color: #2e7d32; }
+        .no { background: #fef2f2; color: #cf304a; }
 
         /* --- AUTH MODAL --- */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-box { background: #fff; width: 100%; max-width: 340px; padding: 25px; border-radius: 20px; text-align: center; }
-        .auth-input { width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; box-sizing: border-box; outline: none; }
-        .auth-btn { width: 100%; padding: 14px; background: #000; color: #fff; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: #fff; padding: 25px; border-radius: 16px; width: 100%; max-width: 320px; text-align: center; }
+        .input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 12px; background: #000; color: #fff; border: none; border-radius: 8px; font-weight: 700; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="top-nav">
-            <div class="logo">NEXGEN</div>
-            <div class="wallet-ui">
-                <div id="auth-btns"><button onclick="toggleModal(true)" style="background:none; border:none; font-weight:800; font-size:12px; cursor:pointer;">SIGN IN</button></div>
-                <div id="user-wallet" style="display:none;">Ksh <span id="bal">0</span> <button class="btn-dep" onclick="deposit()">DEPOSIT</button></div>
+<div class="header">
+    <div class="top-row">
+        <div class="logo">NEXGEN</div>
+        <div class="wallet">
+            <div id="auth-ui"><button onclick="openModal()" style="border:1px solid #ccc; background:#fff; padding:5px 10px; border-radius:5px;">Sign In</button></div>
+            <div id="user-ui" style="display:none;">
+                Ksh <span id="balance">0</span>
+                <button class="btn-dep" onclick="alert('M-Pesa Ready')">Deposit</button>
             </div>
         </div>
-        <div class="cat-bar" id="cat-bar">
-            <div class="cat-item active" onclick="filter('all', this)">All</div>
-            <div class="cat-item" onclick="filter('Politics', this)">Politics</div>
-            <div class="cat-item" onclick="filter('Crypto', this)">Crypto</div>
-            <div class="cat-item" onclick="filter('Sports', this)">Sports</div>
-            <div class="cat-item" onclick="filter('Business', this)">Business</div>
-        </div>
+    </div>
+    <div class="nav-tabs">
+        <div class="tab active">All</div>
+        <div class="tab">Politics</div>
+        <div class="tab">Crypto</div>
+        <div class="tab">Sports</div>
+    </div>
+</div>
+
+<div class="container" id="feed">
     </div>
 
-    <div id="dashboard">
-        <div id="feed"></div>
-        <div id="loader-msg" style="text-align:center; color:#9ca3af; font-size:11px; padding:20px; font-weight:700;">SYCHRONIZING 5,000+ MARKETS...</div>
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3>Welcome</h3>
+        <input type="email" id="email" class="input" placeholder="Email">
+        <input type="password" id="pass" class="input" placeholder="Password">
+        <button class="btn-main" onclick="handleAuth()">Login / Sign Up</button>
+        <p onclick="closeModal()" style="font-size:12px; margin-top:15px; color:gray;">Close</p>
     </div>
+</div>
 
-    <div id="auth-modal" class="modal">
-        <div class="modal-box">
-            <h2 style="margin-top:0;">Secure Login</h2>
-            <input type="email" id="email" class="auth-input" placeholder="Email">
-            <input type="password" id="password" class="auth-input" placeholder="Password">
-            <button class="auth-btn" id="sub-btn" onclick="handleAuth()">LOGIN / SIGN UP</button>
-            <p onclick="toggleModal(false)" style="font-size:12px; color:#6b7280; margin-top:15px; cursor:pointer;">CLOSE</p>
-        </div>
-    </div>
+<script>
+    // 1. DATA: Simply add your news items here
+    const news = [
+        { title: "James Comey sentenced to Prison in 2026?", pct: "9", vol: "$171K" },
+        { title: "Will Jesus Christ return in June 2026?", pct: "11", vol: "$425K" },
+        { title: "Bitcoin to hit $100k this month?", pct: "58", vol: "LIVE" },
+        { title: "Kenya El Niño Flooding (May-July)?", pct: "84", vol: "Ksh 15M" },
+        { title: "Donald Trump to win 2024 Election?", pct: "52", vol: "$154M" }
+    ];
 
-    <script>
-        // --- 1. THE NEWS MATRIX ---
-        // This is the "Hard Inject" - it forces these to show before the API even wakes up.
-        let matrix = [
-            { t: "James Comey sentenced to Prison in 2026?", c: "Politics", p: "9", v: "$171K", s: "chance" },
-            { t: "Will Jesus Christ return in June 2026?", c: "all", p: "11", v: "$425K", s: "chance" },
-            { t: "BTC Up or Down next 5m?", c: "Crypto", p: "51", v: "LIVE", s: "Up" },
-            { t: "Donald Trump to win 2024 Election?", c: "Politics", p: "52", v: "$154M", s: "chance" },
-            { t: "Kenya El Niño Floods (May-July 2026)?", c: "all", p: "84", v: "Ksh 15M", s: "chance" },
-            { t: "Will the Fed cut interest rates in June?", c: "Business", p: "68", v: "$2.4M", s: "chance" }
-        ];
-
-        let currentCat = 'all';
-        let offset = 0;
-
-        // --- 2. THE RENDERER ---
-        function render() {
-            const feed = document.getElementById('feed');
-            const visible = currentCat === 'all' ? matrix : matrix.filter(m => m.c.toLowerCase().includes(currentCat.toLowerCase()));
-            
-            feed.innerHTML = visible.map(m => `
-                <div class="card">
-                    <div class="card-top">
-                        <div class="m-title">${m.t}</div>
-                        <div class="p-box"><span class="p-val">${m.p}%</span><span class="p-lbl">${m.s}</span></div>
-                    </div>
-                    <div class="btn-row">
-                        <button class="m-btn btn-yes" onclick="trade()">YES</button>
-                        <button class="m-btn btn-no" onclick="trade()">NO</button>
-                    </div>
-                    <div class="m-footer"><span>VOL: ${m.v}</span><span class="live-tag"><div class="dot"></div> LIVE</span></div>
+    // 2. RENDER: Draw the cards on the screen
+    function draw() {
+        const feed = document.getElementById('feed');
+        feed.innerHTML = news.map(m => `
+            <div class="card">
+                <div class="card-title">${m.title}</div>
+                <div class="price-row">
+                    <div class="pct">${m.pct}% <span style="font-size:10px; color:gray;">CHANCE</span></div>
+                    <div style="font-size:11px; font-weight:700; color:gray;">VOL: ${m.vol}</div>
                 </div>
-            `).join('');
+                <div class="btn-row">
+                    <button class="btn yes" onclick="bet()">Yes</button>
+                    <button class="btn no" onclick="bet()">No</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // 3. AUTH LOGIC
+    const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co';
+    const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
+    const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+
+    async function handleAuth() {
+        const e = document.getElementById('email').value;
+        const p = document.getElementById('pass').value;
+        let { data, error } = await supabase.auth.signInWithPassword({ email: e, password: p });
+        if (error) {
+            await supabase.auth.signUp({ email: e, password: p });
         }
+        location.reload();
+    }
 
-        // --- 3. THE 5,000 ITEM AUTO-COLLECTOR ---
-        async function buildMatrix() {
-            try {
-                // Collect 100 items every cycle until we hit 5,000
-                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://gamma-api.polymarket.com/events?limit=100&offset=${offset}&active=true`)}`);
-                const json = await res.json();
-                const raw = JSON.parse(json.contents);
-
-                if (raw && raw.length > 0) {
-                    const clean = raw.map(m => ({
-                        t: m.title, c: m.category || "General",
-                        p: Math.round((m.markets[0]?.outcomePrices[0] || 0.5) * 100),
-                        v: "$" + (m.volume > 1000 ? (m.volume/1000).toFixed(0) + "K" : m.volume),
-                        s: "chance"
-                    }));
-
-                    matrix = [...matrix, ...clean];
-                    offset += 100;
-                    render(); // Instantly update view as news pours in
-
-                    if (matrix.length < 5000) {
-                        document.getElementById('loader-msg').innerText = `SYNCHRONIZED: ${matrix.length} / 5000`;
-                        setTimeout(buildMatrix, 1000); // Wait 1 sec then grab next 100
-                    } else {
-                        document.getElementById('loader-msg').innerText = "FULL TERMINAL SYNCED (5,000+ NEWS ITEMS)";
-                    }
-                }
-            } catch (e) { setTimeout(buildMatrix, 5000); }
+    async function checkUser() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            document.getElementById('auth-ui').style.display = 'none';
+            document.getElementById('user-ui').style.display = 'flex';
+            let { data } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
+            if (data) document.getElementById('balance').innerText = data.balance;
         }
+    }
 
-        // --- 4. AUTH & DEPOSIT ---
-        const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co';
-        const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+    function openModal() { document.getElementById('modal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    function bet() { alert("Please login and deposit to trade."); }
 
-        async function handleAuth() {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('password').value;
-            if(!e || !p) return;
-            document.getElementById('sub-btn').innerText = "VERIFYING...";
-            
-            let { data, error } = await supabase.auth.signInWithPassword({ email: e, password: p });
-            if (error) {
-                let { error: err2 } = await supabase.auth.signUp({ email: e, password: p });
-                if (err2) return alert(err2.message);
-            }
-            location.reload();
-        }
+    draw();
+    checkUser();
+</script>
 
-        async function checkSession() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                document.getElementById('auth-btns').style.display = 'none';
-                document.getElementById('user-wallet').style.display = 'flex';
-                let { data } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
-                if (data) document.getElementById('bal').innerText = Math.floor(data.balance).toLocaleString();
-            }
-        }
-
-        function toggleModal(s) { document.getElementById('auth-modal').style.display = s ? 'flex' : 'none'; }
-        function filter(c, el) {
-            currentCat = c;
-            document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-            render();
-        }
-        function trade() { alert("Deposit Required to place Trade."); }
-        function deposit() { alert("M-Pesa Gateway Opening..."); }
-
-        // BOOT SEQUENCE
-        render();       // Load Matrix 0.1 instantly
-        checkSession(); // Login check
-        buildMatrix();  // Start the 5,000 news pump
-    </script>
 </body>
 </html>

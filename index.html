@@ -3,152 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexGen | Africa Terminal</title>
+    <title>NexGen | The Global Prediction Market</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
-    <style>
-        :root { --primary: #2ebd85; --border: #f1f5f9; --text: #0f172a; --yes: #f0fdf4; --no: #fef2f2; }
-        body { background: #f8fafc; color: var(--text); margin: 0; padding-top: 135px; font-family: -apple-system, sans-serif; }
-
-        /* HEADER */
-        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; }
-        .logo { font-weight: 900; font-size: 22px; letter-spacing: -1.2px; }
-        .nav-right { display: flex; align-items: center; gap: 8px; }
-        
-        .auth-group { display: flex; background: #f1f5f9; padding: 3px; border-radius: 12px; }
-        .btn-auth { font-size: 13px; font-weight: 700; border: none; background: transparent; padding: 8px 14px; border-radius: 10px; cursor: pointer; }
-        .btn-auth.active { background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-
-        #wallet-ui { display: none; align-items: center; gap: 8px; }
-        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 4px 4px 4px 12px; border-radius: 12px; gap: 10px; font-size: 14px; font-weight: 700; }
-        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 6px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; }
-        
-        .cat-bar { display: flex; overflow-x: auto; padding: 12px 16px; gap: 24px; background: #fff; border-top: 1px solid var(--border); }
-        .cat-item { font-size: 14px; font-weight: 600; color: #64748b; white-space: nowrap; cursor: pointer; border-bottom: 2px solid transparent; }
-        .cat-item.active { color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 4px; }
-
-        /* CARDS */
-        #dashboard { max-width: 500px; margin: auto; padding: 12px; }
-        .card { background: #fff; border-radius: 24px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; transition: transform 0.2s; }
-        .m-title { font-size: 17px; font-weight: 700; line-height: 1.4; margin-bottom: 16px; }
-        .stat-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
-        .p-val { font-size: 28px; font-weight: 900; }
-        .btn-row { display: flex; gap: 12px; }
-        .m-btn { flex: 1; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; }
-        .btn-yes { background: var(--yes); color: #166534; }
-        .btn-no { background: var(--no); color: #cf304a; }
-
-        /* MODALS */
-        #auth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: #fff; width: 100%; max-width: 360px; padding: 30px; border-radius: 32px; text-align: center; }
-        .m-input { width: 100%; padding: 16px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 16px; box-sizing: border-box; }
-    </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="top-nav">
-            <div class="logo">NEXGEN</div>
-            <div class="nav-right">
-                <div id="auth-ui" class="auth-group">
-                    <button class="btn-auth active" onclick="openAuth()">Sign In</button>
-                    <button class="btn-auth" onclick="openAuth()">Sign Up</button>
+    <header class="pm-header">
+        <div class="top-row">
+            <div class="brand">NEXGEN</div>
+            <div class="user-zone">
+                <div id="logged-out-ui">
+                    <button class="btn-secondary" onclick="toggleAuth('signin')">Log In</button>
+                    <button class="btn-primary" onclick="toggleAuth('signup')">Sign Up</button>
                 </div>
-                <div id="wallet-ui">
+                <div id="logged-in-ui" style="display: none;">
                     <div class="wallet-pill">
-                        Ksh <span id="balance">0.00</span>
-                        <button class="btn-deposit" id="d-btn">Deposit</button>
+                        <span class="balance">Ksh <span id="user-bal">0.00</span></span>
+                        <button id="intasend-btn" class="deposit-trigger">Deposit</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="cat-bar">
-            <div class="cat-item active" onclick="setCat('All')">All</div>
-            <div class="cat-item" onclick="setCat('Politics')">Politics</div>
-            <div class="cat-item" onclick="setCat('Crypto')">Crypto</div>
-            <div class="cat-item" onclick="setCat('Kenya')">Kenya</div>
-        </div>
-    </div>
+        <nav class="cat-nav">
+            <div class="cat-item active" onclick="filterCat('all')">All</div>
+            <div class="cat-item" onclick="filterCat('politics')">Politics</div>
+            <div class="cat-item" onclick="filterCat('crypto')">Crypto</div>
+            <div class="cat-item" onclick="filterCat('kenya')">Kenya</div>
+        </nav>
+    </header>
 
-    <div id="dashboard">
-        <div class="card" style="border: 2px solid var(--primary)">
-            <div class="m-title">Will Jesus come back in June 2026?</div>
-            <div class="stat-row">
-                <div><span class="p-val">11%</span> <span style="font-size:12px; color:#94a3b8; font-weight:700;">CHANCE</span></div>
-                <div style="font-size:11px; font-weight:700; color:#94a3b8;">VOL: $4.2M</div>
-            </div>
-            <div class="btn-row">
-                <button class="m-btn btn-yes" onclick="trade('YES')">YES x9</button>
-                <button class="m-btn btn-no" onclick="trade('NO')">NO x3</button>
-            </div>
-        </div>
-        <div id="feed-container"></div>
-    </div>
-
-    <div id="auth-modal">
-        <div class="modal-content">
-            <h2>Welcome to Terminal</h2>
-            <input type="email" class="m-input" placeholder="Email">
-            <input type="password" class="m-input" placeholder="Password">
-            <button class="m-btn btn-yes" style="width:100%; background:#000; color:#fff;" onclick="login()">Enter NexGen</button>
-        </div>
-    </div>
-
-    <script>
-        // 1. INTASEND
-        const is = new window.IntaSend({
-            public_key: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
-            live: false
-        });
-        is.buttons("#d-btn").on("complete", (r) => alert("Deposit of Ksh" + r.amount + " Complete"));
-
-        // 2. POLYMARKET REAL-TIME NEWS
-        const newsItems = [
-            "Kenya: Will KRA reprint certificates via mobile?",
-            "Crypto: Will Solana flip Ethereum by market cap?",
-            "Sports: Will Arsenal win the Premier League?",
-            "Kenya: Will M-Pesa launch a global gift card exchange?",
-            "Politics: Will there be a cabinet reshuffle this June?"
-        ];
-
-        function spawnNews() {
-            const feed = document.getElementById('feed-container');
-            const card = document.createElement('div');
-            card.className = 'card';
-            const topic = newsItems[Math.floor(Math.random()*newsItems.length)];
-            card.innerHTML = `
-                <div class="m-title">${topic}</div>
-                <div class="stat-row">
-                    <div><span class="p-val">${Math.floor(Math.random()*90)+5}%</span></div>
-                    <div style="font-size:11px; font-weight:700; color:#94a3b8;">VOL: LIVE</div>
+    <main id="app-shell">
+        <section id="market-feed">
+            <div class="market-card hero">
+                <img src="https://images.unsplash.com/photo-1544427928-c49cdfebf194?auto=format&fit=crop&w=500&q=80" alt="News" class="card-img">
+                <div class="card-content">
+                    <h3>Will Jesus come back in June 2026?</h3>
+                    <div class="market-stats">
+                        <span class="prob">11% <small>CHANCE</small></span>
+                        <span class="vol">$4.2M Vol.</span>
+                    </div>
+                    <div class="trade-actions">
+                        <button class="btn-yes" onclick="openOrder('Jesus Prediction', 'Yes', 11)">Yes 11¢</button>
+                        <button class="btn-no" onclick="openOrder('Jesus Prediction', 'No', 89)">No 89¢</button>
+                    </div>
                 </div>
-                <div class="btn-row">
-                    <button class="m-btn btn-yes" onclick="trade('YES')">YES</button>
-                    <button class="m-btn btn-no" onclick="trade('NO')">NO</button>
-                </div>`;
-            feed.prepend(card);
-            if(feed.children.length > 29) feed.removeChild(feed.lastChild);
-        }
-        setInterval(spawnNews, 1000);
+            </div>
+            
+            <div id="dynamic-news"></div>
+        </section>
+    </main>
 
-        // 3. UI HANDLERS
-        function openAuth() { document.getElementById('auth-modal').style.display='flex'; }
-        function login() { 
-            document.getElementById('auth-ui').style.display='none'; 
-            document.getElementById('wallet-ui').style.display='flex';
-            document.getElementById('auth-modal').style.display='none';
-            alert("Supabase Auth Connection Ready");
-        }
-        function trade(side) {
-            if(document.getElementById('wallet-ui').style.display !== 'flex') return openAuth();
-            alert("Order Slip Created: " + side);
-        }
-        function setCat(c) {
-            document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
-            event.target.classList.add('active');
-            alert("Filtering feed for: " + c);
-        }
-    </script>
+    <div id="order-sheet" class="sheet">
+        <div class="sheet-handle" onclick="closeOrder()"></div>
+        <div class="sheet-content">
+            <h2 id="order-market-name">Market Name</h2>
+            <div class="order-toggle">
+                <button id="order-yes-tab" class="tab active">Buy Yes</button>
+                <button id="order-no-tab" class="tab">Buy No</button>
+            </div>
+            <div class="input-group">
+                <label>Amount (Ksh)</label>
+                <input type="number" id="order-amount" placeholder="0.00">
+            </div>
+            <button class="btn-confirm" onclick="executeTrade()">Confirm Prediction</button>
+        </div>
+    </div>
+
+    <div id="auth-overlay" class="modal-overlay">
+        <div class="auth-modal">
+            <div class="modal-header">
+                <h2 id="auth-title">Welcome</h2>
+                <span class="close" onclick="toggleAuth()">✕</span>
+            </div>
+            <input type="email" id="email" placeholder="Email Address">
+            <input type="password" id="pass" placeholder="Password">
+            <button class="btn-confirm" onclick="processAuth()">Continue</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>

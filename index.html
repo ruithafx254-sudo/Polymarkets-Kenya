@@ -3,63 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | KES Executive Market</title>
+    <title>NexGen | Executive Terminal</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
 
     <style>
-        :root { --green: #2ebd85; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --text-muted: #929aa5; }
-        body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; box-sizing: border-box; }
-        #auth-screen { display: flex; justify-content: center; align-items: center; height: 90vh; width: 100%; }
-        #dashboard { display: none; width: 100%; max-width: 480px; animation: fadeIn 0.4s ease; width: 100%; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
-        .balance-amt { font-size: 32px; font-weight: bold; color: var(--green); }
-        .market-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; text-align: center; }
-        .btn-main { background: var(--green); color: black; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; margin-bottom: 20px; }
-        input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; box-sizing: border-box; font-size: 16px; text-align: center; }
-        
-        /* Badge Styling */
-        .trust-badge-container { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
-        .trust-badge-container img { max-width: 100%; height: auto; }
+        :root { 
+            --primary: #2ebd85; 
+            --bg: #0b0e11; 
+            --card-bg: #1e2329; 
+            --border: #363c4e; 
+            --text-main: #eaecef;
+            --text-muted: #848e9c;
+            --input-bg: #2b3139;
+        }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        body { 
+            background: var(--bg); 
+            color: var(--text-main); 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; 
+            padding: 20px; 
+            box-sizing: border-box; 
+        }
+
+        #dashboard { 
+            width: 100%; 
+            max-width: 400px; 
+            animation: fadeIn 0.5s ease-out; 
+        }
+
+        /* Balance Header */
+        .header-card { 
+            background: var(--card-bg); 
+            padding: 24px; 
+            border-radius: 16px; 
+            border: 1px solid var(--border); 
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .balance-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .balance-value { font-size: 28px; font-weight: 700; color: var(--primary); margin-top: 4px; }
+
+        /* Action Card */
+        .action-card { 
+            background: var(--card-bg); 
+            border-radius: 16px; 
+            border: 1px solid var(--border); 
+            padding: 24px;
+        }
+
+        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+
+        input { 
+            width: 100%; 
+            padding: 16px; 
+            border-radius: 10px; 
+            border: 1px solid var(--border); 
+            background: var(--input-bg); 
+            color: white; 
+            font-size: 18px; 
+            font-weight: 600;
+            margin-bottom: 20px; 
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        input:focus { border-color: var(--primary); outline: none; }
+
+        .btn-deposit { 
+            background: var(--primary); 
+            color: #000; 
+            border: none; 
+            padding: 18px; 
+            width: 100%; 
+            border-radius: 10px; 
+            font-weight: 700; 
+            font-size: 16px; 
+            cursor: pointer; 
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .btn-deposit:active { transform: scale(0.98); opacity: 0.9; }
+
+        /* Professional Badge Styling */
+        .trust-section {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .trust-badge { width: 100%; max-width: 280px; filter: grayscale(20%); opacity: 0.8; }
+        .secure-link { 
+            display: block; 
+            color: var(--text-muted); 
+            text-decoration: none; 
+            font-size: 11px; 
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .refresh-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen">
-        <div style="text-align:center;">
-            <h1 style="color: var(--green);">NexGen</h1>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">Direct KES M-Pesa Market</p>
-            <button class="btn-main" onclick="enterAnonymously()">Enter Dashboard</button>
-        </div>
-    </div>
-
     <div id="dashboard">
-        <div class="header">
+        <div class="header-card">
             <div>
-                <div style="font-size: 11px; color: var(--text-muted);">BALANCE (KES)</div>
-                <div class="balance-amt">Ksh <span id="balance">0</span></div>
+                <div class="balance-label">Available Balance</div>
+                <div class="balance-value">Ksh <span id="balance">0</span></div>
             </div>
-            <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px; border-radius:6px; font-size:10px;">REFRESH</button>
+            <button class="refresh-btn" onclick="initDashboard()">REFRESH</button>
         </div>
 
-        <div class="market-card">
-            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block; text-align: left;">DEPOSIT AMOUNT (KES)</label>
-            <input type="number" id="dep-amt" value="250" min="10">
+        <div class="action-card">
+            <label for="dep-amt">Amount to fund (KES)</label>
+            <input type="number" id="dep-amt" value="500" min="10">
             
-            <button class="btn-main" id="pay-btn" onclick="openCheckout()">Deposit with M-Pesa</button>
+            <button class="btn-deposit" onclick="openCheckout()">Deposit</button>
             
-            <div class="trust-badge-container">
-                <span style="display:block; text-align: center">        
-                    <a href="https://intasend.com/security" target="_blank">
-                        <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-v-light.png" width="375px" alt="IntaSend Secure Payments (PCI-DSS Compliant)">
-                    </a>        
-                    <strong>
-                        <a style="display: block; color: var(--text-muted); text-decoration: none; font-size: 0.8em; margin-top: 0.6em;" href="https://intasend.com/security" target="_blank">Secured by IntaSend Payments</a>
-                    </strong>        
-                </span>
+            <div class="trust-section">
+                <a href="https://intasend.com/security" target="_blank">
+                    <img class="trust-badge" src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-v-light.png" alt="Secure Checkout">
+                </a>
+                <a class="secure-link" href="https://intasend.com/security" target="_blank">
+                    &bull; PCI-DSS COMPLIANT ENCRYPTION &bull;
+                </a>
             </div>
         </div>
     </div>
@@ -67,35 +156,28 @@
     <script>
         const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-        
-        // TEST KEY
         const INTASEND_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad"; 
 
         const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
-        async function enterAnonymously() {
-            const { error } = await supabaseClient.auth.signInAnonymously();
-            if (!error) initDashboard();
-        }
-
         async function initDashboard() {
+            // Check auth (assuming user is already logged in via your previous flow)
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (user) {
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                
                 let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
                 if (profile) {
-                    document.getElementById('balance').innerText = Math.floor(profile.balance);
-                } else {
-                    await supabaseClient.from('profiles').insert([{ id: user.id, balance: 0 }]);
+                    document.getElementById('balance').innerText = Math.floor(profile.balance).toLocaleString();
                 }
+            } else {
+                // If no user, trigger the sign-in
+                await supabaseClient.auth.signInAnonymously();
+                initDashboard();
             }
         }
 
         function openCheckout() {
             const amt = document.getElementById('dep-amt').value;
-            if (amt < 10) return alert("Min deposit is 10 KES");
+            if (amt < 10) return alert("Minimum deposit is 10 KES");
 
             const intasend = new window.IntaSend({
                 publicAPIKey: INTASEND_KEY,
@@ -105,15 +187,12 @@
             intasend.run({
                 amount: amt,
                 currency: "KES",
-                label: "NexGen Topup",
+                label: "NexGen Account Funding",
                 method: "M-PESA" 
             })
             .on("COMPLETE", async (response) => {
                 await updateBalance(amt);
-                alert("Deposit of Ksh " + amt + " successful!");
-            })
-            .on("FAILED", (response) => {
-                console.log("Failed", response);
+                alert("Deposit of Ksh " + amt + " processed successfully.");
             });
         }
 
@@ -122,7 +201,7 @@
             let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
             const newBalance = parseFloat(profile.balance || 0) + parseFloat(addedAmount);
             await supabaseClient.from('profiles').update({ balance: newBalance }).eq('id', user.id);
-            document.getElementById('balance').innerText = Math.floor(newBalance);
+            document.getElementById('balance').innerText = Math.floor(newBalance).toLocaleString();
         }
 
         initDashboard();

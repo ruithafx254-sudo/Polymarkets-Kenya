@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Live M-Pesa Market</title>
+    <title>NexGen | Sandbox Test</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
     <style>
-        :root { --green: #2ebd85; --red: #f6465d; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --text-muted: #929aa5; }
+        :root { --green: #2ebd85; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --text-muted: #929aa5; }
         body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; box-sizing: border-box; }
         #auth-screen { display: flex; justify-content: center; align-items: center; height: 90vh; width: 100%; }
         #dashboard { display: none; width: 100%; max-width: 480px; animation: fadeIn 0.4s ease; }
@@ -23,16 +23,16 @@
 
     <div id="auth-screen">
         <div style="text-align:center;">
-            <h1 style="color: var(--green); margin-bottom: 5px;">NexGen</h1>
-            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">Executive Prediction Market</p>
-            <button class="btn-main" onclick="enterAnonymously()">Start Trading</button>
+            <h1 style="color: var(--green);">NexGen</h1>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Testing Sandbox Mode</p>
+            <button class="btn-main" onclick="enterAnonymously()">Enter Market</button>
         </div>
     </div>
 
     <div id="dashboard">
         <div class="header">
             <div>
-                <div style="font-size: 11px; color: var(--text-muted);">WALLET BALANCE (USD)</div>
+                <div style="font-size: 11px; color: var(--text-muted);">BALANCE (USD)</div>
                 <div class="balance-amt">$<span id="balance">0.00</span></div>
             </div>
             <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px; border-radius:6px; font-size:11px;">REFRESH</button>
@@ -41,15 +41,17 @@
         <div class="market-card">
             <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block;">DEPOSIT AMOUNT ($)</label>
             <input type="number" id="dep-amt" value="2" min="2">
-            <button class="btn-main" id="pay-btn" onclick="payWithMpesa()">Deposit with M-Pesa / Card</button>
-            <p id="status-msg" style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 15px;">Fast STK Push enabled. Minimum $2.</p>
+            <button class="btn-main" id="pay-btn" onclick="payWithMpesa()">Test Deposit Prompt</button>
+            <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 15px;">Currently in Sandbox Mode.</p>
         </div>
     </div>
 
     <script>
         const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-        const INTASEND_KEY = "ISPubKey_live_95010572-41c2-46f6-ba0d-438fc260f1bd"; 
+        
+        // YOUR TEST KEY
+        const INTASEND_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad"; 
 
         const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
@@ -63,54 +65,56 @@
             if (user) {
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
+                
                 let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
                 if (profile) {
                     document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
                 } else {
-                    // Create profile if it doesn't exist
+                    // Create profile if missing
                     await supabaseClient.from('profiles').insert([{ id: user.id, balance: 0 }]);
+                    document.getElementById('balance').innerText = "0.00";
                 }
             }
         }
 
         function payWithMpesa() {
             const amt = document.getElementById('dep-amt').value;
-            if (amt < 2) return alert("Minimum deposit is $2");
+            if (amt < 2) return alert("Min $2");
+
+            console.log("Launching IntaSend Sandbox...");
 
             const intasend = new window.IntaSend({
                 publicAPIKey: INTASEND_KEY,
-                live: true // LIVE MODE ENABLED
+                live: false // MUST BE FALSE FOR TEST KEY
             });
 
             intasend.run({
                 amount: amt,
                 currency: "USD",
-                label: "NexGen Wallet Topup"
+                label: "NexGen Sandbox Test"
             })
             .on("COMPLETE", async (response) => {
-                // If payment is successful, update Supabase
-                await updateSupabaseBalance(amt);
-                alert("Payment Successful! Your balance has been updated.");
+                console.log("Payment Success!", response);
+                await updateBalance(amt);
+                alert("Success! Check your balance.");
             })
-            .on("FAILED", () => {
-                alert("Payment failed or cancelled.");
+            .on("FAILED", (response) => {
+                console.log("Payment Failed", response);
+                alert("Payment cancelled.");
+            })
+            .on("IN-PROGRESS", () => {
+                console.log("Payment window is open...");
             });
         }
 
-        async function updateSupabaseBalance(amount) {
+        async function updateBalance(addedAmount) {
             const { data: { user } } = await supabaseClient.auth.getUser();
             let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
             
-            const currentBalance = parseFloat(profile.balance || 0);
-            const newBalance = currentBalance + parseFloat(amount);
+            const newBalance = parseFloat(profile.balance || 0) + parseFloat(addedAmount);
             
-            const { error } = await supabaseClient.from('profiles')
-                .update({ balance: newBalance })
-                .eq('id', user.id);
-            
-            if (!error) {
-                document.getElementById('balance').innerText = newBalance.toFixed(2);
-            }
+            await supabaseClient.from('profiles').update({ balance: newBalance }).eq('id', user.id);
+            document.getElementById('balance').innerText = newBalance.toFixed(2);
         }
 
         initDashboard();

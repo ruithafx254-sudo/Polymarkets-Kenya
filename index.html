@@ -9,29 +9,24 @@
         :root { --green: #2ebd85; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --text-muted: #929aa5; }
         body { background: var(--bg); color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* Login UI */
+        /* Login Screen */
         #auth-screen { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; }
         .auth-card { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 350px; width: 90%; }
         
-        /* Dashboard UI */
+        /* Dashboard Screen */
         #dashboard { display: none; width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; animation: fadeIn 0.5s ease; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
-        .balance-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .balance-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
         .balance-amt { font-size: 28px; font-weight: bold; color: var(--green); margin-top: 5px; }
         
-        /* Cards & Components */
+        /* UI Components */
         .market-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
         .market-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: block; }
-        
-        /* Inputs & Buttons */
         input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; font-size: 16px; box-sizing: border-box; }
-        input:focus { border-color: var(--green); outline: none; }
         button { width: 100%; padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 14px; }
         .btn-primary { background: var(--green); color: black; }
-        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn-secondary { background: transparent; color: white; border: 1px solid var(--border); width: auto; padding: 8px 15px; }
         .btn-bet { flex: 1; background: #2b3139; color: white; border: 1px solid var(--border); margin-top: 10px; }
-        .btn-bet:hover { border-color: var(--green); }
         
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -40,10 +35,10 @@
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h1 style="color: var(--green); margin: 0 0 10px 0; font-size: 32px;">NexGen</h1>
+            <h1 style="color: var(--green); margin-bottom: 10px;">NexGen</h1>
             <p style="color: var(--text-muted); margin-bottom: 30px;">Executive Card-to-Crypto Market</p>
             <button class="btn-primary" onclick="enterAnonymously()">Enter Market Anonymously</button>
-            <p style="font-size: 11px; margin-top: 20px; color: #5e6673;">No Registration Required. Pure Privacy.</p>
+            <p style="font-size: 11px; margin-top: 20px; color: #5e6673;">No Registration. Pure Privacy.</p>
         </div>
     </div>
 
@@ -58,17 +53,16 @@
 
         <div class="market-card">
             <span class="market-title">Instant Card Deposit</span>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Convert Card Funds to USDT automatically.</p>
             <input type="number" id="dep-amt" placeholder="Amount (USD)" value="10">
             <button class="btn-primary" onclick="depositFunds()">Deposit via Card</button>
         </div>
 
         <div class="market-card">
             <span class="market-title">Market: XAUUSD (Gold)</span>
-            <p style="font-size: 14px;">Will Gold trade above $2,350 by 11:00 PM EAT?</p>
+            <p style="font-size: 14px;">Will Gold trade above $2,350 tonight?</p>
             <div style="display: flex; gap: 10px;">
-                <button class="btn-bet" onclick="alert('Bet Placed on YES')">YES</button>
-                <button class="btn-bet" onclick="onclick="alert('Bet Placed on NO')">NO</button>
+                <button class="btn-bet" onclick="alert('Bet Placed: YES')">YES</button>
+                <button class="btn-bet" onclick="alert('Bet Placed: NO')">NO</button>
             </div>
         </div>
     </div>
@@ -83,53 +77,53 @@
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
         async function enterAnonymously() {
-            const { data, error } = await supabase.auth.signInAnonymously();
-            if (error) {
-                console.error(error);
-                return alert("Setup Error: Ensure 'Anonymous Sign-ins' are enabled in Supabase.");
+            try {
+                const { data, error } = await supabase.auth.signInAnonymously();
+                if (error) throw error;
+                initDashboard();
+            } catch (err) {
+                alert("Setup Error: " + err.message);
             }
-            initDashboard();
         }
 
         async function initDashboard() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                
-                let { data: profile, error } = await supabase
-                    .from('profiles')
-                    .select('balance')
-                    .eq('id', user.id)
-                    .single();
-                
-                if (!profile && !error) {
-                    await supabase.from('profiles').insert([{ id: user.id, balance: 0 }]);
-                    document.getElementById('balance').innerText = "0.00";
-                } else if (profile) {
-                    document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    document.getElementById('auth-screen').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    
+                    let { data: profile, error } = await supabase
+                        .from('profiles')
+                        .select('balance')
+                        .eq('id', user.id)
+                        .single();
+                    
+                    if (!profile && !error) {
+                        await supabase.from('profiles').insert([{ id: user.id, balance: 0 }]);
+                        document.getElementById('balance').innerText = "0.00";
+                    } else if (profile) {
+                        document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
+                    }
                 }
+            } catch (err) {
+                console.error("Dashboard error:", err);
             }
         }
 
         async function depositFunds() {
             const amt = document.getElementById('dep-amt').value;
-            if (!amt || amt < 5) return alert("Minimum deposit is $5 USD");
+            if (!amt || amt < 5) return alert("Minimum deposit is $5");
 
             const { data: { user } } = await supabase.auth.getUser();
 
             const nowUrl = `https://nowpayments.io/fiat-external-on-ramp?` + 
-                `api_key=${NOWPAY_API_KEY}` + 
-                `&wallet_address=${MY_WALLET}` + 
-                `&fiat_amount=${amt}` + 
-                `&fiat_currency=usd` + 
-                `&track_id=${user.id}` + 
-                `&theme=dark`;
+                `api_key=${NOWPAY_API_KEY}&wallet_address=${MY_WALLET}&fiat_amount=${amt}&fiat_currency=usd&track_id=${user.id}&theme=dark`;
 
-            window.open(nowUrl, "_blank", "width=450,height=700");
-            alert("Deposit initiated. Please refresh balance once payment is confirmed.");
+            window.open(nowUrl, "_blank");
         }
 
+        // Initialize on load
         initDashboard();
     </script>
 </body>

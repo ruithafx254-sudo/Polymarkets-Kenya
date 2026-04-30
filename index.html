@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Card-to-Crypto</title>
+    <title>NexGen | Live M-Pesa Market</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
     <style>
         :root { --green: #2ebd85; --red: #f6465d; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --text-muted: #929aa5; }
         body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; box-sizing: border-box; }
         #auth-screen { display: flex; justify-content: center; align-items: center; height: 90vh; width: 100%; }
         #dashboard { display: none; width: 100%; max-width: 480px; animation: fadeIn 0.4s ease; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); width: 100%; box-sizing: border-box; }
         .balance-amt { font-size: 32px; font-weight: bold; color: var(--green); }
-        .market-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .market-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; width: 100%; box-sizing: border-box; }
         .btn-main { background: var(--green); color: black; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; }
-        .btn-check { background: transparent; border: 1px solid var(--green); color: var(--green); margin-top: 10px; padding: 12px; }
         input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; box-sizing: border-box; font-size: 16px; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -24,33 +24,32 @@
     <div id="auth-screen">
         <div style="text-align:center;">
             <h1 style="color: var(--green); margin-bottom: 5px;">NexGen</h1>
-            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">Direct Card Payouts</p>
-            <button class="btn-main" onclick="enterAnonymously()">Enter Executive Market</button>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">Executive Prediction Market</p>
+            <button class="btn-main" onclick="enterAnonymously()">Start Trading</button>
         </div>
     </div>
 
     <div id="dashboard">
         <div class="header">
             <div>
-                <div style="font-size: 11px; color: var(--text-muted);">BALANCE</div>
+                <div style="font-size: 11px; color: var(--text-muted);">WALLET BALANCE (USD)</div>
                 <div class="balance-amt">$<span id="balance">0.00</span></div>
             </div>
-            <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px; border-radius:6px; font-size:12px;">Refresh</button>
+            <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px; border-radius:6px; font-size:11px;">REFRESH</button>
         </div>
 
         <div class="market-card">
-            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block;">DEPOSIT AMOUNT (USD)</label>
-            <input type="number" id="dep-amt" value="30" min="30">
-            <button class="btn-main" onclick="payWithCard()">Pay with Card</button>
-            <button class="btn-main btn-check" id="check-btn" onclick="verifyDeposit()">I've Paid - Check Balance</button>
-            <p id="status-msg" style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 12px;"></p>
+            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block;">DEPOSIT AMOUNT ($)</label>
+            <input type="number" id="dep-amt" value="2" min="2">
+            <button class="btn-main" id="pay-btn" onclick="payWithMpesa()">Deposit with M-Pesa / Card</button>
+            <p id="status-msg" style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 15px;">Fast STK Push enabled. Minimum $2.</p>
         </div>
     </div>
 
     <script>
         const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-        const WALLET = 'TKNkgA7mvwSW8oDtpN1Up8PoVLX1ff17aH'; 
+        const INTASEND_KEY = "ISPubKey_live_95010572-41c2-46f6-ba0d-438fc260f1bd"; 
 
         const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
@@ -65,59 +64,53 @@
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-                if (profile) document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
-            }
-        }
-
-        function payWithCard() {
-            const amt = document.getElementById('dep-amt').value;
-            if (amt < 30) return alert("Min $30");
-            const url = `https://guardarian.com/calculator/v1/?crypto_currencies_list=USDT_TRX&fiat_amount=${amt}&fiat_currency=USD&crypto_address=${WALLET}`;
-            window.open(url, "_blank");
-            document.getElementById('status-msg').innerText = "Guardarian opened. Pay, then click 'Check Balance' below.";
-        }
-
-        async function verifyDeposit() {
-            const btn = document.getElementById('check-btn');
-            const msg = document.getElementById('status-msg');
-            btn.disabled = true;
-            msg.innerText = "Scanning blockchain for your USDT...";
-
-            try {
-                // Check recent TRC20 transfers to your wallet
-                const res = await fetch(`https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=10&toAddress=${WALLET}`);
-                const data = await res.json();
-                
-                const { data: { user } } = await supabaseClient.auth.getUser();
-                let { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
-
-                // Find a successful USDT transfer that hasn't been claimed by this user yet
-                const payment = data.token_transfers.find(t => 
-                    t.symbol === 'USDT' && 
-                    t.transaction_id !== profile.last_transaction_id &&
-                    t.to_address === WALLET
-                );
-
-                if (payment) {
-                    const received = payment.quant / 1000000; // USDT decimals
-                    const newTotal = parseFloat(profile.balance || 0) + received;
-                    
-                    // Securely update Supabase
-                    await supabaseClient.from('profiles').update({ 
-                        balance: newTotal, 
-                        last_transaction_id: payment.transaction_id 
-                    }).eq('id', user.id);
-
-                    document.getElementById('balance').innerText = newTotal.toFixed(2);
-                    msg.style.color = "#2ebd85";
-                    msg.innerText = `Success! $${received} added automatically.`;
+                if (profile) {
+                    document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
                 } else {
-                    msg.innerText = "Payment not found yet. Network can take 2-5 mins.";
+                    // Create profile if it doesn't exist
+                    await supabaseClient.from('profiles').insert([{ id: user.id, balance: 0 }]);
                 }
-            } catch (e) {
-                msg.innerText = "Network busy. Try again shortly.";
             }
-            btn.disabled = false;
+        }
+
+        function payWithMpesa() {
+            const amt = document.getElementById('dep-amt').value;
+            if (amt < 2) return alert("Minimum deposit is $2");
+
+            const intasend = new window.IntaSend({
+                publicAPIKey: INTASEND_KEY,
+                live: true // LIVE MODE ENABLED
+            });
+
+            intasend.run({
+                amount: amt,
+                currency: "USD",
+                label: "NexGen Wallet Topup"
+            })
+            .on("COMPLETE", async (response) => {
+                // If payment is successful, update Supabase
+                await updateSupabaseBalance(amt);
+                alert("Payment Successful! Your balance has been updated.");
+            })
+            .on("FAILED", () => {
+                alert("Payment failed or cancelled.");
+            });
+        }
+
+        async function updateSupabaseBalance(amount) {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
+            
+            const currentBalance = parseFloat(profile.balance || 0);
+            const newBalance = currentBalance + parseFloat(amount);
+            
+            const { error } = await supabaseClient.from('profiles')
+                .update({ balance: newBalance })
+                .eq('id', user.id);
+            
+            if (!error) {
+                document.getElementById('balance').innerText = newBalance.toFixed(2);
+            }
         }
 
         initDashboard();

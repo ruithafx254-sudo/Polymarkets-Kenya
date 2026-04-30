@@ -32,11 +32,7 @@
             box-sizing: border-box; 
         }
 
-        #dashboard { 
-            width: 100%; 
-            max-width: 400px; 
-            animation: fadeIn 0.5s ease-out; 
-        }
+        #dashboard { width: 100%; max-width: 400px; animation: fadeIn 0.5s ease-out; }
 
         .header-card { 
             background: var(--card-bg); 
@@ -49,7 +45,7 @@
             align-items: center;
         }
 
-        .balance-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .balance-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
         .balance-value { font-size: 28px; font-weight: 700; color: var(--primary); margin-top: 4px; }
 
         .action-card { 
@@ -57,9 +53,10 @@
             border-radius: 16px; 
             border: 1px solid var(--border); 
             padding: 24px;
+            text-align: center;
         }
 
-        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 10px; text-align: left; }
 
         input { 
             width: 100%; 
@@ -75,8 +72,6 @@
             text-align: center;
         }
 
-        input:focus { border-color: var(--primary); outline: none; }
-
         .btn-deposit { 
             background: var(--primary); 
             color: #000; 
@@ -87,23 +82,14 @@
             font-weight: 700; 
             font-size: 16px; 
             cursor: pointer; 
+            transition: 0.2s;
         }
 
-        .trust-section {
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-            text-align: center;
-        }
+        .btn-deposit:active { opacity: 0.8; transform: scale(0.98); }
 
+        .trust-section { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
         .trust-badge { width: 100%; max-width: 280px; opacity: 0.8; }
-        .secure-link { 
-            display: block; 
-            color: var(--text-muted); 
-            text-decoration: none; 
-            font-size: 11px; 
-            margin-top: 8px;
-        }
+        .secure-text { font-size: 10px; color: var(--text-muted); margin-top: 8px; letter-spacing: 1px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -130,18 +116,16 @@
         </div>
 
         <div class="action-card">
-            <label for="dep-amt">Enter Deposit Amount (KES)</label>
+            <label for="dep-amt">Account Funding (KES)</label>
             <input type="number" id="dep-amt" value="500" min="10">
             
-            <button class="btn-deposit" onclick="openCheckout()">Deposit</button>
+            <button class="btn-deposit" id="deposit-btn" onclick="openCheckout()">Deposit</button>
             
             <div class="trust-section">
                 <a href="https://intasend.com/security" target="_blank">
                     <img class="trust-badge" src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-v-light.png" alt="Secure Checkout">
                 </a>
-                <a class="secure-link" href="https://intasend.com/security" target="_blank">
-                    &bull; PCI-DSS COMPLIANT ENCRYPTION &bull;
-                </a>
+                <div class="secure-text">SECURED BY INTASEND PAYMENTS</div>
             </div>
         </div>
     </div>
@@ -150,17 +134,20 @@
         const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
         
-        // YOUR LIVE KEY APPLIED
+        // YOUR LIVE KEY
         const INTASEND_KEY = "ISPubKey_live_95010572-41c2-46f6-ba0d-438fc260f1bd"; 
 
         const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
+        // 1. Initialize User and Balance
         async function initDashboard() {
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (user) {
                 let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
                 if (profile) {
                     document.getElementById('balance').innerText = Math.floor(profile.balance).toLocaleString();
+                } else {
+                    await supabaseClient.from('profiles').insert([{ id: user.id, balance: 0 }]);
                 }
             } else {
                 await supabaseClient.auth.signInAnonymously();
@@ -168,39 +155,57 @@
             }
         }
 
+        // 2. The Main Payment Trigger
         function openCheckout() {
             const amt = document.getElementById('dep-amt').value;
-            if (amt < 10) return alert("Minimum deposit is 10 KES");
+            
+            if (amt < 10) {
+                alert("Minimum deposit is Ksh 10");
+                return;
+            }
 
-            // INITIALIZING LIVE INSTANCE
+            if (!window.IntaSend) {
+                alert("Payment system is still loading. Please wait 5 seconds and try again.");
+                return;
+            }
+
             const intasend = new window.IntaSend({
                 publicAPIKey: INTASEND_KEY,
-                live: true 
+                live: true // LIVE MODE ACTIVE
             });
 
             intasend.run({
                 amount: amt,
                 currency: "KES",
-                label: "NexGen Funding",
+                label: "NexGen Account Funding",
                 method: "M-PESA" 
             })
             .on("COMPLETE", async (response) => {
                 await updateBalance(amt);
-                alert("Deposit of Ksh " + amt + " processed successfully.");
+                alert("Deposit of Ksh " + amt + " successful!");
             })
             .on("FAILED", (response) => {
-                console.log("Payment Failed:", response);
+                alert("Payment failed. Please try again.");
+                console.error("IntaSend Error:", response);
+            })
+            .on("IN-PROGRESS", () => {
+                console.log("Payment in progress...");
             });
         }
 
+        // 3. Update Supabase
         async function updateBalance(addedAmount) {
             const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) return;
+
             let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
             const newBalance = parseFloat(profile.balance || 0) + parseFloat(addedAmount);
+            
             await supabaseClient.from('profiles').update({ balance: newBalance }).eq('id', user.id);
             document.getElementById('balance').innerText = Math.floor(newBalance).toLocaleString();
         }
 
+        // Start on load
         initDashboard();
     </script>
 </body>

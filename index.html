@@ -3,123 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Polymarket Clone</title>
+    <title>NexGen | Global Terminal</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
 
     <style>
         :root { 
-            --primary: #2ebd85; 
-            --withdraw: #cf304a; /* Red for 'No' to match your screenshot */
-            --bg: #ffffff; 
-            --card-bg: #ffffff; 
-            --border: #e5e7eb; 
-            --text-main: #111827; 
-            --text-muted: #6b7280; 
-            --input-bg: #f9fafb;
+            --primary: #2ebd85; --no-red: #fef2f2; --no-text: #cf304a;
+            --yes-green: #f0fdf4; --yes-text: #166534;
+            --bg: #ffffff; --border: #e5e7eb; --text-muted: #6b7280;
         }
 
         body { 
-            background: var(--bg); color: var(--text-main); 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            margin: 0; padding-top: 70px;
-            display: flex; justify-content: center;
+            background: var(--bg); color: #111827; 
+            font-family: -apple-system, system-ui, sans-serif; 
+            margin: 0; padding-top: 110px; /* Space for nav + categories */
         }
 
-        /* --- NAVIGATION --- */
-        .top-nav {
+        /* --- FIXED HEADER --- */
+        .header-fixed {
             position: fixed; top: 0; left: 0; right: 0;
-            height: 60px; background: #fff;
-            border-bottom: 1px solid var(--border);
+            background: #fff; z-index: 1000; border-bottom: 1px solid var(--border);
+        }
+
+        .top-nav {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 16px; z-index: 1000;
+            padding: 10px 16px; height: 50px;
         }
 
-        .logo { font-weight: 800; font-size: 18px; color: #000; }
+        .logo { font-weight: 900; font-size: 18px; letter-spacing: -1px; }
 
-        .wallet-bar { display: flex; align-items: center; gap: 8px; }
-
-        .mini-balance { text-align: right; margin-right: 5px; }
-        .bal-amt { font-weight: 700; color: var(--primary); font-size: 14px; }
-        .bal-lbl { font-size: 9px; color: var(--text-muted); text-transform: uppercase; }
-
-        .btn-action { 
-            padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; 
-            cursor: pointer; border: 1px solid var(--border); transition: 0.2s;
+        /* --- CATEGORY SCROLL BAR --- */
+        .cat-bar {
+            display: flex; overflow-x: auto; padding: 10px 16px;
+            gap: 12px; white-space: nowrap; scrollbar-width: none;
         }
-        .btn-dep { background: #d1fae5; color: #065f46; border: none; }
-        .btn-wit { background: #f3f4f6; color: #374151; }
+        .cat-bar::-webkit-scrollbar { display: none; }
+        .cat-item {
+            font-size: 13px; font-weight: 600; color: var(--text-muted);
+            cursor: pointer; padding-bottom: 5px; border-bottom: 2px solid transparent;
+        }
+        .cat-item.active { color: #000; border-bottom-color: var(--primary); }
 
         /* --- DASHBOARD --- */
-        #dashboard { width: 100%; max-width: 480px; padding: 12px; }
+        #dashboard { max-width: 500px; margin: auto; padding: 12px; }
 
         .search-bar { 
-            width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border);
-            background: var(--input-bg); color: #000; font-size: 14px; outline: none; margin-bottom: 16px;
+            width: 100%; padding: 10px 14px; border-radius: 20px; border: 1px solid var(--border);
+            background: #f9fafb; font-size: 14px; margin-bottom: 16px; box-sizing: border-box;
         }
 
-        /* --- POLYMARKET STYLE CARDS --- */
+        /* --- POLYMARKET CARD STYLE --- */
         .card { 
-            background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); 
-            padding: 16px; margin-bottom: 12px; position: relative;
+            background: #fff; border-radius: 16px; border: 1px solid var(--border); 
+            padding: 16px; margin-bottom: 12px;
         }
 
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .m-title { font-size: 15px; font-weight: 600; line-height: 1.4; margin-bottom: 20px; flex: 1; padding-right: 10px;}
+        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .m-title { font-size: 15px; font-weight: 600; line-height: 1.4; flex: 1; padding-right: 15px; }
         
-        .percentage-box { text-align: right; min-width: 60px; }
-        .p-val { font-size: 18px; font-weight: 700; display: block; }
-        .p-lbl { font-size: 10px; color: var(--text-muted); }
+        .m-chance { text-align: right; }
+        .chance-val { font-size: 18px; font-weight: 800; display: block; }
+        .chance-lbl { font-size: 10px; color: var(--text-muted); text-transform: lowercase; }
 
-        .odds-row { display: flex; gap: 8px; }
-        .odds-btn { 
-            flex: 1; padding: 10px; border-radius: 8px; border: none;
-            font-weight: 700; font-size: 14px; cursor: pointer; text-align: center;
+        .btn-row { display: flex; gap: 8px; }
+        .m-btn { 
+            flex: 1; padding: 12px; border-radius: 10px; border: none;
+            font-weight: 700; font-size: 14px; cursor: pointer;
         }
-        .btn-yes { background: #e8f5e9; color: #2e7d32; }
-        .btn-no { background: #ffebee; color: #c62828; }
+        .btn-yes { background: var(--yes-green); color: var(--yes-text); }
+        .btn-no { background: var(--no-red); color: var(--no-text); }
 
-        .card-footer { display: flex; justify-content: space-between; margin-top: 12px; font-size: 11px; color: var(--text-muted); }
+        .m-footer { display: flex; justify-content: space-between; margin-top: 12px; font-size: 11px; color: var(--text-muted); }
+
+        /* WALLET BUTTONS */
+        .wallet-btn { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <nav class="top-nav">
-        <div class="logo">NEXGEN</div>
-        <div class="wallet-bar">
-            <div class="mini-balance">
-                <span class="bal-lbl">Balance</span>
-                <span class="bal-amt">Ksh <span id="balance">0</span></span>
+    <div class="header-fixed">
+        <div class="top-nav">
+            <div class="logo">NEXGEN</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <div style="text-align: right; line-height: 1;">
+                    <span style="font-size: 10px; color: var(--text-muted);">Ksh</span><br>
+                    <span id="balance" style="font-weight: 800;">0</span>
+                </div>
+                <button class="wallet-btn" style="background: #000; color: #fff;" onclick="directDeposit()">Deposit</button>
             </div>
-            <button class="btn-action btn-dep" onclick="directDeposit()">Deposit</button>
-            <button class="btn-action btn-wit" onclick="directWithdraw()">Withdraw</button>
         </div>
-    </nav>
+        <div class="cat-bar" id="cat-list">
+            <div class="cat-item active" onclick="loadCategory('all')">All</div>
+            <div class="cat-item" onclick="loadCategory('politics')">Politics</div>
+            <div class="cat-item" onclick="loadCategory('crypto')">Crypto</div>
+            <div class="cat-item" onclick="loadCategory('sports')">Sports</div>
+            <div class="cat-item" onclick="loadCategory('business')">Business</div>
+            <div class="cat-item" onclick="loadCategory('science')">Science</div>
+        </div>
+    </div>
 
     <div id="dashboard">
-        <input type="text" class="search-bar" id="market-search" placeholder="Search markets..." onkeyup="filterMarkets()">
+        <input type="text" class="search-bar" id="market-search" placeholder="Search world and Kenya events..." onkeyup="filterMarkets()">
 
-        <div class="card">
-            <div class="card-header">
+        <div class="card" style="border-left: 4px solid var(--primary);">
+            <div class="m-header">
                 <div class="m-title">Will Jesus come back in June 2026?</div>
-                <div class="percentage-box">
-                    <span class="p-val">11%</span>
-                    <span class="p-lbl">chance</span>
+                <div class="m-chance">
+                    <span class="chance-val">11%</span>
+                    <span class="chance-lbl">chance</span>
                 </div>
             </div>
-            <div class="odds-row">
-                <button class="odds-btn btn-yes" onclick="placeTrade('YES', 9, 'Jesus 2026')">Yes</button>
-                <button class="odds-btn btn-no" onclick="placeTrade('NO', 3, 'Jesus 2026')">No</button>
-            </div>
-            <div class="card-footer">
-                <span>$420K Vol.</span>
-                <span>🎁</span>
+            <div class="btn-row">
+                <button class="m-btn btn-yes" onclick="placeTrade('YES', 9, 'Jesus 2026')">Yes (9x)</button>
+                <button class="m-btn btn-no" onclick="placeTrade('NO', 3, 'Jesus 2026')">No (3x)</button>
             </div>
         </div>
 
         <div id="market-feed">
-            <div style="text-align: center; padding: 50px; color: var(--text-muted);">Syncing live markets...</div>
+            <div style="text-align: center; padding: 40px; color: var(--text-muted);">Loading Global Markets...</div>
         </div>
     </div>
 
@@ -130,6 +133,7 @@
 
         const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
         let liveMarkets = [];
+        let currentCat = 'all';
 
         async function initDashboard() {
             const { data: { user } } = await supabaseClient.auth.getUser();
@@ -146,88 +150,83 @@
         async function syncPolymarket() {
             try {
                 const proxy = "https://corsproxy.io/?";
-                const target = "https://gamma-api.polymarket.com/events?limit=10&active=true&closed=false";
+                const target = "https://gamma-api.polymarket.com/events?limit=30&active=true&closed=false";
                 const response = await fetch(proxy + encodeURIComponent(target));
                 liveMarkets = await response.json();
                 renderMarkets(liveMarkets);
-            } catch (e) { console.error("Sync Failed", e); }
+            } catch (e) { console.error("Sync Error", e); }
         }
 
         function renderMarkets(data) {
             const feed = document.getElementById('market-feed');
             feed.innerHTML = '';
-            data.forEach(m => {
+            
+            const filtered = currentCat === 'all' ? data : data.filter(m => m.category.toLowerCase().includes(currentCat));
+
+            filtered.forEach(m => {
                 const yesPrice = m.markets[0]?.outcomePrices[0] || 0.5;
                 const prob = (yesPrice * 100).toFixed(0);
+                
+                // Polymarket Payout Display logic
+                // If yesPrice is 0.5, it costs 0.5 to win 1.0 (2x)
                 const yesMult = (1 / yesPrice).toFixed(1);
                 const noMult = (1 / (1-yesPrice)).toFixed(1);
 
                 feed.innerHTML += `
                     <div class="card">
-                        <div class="card-header">
+                        <div class="m-header">
                             <div class="m-title">${m.title}</div>
-                            <div class="percentage-box">
-                                <span class="p-val">${prob}%</span>
-                                <span class="p-lbl">chance</span>
+                            <div class="m-chance">
+                                <span class="chance-val">${prob}%</span>
+                                <span class="chance-lbl">chance</span>
                             </div>
                         </div>
-                        <div class="odds-row">
-                            <button class="odds-btn btn-yes" onclick="placeTrade('YES', ${yesMult}, '${m.title.replace(/'/g, "")}')">Yes</button>
-                            <button class="odds-btn btn-no" onclick="placeTrade('NO', ${noMult}, '${m.title.replace(/'/g, "")}')">No</button>
+                        <div class="btn-row">
+                            <button class="m-btn btn-yes" onclick="placeTrade('YES', ${yesMult}, '${m.title.replace(/'/g, "")}')">Yes</button>
+                            <button class="m-btn btn-no" onclick="placeTrade('NO', ${noMult}, '${m.title.replace(/'/g, "")}')">No</button>
                         </div>
-                        <div class="card-footer">
+                        <div class="m-footer">
                             <span>$${Math.floor(m.volume/1000)}K Vol.</span>
-                            <span>🎁</span>
+                            <span style="color:var(--primary); font-weight:700;">${m.category}</span>
                         </div>
                     </div>
                 `;
             });
         }
 
-        // --- DIRECT PAYMENT LOGIC ---
-        function directDeposit() {
-            const amt = prompt("Enter amount to deposit (KES):", "500");
-            if (!amt || amt < 10) return;
-
-            const intasend = new window.IntaSend({ publicAPIKey: INTASEND_KEY, live: false });
-            intasend.run({ amount: amt, currency: "KES", label: "NexGen Deposit" })
-            .on("COMPLETE", async () => {
-                const { data: { user } } = await supabaseClient.auth.getUser();
-                let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-                await supabaseClient.from('profiles').update({ balance: parseFloat(profile.balance) + parseFloat(amt) }).eq('id', user.id);
-                location.reload();
-            });
-        }
-
-        async function directWithdraw() {
-            const amt = prompt("Enter amount to withdraw (KES):");
-            if (!amt || amt < 50) return alert("Min 50 KES");
-            
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-            
-            if (profile.balance < amt) return alert("Insufficient funds");
-            
-            await supabaseClient.from('profiles').update({ balance: profile.balance - amt }).eq('id', user.id);
-            alert("Withdrawal request sent to M-Pesa!");
-            location.reload();
-        }
-
-        async function placeTrade(choice, mult, name) {
-            const amt = prompt(`Confirm ${choice} on ${name}. Amount (KES):`, "100");
-            if (!amt || amt < 10) return;
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-            if (profile.balance < amt) return alert("Deposit more KES first!");
-            await supabaseClient.from('profiles').update({ balance: profile.balance - amt }).eq('id', user.id);
-            await supabaseClient.from('trades').insert([{ user_id: user.id, selection: choice, amount: amt, market_name: name }]);
-            location.reload();
+        function loadCategory(cat) {
+            currentCat = cat;
+            document.querySelectorAll('.cat-item').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            renderMarkets(liveMarkets);
         }
 
         function filterMarkets() {
             const term = document.getElementById('market-search').value.toLowerCase();
-            const filtered = liveMarkets.filter(m => m.title.toLowerCase().includes(term));
+            const filtered = liveMarkets.filter(m => m.title.toLowerCase().includes(term) || m.category.toLowerCase().includes(term));
             renderMarkets(filtered);
+        }
+
+        // --- PAYMENT & TRADING ---
+        function directDeposit() {
+            const amt = prompt("Deposit Amount (KES):", "500");
+            if (!amt) return;
+            const intasend = new window.IntaSend({ publicAPIKey: INTASEND_KEY, live: false });
+            intasend.run({ amount: amt, currency: "KES", label: "NexGen Funding" })
+            .on("COMPLETE", () => location.reload());
+        }
+
+        async function placeTrade(choice, mult, name) {
+            const amt = prompt(`Trade on ${name}\nOutcome: ${choice}\nConfirm Amount (KES):`, "100");
+            if (!amt) return;
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
+            if (profile.balance < amt) return alert("Insufficient Balance");
+            
+            await supabaseClient.from('profiles').update({ balance: profile.balance - amt }).eq('id', user.id);
+            await supabaseClient.from('trades').insert([{ user_id: user.id, selection: choice, amount: amt, market_name: name }]);
+            alert("Trade Successful!");
+            location.reload();
         }
 
         initDashboard();

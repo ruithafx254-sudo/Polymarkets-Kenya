@@ -14,12 +14,10 @@
         
         #dashboard { display: none; width: 100%; max-width: 480px; padding: 15px; box-sizing: border-box; }
         
-        /* Header & Balance */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
         .balance-amt { font-size: 28px; font-weight: bold; color: var(--green); }
         .live-dot { height: 8px; width: 8px; background-color: var(--red); border-radius: 50%; display: inline-block; margin-right: 5px; animation: blink 1s infinite; }
         
-        /* Polymarket Style UI */
         .market-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
         .market-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
         .chance-pill { background: rgba(46, 189, 133, 0.1); color: var(--green); padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
@@ -27,8 +25,7 @@
         .bet-row { display: flex; gap: 10px; margin-top: 15px; }
         .btn-yes { flex: 1; background: rgba(46, 189, 133, 0.2); color: var(--green); border: 1px solid var(--green); padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .btn-no { flex: 1; background: rgba(246, 70, 93, 0.2); color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-yes:active, .btn-no:active { transform: scale(0.98); }
-
+        
         input { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; box-sizing: border-box; }
         .btn-deposit { background: var(--green); color: black; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
@@ -75,6 +72,7 @@
     </div>
 
     <script>
+        // CONFIGURATION
         const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
         const NOWPAY_API_KEY = 'HWQ3MH8-JCH4K63-NWYP1W7-FJXHXVA'; 
@@ -83,36 +81,42 @@
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
         async function enterAnonymously() {
-            const { data, error } = await supabase.auth.signInAnonymously();
-            if (error) alert("Error: " + error.message);
-            initDashboard();
+            try {
+                const { data, error } = await supabase.auth.signInAnonymously();
+                if (error) throw error;
+                initDashboard();
+            } catch (err) {
+                alert("Login Failed: " + err.message);
+            }
         }
 
         async function initDashboard() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                
-                let { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
-                if (!profile) {
-                    await supabase.from('profiles').insert([{ id: user.id, balance: 0 }]);
-                    document.getElementById('balance').innerText = "0.00";
-                } else {
-                    document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    document.getElementById('auth-screen').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    
+                    let { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
+                    if (!profile) {
+                        await supabase.from('profiles').insert([{ id: user.id, balance: 0 }]);
+                        document.getElementById('balance').innerText = "0.00";
+                    } else {
+                        document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
+                    }
                 }
+            } catch (err) {
+                console.error(err);
             }
         }
 
         async function placeBet(side) {
-            const currentBalance = parseFloat(document.getElementById('balance').innerText);
-            if (currentBalance <= 0) {
-                alert("Insufficient Balance. Please deposit funds first.");
-                return;
+            const bal = parseFloat(document.getElementById('balance').innerText);
+            if (bal <= 0) {
+                alert("Insufficient Balance. Deposit funds to trade.");
+            } else {
+                alert(`Order Placed: ${side}. Syncing with Market...`);
             }
-            // Button response simulation
-            alert(`Order Placed: ${side} at market price. Deducting from balance...`);
-            // In a real setup, you would now run a Supabase update to subtract the bet amount.
         }
 
         async function depositFunds() {

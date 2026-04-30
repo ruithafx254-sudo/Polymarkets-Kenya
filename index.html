@@ -3,19 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Sandbox Test</title>
+    <title>NexGen | Multi-Payment Market</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
+
     <style>
         :root { --green: #2ebd85; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --text-muted: #929aa5; }
         body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; box-sizing: border-box; }
         #auth-screen { display: flex; justify-content: center; align-items: center; height: 90vh; width: 100%; }
-        #dashboard { display: none; width: 100%; max-width: 480px; animation: fadeIn 0.4s ease; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); width: 100%; box-sizing: border-box; }
+        #dashboard { display: none; width: 100%; max-width: 480px; animation: fadeIn 0.4s ease; width: 100%; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
         .balance-amt { font-size: 32px; font-weight: bold; color: var(--green); }
-        .market-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; width: 100%; box-sizing: border-box; }
-        .btn-main { background: var(--green); color: black; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; }
+        .market-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .btn-main { background: var(--green); color: black; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; }
+        .btn-main:active { opacity: 0.7; }
         input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; box-sizing: border-box; font-size: 16px; }
+        .payment-icons { display: flex; justify-content: center; gap: 10px; margin-top: 15px; opacity: 0.6; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -24,34 +28,41 @@
     <div id="auth-screen">
         <div style="text-align:center;">
             <h1 style="color: var(--green);">NexGen</h1>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">Testing Sandbox Mode</p>
-            <button class="btn-main" onclick="enterAnonymously()">Enter Market</button>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Executive Market Platform</p>
+            <button class="btn-main" onclick="enterAnonymously()">Enter Dashboard</button>
         </div>
     </div>
 
     <div id="dashboard">
         <div class="header">
             <div>
-                <div style="font-size: 11px; color: var(--text-muted);">BALANCE (USD)</div>
+                <div style="font-size: 11px; color: var(--text-muted);">ACCOUNT BALANCE</div>
                 <div class="balance-amt">$<span id="balance">0.00</span></div>
             </div>
-            <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px; border-radius:6px; font-size:11px;">REFRESH</button>
+            <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px; border-radius:6px; font-size:10px;">REFRESH</button>
         </div>
 
         <div class="market-card">
-            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block;">DEPOSIT AMOUNT ($)</label>
-            <input type="number" id="dep-amt" value="2" min="2">
-            <button class="btn-main" id="pay-btn" onclick="payWithMpesa()">Test Deposit Prompt</button>
-            <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 15px;">Currently in Sandbox Mode.</p>
+            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block;">DEPOSIT AMOUNT (USD)</label>
+            <input type="number" id="dep-amt" value="2.00" min="2">
+            
+            <button class="btn-main" id="pay-btn" onclick="openCheckout()">Deposit Now</button>
+            
+            <div class="payment-icons">
+                <span style="font-size: 10px;">M-Pesa • Visa • Mastercard • Bank</span>
+            </div>
+            
+            <p id="status-msg" style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 15px;">
+                Secure payment via IntaSend.
+            </p>
         </div>
     </div>
 
     <script>
+        // CONFIGURATION
         const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-        
-        // YOUR TEST KEY
-        const INTASEND_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad"; 
+        const INTASEND_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad"; // Your Test Key
 
         const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
@@ -70,40 +81,37 @@
                 if (profile) {
                     document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
                 } else {
-                    // Create profile if missing
                     await supabaseClient.from('profiles').insert([{ id: user.id, balance: 0 }]);
-                    document.getElementById('balance').innerText = "0.00";
                 }
             }
         }
 
-        function payWithMpesa() {
+        function openCheckout() {
             const amt = document.getElementById('dep-amt').value;
-            if (amt < 2) return alert("Min $2");
+            if (amt < 2) return alert("Min deposit is $2");
 
-            console.log("Launching IntaSend Sandbox...");
-
+            // IntaSend Initialization
             const intasend = new window.IntaSend({
                 publicAPIKey: INTASEND_KEY,
-                live: false // MUST BE FALSE FOR TEST KEY
+                live: false // SET TO TRUE FOR PRODUCTION
             });
 
             intasend.run({
                 amount: amt,
                 currency: "USD",
-                label: "NexGen Sandbox Test"
+                label: "NexGen Account Deposit",
+                // Leaving 'method' blank enables ALL payment methods automatically
+                comment: "Top-up for trading account"
             })
             .on("COMPLETE", async (response) => {
-                console.log("Payment Success!", response);
                 await updateBalance(amt);
-                alert("Success! Check your balance.");
+                alert("Payment Confirmed! Your balance has been updated.");
             })
             .on("FAILED", (response) => {
-                console.log("Payment Failed", response);
-                alert("Payment cancelled.");
+                console.log("Failed", response);
             })
             .on("IN-PROGRESS", () => {
-                console.log("Payment window is open...");
+                console.log("Checkout window active...");
             });
         }
 
@@ -113,7 +121,7 @@
             
             const newBalance = parseFloat(profile.balance || 0) + parseFloat(addedAmount);
             
-            await supabaseClient.from('profiles').update({ balance: newBalance }).eq('id', user.id);
+            await supabaseClient.from('profiles').update({ balance: newBalance }).eq( 'id', user.id);
             document.getElementById('balance').innerText = newBalance.toFixed(2);
         }
 

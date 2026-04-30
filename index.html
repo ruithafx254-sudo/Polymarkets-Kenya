@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Prediction Terminal</title>
+    <title>NexGen | Global Prediction Terminal</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
@@ -11,147 +11,217 @@
     <style>
         :root { 
             --primary: #2ebd85; --withdraw: #f0b90b; --bg: #0b0e11; 
-            --card-bg: #1e2329; --border: #363c4e; --text-main: #eaecef; --text-muted: #848e9c;
+            --card-bg: #1e2329; --border: #363c4e; --text-main: #eaecef; 
+            --text-muted: #848e9c; --input-bg: #2b3139;
         }
-        body { background: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; display: flex; justify-content: center; padding: 20px; }
-        #dashboard { width: 100%; max-width: 480px; }
-        .card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; }
-        
-        /* Balance Header */
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); }
-        .balance-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .balance-value { font-size: 26px; font-weight: 700; color: var(--primary); }
 
-        /* Market Styling */
-        .market-badge { background: rgba(46, 189, 133, 0.1); color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; display: inline-block; margin-bottom: 10px; }
-        .market-q { font-size: 17px; font-weight: 600; margin-bottom: 15px; color: #fff; line-height: 1.4; }
+        body { 
+            background: var(--bg); color: var(--text-main); 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            margin: 0; padding-top: 80px; /* Offset for fixed header */
+            display: flex; justify-content: center;
+        }
+
+        /* --- TOP NAV BAR --- */
+        .top-nav {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: 70px; background: rgba(11, 14, 17, 0.95);
+            backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 1000;
+        }
+
+        .logo { font-weight: 800; font-size: 20px; color: var(--primary); letter-spacing: -1px; }
+
+        .wallet-bar { display: flex; align-items: center; gap: 12px; }
+
+        .mini-balance { text-align: right; margin-right: 10px; }
+        .bal-amt { font-weight: 700; color: var(--primary); display: block; font-size: 14px; }
+        .bal-lbl { font-size: 9px; color: var(--text-muted); text-transform: uppercase; }
+
+        .btn-sm { 
+            padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; 
+            cursor: pointer; border: none; transition: 0.2s;
+        }
+        .btn-dep { background: var(--primary); color: #000; }
+        .btn-wit { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+
+        /* --- CONTENT --- */
+        #dashboard { width: 100%; max-width: 500px; padding: 10px; }
+
+        .search-container { margin-bottom: 20px; }
+        .search-bar { 
+            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border);
+            background: var(--card-bg); color: white; font-size: 14px; outline: none;
+        }
+
+        .card { 
+            background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); 
+            padding: 20px; margin-bottom: 16px; transition: 0.3s;
+        }
+        .card:hover { border-color: var(--primary); }
+
+        .m-tag { font-size: 9px; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .m-title { font-size: 16px; font-weight: 600; line-height: 1.4; margin-bottom: 15px; }
+
         .odds-row { display: flex; gap: 10px; }
-        .btn-opt { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; text-align: center; background: #2b3139; color: white; }
-        .btn-opt:hover { border-color: var(--primary); background: rgba(46, 189, 133, 0.05); }
-        .odds-val { font-size: 18px; font-weight: 800; display: block; margin-top: 4px; }
-        .yes-text { color: var(--primary); }
-        .no-text { color: var(--withdraw); }
+        .odds-btn { 
+            flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
+            background: var(--input-bg); color: white; cursor: pointer; text-align: center;
+        }
+        .odds-val { display: block; font-size: 18px; font-weight: 800; margin-top: 4px; }
+        .p-vol { font-size: 10px; color: var(--text-muted); margin-top: 12px; }
 
-        /* General UI */
-        input { width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; font-size: 16px; margin-bottom: 12px; box-sizing: border-box; text-align: center; }
-        .btn-full { width: 100%; padding: 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
+        /* Modal for Deposit/Withdraw */
+        .modal { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            z-index: 2000; align-items: center; justify-content: center;
+        }
+        .modal-content { background: var(--card-bg); padding: 30px; border-radius: 20px; width: 90%; max-width: 350px; }
     </style>
 </head>
 <body>
 
-<div id="dashboard">
-    <div class="card header">
-        <div>
-            <div class="balance-label">Trading Balance</div>
-            <div class="balance-value">Ksh <span id="balance">0</span></div>
+    <nav class="top-nav">
+        <div class="logo">NEXGEN</div>
+        <div class="wallet-bar">
+            <div class="mini-balance">
+                <span class="bal-lbl">Balance</span>
+                <span class="bal-amt">Ksh <span id="balance">0</span></span>
+            </div>
+            <button class="btn-sm btn-dep" onclick="toggleModal('dep-modal')">Deposit</button>
+            <button class="btn-sm btn-wit" onclick="toggleModal('wit-modal')">Withdraw</button>
         </div>
-        <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:6px; border-radius:6px; cursor:pointer;">Refresh</button>
-    </div>
+    </nav>
 
-    <div class="card">
-        <span class="market-badge">GLOBAL / RELIGION</span>
-        <div class="market-q">Will Jesus come back in June 2026?</div>
-        <div class="odds-row">
-            <div class="btn-opt" onclick="placeTrade('YES', 9, 'Jesus 2026')">
-                <span style="font-size: 11px;">YES</span>
-                <span class="odds-val yes-text">9x</span>
-            </div>
-            <div class="btn-opt" onclick="placeTrade('NO', 3, 'Jesus 2026')">
-                <span style="font-size: 11px;">NO</span>
-                <span class="odds-val no-text">3x</span>
-            </div>
+    <div id="dashboard">
+        <div class="search-container">
+            <input type="text" class="search-bar" id="market-search" placeholder="Search Polymarket questions..." onkeyup="filterMarkets()">
+        </div>
+
+        <div id="market-feed">
+            <div style="text-align: center; padding: 50px; color: var(--text-muted);">Syncing with Polymarket API...</div>
         </div>
     </div>
 
-    <div class="card">
-        <span class="market-badge">ECONOMY / KES</span>
-        <div class="market-q">Will the USD/KES exchange rate drop below 125 by July?</div>
-        <div class="odds-row">
-            <div class="btn-opt" onclick="placeTrade('YES', 2.5, 'USD Drop')">
-                <span style="font-size: 11px;">YES</span>
-                <span class="odds-val yes-text">2.5x</span>
-            </div>
-            <div class="btn-opt" onclick="placeTrade('NO', 1.8, 'USD Drop')">
-                <span style="font-size: 11px;">NO</span>
-                <span class="odds-val no-text">1.8x</span>
-            </div>
+    <div id="dep-modal" class="modal" onclick="closeOnOverlay(event)">
+        <div class="modal-content">
+            <h3 style="margin-top:0">Deposit via M-Pesa</h3>
+            <input type="number" id="dep-amt" value="500" style="width:100%; padding:15px; margin:20px 0; border-radius:10px; border:1px solid var(--border); background:#000; color:#fff; text-align:center;">
+            <button class="btn-sm btn-dep" style="width:100%; padding:15px; font-size:14px;" onclick="openCheckout()">Confirm Deposit</button>
         </div>
     </div>
 
-    <div class="card">
-        <label class="balance-label">Deposit via M-Pesa</label>
-        <input type="number" id="dep-amt" value="500">
-        <button class="btn-full" style="background: var(--primary); color: #000;" onclick="openCheckout()">Deposit Funds</button>
+    <div id="wit-modal" class="modal" onclick="closeOnOverlay(event)">
+        <div class="modal-content">
+            <h3 style="margin-top:0">Withdraw to M-Pesa</h3>
+            <input type="number" id="wit-amt" placeholder="Min 50 KES" style="width:100%; padding:15px; margin:20px 0; border-radius:10px; border:1px solid var(--border); background:#000; color:#fff; text-align:center;">
+            <button class="btn-sm btn-dep" style="width:100%; padding:15px; font-size:14px; background:var(--withdraw)" onclick="requestWithdrawal()">Request Cashout</button>
+        </div>
     </div>
 
-    <div class="card">
-        <label class="balance-label">Withdraw Profits</label>
-        <input type="number" id="wit-amt" placeholder="Min 50 KES">
-        <button class="btn-full" style="background: var(--withdraw); color: #000;" onclick="requestWithdrawal()">Withdraw to M-Pesa</button>
-    </div>
-</div>
+    <script>
+        const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
+        const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
+        const INTASEND_KEY = "ISPubKey_live_95010572-41c2-46f6-ba0d-438fc260f1bd"; 
 
-<script>
-    const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
-    const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-    const INTASEND_KEY = "ISPubKey_live_95010572-41c2-46f6-ba0d-438fc260f1bd"; 
+        const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
+        let liveMarkets = [];
 
-    const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
-
-    async function initDashboard() {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (user) {
-            let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-            if (profile) document.getElementById('balance').innerText = Math.floor(profile.balance).toLocaleString();
-        } else {
-            await supabaseClient.auth.signInAnonymously();
-            initDashboard();
+        async function initDashboard() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
+                if (profile) document.getElementById('balance').innerText = Math.floor(profile.balance).toLocaleString();
+            } else {
+                await supabaseClient.auth.signInAnonymously();
+                initDashboard();
+            }
+            syncPolymarket();
         }
-    }
 
-    async function placeTrade(choice, multiplier, marketName) {
-        const tradeAmt = prompt(`Trade on ${marketName}: ${choice} (${multiplier}x). Amount (KES):`, "100");
-        if (!tradeAmt || tradeAmt < 10) return;
+        async function syncPolymarket() {
+            try {
+                const response = await fetch('https://gamma-api.polymarket.com/events?limit=10&active=true&closed=false');
+                liveMarkets = await response.json();
+                renderMarkets(liveMarkets);
+            } catch (e) { console.error("Sync Failed", e); }
+        }
 
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
+        function renderMarkets(data) {
+            const feed = document.getElementById('market-feed');
+            feed.innerHTML = '';
+            data.forEach(m => {
+                const yesPrice = m.markets[0]?.outcomePrices[0] || 0.5;
+                const noPrice = m.markets[0]?.outcomePrices[1] || 0.5;
+                const yesMult = (1 / yesPrice).toFixed(1);
+                const noMult = (1 / noPrice).toFixed(1);
 
-        if (profile.balance < tradeAmt) return alert("Low balance. Please deposit via M-Pesa.");
+                feed.innerHTML += `
+                    <div class="card">
+                        <span class="m-tag">${m.category}</span>
+                        <div class="m-title">${m.title}</div>
+                        <div class="odds-row">
+                            <div class="odds-btn" onclick="placeTrade('YES', ${yesMult}, '${m.title.replace(/'/g, "")}')">
+                                <span style="font-size:10px; color:var(--primary)">YES (${(yesPrice*100).toFixed(0)}%)</span>
+                                <span class="odds-val">${yesMult}x</span>
+                            </div>
+                            <div class="odds-btn" onclick="placeTrade('NO', ${noMult}, '${m.title.replace(/'/g, "")}')">
+                                <span style="font-size:10px; color:var(--withdraw)">NO (${(noPrice*100).toFixed(0)}%)</span>
+                                <span class="odds-val">${noMult}x</span>
+                            </div>
+                        </div>
+                        <div class="p-vol">Liquidity: $${Math.floor(m.volume).toLocaleString()}</div>
+                    </div>
+                `;
+            });
+        }
 
-        const newBal = profile.balance - tradeAmt;
-        await supabaseClient.from('profiles').update({ balance: newBal }).eq('id', user.id);
-        await supabaseClient.from('trades').insert([{ user_id: user.id, selection: choice, amount: tradeAmt, market_name: marketName }]);
+        function filterMarkets() {
+            const term = document.getElementById('market-search').value.toLowerCase();
+            const filtered = liveMarkets.filter(m => m.title.toLowerCase().includes(term));
+            renderMarkets(filtered);
+        }
 
-        document.getElementById('balance').innerText = Math.floor(newBal).toLocaleString();
-        alert(`Order Placed! Potential Payout: Ksh ${tradeAmt * multiplier}`);
-    }
-
-    function openCheckout() {
-        const amt = document.getElementById('dep-amt').value;
-        const intasend = new window.IntaSend({ publicAPIKey: INTASEND_KEY, live: true });
-        intasend.run({ amount: amt, currency: "KES", label: "NexGen Funding", method: "M-PESA" })
-        .on("COMPLETE", async () => {
+        async function placeTrade(choice, mult, name) {
+            const amt = prompt(`Bet on ${choice} (${mult}x). Amount (KES):`, "100");
+            if (!amt || amt < 10) return;
             const { data: { user } } = await supabaseClient.auth.getUser();
             let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-            const updated = parseFloat(profile.balance) + parseFloat(amt);
-            await supabaseClient.from('profiles').update({ balance: updated }).eq('id', user.id);
-            initDashboard();
-        });
-    }
+            if (profile.balance < amt) return alert("Deposit more KES first!");
+            
+            const newBal = profile.balance - amt;
+            await supabaseClient.from('profiles').update({ balance: newBal }).eq('id', user.id);
+            await supabaseClient.from('trades').insert([{ user_id: user.id, selection: choice, amount: amt, market_name: name }]);
+            document.getElementById('balance').innerText = Math.floor(newBal).toLocaleString();
+            alert("Order Placed!");
+        }
 
-    async function requestWithdrawal() {
-        const amt = document.getElementById('wit-amt').value;
-        if (amt < 50) return alert("Min. withdrawal is 50 KES");
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-        if (profile.balance < amt) return alert("Insufficient funds.");
-        const remaining = parseFloat(profile.balance) - parseFloat(amt);
-        await supabaseClient.from('profiles').update({ balance: remaining }).eq('id', user.id);
+        // Wallet Functions
+        function toggleModal(id) { 
+            const m = document.getElementById(id);
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; 
+        }
+        function closeOnOverlay(e) { if(e.target.classList.contains('modal')) e.target.style.display = 'none'; }
+
+        function openCheckout() {
+            const amt = document.getElementById('dep-amt').value;
+            const intasend = new window.IntaSend({ publicAPIKey: INTASEND_KEY, live: true });
+            intasend.run({ amount: amt, currency: "KES", label: "NexGen Funding", method: "M-PESA" })
+            .on("COMPLETE", async () => { location.reload(); });
+        }
+
+        async function requestWithdrawal() {
+            const amt = document.getElementById('wit-amt').value;
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
+            if (profile.balance < amt) return alert("Insufficient funds");
+            await supabaseClient.from('profiles').update({ balance: profile.balance - amt }).eq('id', user.id);
+            alert("Withdrawal request sent!");
+            location.reload();
+        }
+
         initDashboard();
-        alert("Withdrawal request sent!");
-    }
-
-    initDashboard();
-</script>
+    </script>
 </body>
 </html>

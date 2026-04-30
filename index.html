@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Professional Terminal</title>
+    <title>NexGen | Polymarket Official Feed</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
@@ -15,88 +15,78 @@
         }
 
         body { 
-            background: var(--bg); color: #111827; margin: 0; padding-top: 155px;
+            background: var(--bg); color: #111827; margin: 0; padding-top: 160px;
             font-family: -apple-system, system-ui, sans-serif;
         }
 
-        /* --- FIXED TOP PANEL --- */
-        .header-fixed {
+        /* --- STICKY MASTER NAV --- */
+        .master-nav {
             position: fixed; top: 0; left: 0; right: 0;
-            background: #fff; z-index: 1000; border-bottom: 1px solid var(--border);
+            background: #fff; z-index: 2000; border-bottom: 1px solid var(--border);
         }
 
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
-        .logo { font-weight: 900; font-size: 22px; letter-spacing: -1.5px; }
+        .top-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+        .logo { font-weight: 900; font-size: 24px; letter-spacing: -1.5px; }
 
-        /* AUTH & DEPOSIT BAR */
-        .action-bar { display: flex; align-items: center; gap: 12px; }
-        .auth-group { display: flex; gap: 8px; font-size: 12px; font-weight: 700; }
-        .auth-group span { cursor: pointer; color: #000; border: 1px solid var(--border); padding: 5px 10px; border-radius: 6px; }
-        
-        .bal-chip { background: #000; color: #fff; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 5px; }
-        .dep-btn { background: var(--primary); color: #fff; border: none; width: 24px; height: 24px; border-radius: 50%; font-weight: 900; cursor: pointer; }
+        .auth-wallet { display: flex; align-items: center; gap: 10px; }
+        .btn-auth { border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; background: #fff; }
+        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 800; cursor: pointer; }
 
-        /* --- TICKER --- */
-        .ticker { background: #f9fafb; border-bottom: 1px solid var(--border); padding: 8px 0; overflow: hidden; white-space: nowrap; font-size: 11px; font-weight: 600; color: #374151; }
-        .ticker-inner { display: inline-block; animation: slide 40s linear infinite; }
-        @keyframes slide { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-        .ticker span { padding: 0 40px; }
+        /* --- CATEGORIES & TICKER --- */
+        .ticker { background: #000; color: #fff; padding: 6px 0; font-size: 11px; font-weight: 700; overflow: hidden; white-space: nowrap; }
+        .ticker-move { display: inline-block; animation: scroll 30s linear infinite; }
+        @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* --- CATEGORIES --- */
-        .cat-bar { display: flex; overflow-x: auto; padding: 10px 16px; gap: 18px; scrollbar-width: none; }
-        .cat-bar::-webkit-scrollbar { display: none; }
+        .cat-bar { display: flex; overflow-x: auto; padding: 10px 16px; gap: 20px; scrollbar-width: none; background: #fff; border-bottom: 1px solid var(--border); }
         .cat-item { font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; white-space: nowrap; }
-        .cat-item.active { color: #000; border-bottom: 2.5px solid var(--primary); padding-bottom: 4px; }
+        .cat-item.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 5px; }
 
-        /* --- CARDS --- */
-        #dashboard { max-width: 500px; margin: auto; padding: 12px; }
-        .card { background: #fff; border-radius: 14px; border: 1px solid var(--border); padding: 18px; margin-bottom: 12px; transition: 0.2s; }
-        .card:active { transform: scale(0.98); }
-        .m-title { font-size: 16px; font-weight: 700; line-height: 1.4; margin-bottom: 15px; display: block; }
+        /* --- CARDS (Mirroring Polymarket Style) --- */
+        #dashboard { max-width: 520px; margin: auto; padding: 12px; }
+        .card { background: #fff; border-radius: 16px; border: 1px solid var(--border); padding: 16px; margin-bottom: 12px; }
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
+        .m-title { font-size: 15px; font-weight: 600; line-height: 1.4; flex: 1; padding-right: 15px; }
         
-        .btn-row { display: flex; gap: 10px; }
-        .m-btn { flex: 1; padding: 14px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; }
-        .btn-yes { background: #f0fdf4; color: var(--yes-text); }
-        .btn-no { background: #fef2f2; color: var(--no-text); }
-        .m-footer { display: flex; justify-content: space-between; margin-top: 12px; font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+        .price-box { text-align: right; min-width: 60px; }
+        .p-val { font-size: 18px; font-weight: 800; }
+        .p-lbl { font-size: 10px; color: var(--text-muted); display: block; }
 
-        .loader { text-align: center; padding: 40px; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; font-size: 12px; }
+        .bet-row { display: flex; gap: 8px; }
+        .bet-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
+        .btn-yes { background: #e8f5e9; color: #2e7d32; }
+        .btn-no { background: #ffebee; color: #c62828; }
+
+        .m-footer { display: flex; justify-content: space-between; margin-top: 12px; font-size: 11px; color: var(--text-muted); border-top: 1px solid #f9fafb; padding-top: 8px; }
     </style>
 </head>
 <body>
 
-    <div class="header-fixed">
-        <div class="top-nav">
+    <div class="master-nav">
+        <div class="top-row">
             <div class="logo">NEXGEN</div>
-            <div class="action-bar">
-                <div id="user-ui" class="auth-group">
-                    <span onclick="auth('login')">Login</span>
-                    <span onclick="auth('signup')">Sign Up</span>
+            <div class="auth-wallet">
+                <div id="auth-ui" style="display:flex; gap:5px;">
+                    <button class="btn-auth" onclick="auth('login')">Sign In</button>
+                    <button class="btn-auth" onclick="auth('signup')">Sign Up</button>
                 </div>
-                <div class="bal-chip">
-                    Ksh <span id="balance">0</span>
-                    <button class="dep-btn" onclick="deposit()">+</button>
+                <div id="wallet-ui" style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:13px; font-weight:800;">Ksh <span id="balance">0</span></span>
+                    <button class="btn-deposit" onclick="deposit()">Deposit</button>
                 </div>
             </div>
         </div>
-        <div class="ticker">
-            <div class="ticker-inner">
-                <span>🇰🇪 CBK Interest Rate: 8.75% (Held)</span>
-                <span>📈 Gold: $2,342.10 (Mombasa Spot)</span>
-                <span>🚢 Port of Mombasa: Vessel traffic up 12% for May 2026</span>
-                <span>🏛️ NSE: KMRC Sustainability Bond Offer open until May 12</span>
-            </div>
-        </div>
+        <div class="ticker"><div class="ticker-move"><span>NEWS FEED: XAUUSD Gaps up to $2,350 • CBK Interest Rates Held • Global Prediction Volume Surges • Bitcoin hits new 2026 local high</span></div></div>
         <div class="cat-bar">
-            <div class="cat-item active" onclick="setCat('all', this)">Global News</div>
-            <div class="cat-item" onclick="setCat('Kenya', this)">Kenya Predictions</div>
+            <div class="cat-item active" onclick="setCat('all', this)">All</div>
             <div class="cat-item" onclick="setCat('Politics', this)">Politics</div>
             <div class="cat-item" onclick="setCat('Crypto', this)">Crypto</div>
+            <div class="cat-item" onclick="setCat('Sports', this)">Sports</div>
+            <div class="cat-item" onclick="setCat('Business', this)">Business</div>
         </div>
     </div>
 
     <div id="dashboard">
-        <div id="market-feed"><div class="loader">SYNCING REAL-TIME DATA...</div></div>
+        <div id="market-feed"><div style="text-align:center; padding:50px;">FETCHING OFFICIAL POLYMARKET DATA...</div></div>
     </div>
 
     <script>
@@ -111,57 +101,68 @@
         async function init() {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                document.getElementById('user-ui').innerHTML = `<span onclick="logout()">Logout</span>`;
+                document.getElementById('auth-ui').innerHTML = `<span style="font-size:10px; font-weight:700;">${user.email.split('@')[0]}</span>`;
                 let { data: p } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
                 if (p) document.getElementById('balance').innerText = Math.floor(p.balance).toLocaleString();
             }
-            loadMarkets();
+            loadPolymarket();
         }
 
-        async function loadMarkets() {
+        async function loadPolymarket() {
             try {
                 const proxy = "https://corsproxy.io/?";
-                const api = "https://gamma-api.polymarket.com/events?limit=100&active=true&closed=false";
+                const api = "https://gamma-api.polymarket.com/events?limit=50&active=true&closed=false";
                 const res = await fetch(proxy + encodeURIComponent(api));
                 const data = await res.json();
-                markets = data.map(m => ({
-                    title: m.title, 
-                    tag: m.category || "World",
-                    y: (1 / (m.markets[0]?.outcomePrices[0] || 0.5)).toFixed(1),
-                    n: (1 / (1 - (m.markets[0]?.outcomePrices[0] || 0.5))).toFixed(1)
-                }));
+                
+                markets = data.map(m => {
+                    const yesPrice = m.markets[0]?.outcomePrices[0] || 0.5;
+                    return {
+                        title: m.title,
+                        cat: m.category || "General",
+                        prob: (yesPrice * 100).toFixed(0),
+                        vol: (m.volume / 1000).toFixed(0) + "K",
+                        stake: "USDC" // Exactly like Polymarket
+                    };
+                });
                 render();
-            } catch (e) { console.error("Syncing..."); }
+            } catch (e) { console.log("Retrying fetch..."); }
         }
 
         function render() {
             const feed = document.getElementById('market-feed');
             feed.innerHTML = '';
 
-            // JESUS ALWAYS LOADS FIRST (Pinned to All)
+            // Jesus Pinned to All
             if (currentCat === 'all') {
                 feed.innerHTML += `
-                    <div class="card" style="border: 2px solid gold;">
-                        <span class="m-title">Will Jesus come back in June 2026?</span>
-                        <div class="btn-row">
-                            <button class="m-btn btn-yes" onclick="bet('Jesus', 9)">YES (9x)</button>
-                            <button class="m-btn btn-no" onclick="bet('Jesus', 3)">NO (3x)</button>
-                        </div>
-                        <div class="m-footer"><span>EXCLUSIVE</span><span>PROPHETIC NEWS</span></div>
-                    </div>`;
+                <div class="card" style="border-top: 4px solid gold;">
+                    <div class="card-header">
+                        <div class="m-title">Will Jesus come back in June 2026?</div>
+                        <div class="price-box"><span class="p-val">11%</span><span class="p-lbl">chance</span></div>
+                    </div>
+                    <div class="bet-row">
+                        <button class="bet-btn btn-yes" onclick="trade('Jesus', 9)">Yes (9.0x)</button>
+                        <button class="bet-btn btn-no" onclick="trade('Jesus', 3)">No (3.0x)</button>
+                    </div>
+                    <div class="m-footer"><span>Vol: $420K</span><span style="color:gold;">EXCLUSIVE</span></div>
+                </div>`;
             }
 
-            const filtered = currentCat === 'all' ? markets : markets.filter(m => m.tag.includes(currentCat));
+            const filtered = currentCat === 'all' ? markets : markets.filter(m => m.cat.includes(currentCat));
             filtered.forEach(m => {
                 feed.innerHTML += `
-                    <div class="card">
-                        <span class="m-title">${m.title}</span>
-                        <div class="btn-row">
-                            <button class="m-btn btn-yes" onclick="bet('${m.title}', ${m.y})">YES ${m.y}x</button>
-                            <button class="m-btn btn-no" onclick="bet('${m.title}', ${m.n})">NO ${m.n}x</button>
-                        </div>
-                        <div class="m-footer"><span>${m.tag}</span><span>POLYGON SETTLED</span></div>
-                    </div>`;
+                <div class="card">
+                    <div class="card-header">
+                        <div class="m-title">${m.title}</div>
+                        <div class="price-box"><span class="p-val">${m.prob}%</span><span class="p-lbl">chance</span></div>
+                    </div>
+                    <div class="bet-row">
+                        <button class="bet-btn btn-yes" onclick="trade('${m.title}', 2)">Yes</button>
+                        <button class="bet-btn btn-no" onclick="trade('${m.title}', 2)">No</button>
+                    </div>
+                    <div class="m-footer"><span>Vol: $${m.vol}</span><span>STAKE: ${m.stake}</span></div>
+                </div>`;
             });
         }
 
@@ -172,26 +173,22 @@
             render();
         }
 
-        // AUTH & MONEY
-        async function auth(type) {
-            const e = prompt("Email:"); const p = prompt("Password:");
-            if (type === 'login') await supabase.auth.signInWithPassword({email:e, password:p});
-            else await supabase.auth.signUp({email:e, password:p});
-            location.reload();
+        // --- AUTH & PAYMENT ACTIONS ---
+        function auth(type) {
+            const e = prompt("Enter Email:"); const p = prompt("Enter Password:");
+            if (type === 'login') supabase.auth.signInWithPassword({email:e, password:p}).then(() => location.reload());
+            else supabase.auth.signUp({email:e, password:p}).then(() => alert("Account Created! Check email."));
         }
-        function logout() { supabase.auth.signOut().then(() => location.reload()); }
 
         function deposit() {
-            const amt = prompt("Deposit amount (KES):", "1000");
+            const amt = prompt("Amount (KES):", "1000");
             if (amt) new window.IntaSend({ publicAPIKey: INT_KEY, live: false }).run({ amount: amt, currency: "KES" })
             .on("COMPLETE", () => location.reload());
         }
 
-        async function bet(name, mult) {
-            const { data: { user } } = await supabase.auth.getUser();
-            if(!user) return auth('login');
-            prompt(`Trade ${mult}x on ${name}. Amount (KES):`, "100");
-            alert("Order Processing...");
+        function trade(name, mult) {
+            const amt = prompt(`Trade on ${name}. Payout is ~${mult}x. Amount (KES):`, "100");
+            if (amt) alert("Processing your Stake...");
         }
 
         init();

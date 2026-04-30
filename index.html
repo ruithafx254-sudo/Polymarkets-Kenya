@@ -3,72 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Executive Market</title>
+    <title>NexGen | Card-to-Crypto</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --green: #2ebd85; --red: #f6465d; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --text-muted: #929aa5; }
         body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 15px; box-sizing: border-box; }
-        #auth-screen { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; }
-        .auth-card { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); text-align: center; max-width: 380px; width: 100%; }
+        #auth-screen { display: flex; justify-content: center; align-items: center; height: 90vh; width: 100%; }
         #dashboard { display: none; width: 100%; max-width: 480px; animation: fadeIn 0.4s ease; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
         .balance-amt { font-size: 32px; font-weight: bold; color: var(--green); }
         .market-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
-        .btn-main { background: var(--green); color: black; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; box-sizing: border-box; }
+        .btn-main { background: var(--green); color: black; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; }
+        .btn-check { background: transparent; border: 1px solid var(--green); color: var(--green); margin-top: 10px; padding: 12px; }
+        input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; box-sizing: border-box; font-size: 16px; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
-        <div class="auth-card">
-            <h1 style="color: var(--green); margin: 0;">NexGen</h1>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">Executive Prediction Market</p>
-            <button class="btn-main" onclick="enterAnonymously()">Enter Market Anonymously</button>
+        <div style="text-align:center;">
+            <h1 style="color: var(--green); margin-bottom: 5px;">NexGen</h1>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">Direct Card Payouts</p>
+            <button class="btn-main" onclick="enterAnonymously()">Enter Executive Market</button>
         </div>
     </div>
 
     <div id="dashboard">
         <div class="header">
             <div>
-                <div style="font-size: 11px; color: var(--text-muted);">WALLET BALANCE</div>
+                <div style="font-size: 11px; color: var(--text-muted);">BALANCE</div>
                 <div class="balance-amt">$<span id="balance">0.00</span></div>
             </div>
-            <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px; border-radius:6px; cursor:pointer;">Refresh</button>
+            <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px; border-radius:6px; font-size:12px;">Refresh</button>
         </div>
 
         <div class="market-card">
-            <p style="font-weight: bold; margin-bottom: 5px;">Gold (XAUUSD) Prediction</p>
-            <p style="font-size: 14px; color: #ced4da;">Will Gold stay above $2,350 tonight?</p>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn-main" style="background: rgba(46,189,133,0.1); color: var(--green); border: 1px solid var(--green);" onclick="alert('Insufficient Funds')">YES</button>
-                <button class="btn-main" style="background: rgba(246,70,93,0.1); color: var(--red); border: 1px solid var(--red);" onclick="alert('Insufficient Funds')">NO</button>
-            </div>
-        </div>
-
-        <div class="market-card">
-            <input type="number" id="dep-amt" value="10" min="5">
-            <button class="btn-main" onclick="depositFunds()">Pay with Card</button>
+            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block;">DEPOSIT AMOUNT (USD)</label>
+            <input type="number" id="dep-amt" value="30" min="30">
+            <button class="btn-main" onclick="payWithCard()">Pay with Card</button>
+            <button class="btn-main btn-check" id="check-btn" onclick="verifyDeposit()">I've Paid - Check Balance</button>
+            <p id="status-msg" style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 12px;"></p>
         </div>
     </div>
 
     <script>
         const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-        const NOW_KEY = 'HWQ3MH8-JCH4K63-NWYP1W7-FJXHXVA'; 
         const WALLET = 'TKNkgA7mvwSW8oDtpN1Up8PoVLX1ff17aH'; 
 
         const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
         async function enterAnonymously() {
-            try {
-                const { data, error } = await supabaseClient.auth.signInAnonymously();
-                if (error) throw error;
-                initDashboard();
-            } catch (err) {
-                alert("Login Error: " + err.message);
-            }
+            const { error } = await supabaseClient.auth.signInAnonymously();
+            if (!error) initDashboard();
         }
 
         async function initDashboard() {
@@ -76,23 +64,60 @@
             if (user) {
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
-                
                 let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-                if (profile) {
-                    document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
-                } else {
-                    await supabaseClient.from('profiles').insert([{ id: user.id, balance: 0 }]);
-                }
+                if (profile) document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
             }
         }
 
-        function depositFunds() {
+        function payWithCard() {
             const amt = document.getElementById('dep-amt').value;
-            if (!amt || amt < 5) return alert("Minimum deposit is $5");
+            if (amt < 30) return alert("Min $30");
+            const url = `https://guardarian.com/calculator/v1/?crypto_currencies_list=USDT_TRX&fiat_amount=${amt}&fiat_currency=USD&crypto_address=${WALLET}`;
+            window.open(url, "_blank");
+            document.getElementById('status-msg').innerText = "Guardarian opened. Pay, then click 'Check Balance' below.";
+        }
 
-            // Corrected Invoice URL
-            const paymentUrl = `https://nowpayments.io/payment/?api_key=${NOW_KEY}&amount=${amt}&currency=usd&pay_currency=usdttrc20&address=${WALLET}`;
-            window.open(paymentUrl, "_blank");
+        async function verifyDeposit() {
+            const btn = document.getElementById('check-btn');
+            const msg = document.getElementById('status-msg');
+            btn.disabled = true;
+            msg.innerText = "Scanning blockchain for your USDT...";
+
+            try {
+                // Check recent TRC20 transfers to your wallet
+                const res = await fetch(`https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=10&toAddress=${WALLET}`);
+                const data = await res.json();
+                
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                let { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
+
+                // Find a successful USDT transfer that hasn't been claimed by this user yet
+                const payment = data.token_transfers.find(t => 
+                    t.symbol === 'USDT' && 
+                    t.transaction_id !== profile.last_transaction_id &&
+                    t.to_address === WALLET
+                );
+
+                if (payment) {
+                    const received = payment.quant / 1000000; // USDT decimals
+                    const newTotal = parseFloat(profile.balance || 0) + received;
+                    
+                    // Securely update Supabase
+                    await supabaseClient.from('profiles').update({ 
+                        balance: newTotal, 
+                        last_transaction_id: payment.transaction_id 
+                    }).eq('id', user.id);
+
+                    document.getElementById('balance').innerText = newTotal.toFixed(2);
+                    msg.style.color = "#2ebd85";
+                    msg.innerText = `Success! $${received} added automatically.`;
+                } else {
+                    msg.innerText = "Payment not found yet. Network can take 2-5 mins.";
+                }
+            } catch (e) {
+                msg.innerText = "Network busy. Try again shortly.";
+            }
+            btn.disabled = false;
         }
 
         initDashboard();

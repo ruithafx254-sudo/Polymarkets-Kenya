@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Multi-Payment Market</title>
+    <title>NexGen | KES Market</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
@@ -16,10 +16,8 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
         .balance-amt { font-size: 32px; font-weight: bold; color: var(--green); }
         .market-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
-        .btn-main { background: var(--green); color: black; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; }
-        .btn-main:active { opacity: 0.7; }
+        .btn-main { background: var(--green); color: black; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; }
         input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; box-sizing: border-box; font-size: 16px; }
-        .payment-icons { display: flex; justify-content: center; gap: 10px; margin-top: 15px; opacity: 0.6; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -28,7 +26,7 @@
     <div id="auth-screen">
         <div style="text-align:center;">
             <h1 style="color: var(--green);">NexGen</h1>
-            <p style="color: var(--text-muted); margin-bottom: 30px;">Executive Market Platform</p>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Executive KES Market</p>
             <button class="btn-main" onclick="enterAnonymously()">Enter Dashboard</button>
         </div>
     </div>
@@ -36,33 +34,30 @@
     <div id="dashboard">
         <div class="header">
             <div>
-                <div style="font-size: 11px; color: var(--text-muted);">ACCOUNT BALANCE</div>
-                <div class="balance-amt">$<span id="balance">0.00</span></div>
+                <div style="font-size: 11px; color: var(--text-muted);">BALANCE (KES)</div>
+                <div class="balance-amt">Ksh <span id="balance">0</span></div>
             </div>
             <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px; border-radius:6px; font-size:10px;">REFRESH</button>
         </div>
 
         <div class="market-card">
-            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block;">DEPOSIT AMOUNT (USD)</label>
-            <input type="number" id="dep-amt" value="2.00" min="2">
+            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block;">DEPOSIT AMOUNT (KES)</label>
+            <input type="number" id="dep-amt" value="250" min="10">
             
-            <button class="btn-main" id="pay-btn" onclick="openCheckout()">Deposit Now</button>
+            <button class="btn-main" id="pay-btn" onclick="openCheckout()">Deposit with M-Pesa</button>
             
-            <div class="payment-icons">
-                <span style="font-size: 10px;">M-Pesa • Visa • Mastercard • Bank</span>
-            </div>
-            
-            <p id="status-msg" style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 15px;">
-                Secure payment via IntaSend.
+            <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 15px;">
+                M-Pesa, Card, and Bank enabled.
             </p>
         </div>
     </div>
 
     <script>
-        // CONFIGURATION
         const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-        const INTASEND_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad"; // Your Test Key
+        
+        // Using your TEST KEY
+        const INTASEND_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad"; 
 
         const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
@@ -79,7 +74,7 @@
                 
                 let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
                 if (profile) {
-                    document.getElementById('balance').innerText = parseFloat(profile.balance).toFixed(2);
+                    document.getElementById('balance').innerText = Math.floor(profile.balance);
                 } else {
                     await supabaseClient.from('profiles').insert([{ id: user.id, balance: 0 }]);
                 }
@@ -88,41 +83,34 @@
 
         function openCheckout() {
             const amt = document.getElementById('dep-amt').value;
-            if (amt < 2) return alert("Min deposit is $2");
+            if (amt < 10) return alert("Min deposit is 10 KES");
 
-            // IntaSend Initialization
             const intasend = new window.IntaSend({
                 publicAPIKey: INTASEND_KEY,
-                live: false // SET TO TRUE FOR PRODUCTION
+                live: false // Set to TRUE when using live key
             });
 
             intasend.run({
                 amount: amt,
-                currency: "USD",
-                label: "NexGen Account Deposit",
-                // Leaving 'method' blank enables ALL payment methods automatically
-                comment: "Top-up for trading account"
+                currency: "KES", // NOW IN KES
+                label: "NexGen Topup",
+                method: "M-PESA" // FORCES M-PESA PROMPT FIRST
             })
             .on("COMPLETE", async (response) => {
                 await updateBalance(amt);
-                alert("Payment Confirmed! Your balance has been updated.");
+                alert("Deposit of Ksh " + amt + " successful!");
             })
             .on("FAILED", (response) => {
                 console.log("Failed", response);
-            })
-            .on("IN-PROGRESS", () => {
-                console.log("Checkout window active...");
             });
         }
 
         async function updateBalance(addedAmount) {
             const { data: { user } } = await supabaseClient.auth.getUser();
             let { data: profile } = await supabaseClient.from('profiles').select('balance').eq('id', user.id).single();
-            
             const newBalance = parseFloat(profile.balance || 0) + parseFloat(addedAmount);
-            
-            await supabaseClient.from('profiles').update({ balance: newBalance }).eq( 'id', user.id);
-            document.getElementById('balance').innerText = newBalance.toFixed(2);
+            await supabaseClient.from('profiles').update({ balance: newBalance }).eq('id', user.id);
+            document.getElementById('balance').innerText = Math.floor(newBalance);
         }
 
         initDashboard();

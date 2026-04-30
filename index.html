@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Polymarket Live</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>NexGen | Prediction Market</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.js"></script>
     <style>
         :root { --green: #2ebd85; --red: #f6465d; --bg: #0b0e11; --card: #181a20; --border: #2b3139; --text-muted: #929aa5; }
         body { background: var(--bg); color: white; font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
         #auth-screen { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; }
-        .auth-card { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); text-align: center; max-width: 350px; width: 90%; }
+        .auth-card { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); text-align: center; max-width: 350px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
         #dashboard { display: none; width: 100%; max-width: 480px; padding: 15px; box-sizing: border-box; }
         
@@ -23,11 +23,11 @@
         .chance-pill { background: rgba(46, 189, 133, 0.1); color: var(--green); padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
         
         .bet-row { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-yes { flex: 1; background: rgba(46, 189, 133, 0.2); color: var(--green); border: 1px solid var(--green); padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-no { flex: 1; background: rgba(246, 70, 93, 0.2); color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-yes { flex: 1; background: rgba(46, 189, 133, 0.15); color: var(--green); border: 1px solid var(--green); padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; }
+        .btn-no { flex: 1; background: rgba(246, 70, 93, 0.15); color: var(--red); border: 1px solid var(--red); padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; }
         
         input { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--border); background: #2b3139; color: white; box-sizing: border-box; }
-        .btn-deposit { background: var(--green); color: black; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-main { background: var(--green); color: black; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
 
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
@@ -36,47 +36,47 @@
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h1 style="color: var(--green);">NexGen</h1>
-            <p style="color: var(--text-muted);">Decentralized Prediction Market</p>
-            <button class="btn-deposit" onclick="enterAnonymously()">Connect Anonymously</button>
+            <h1 style="color: var(--green); margin:0;">NexGen</h1>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Anonymous Prediction Market</p>
+            <button class="btn-main" onclick="enterAnonymously()">Connect Anonymously</button>
         </div>
     </div>
 
     <div id="dashboard">
         <div class="header">
             <div>
-                <div style="font-size: 12px; color: var(--text-muted);">WALLET BALANCE</div>
+                <div style="font-size: 11px; color: var(--text-muted); letter-spacing: 1px;">AVAILABLE BALANCE</div>
                 <div class="balance-amt">$<span id="balance">0.00</span></div>
             </div>
-            <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:5px 10px; border-radius:5px; cursor:pointer;">Refresh</button>
+            <button onclick="initDashboard()" style="background:none; border:1px solid var(--border); color:white; padding:8px 12px; border-radius:6px; cursor:pointer; font-size:12px;">Refresh</button>
         </div>
 
         <div class="market-card">
             <div class="market-header">
-                <span style="font-weight: bold;"><span class="live-dot"></span>XAUUSD Prediction</span>
-                <span class="chance-pill">64% Chance</span>
+                <span style="font-weight: bold;"><span class="live-dot"></span>XAUUSD Gold Price</span>
+                <span class="chance-pill">68% Yes</span>
             </div>
-            <p style="font-size: 14px; margin: 0;">Will Gold (XAUUSD) close above $2,350 by 11:00 PM EAT?</p>
+            <p style="font-size: 14px; color: #ced4da;">Will Gold trade above $2,355.00 by midnight?</p>
             
             <div class="bet-row">
-                <button class="btn-yes" onclick="placeBet('YES')">YES <br> <small>$0.64</small></button>
-                <button class="btn-no" onclick="placeBet('NO')">NO <br> <small>$0.36</small></button>
+                <div class="btn-yes" onclick="handleBet('YES')">YES<br><span style="font-size:11px; opacity:0.8;">$0.68</span></div>
+                <div class="btn-no" onclick="handleBet('NO')">NO<br><span style="font-size:11px; opacity:0.8;">$0.32</span></div>
             </div>
         </div>
 
         <div class="market-card">
-            <span style="display:block; margin-bottom:10px; font-weight:bold;">Add Funds</span>
-            <input type="number" id="dep-amt" placeholder="Amount in USD" value="10">
-            <button class="btn-deposit" onclick="depositFunds()">Deposit via Card</button>
+            <span style="display:block; margin-bottom:12px; font-weight:bold; font-size:14px;">Instant Deposit</span>
+            <input type="number" id="dep-amt" placeholder="Amount (USD)" value="10">
+            <button class="btn-main" onclick="depositFunds()">Add Funds</button>
         </div>
     </div>
 
     <script>
-        // CONFIGURATION
+        // Use your verified credentials
         const SB_URL = 'https://hwxnfzuwaeseszgsjeny.supabase.co'; 
         const SB_KEY = 'sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL';
-        const NOWPAY_API_KEY = 'HWQ3MH8-JCH4K63-NWYP1W7-FJXHXVA'; 
-        const MY_WALLET = '0xc363ca9fee66b306b8ff9a38584a260d400fbbc0'; 
+        const NOW_KEY = 'HWQ3MH8-JCH4K63-NWYP1W7-FJXHXVA'; 
+        const WALLET = '0xc363ca9fee66b306b8ff9a38584a260d400fbbc0'; 
 
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
@@ -84,9 +84,9 @@
             try {
                 const { data, error } = await supabase.auth.signInAnonymously();
                 if (error) throw error;
-                initDashboard();
+                await initDashboard();
             } catch (err) {
-                alert("Login Failed: " + err.message);
+                alert("Login Error: " + err.message);
             }
         }
 
@@ -98,6 +98,7 @@
                     document.getElementById('dashboard').style.display = 'block';
                     
                     let { data: profile } = await supabase.from('profiles').select('balance').eq('id', user.id).single();
+                    
                     if (!profile) {
                         await supabase.from('profiles').insert([{ id: user.id, balance: 0 }]);
                         document.getElementById('balance').innerText = "0.00";
@@ -106,26 +107,29 @@
                     }
                 }
             } catch (err) {
-                console.error(err);
+                console.error("Sync Error:", err);
             }
         }
 
-        async function placeBet(side) {
+        function handleBet(side) {
             const bal = parseFloat(document.getElementById('balance').innerText);
             if (bal <= 0) {
-                alert("Insufficient Balance. Deposit funds to trade.");
+                alert("Insufficient funds. Please add balance to place a " + side + " bet.");
             } else {
-                alert(`Order Placed: ${side}. Syncing with Market...`);
+                alert("Order submitted for " + side + " at current market price.");
             }
         }
 
         async function depositFunds() {
             const amt = document.getElementById('dep-amt').value;
             const { data: { user } } = await supabase.auth.getUser();
-            const nowUrl = `https://nowpayments.io/fiat-external-on-ramp?api_key=${NOWPAY_API_KEY}&wallet_address=${MY_WALLET}&fiat_amount=${amt}&fiat_currency=usd&track_id=${user.id}&theme=dark`;
-            window.open(nowUrl, "_blank");
+            if(!user) return alert("Please connect first.");
+            
+            const url = `https://nowpayments.io/fiat-external-on-ramp?api_key=${NOW_KEY}&wallet_address=${WALLET}&fiat_amount=${amt}&fiat_currency=usd&track_id=${user.id}&theme=dark`;
+            window.open(url, "_blank");
         }
 
+        // Run on startup
         initDashboard();
     </script>
 </body>

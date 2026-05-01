@@ -141,7 +141,7 @@
             <div style="background:#f8fafc; padding:18px; border-radius:18px; border: 1px solid var(--border); margin-bottom:16px;">
                 <div class="input-group">
                     <label id="amtLabel">Deposit Amount (Ksh)</label>
-                    <input type="number" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800; color: #000;" value="0.00" onfocus="if(this.value==='0.00')this.value='';" onblur="if(this.value==='')this.value='0.00';">
+                    <input type="text" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800; color: #000;" value="0.00" onfocus="if(this.value==='0.00')this.value='';" onblur="if(this.value==='')this.value='0.00';">
                 </div>
                 <div id="fundsChips" class="chip-grid">
                     <div class="amt-chip" onclick="setAmt(250)">250</div>
@@ -169,6 +169,7 @@
     </div>
 
     <script>
+        // Ensure test environment explicit public key
         const INTASEND_PUBLIC_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad";
 
         const predictionThemes = [
@@ -345,6 +346,4 @@
 
             closeModal('depositModal');
             localStorage.setItem('nx_balance', curBal - amt);
-            syncState();
-            alert("Withdrawal complete");
-        }
+            syncState()

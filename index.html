@@ -147,12 +147,9 @@
     </div>
 
     <script>
-        // --------------------------------------------------
-        // ACTIVE SUPABASE CREDENTIALS INJECTED
-        // --------------------------------------------------
+        // Set exact API parameters
         const SUPABASE_URL = "https://hwxnfzuwaeseszgsjeny.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL";
-        // --------------------------------------------------
 
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -174,19 +171,31 @@
 
         async function fetchUserData() {
             if (!currentUser) return;
-            const { data, error } = await supabase.from('profiles').select('*').eq('email', currentUser).single();
-            if (!error && data) {
-                userData = data;
-                const { data: wagers } = await supabase.from('wagers').select('*').eq('email', currentUser);
-                userWagers = wagers || [];
+            try {
+                const { data, error } = await supabase.from('profiles').select('*').eq('email', currentUser).maybeSingle();
+                if (!error && data) {
+                    userData = data;
+                    const { data: wagers } = await supabase.from('wagers').select('*').eq('email', currentUser);
+                    userWagers = wagers || [];
+                } else if (error) {
+                    console.error("Profile error:", error);
+                }
+                syncHeader();
+            } catch(err) {
+                console.error("Fetch profile failed:", err);
             }
-            syncHeader();
         }
 
         async function fetchMarkets() {
-            const { data, error } = await supabase.from('markets').select('*');
-            if (!error && data) {
-                markets = data;
+            try {
+                const { data, error } = await supabase.from('markets').select('*');
+                if (!error && data) {
+                    markets = data;
+                } else {
+                    console.error("Error fetching markets:", error);
+                }
+            } catch (err) {
+                console.error("Fetch markets exception:", err);
             }
         }
 
@@ -222,14 +231,14 @@
             
             if(item.type === 'm') {
                 card.className = 'market-card';
-                const safeQ = item.q.replace(/'/g, "\\'");
+                const safeQ = item.q ? item.q.replace(/'/g, "\\'") : "Prediction";
                 const activeWager = userWagers.find(w => w.market_id === item.id);
                 const wagerHtml = activeWager ? `<br><span style="color:var(--accent); font-size:11px; font-weight:700;">Wagered: Ksh ${activeWager.amt} on '${activeWager.side}'</span>` : '';
 
                 card.innerHTML = `
                     <div class="m-header">
-                        <div class="m-title">${item.q}${wagerHtml}</div>
-                        <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
+                        <div class="m-title">${item.q || "Prediction"}${wagerHtml}</div>
+                        <div class="m-odds"><span class="odds-val">${item.p || 0}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
                         <button class="trade-btn yes" onclick="openStakeModal('YES', '${safeQ}', '${item.id}')">Yes</button>
@@ -238,7 +247,7 @@
                     <button class="resolve-btn" onclick="resolvePrediction('${item.id}')">Settle Prediction</button>`;
             } else {
                 card.className = 'news-card';
-                card.innerHTML = `<div class="news-h">${item.h}</div><p class="news-p">${item.p_desc}</p>`;
+                card.innerHTML = `<div class="news-h">${item.h || "News Update"}</div><p class="news-p">${item.p_desc || ""}</p>`;
             }
             f.appendChild(card);
         }
@@ -309,7 +318,7 @@
             const pass = document.getElementById('aPass').value;
             if(!email.includes('@') || pass.length < 4) return alert("Valid credentials required.");
 
-            const { data: existingUser } = await supabase.from('profiles').select('*').eq('email', email).single();
+            const { data: existingUser, error } = await supabase.from('profiles').select('*').eq('email', email).maybeSingle();
 
             if (!existingUser) {
                 await supabase.from('profiles').insert([{ email, password: pass, balance: 1000 }]);
@@ -328,7 +337,7 @@
         async function payNow() {
             const amt = parseFloat(document.getElementById('depAmt').value);
             if (!amt || amt < 200) return alert("Min required deposit is Ksh 200");
-            const newBal = userData.balance + amt;
+            const newBal = (userData ? userData.balance : 1000) + amt;
             await supabase.from('profiles').update({ balance: newBal }).eq('email', currentUser);
             await fetchUserData();
             closeModal('depositModal');
@@ -348,6 +357,4 @@
         }
 
         function setAuth(mode) {
-            const tIn = document.getElementById('tabIn'), tUp = document.getElementById('tabUp'), title = document.getElementById('aTitle');
-            if (mode === 'up') { tUp.classList.add('active'); tIn.classList.remove('active'); title.innerText = "Register Identity"; }
-            else { tIn.classList.add('active'); tUp.classList.remove('active'); title.innerText = "Terminal Acce
+   

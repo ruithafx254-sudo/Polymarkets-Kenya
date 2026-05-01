@@ -6,14 +6,13 @@
     <title>NexGen | Professional Terminal</title>
     
     <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root { 
             --primary: #2ebd85; --border: #f1f5f9; --text-main: #0f172a;
             --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #cf304a;
         }
-        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 100px; font-family: -apple-system, sans-serif; }
+        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 100px; font-family: -apple-system, sans-serif; overflow-x: hidden; }
 
         /* --- HEADER --- */
         .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
@@ -26,20 +25,19 @@
         .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 14px; font-weight: 700; }
         
         /* DEPOSIT BUTTON */
-        .intaSendPayButton { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; }
 
-        /* --- AUTH SLIDING SWITCH --- */
+        /* --- AUTH SWITCH --- */
         #auth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
         .modal-content { background: #fff; width: 100%; max-width: 340px; padding: 25px; border-radius: 30px; text-align: center; }
-        
-        .switch-container { display: flex; background: #f1f5f9; padding: 4px; border-radius: 14px; margin-bottom: 25px; position: relative; cursor: pointer; border: 1px solid #e2e8f0; }
-        .switch-tab { flex: 1; padding: 12px; font-size: 14px; font-weight: 700; color: #64748b; z-index: 1; transition: 0.3s; }
+        .switch-container { display: flex; background: #f1f5f9; padding: 4px; border-radius: 14px; margin-bottom: 20px; position: relative; cursor: pointer; border: 1px solid #e2e8f0; }
+        .switch-tab { flex: 1; padding: 12px; font-size: 14px; font-weight: 700; color: #64748b; z-index: 1; }
         .switch-tab.active { color: #000; }
-        .slider { position: absolute; width: calc(50% - 4px); height: calc(100% - 8px); background: #fff; border-radius: 11px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .slider { position: absolute; width: calc(50% - 4px); height: calc(100% - 8px); background: #fff; border-radius: 11px; transition: 0.3s transform; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .signup-mode .slider { transform: translateX(100%); }
 
-        .m-input { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 16px; outline: none; box-sizing: border-box; }
-        .m-btn-main { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; margin-top: 10px; }
+        .m-input { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 16px; box-sizing: border-box; outline: none; }
+        .m-btn-main { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; }
 
         /* --- CARDS --- */
         #dashboard { max-width: 500px; margin: auto; padding: 12px; }
@@ -47,8 +45,6 @@
         .m-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 18px; color: #1e293b; }
         .stat-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
         .p-val { font-size: 30px; font-weight: 800; color: #000; }
-        .vol { font-size: 11px; color: #94a3b8; font-weight: 700; }
-        
         .btn-row { display: flex; gap: 12px; }
         .m-btn { flex: 1; padding: 16px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; font-size: 15px; }
         .btn-yes { background: var(--yes); color: var(--yes-text); }
@@ -64,10 +60,7 @@
                 <button class="auth-trigger-btn" onclick="openAuth()">Sign In</button>
                 <div class="wallet-pill">
                     Ksh <span id="balance">0.00</span>
-                    <button id="deposit-btn" class="intaSendPayButton" 
-                            data-amount="50" 
-                            data-currency="KES"
-                            data-email="user@nexgen.com">Deposit</button>
+                    <button onclick="handleDeposit()" class="btn-deposit">Deposit</button>
                 </div>
             </div>
         </div>
@@ -78,7 +71,7 @@
             <div class="m-title">Will Jesus Christ return before December 2026?</div>
             <div class="stat-row">
                 <span class="p-val">12%</span>
-                <span class="vol">VOL: $4.8M</span>
+                <span style="font-size:11px; color:#94a3b8; font-weight:700;">VOL: $4.8M</span>
             </div>
             <div class="btn-row">
                 <button class="m-btn btn-yes">YES</button>
@@ -99,82 +92,69 @@
             <input type="email" class="m-input" placeholder="Email Address">
             <input type="password" class="m-input" placeholder="Password">
             <button class="m-btn-main" onclick="closeAuth()">Continue</button>
-            <p onclick="closeAuth()" style="margin-top:20px; font-size:13px; color:#94a3b8; cursor:pointer;">Cancel</p>
         </div>
     </div>
 
     <script>
-        // --- DEPOSIT SYSTEM ---
-        window.onload = function() {
-            if (window.IntaSend) {
-                new window.IntaSend({
-                    publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
-                    live: false 
-                }).buttons("#deposit-btn").on("COMPLETE", (res) => {
-                    document.getElementById('balance').innerText = res.amount;
-                });
-            }
-            renderMarkets(30); // Load 30 right away
-        };
+        // --- FIXED DEPOSIT (FULL PAGE REDIRECT) ---
+        function handleDeposit() {
+            const intasend = new window.IntaSend({
+                publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
+                live: false 
+            });
 
-        // --- AUTH TOGGLE ---
+            intasend.run({
+                amount: 50,
+                currency: "KES",
+                redirect: true // FORCES NEW PAGE - NO BLOCKING
+            });
+        }
+
+        // --- AUTH LOGIC ---
         let isSignUp = false;
         function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
         function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
         function toggleAuthMode() {
             isSignUp = !isSignUp;
             const title = document.getElementById('auth-title');
-            const slider = document.querySelector('.switch-container');
+            const container = document.querySelector('.switch-container');
             const tabIn = document.getElementById('tabIn');
             const tabUp = document.getElementById('tabUp');
             
             if(isSignUp) {
-                slider.classList.add('signup-mode');
+                container.classList.add('signup-mode');
                 tabUp.classList.add('active'); tabIn.classList.remove('active');
                 title.innerText = "Create Account";
             } else {
-                slider.classList.remove('signup-mode');
+                container.classList.remove('signup-mode');
                 tabIn.classList.add('active'); tabUp.classList.remove('active');
                 title.innerText = "Welcome Back";
             }
         }
 
-        // --- MARKET FEED ---
-        const marketPool = [
-            "Will Bitcoin hit $120k by Christmas?",
-            "Will Kenya Shilling reach 115 per USD?",
-            "Will Arsenal win the League?",
-            "Will AI solve Nuclear Fusion by 2027?",
-            "Will Solana flip ETH in Volume?",
-            "Will GPT-5 be released this year?"
-        ];
-
-        let totalLoaded = 0;
+        // --- FEED LOGIC (30 INITIAL + INFINITE) ---
+        const marketPool = ["Bitcoin to $100k?", "Ksh to 120?", "Arsenal Win?", "AI Solves Cancer?", "Solana Flip ETH?"];
+        let count = 0;
         function renderMarkets(num) {
             const feed = document.getElementById('dynamic-feed');
             for(let i=0; i<num; i++) {
-                if(totalLoaded >= 1000) break;
-                totalLoaded++;
+                if(count >= 1000) break;
+                count++;
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
                     <div class="m-title">${marketPool[Math.floor(Math.random()*marketPool.length)]}</div>
-                    <div class="stat-row">
-                        <span class="p-val">${Math.floor(Math.random()*80)+10}%</span>
-                        <span class="vol">VOL: $${(Math.random()*3).toFixed(1)}M</span>
-                    </div>
-                    <div class="btn-row">
-                        <button class="m-btn btn-yes">YES</button>
-                        <button class="m-btn btn-no">NO</button>
-                    </div>
+                    <div class="stat-row"><span class="p-val">${Math.floor(Math.random()*80)+10}%</span></div>
+                    <div class="btn-row"><button class="m-btn btn-yes">YES</button><button class="m-btn btn-no">NO</button></div>
                 `;
                 feed.appendChild(card);
             }
         }
 
+        window.onload = () => renderMarkets(30);
         window.onscroll = () => {
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 800) {
-                renderMarkets(15);
+                renderMarkets(10);
             }
         };
     </script>

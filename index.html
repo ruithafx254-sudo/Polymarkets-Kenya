@@ -13,45 +13,26 @@
             --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #cf304a;
         }
         
-        /* Default body state */
         body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 100px; font-family: -apple-system, sans-serif; overflow-x: hidden; transition: padding 0.2s ease; }
 
-        /* --- THE HEADER HIDER (FIXED FOR CLICKABILITY) --- */
-        body.hide-header .header {
-            display: none !important;
-        }
-        /* CRITICAL: Remove padding so the top fields (Amount/Phone) are clickable */
-        body.hide-header {
-            padding-top: 0 !important;
-        }
+        /* --- HEADER HIDER --- */
+        body.hide-header .header { display: none !important; }
+        body.hide-header { padding-top: 0 !important; }
 
-        /* --- THE BOTTOM BAR FIX --- */
-        #intasend-inline-container .intasend-modal-content {
-            display: flex !important;
-            flex-direction: column !important;
-        }
-        #intasend-inline-container .intasend-payment-nav {
-            order: 2 !important; 
-            margin-top: 20px !important;
-            border-top: 1px solid #eee !important;
-            border-bottom: none !important;
-        }
-        #intasend-inline-container .intasend-payment-body {
-            order: 1 !important;
-        }
+        /* --- INTASEND UI TWEAKS --- */
+        #intasend-inline-container .intasend-modal-content { display: flex !important; flex-direction: column !important; }
+        #intasend-inline-container .intasend-payment-nav { order: 2 !important; margin-top: 20px !important; border-top: 1px solid #eee !important; border-bottom: none !important; }
+        #intasend-inline-container .intasend-payment-body { order: 1 !important; }
 
         /* --- HEADER --- */
         .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
         .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
         .logo { font-weight: 900; font-size: 24px; color: #000; letter-spacing: -1.5px; }
-        
         .bar-right { display: flex; align-items: center; gap: 8px; }
-        .auth-trigger-btn { background: #f1f5f9; color: #475569; border: none; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
-
         .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 14px; font-weight: 700; }
         .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; }
 
-        /* --- DASHBOARD --- */
+        /* --- FEED --- */
         #dashboard { max-width: 500px; margin: auto; padding: 12px; }
         .card { background: #fff; border-radius: 24px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; }
         .m-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 18px; color: #1e293b; }
@@ -69,7 +50,6 @@
         <div class="top-nav">
             <div class="logo">NEXGEN</div>
             <div class="bar-right">
-                <button class="auth-trigger-btn">Sign In</button>
                 <div class="wallet-pill">
                     Ksh <span id="balance">0.00</span>
                     <button onclick="handleDeposit()" class="btn-deposit">Deposit</button>
@@ -95,7 +75,15 @@
 
     <script>
         function handleDeposit() {
-            // Hide header and remove padding
+            // 1. Ask the user for the amount
+            const userAmount = prompt("Enter deposit amount (Ksh):", "100");
+            
+            // 2. Validate the input
+            if (userAmount === null || userAmount.trim() === "" || isNaN(userAmount) || Number(userAmount) <= 0) {
+                return; // Cancel if input is invalid or user hits cancel
+            }
+
+            // 3. Proceed with the amount provided
             document.body.classList.add('hide-header');
 
             const intasend = new window.IntaSend({
@@ -104,19 +92,21 @@
             });
 
             intasend.run({
-                amount: 50,
+                amount: Number(userAmount),
                 currency: "KES",
                 redirect: false 
             })
             .on("COMPLETE", (res) => {
-                document.getElementById('balance').innerText = res.amount;
+                // Update balance on success
+                const currentBal = parseFloat(document.getElementById('balance').innerText);
+                document.getElementById('balance').innerText = (currentBal + Number(userAmount)).toFixed(2);
                 document.body.classList.remove('hide-header');
             })
             .on("FAILED", () => {
                 document.body.classList.remove('hide-header');
             });
 
-            // Watch for modal close to restore header
+            // Auto-restore header if modal container disappears
             const checkModal = setInterval(() => {
                 const container = document.getElementById('intasend-inline-container');
                 if (container && container.style.display === 'none') {

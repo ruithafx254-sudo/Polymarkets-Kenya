@@ -16,7 +16,7 @@
         
         body { background: #fafafa; color: var(--text-main); margin: 0; padding-top: 80px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
 
-        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
+        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); transition: transform 0.3s ease-in-out; }
         .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 68px; }
         .logo-wrap { display: flex; flex-direction: column; line-height: 1; }
         .logo-main { font-weight: 900; font-size: 19px; letter-spacing: -0.5px; color: #000; text-transform: uppercase; }
@@ -30,6 +30,10 @@
         .user-id { width: 36px; height: 36px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .person-icon { width: 18px; height: 18px; fill: currentColor; }
 
+        /* Hide header when payment window or modals are active */
+        body.hide-header .header-stack { transform: translateY(-100%); }
+        body.hide-header { padding-top: 20px; }
+
         #dashboard { max-width: 600px; margin: auto; padding: 12px; box-sizing: border-box; }
         .market-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.01); }
         .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
@@ -38,10 +42,11 @@
         .odds-lbl { font-size: 10px; color: var(--text-sub); text-transform: uppercase; display: block; text-align: right; }
         
         .btn-group { display: flex; gap: 10px; }
-        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .trade-btn:active { opacity: 0.7; }
         .trade-btn.yes { background: var(--yes); color: var(--yes-text); }
         .trade-btn.no { background: var(--no); color: var(--no-text); }
+        .multiplier { font-size: 11px; font-weight: 700; opacity: 0.8; }
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
         .modal { background: #fff; width: 100%; max-width: 390px; padding: 28px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); box-sizing: border-box; }
@@ -61,7 +66,7 @@
 </head>
 <body>
 
-    <div class="header-stack">
+    <div id="headerStack" class="header-stack">
         <div class="top-nav">
             <div class="logo-wrap">
                 <div class="logo-main">Polymarkets</div>
@@ -130,22 +135,28 @@
     </div>
 
     <script>
-        // Updated to use the correct test key string
         const INTASEND_PUBLIC_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad";
 
-        const subjects = [
+        // Extensive dummy card markets for 200 high-performance predictions
+        const predictionThemes = [
             "Will Kenya's GDP growth surpass the 5.5% marker next quarter?",
             "Will the Central Bank of Kenya reduce interest rates at the next policy review?",
             "Will major indices finish the quarter with gains?",
-            "Will a major tech titan announce a new digital device this year?",
             "Will Bitcoin secure a stable position above the $100k line next month?",
-            "Will the next James Bond actor be officially announced before the end of the year?",
             "Will Arsenal claim the English Premier League crown this season?",
             "Will Real Madrid successfully claim the Champions League trophy?",
             "Will global central banks expand their digital currency frameworks?",
             "Will crude oil benchmarks remain stable at $80 per barrel?",
+            "Will EV sales establish a new high within the regional automotive market?",
+            "Will a major tech titan announce a new digital device this year?",
+            "Will the next James Bond actor be officially announced before August?",
             "Will a new movie release surpass the current records?",
-            "Will EV sales establish a new high within the regional automotive market?"
+            "Will gold prices break past the $2,500/oz ceiling this month?",
+            "Will the US Federal Reserve lower the benchmark rate by September?",
+            "Will the African Union establish a unified startup regulatory framework?",
+            "Will total global daily flights exceed pre-pandemic highs by December?",
+            "Will a major streaming platform restrict password sharing worldwide next month?",
+            "Will AI-generated software engineering tools outpace traditional platforms this year?"
         ];
 
         let markets = [];
@@ -158,12 +169,19 @@
 
         function initialize200Markets() {
             for (let i = 1; i <= 200; i++) {
-                const sub = subjects[i % subjects.length];
+                const sub = predictionThemes[i % predictionThemes.length];
                 const chanceValue = Math.floor(15 + (i * 3) % 75);
+                
+                // Calculate realistic multipliers based on the probability percentage
+                const yesMultiplier = (100 / chanceValue).toFixed(2);
+                const noMultiplier = (100 / (100 - chanceValue)).toFixed(2);
+
                 markets.push({
                     id: `m-ext-${i}`,
-                    q: `${sub} (Instance #${i})`,
-                    p: chanceValue
+                    q: sub,
+                    p: chanceValue,
+                    yesMult: yesMultiplier,
+                    noMult: noMultiplier
                 });
             }
         }
@@ -182,8 +200,14 @@
                         <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
-                        <button class="trade-btn yes" onclick="handleWagerClick('${item.q}')">Yes</button>
-                        <button class="trade-btn no" onclick="handleWagerClick('${item.q}')">No</button>
+                        <button class="trade-btn yes" onclick="handleWagerClick('${item.q}')">
+                            <span>Yes</span>
+                            <span class="multiplier">${item.yesMult}x</span>
+                        </button>
+                        <button class="trade-btn no" onclick="handleWagerClick('${item.q}')">
+                            <span>No</span>
+                            <span class="multiplier">${item.noMult}x</span>
+                        </button>
                     </div>`;
                 f.appendChild(card);
             });
@@ -242,21 +266,29 @@
             }
 
             closeModal('depositModal');
+            
+            // Instantly hide the header before initiating the IntaSend Checkout
+            document.body.classList.add('hide-header');
 
-            // Corrected to test mode (live: false) matching the Test API Key
             let intasend = new window.IntaSend({
                 publicAPIKey: INTASEND_PUBLIC_KEY,
                 live: false 
             });
 
             intasend.on("COMPLETE", (results) => {
+                document.body.classList.remove('hide-header');
                 let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
                 localStorage.setItem('nx_balance', cur + Number(amt));
                 syncState();
                 alert(`Success! Ksh ${amt.toLocaleString()} has been added to your balance.`);
             })
             .on("FAILED", (results) => {
+                document.body.classList.remove('hide-header');
                 alert("The transaction was not completed.");
+            })
+            .on("IN-PROGRESS", () => {
+                // Keep header hidden during transaction processing
+                document.body.classList.add('hide-header');
             });
 
             intasend.run({
@@ -266,9 +298,22 @@
             });
         }
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function logout() { if(confirm("Terminate session?")) { localStorage.clear(); location.reload(); } }
+        function openModal(id) { 
+            document.body.classList.add('hide-header');
+            document.getElementById(id).style.display = 'flex'; 
+        }
+
+        function closeModal(id) { 
+            document.body.classList.remove('hide-header');
+            document.getElementById(id).style.display = 'none'; 
+        }
+
+        function logout() { 
+            if(confirm("Terminate session?")) { 
+                localStorage.clear(); 
+                location.reload(); 
+            } 
+        }
     </script>
 </body>
 </html>

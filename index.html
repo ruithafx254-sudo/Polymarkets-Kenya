@@ -12,7 +12,6 @@
             --accent: #2ebd85; --border: #eceef2; --text-main: #0f172a; --text-sub: #64748b;
             --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #991b1b;
             --tech-bg: #0f172a;
-            --news-accent: #ef4444;
         }
         
         body { background: #fafafa; color: var(--text-main); margin: 0; padding-top: 80px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
@@ -36,82 +35,6 @@
 
         #dashboard { max-width: 600px; margin: auto; padding: 12px; box-sizing: border-box; }
         
-        /* Continuous Smooth Professional Ticker */
-        .news-ticker-container { 
-            background: #fff; 
-            border: 1px solid var(--border); 
-            border-left: 4px solid var(--news-accent);
-            border-radius: 14px; 
-            padding: 14px 0; 
-            margin-bottom: 20px; 
-            display: flex; 
-            align-items: center; 
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.04); 
-            overflow: hidden;
-            position: relative;
-        }
-        .news-badge { 
-            background: var(--news-accent); 
-            color: #fff; 
-            font-size: 10px; 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            padding: 5px 10px; 
-            border-radius: 6px; 
-            letter-spacing: 1px; 
-            flex-shrink: 0; 
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-left: 18px;
-            margin-right: 14px;
-            z-index: 2;
-            box-shadow: 2px 0 8px rgba(255, 255, 255, 0.9);
-        }
-        .news-badge::before {
-            content: "";
-            width: 6px;
-            height: 6px;
-            background: #fff;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        /* Seamless Continuous Scroll Area */
-        .news-headline-wrapper {
-            flex-grow: 1;
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-            display: flex;
-        }
-        .news-scroller {
-            display: flex;
-            gap: 50px;
-            animation: tickerScroll 35s linear infinite;
-            padding-right: 50px;
-        }
-        .news-scroller:hover {
-            animation-play-state: paused;
-        }
-        .news-item {
-            font-size: 13.5px; 
-            font-weight: 700; 
-            color: var(--text-main); 
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .news-divider {
-            color: var(--news-accent);
-            font-weight: 900;
-        }
-
-        @keyframes tickerScroll {
-            0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(-50%, 0, 0); }
-        }
-
         /* Lively Market Cards */
         .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
         .market-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
@@ -175,14 +98,6 @@
     </div>
 
     <div id="dashboard">
-        <div class="news-ticker-container">
-            <div class="news-badge">Live</div>
-            <div class="news-headline-wrapper">
-                <div id="news-scroller" class="news-scroller">
-                    </div>
-            </div>
-        </div>
-
         <div id="feed"></div>
     </div>
 
@@ -276,23 +191,45 @@
         let activeTab = 'in';
         let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
 
-        // Preset Professional Terminal News Items
-        const headlines = [
-            "Market volatility shifts following regional central bank updates",
-            "Gold markets sustain positive traction ahead of US CPI metrics",
-            "African tech networks report surging investment cycles this season",
-            "Local derivatives post record liquidity as volumes continue to climb",
-            "Crude oil stabilizes as international supply frameworks adjust"
-        ];
-
-        // Global Prediction Dataset
+        // Variety Dataset (Fully Unique Lists)
         const categories = ["Finance", "Sports", "Politics", "Tech", "Entertainment"];
         const feedThemes = {
-            "Finance": ["Will Kenya's GDP growth surpass the 5.5% marker next quarter?", "Will the CBK reduce interest rates?"],
-            "Sports": ["Will Arsenal claim the English Premier League crown this season?", "Will Kenya win 3+ gold medals?"],
-            "Politics": ["Will the African Union establish a unified startup regulatory framework?"],
-            "Tech": ["Will EV sales establish a new high within the regional market?"],
-            "Entertainment": ["Will the next James Bond actor be officially announced before August?"]
+            "Finance": [
+                "Will Kenya's GDP growth surpass the 5.5% marker next quarter?",
+                "Will the Central Bank of Kenya reduce interest rates at the next policy review?",
+                "Will Bitcoin secure a stable position above the $100k line next month?",
+                "Will major indices finish the quarter with overall gains?",
+                "Will crude oil benchmarks remain stable at $80 per barrel?",
+                "Will gold prices break past the $2,500/oz ceiling this month?",
+                "Will the US Federal Reserve lower the benchmark rate by September?",
+                "Will the Nairobi Securities Exchange post a record year for transaction volume?"
+            ],
+            "Sports": [
+                "Will Arsenal claim the English Premier League crown this season?",
+                "Will Real Madrid successfully claim the Champions League trophy?",
+                "Will Kenya win at least 3 gold medals in the upcoming Athletics Championships?",
+                "Will the next World Cup host unveil new regional stadium upgrades this month?",
+                "Will a new lap record be set at the next Formula 1 Grand Prix?"
+            ],
+            "Politics": [
+                "Will the African Union establish a unified startup regulatory framework?",
+                "Will the regional trade pact see 5 new member additions before December?",
+                "Will a major environmental treaty be ratified by global leaders next quarter?",
+                "Will upcoming regional summits resolve outstanding border tariff disputes?"
+            ],
+            "Tech": [
+                "Will EV sales establish a new high within the regional automotive market?",
+                "Will a major tech titan announce a new digital device this year?",
+                "Will AI-generated software engineering tools outpace traditional platforms?",
+                "Will European energy storage networks double total capacity before next winter?",
+                "Will the next global cybersecurity standard be deployed by Q4?"
+            ],
+            "Entertainment": [
+                "Will the next James Bond actor be officially announced before August?",
+                "Will a new movie release surpass current box office records?",
+                "Will a major streaming platform restrict password sharing worldwide next month?",
+                "Will regional music artists sweep at least two major international awards this year?"
+            ]
         };
 
         let markets = [];
@@ -302,38 +239,37 @@
             initializeMarkets();
             syncState(); 
             renderFeed();
-            setupNewsTicker();
         };
 
-        function setupNewsTicker() {
-            const scroller = document.getElementById('news-scroller');
-            scroller.innerHTML = '';
-
-            // Generate content once
-            const content = headlines.map(h => `<div class="news-item"><span>${h}</span><span class="news-divider">•</span></div>`).join('');
-            
-            // Duplicate the contents exactly to create an uninterrupted continuous marquee loop
-            scroller.innerHTML = content + content;
-        }
-
         function initializeMarkets() {
-            for (let i = 1; i <= 3000; i++) {
+            let catCounters = { "Finance": 0, "Sports": 0, "Politics": 0, "Tech": 0, "Entertainment": 0 };
+            
+            for (let i = 0; i < 200; i++) {
+                // Placed exactly between 8 and 9 (Index 8 is the 9th item)
                 if (i === 8) {
                     markets.push({
-                        id: `m-ext-0`,
+                        id: `m-ext-jesus`,
                         q: "Will Jesus be back before June 5th?",
                         category: "Culture",
                         p: 25,
-                        yesMult: "9.00",
-                        noMult: "3.00"
+                        yesMult: "4.00",
+                        noMult: "1.33"
                     });
+                    continue;
                 }
+
+                // Choose distinct categories sequentially
                 const cat = categories[i % categories.length];
-                const prompts = feedThemes[cat] || ["General market predictions to monitor this month."];
-                const basePrompt = prompts[i % prompts.length];
-                const question = `${basePrompt} (Market Variant #${1000 + i})`;
+                const prompts = feedThemes[cat];
                 
-                const chanceValue = Math.floor(10 + (i * 3.7) % 80);
+                // Track usage index to avoid immediate sequential repetition
+                const promptIndex = catCounters[cat] % prompts.length;
+                catCounters[cat]++;
+
+                const question = prompts[promptIndex];
+                
+                // Formulate balanced initial trading probabilities
+                const chanceValue = Math.floor(25 + ((i * 7) % 51)); 
                 const yesMultiplier = (100 / chanceValue).toFixed(2);
                 const noMultiplier = (100 / (100 - chanceValue)).toFixed(2);
 

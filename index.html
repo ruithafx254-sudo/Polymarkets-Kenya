@@ -13,7 +13,7 @@
             --primary: #2ebd85; --border: #f1f5f9; --text-main: #0f172a;
             --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #cf304a;
         }
-        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 100px; font-family: -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 100px; font-family: -apple-system, sans-serif; }
 
         /* --- HEADER --- */
         .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
@@ -25,9 +25,8 @@
 
         .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 14px; font-weight: 700; }
         
-        /* DEPOSIT BUTTON - UPDATED TO UNBLOCK MPESA */
-        .intaSendPayButton { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
-        .intaSendPayButton:active { transform: scale(0.95); }
+        /* DEPOSIT BUTTON */
+        .intaSendPayButton { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; }
 
         /* --- AUTH SLIDING SWITCH --- */
         #auth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
@@ -39,22 +38,21 @@
         .slider { position: absolute; width: calc(50% - 4px); height: calc(100% - 8px); background: #fff; border-radius: 11px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .signup-mode .slider { transform: translateX(100%); }
 
-        .m-input { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 16px; outline: none; box-sizing: border-box; background: #fcfdfe; }
+        .m-input { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 16px; outline: none; box-sizing: border-box; }
         .m-btn-main { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; margin-top: 10px; }
 
         /* --- CARDS --- */
         #dashboard { max-width: 500px; margin: auto; padding: 12px; }
-        .card { background: #fff; border-radius: 24px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; transition: transform 0.2s; }
-        .m-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 18px; color: #1e293b; letter-spacing: -0.3px; }
+        .card { background: #fff; border-radius: 24px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; }
+        .m-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 18px; color: #1e293b; }
         .stat-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
-        .p-val { font-size: 30px; font-weight: 800; color: #000; letter-spacing: -1px; }
-        .vol { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; }
+        .p-val { font-size: 30px; font-weight: 800; color: #000; }
+        .vol { font-size: 11px; color: #94a3b8; font-weight: 700; }
         
         .btn-row { display: flex; gap: 12px; }
-        .m-btn { flex: 1; padding: 16px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; font-size: 15px; transition: opacity 0.1s; }
+        .m-btn { flex: 1; padding: 16px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; font-size: 15px; }
         .btn-yes { background: var(--yes); color: var(--yes-text); }
         .btn-no { background: var(--no); color: var(--no-text); }
-        .m-btn:active { opacity: 0.7; }
     </style>
 </head>
 <body>
@@ -69,8 +67,7 @@
                     <button id="deposit-btn" class="intaSendPayButton" 
                             data-amount="50" 
                             data-currency="KES"
-                            data-email="user@nexgen.com"
-                            data-method="CARD-MPESA">Deposit</button>
+                            data-email="user@nexgen.com">Deposit</button>
                 </div>
             </div>
         </div>
@@ -80,8 +77,8 @@
         <div class="card">
             <div class="m-title">Will Jesus Christ return before December 2026?</div>
             <div class="stat-row">
-                <span class="p-val">11%</span>
-                <span class="vol">VOL: $4.2M</span>
+                <span class="p-val">12%</span>
+                <span class="vol">VOL: $4.8M</span>
             </div>
             <div class="btn-row">
                 <button class="m-btn btn-yes">YES</button>
@@ -93,22 +90,21 @@
 
     <div id="auth-modal">
         <div class="modal-content">
-            <div class="switch-container" id="authToggle" onclick="toggleAuthMode()">
+            <div class="switch-container" onclick="toggleAuthMode()">
                 <div class="slider" id="authSlider"></div>
                 <div class="switch-tab active" id="tabIn">Sign In</div>
                 <div class="switch-tab" id="tabUp">Sign Up</div>
             </div>
-            
-            <h2 id="auth-title" style="margin-top:0; font-size: 24px; letter-spacing: -1px;">Welcome Back</h2>
+            <h2 id="auth-title">Welcome Back</h2>
             <input type="email" class="m-input" placeholder="Email Address">
             <input type="password" class="m-input" placeholder="Password">
-            <button class="m-btn-main" id="authSubmit" onclick="closeAuth()">Sign In</button>
-            <p onclick="closeAuth()" style="margin-top:20px; font-size:13px; color:#94a3b8; cursor:pointer;">Maybe later</p>
+            <button class="m-btn-main" onclick="closeAuth()">Continue</button>
+            <p onclick="closeAuth()" style="margin-top:20px; font-size:13px; color:#94a3b8; cursor:pointer;">Cancel</p>
         </div>
     </div>
 
     <script>
-        // --- DEPOSIT SYSTEM (UNTOUCHED LOGIC) ---
+        // --- DEPOSIT SYSTEM ---
         window.onload = function() {
             if (window.IntaSend) {
                 new window.IntaSend({
@@ -116,82 +112,69 @@
                     live: false 
                 }).buttons("#deposit-btn").on("COMPLETE", (res) => {
                     document.getElementById('balance').innerText = res.amount;
-                }).on("FAILED", () => {
-                    alert("Payment Canceled or Failed");
                 });
             }
-            renderMarkets(30); // Initial 30 predictions for immediate impact
+            renderMarkets(30); // Load 30 right away
         };
 
-        // --- AUTH SWITCH LOGIC ---
+        // --- AUTH TOGGLE ---
         let isSignUp = false;
         function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
         function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
-
         function toggleAuthMode() {
             isSignUp = !isSignUp;
-            const container = document.getElementById('authToggle');
             const title = document.getElementById('auth-title');
-            const btn = document.getElementById('authSubmit');
+            const slider = document.querySelector('.switch-container');
             const tabIn = document.getElementById('tabIn');
             const tabUp = document.getElementById('tabUp');
-
+            
             if(isSignUp) {
-                container.classList.add('signup-mode');
-                tabUp.classList.add('active');
-                tabIn.classList.remove('active');
+                slider.classList.add('signup-mode');
+                tabUp.classList.add('active'); tabIn.classList.remove('active');
                 title.innerText = "Create Account";
-                btn.innerText = "Sign Up";
             } else {
-                container.classList.remove('signup-mode');
-                tabIn.classList.add('active');
-                tabUp.classList.remove('active');
+                slider.classList.remove('signup-mode');
+                tabIn.classList.add('active'); tabUp.classList.remove('active');
                 title.innerText = "Welcome Back";
-                btn.innerText = "Sign In";
             }
         }
 
-        // --- MAX PERFORMANCE FEED ---
+        // --- MARKET FEED ---
         const marketPool = [
-            "Will BTC reach $150k this year?",
-            "Will the Finance Bill 2026 pass fully?",
-            "Will Arsenal win the Champions League?",
-            "Will Kenya Shilling stay below 120 per USD?",
-            "Will Solana flip Ethereum in daily volume?",
-            "Will AI pass the Bar Exam with 99% score?",
-            "Will a new pandemic be declared by WHO in 2026?",
-            "Will Mars landing happen before 2030?",
-            "Will GTA VI sell 20M copies on day one?"
+            "Will Bitcoin hit $120k by Christmas?",
+            "Will Kenya Shilling reach 115 per USD?",
+            "Will Arsenal win the League?",
+            "Will AI solve Nuclear Fusion by 2027?",
+            "Will Solana flip ETH in Volume?",
+            "Will GPT-5 be released this year?"
         ];
 
-        let marketCount = 0;
+        let totalLoaded = 0;
         function renderMarkets(num) {
             const feed = document.getElementById('dynamic-feed');
-            if (marketCount >= 1000) return; 
-
             for(let i=0; i<num; i++) {
-                marketCount++;
+                if(totalLoaded >= 1000) break;
+                totalLoaded++;
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
                     <div class="m-title">${marketPool[Math.floor(Math.random()*marketPool.length)]}</div>
                     <div class="stat-row">
-                        <span class="p-val">${Math.floor(Math.random()*85)+5}%</span>
-                        <span class="vol">VOL: $${(Math.random()*2).toFixed(1)}M</span>
+                        <span class="p-val">${Math.floor(Math.random()*80)+10}%</span>
+                        <span class="vol">VOL: $${(Math.random()*3).toFixed(1)}M</span>
                     </div>
                     <div class="btn-row">
-                        <button class="m-btn btn-yes" onclick="alert('Order processing...')">YES</button>
-                        <button class="m-btn btn-no" onclick="alert('Order processing...')">NO</button>
+                        <button class="m-btn btn-yes">YES</button>
+                        <button class="m-btn btn-no">NO</button>
                     </div>
                 `;
                 feed.appendChild(card);
             }
         }
 
-        // Infinite Scroll to reach 1000
         window.onscroll = () => {
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 800) {
-                renderMarkets(10);
+                renderMarkets(15);
             }
         };
     </script>

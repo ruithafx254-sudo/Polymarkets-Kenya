@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Polymarkets Africa | Terminal</title>
     
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js" async onerror="console.warn('IntaSend CDN failed to load. Operating in local mode.')"></script>
 
     <style>
         :root { 
@@ -292,7 +292,6 @@
     <script>
         let currentCat = 'All';
         
-        // Base seed markets
         let markets = [
             { id: 'jesus-return-permanent-99', type: 'm', cat: "Spirituality", q: "Will Jesus come back before June?", p: 69, isPermanent: true, xYes: 9, xNo: 4 },
             { id: 'ruto-reshuffle-june', type: 'm', cat: "Kenya", q: "Will William Ruto reshuffle the cabinet by June?", p: 62 },
@@ -300,7 +299,6 @@
             { id: 'n-kes-variance', type: 'n', cat: "News", h: "Ksh Volatility Alert", p: "The KES has shown 0.4% variance in the last 24h. Local markets reacting to export data." }
         ];
 
-        // Deduplication Registry to block repeating generated predictions
         let usedQuestionsRegistry = new Set([
             "Will Jesus come back before June?",
             "Will William Ruto reshuffle the cabinet by June?",
@@ -328,7 +326,6 @@
             setInterval(generateGeminiPulse, 7000); 
         };
 
-        // --- CORE UI ENGINE ---
         function render(cat) {
             currentCat = cat;
             const f = document.getElementById('feed'); f.innerHTML = '';
@@ -348,7 +345,6 @@
             render(cat);
         }
 
-        // --- GEMINI INTELLIGENCE PULSE (Continuous news/prediction updates) ---
         function generateGeminiPulse() {
             const cats = Object.keys(intelligenceSignals);
             const rCat = cats[Math.floor(Math.random() * cats.length)];
@@ -362,7 +358,6 @@
 
             const question = qTemplates[Math.floor(Math.random() * qTemplates.length)];
 
-            // Deduplication Guard: Check if already created, skip generation if it matches
             if (usedQuestionsRegistry.has(question)) return;
             usedQuestionsRegistry.add(question);
 
@@ -383,7 +378,6 @@
                 p: signal
             };
 
-            // Inject to feed
             markets.unshift(newItem);
             injectToTerminal(newItem, true);
 
@@ -395,8 +389,6 @@
 
         function injectToTerminal(item, isNew) {
             const f = document.getElementById('feed');
-            
-            // Render checks
             if (!isNew && currentCat !== 'All' && currentCat !== 'News' && currentCat !== item.cat) return;
             if (isNew && currentCat !== 'All' && currentCat !== 'News' && currentCat !== item.cat) return;
 
@@ -419,4 +411,7 @@
                         <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
-                      
+                        <button class="trade-btn yes" onclick="wagerDialog('${item.id}', 'YES', '${item.q.replace(/'/g, "\\'")}')">
+                            Yes ${yesMultiplier}
+                        </button>
+                        <button class="trade-btn no" onclick="wagerDialog('${item.id}', 'NO', '${item.q.r

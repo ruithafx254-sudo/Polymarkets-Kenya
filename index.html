@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Polymarkets Africa | Terminal</title>
     
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js" async onerror="console.warn('Intasend script unavailable')"></script>
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js" async></script>
 
     <style>
         :root { 
@@ -47,7 +47,7 @@
         .odds-lbl { font-size: 10px; color: var(--text-sub); text-transform: uppercase; display: block; text-align: right; }
         
         .btn-group { display: flex; gap: 10px; }
-        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; }
         .trade-btn.yes { background: var(--yes); color: var(--yes-text); }
         .trade-btn.no { background: var(--no); color: var(--no-text); }
 
@@ -136,39 +136,27 @@
         </div>
     </div>
 
-    <div id="wagerModal" class="overlay">
+    <div id="stakeModal" class="overlay">
         <div class="modal">
-            <h2 id="wTitle" style="font-size: 16px; font-weight: 800; text-align: left; margin-bottom: 8px;">Make Prediction</h2>
-            <p id="wQuestion" style="font-size: 13px; color: var(--text-sub); text-align: left; margin-bottom: 16px; font-weight: 500;"></p>
-            <input type="number" id="wAmount" class="input-tech" placeholder="Enter Wager (Min Ksh 50)" style="font-size: 15px; font-weight: 700;">
-            <button id="wConfirmBtn" class="btn-tech" style="margin-top: 4px;">Confirm Wager</button>
-            <p style="font-size: 12px; color: var(--text-sub); margin-top: 16px; cursor: pointer;" onclick="closeModal('wagerModal')">Cancel</p>
+            <h2 id="sTitle">Place Stake</h2>
+            <p id="sQuestion" style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px;"></p>
+            <input type="number" id="stakeAmt" class="input-tech" placeholder="Stake Amount (Ksh)">
+            <button id="stakeConfirmBtn" class="btn-tech" style="background: var(--accent)">Confirm Stake</button>
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('stakeModal')">Cancel</p>
         </div>
     </div>
 
     <script>
         // --- DATA & INITIALIZATION ---
         let currentCat = 'All';
-        
         let markets = [
-            { type: 'm', cat: "Kenya", q: "Will Jesus come back before June?", p: 4, isPermanent: true },
-            { type: 'm', cat: "Kenya", q: "Will William Ruto reshuffle the cabinet by June?", p: 62 },
-            { type: 'm', cat: "Crypto", q: "Will Bitcoin stay above $100k until June?", p: 72 },
-            { type: 'n', cat: "News", h: "Ksh Volatility Alert", p: "The KES has shown 0.4% variance in the last 24h. Local markets reacting to export data." }
+            { type: 'm', cat: "Kenya", q: "Will Jesus come back before June?", p: 4, id: 1 }
         ];
 
         const intelligenceSignals = {
             Kenya: [
                 "I&M Bank launches KSh 10 billion fixed-rate note offer.",
-                "NSE derivatives turnover hits record high in February 2026.",
-                "KMRC launches KES 3bn sustainability bond for green home loans.",
-                "Nairobi to host 'AI Everything Kenya' summit in 4 days."
-            ],
-            Crypto: [
-                "Coinbase Q1 2026 earnings expectations set at conservative levels.",
-                "Prediction market volume grew 9.2x in 2025; Kalshi and Polymarket lead.",
-                "Phemex expands prediction market with daily crypto forecasts.",
-                "Institutional adoption of Digital Asset Treasuries (DATs) expands in 2026."
+                "NSE derivatives turnover hits record high in February 2026."
             ]
         };
 
@@ -182,13 +170,7 @@
         function render(cat) {
             currentCat = cat;
             const f = document.getElementById('feed'); f.innerHTML = '';
-            
-            let filtered = markets.filter(m => {
-                if (cat === 'All') return m.type === 'm';
-                if (cat === 'News') return m.type === 'n';
-                return m.cat === cat;
-            });
-
+            let filtered = markets.filter(m => cat === 'All' ? m.type === 'm' : (cat === 'News' ? m.type === 'n' : m.cat === cat));
             filtered.forEach(m => injectToTerminal(m, false));
         }
 
@@ -204,15 +186,10 @@
             const rCat = cats[Math.floor(Math.random() * cats.length)];
             const signal = intelligenceSignals[rCat][Math.floor(Math.random() * intelligenceSignals[rCat].length)];
             
-            const qTemplates = [
-                `Will the ${rCat} trend following "${signal.substring(0, 15)}..." hold through May 2026?`,
-                `Intelligence Alert: Will ${rCat} volatility exceed 12% by June?`
-            ];
-
             const newItem = {
                 type: 'm',
                 cat: rCat,
-                q: qTemplates[Math.floor(Math.random() * qTemplates.length)],
+                q: `Will trends follow "${signal.substring(0, 15)}..." this week?`,
                 p: Math.floor(Math.random() * 70 + 15),
                 isAI: true
             };
@@ -243,23 +220,19 @@
             if(item.type === 'm') {
                 card.className = 'market-card';
                 if(item.isAI) card.style.borderTop = "2px solid var(--gemini)";
-                if(item.isPermanent) card.style.borderTop = "2px solid var(--accent)";
                 
-                // Safe string conversion to prevent unescaped quote breaks
-                const safeQuestion = item.q.replace(/'/g, "\\'");
-
+                const safeQ = item.q.replace(/'/g, "\\'");
                 card.innerHTML = `
                     <div class="m-header">
                         <div class="m-title">
-                            ${item.isPermanent ? '<span style="color:var(--accent); font-size:9px; font-weight:900;">PERMANENT POOL</span><br>' : ''}
                             ${item.isAI ? '<span style="color:var(--gemini); font-size:9px; font-weight:900;">AI PREDICTION</span><br>' : ''}
                             ${item.q}
                         </div>
                         <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
-                        <button class="trade-btn yes" onclick="wagerDialog('YES', '${safeQuestion}')">Yes</button>
-                        <button class="trade-btn no" onclick="wagerDialog('NO', '${safeQuestion}')">No</button>
+                        <button class="trade-btn yes" onclick="openStakeModal('YES', '${safeQ}')">Yes</button>
+                        <button class="trade-btn no" onclick="openStakeModal('NO', '${safeQ}')">No</button>
                     </div>`;
             } else {
                 card.className = 'news-card';
@@ -272,18 +245,31 @@
                     <p class="news-p">${item.p}</p>`;
             }
 
-            // Always append to the bottom
+            // Appends to the bottom as requested
             f.appendChild(card);
-            
-            // Clean up old events if the feed exceeds 50 items
-            if(isNew && f.children.length > 50) {
-                for (let i = 0; i < f.children.length; i++) {
-                    if (!markets[i]?.isPermanent) {
-                        f.removeChild(f.children[i]);
-                        break;
-                    }
-                }
-            }
+            if(f.children.length > 25) f.removeChild(f.firstChild); 
+        }
+
+        // --- STAKING ENGINE ---
+        function openStakeModal(side, question) {
+            if(!localStorage.getItem('nx_user')) return openModal('authModal');
+            document.getElementById('sTitle').innerText = `Predicting '${side}'`;
+            document.getElementById('sQuestion').innerText = question;
+            document.getElementById('stakeAmt').value = '';
+            openModal('stakeModal');
+
+            document.getElementById('stakeConfirmBtn').onclick = () => {
+                const amt = Number(document.getElementById('stakeAmt').value);
+                const currentBalance = parseFloat(localStorage.getItem('nx_balance') || 0);
+
+                if(!amt || amt < 50) return alert("Minimum stake is Ksh 50");
+                if(amt > currentBalance) return alert("Insufficient balance to place stake.");
+
+                localStorage.setItem('nx_balance', currentBalance - amt);
+                syncState();
+                closeModal('stakeModal');
+                alert(`Stake successfully placed on '${side}'!`);
+            };
         }
 
         // --- ACCOUNT & WALLET ---
@@ -319,27 +305,6 @@
 
         function setAmt(v) { document.getElementById('depAmt').value = v; }
 
-        function wagerDialog(side, text) {
-            if(!localStorage.getItem('nx_user')) return openModal('authModal');
-            document.getElementById('wTitle').innerText = `Make '${side}' Prediction`;
-            document.getElementById('wQuestion').innerText = text;
-            document.getElementById('wagerModal').style.display = 'flex';
-            
-            document.getElementById('wConfirmBtn').onclick = () => {
-                const amount = parseFloat(document.getElementById('wAmount').value);
-                const currentBalance = parseFloat(localStorage.getItem('nx_balance') || 0);
-
-                if (isNaN(amount) || amount < 50) return alert("Min allowed: Ksh 50");
-                if (amount > currentBalance) return alert("Insufficient balance! Please fund your account.");
-
-                localStorage.setItem('nx_balance', currentBalance - amount);
-                syncState();
-                closeModal('wagerModal');
-                document.getElementById('wAmount').value = '';
-                alert(`Stake successful! Wagered Ksh ${amount.toLocaleString()} on '${side}'.`);
-            };
-        }
-
         function payNow() {
             const amt = document.getElementById('depAmt').value;
             if(!localStorage.getItem('nx_user')) return openModal('authModal');
@@ -347,7 +312,28 @@
             document.body.classList.add('hide-header');
             closeModal('depositModal');
             
+            // Safe direct fallback if SDK fails to respond
             if (typeof window.IntaSend === 'undefined') {
-                alert("Payment system initializing. Fallback direct manual credit processed.");
                 let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-                localSto
+                localStorage.setItem('nx_balance', cur + Number(amt));
+                syncState();
+                return;
+            }
+
+            const intasend = new window.IntaSend({ publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad", live: false });
+            intasend.run({ amount: Number(amt), currency: "KES" })
+            .on("COMPLETE", () => {
+                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
+                localStorage.setItem('nx_balance', cur + Number(amt));
+                document.body.classList.remove('hide-header');
+                syncState();
+            })
+            .on("CLOSE", () => document.body.classList.remove('hide-header'));
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function logout() { if(confirm("Sign out?")) { localStorage.clear(); location.reload(); } }
+    </script>
+</body>
+</html>

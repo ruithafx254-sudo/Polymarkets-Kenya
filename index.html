@@ -149,14 +149,15 @@
         let currentCat = 'All';
         let markets = [];
 
-        // Seeded exactly with the trending top global Polymarket predictions and news
+        // Seed exactly with real top 2026 Polymarket choices
         const baseMarkets = [
             { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" },
-            { type: 'm', cat: "Crypto", q: "Will Bitcoin hit $100k in 2026?", p: 59, id: "poly-btc-100k" },
-            { type: 'm', cat: "Elections", q: "Will there be no Fed Rate cuts in 2026?", p: 58, id: "poly-fed-cuts" },
+            { type: 'm', cat: "Crypto", q: "Will Bitcoin outperform gold in 2026?", p: 59, id: "poly-btc-gold" },
+            { type: 'm', cat: "Elections", q: "Will U.S. fall into a recession in 2026?", p: 27, id: "poly-us-recession" },
             { type: 'm', cat: "Crypto", q: "Will the AI bubble burst by the end of 2026?", p: 40, id: "poly-ai-bubble" },
-            { type: 'n', cat: "News", h: "Global Markets Coverage", p: "Economic adjustments continue to alter prediction volumes on inflation indicators.", id: "news-1" },
-            { type: 'n', cat: "News", h: "Digital Assets Review", p: "Trading lines indicate sustained momentum across global prediction ecosystems.", id: "news-2" }
+            { type: 'm', cat: "World", q: "Will Spain win the 2026 FIFA World Cup?", p: 16, id: "poly-wc-spain" },
+            { type: 'n', cat: "News", h: "Prediction Market Growth", p: "Trading records surged globally, reaching an all-time daily high volume of $425 million.", id: "news-1" },
+            { type: 'n', cat: "News", h: "Global Economic Easing", p: "Bettors maintain an outlook of 0.50% total cumulative cuts from the Fed in 2026.", id: "news-2" }
         ];
 
         window.onload = () => { 
@@ -170,13 +171,13 @@
             if (stored) {
                 try {
                     markets = JSON.parse(stored);
-                    // Prevent empty load if data gets completely cleared
-                    if(markets.length === 0) {
+                    if (!Array.isArray(markets) || markets.length === 0) {
                         markets = [...baseMarkets];
                         saveMarkets();
                     }
                 } catch(e) {
                     markets = [...baseMarkets];
+                    saveMarkets();
                 }
             } else {
                 markets = [...baseMarkets];
@@ -301,6 +302,7 @@
                 alertMsg += `You didn't have an active stake on this market.`;
             }
 
+            // Remove market from global array
             markets = markets.filter(m => m.id !== marketId);
             saveMarkets();
             
@@ -348,6 +350,4 @@
             document.body.classList.add('hide-header');
             closeModal('depositModal');
             
-            let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-            localStorage.setItem('nx_balance', cur + Number(amt));
-            document.body.classList.remove('hide-header')
+            let cur = parseFloat(localStorage.getIte

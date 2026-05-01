@@ -117,6 +117,10 @@
                     <input type="text" id="aName" class="input-tech" placeholder="e.g. Wanny Doe">
                 </div>
                 <div class="input-group">
+                    <label>Confirm Email</label>
+                    <input type="email" id="aConfirmEmail" class="input-tech" placeholder="Confirm your email address">
+                </div>
+                <div class="input-group">
                     <label>Country</label>
                     <select id="aCountry" class="input-tech">
                         <option value="Algeria">Algeria</option>
@@ -228,12 +232,12 @@
                 </span>
             </div>
 
-            <div id="withdrawBadge" class="badge-wrap hidden" style="background: #0f172a; padding: 16px; border-radius: 16px; margin-top: 14px;">
+            <div id="withdrawBadge" class="badge-wrap hidden">
                 <span style="display:block; text-align: center">
                     <a href="https://intasend.com/security" target="_blank">
-                        <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-dark.png" style="width:100%; max-width:320px; height:auto; display:inline-block;" alt="IntaSend Secure Payments (PCI-DSS Compliant)">
+                        <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" width="375px" alt="IntaSend Secure Payments (PCI-DSS Compliant)">
                     </a>
-                    <strong><a style="display: block; color: #fafafa; text-decoration: none; font-size: 0.75em; margin-top: 0.6em;" href="https://intasend.com/security" target="_blank">Secured by IntaSend Payments</a></strong>
+                    <strong><a style="display: block; color: #454545; text-decoration: none; font-size: 0.8em; margin-top: 0.6em;" href="https://intasend.com/security" target="_blank">Secured by IntaSend Payments</a></strong>
                 </span>
             </div>
 
@@ -243,8 +247,12 @@
 
     <script>
         const INTASEND_PUBLIC_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad";
+        let activeTab = 'in';
 
-        // Categorized prediction news datasets
+        // Synchronize and validate across LocalStorage fallback 
+        let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
+
+        // Global Prediction Dataset
         const categories = ["Finance", "Sports", "Politics", "Tech", "Entertainment"];
         const feedThemes = {
             "Finance": [
@@ -286,13 +294,23 @@
         let currentFundsMode = 'deposit';
 
         window.onload = () => {
-            initialize3000Markets();
+            initializeMarkets();
             syncState(); 
             renderFeed();
         };
 
-        function initialize3000Markets() {
-            // Generates up to 3000 dynamic prediction topics
+        function initializeMarkets() {
+            // Priority Jesus Market
+            markets.push({
+                id: `m-ext-0`,
+                q: "Will Jesus be back before June 5th?",
+                category: "Culture",
+                p: 25,
+                yesMult: "9.00",
+                noMult: "3.00"
+            });
+
+            // Generates remaining dynamic markets
             for (let i = 1; i <= 3000; i++) {
                 const cat = categories[i % categories.length];
                 const prompts = feedThemes[cat];
@@ -360,6 +378,7 @@
         }
 
         function setAuth(mode) {
+            activeTab = mode;
             const up = document.getElementById('upFields'), title = document.getElementById('aTitle'), desc = document.getElementById('aDesc');
             const tIn = document.getElementById('tabIn'), tUp = document.getElementById('tabUp');
             if(mode === 'up') {
@@ -406,11 +425,42 @@
         }
 
         function doAuth() {
-            const email = document.getElementById('aEmail').value;
-            if(!email.includes('@')) return alert("Please enter a valid email address.");
-            localStorage.setItem('nx_user', email);
-            closeModal('authModal');
-            syncState();
+            const email = document.getElementById('aEmail').value.trim().toLowerCase();
+            const pass = document.getElementById('aPass').value.trim();
+
+            if (!email.includes('@') || email.length < 5) return alert("Please enter a valid email address.");
+            if (pass.length < 4) return alert("Password should be at least 4 characters long.");
+
+            if (activeTab === 'up') {
+                const name = document.getElementById('aName').value.trim();
+                const confirmEmail = document.getElementById('aConfirmEmail').value.trim().toLowerCase();
+                const country = document.getElementById('aCountry').value;
+
+                if (!name) return alert("Full Name is required.");
+                if (email !== confirmEmail) return alert("Email confirmation does not match.");
+
+                // Save user record securely to database
+                userDB[email] = { name, email, pass, country, balance: "0.00" };
+                localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
+
+                localStorage.setItem('nx_user', email);
+                localStorage.setItem('nx_balance', "0.00");
+                alert(`Account created successfully! Country set to ${country}.`);
+                closeModal('authModal');
+                syncState();
+            } else {
+                // Validate if user exists
+                const userRecord = userDB[email];
+                if (!userRecord || userRecord.pass !== pass) {
+                    return alert("Access denied. Incorrect email address or password.");
+                }
+
+                localStorage.setItem('nx_user', userRecord.email);
+                localStorage.setItem('nx_balance', userRecord.balance || "0.00");
+                alert(`Session initialized for ${userRecord.name || userRecord.email}`);
+                closeModal('authModal');
+                syncState();
+            }
         }
 
         function setAmt(v) { document.getElementById('depAmt').value = parseFloat(v).toFixed(2); }
@@ -442,7 +492,15 @@
             }
 
             closeModal('depositModal');
-            localStorage.setItem('nx_balance', curBal - amt);
+            
+            const newBal = (curBal - amt).toFixed(2);
+            localStorage.setItem('nx_balance', newBal);
+            
+            if (userDB[userEmail]) {
+                userDB[userEmail].balance = newBal;
+                localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
+            }
+
             syncState();
             alert("Withdrawal complete");
         }
@@ -471,7 +529,15 @@
             intasend.on("COMPLETE", (results) => {
                 document.body.classList.remove('hide-header');
                 let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-                localStorage.setItem('nx_balance', cur + Number(amt));
+                const newBal = (cur + Number(amt)).toFixed(2);
+                
+                localStorage.setItem('nx_balance', newBal);
+
+                if (userDB[userEmail]) {
+                    userDB[userEmail].balance = newBal;
+                    localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
+                }
+
                 syncState();
                 alert(`Success! Ksh ${amt.toLocaleString()} has been added to your balance.`);
             })
@@ -505,7 +571,8 @@
 
         function logout() { 
             if(confirm("Terminate session?")) { 
-                localStorage.clear(); 
+                localStorage.removeItem('nx_user');
+                localStorage.removeItem('nx_balance');
                 location.reload(); 
             } 
         }

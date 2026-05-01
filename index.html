@@ -291,21 +291,31 @@
             initializeMarkets();
             syncState(); 
             renderFeed();
+            
+            // Intercept hardware/browser back buttons to safely close overlay/payment mode instead of navigating away
+            window.addEventListener('popstate', (e) => {
+                if (document.body.classList.contains('hide-header')) {
+                    document.body.classList.remove('hide-header');
+                    document.getElementById('depositModal').style.display = 'none';
+                    document.getElementById('authModal').style.display = 'none';
+                    history.pushState(null, null, window.location.pathname);
+                }
+            });
         };
 
         function initializeMarkets() {
-            // Priority Jesus Market
-            markets.push({
-                id: `m-ext-0`,
-                q: "Will Jesus be back before June 5th?",
-                category: "Culture",
-                p: 25,
-                yesMult: "9.00",
-                noMult: "3.00"
-            });
-
-            // Generates remaining dynamic markets
+            // Generates dynamic markets and injects Jesus Market as Prediction #8
             for (let i = 1; i <= 3000; i++) {
+                if (i === 8) {
+                    markets.push({
+                        id: `m-ext-0`,
+                        q: "Will Jesus be back before June 5th?",
+                        category: "Culture",
+                        p: 25,
+                        yesMult: "9.00",
+                        noMult: "3.00"
+                    });
+                }
                 const cat = categories[i % categories.length];
                 const prompts = feedThemes[cat];
                 const basePrompt = prompts[i % prompts.length];
@@ -509,6 +519,7 @@
 
             closeModal('depositModal');
             document.body.classList.add('hide-header');
+            history.pushState(null, null, window.location.pathname);
 
             let intasend = new window.IntaSend({
                 publicAPIKey: INTASEND_PUBLIC_KEY,
@@ -547,7 +558,8 @@
 
         function openModal(id) { 
             document.body.classList.add('hide-header');
-            document.getElementById(id).style.display = 'flex'; 
+            document.getElementById(id).style.display = 'flex';
+            history.pushState(null, null, window.location.pathname);
         }
 
         function closeModal(id) { 

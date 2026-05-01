@@ -35,7 +35,7 @@
         .cat-link { font-size: 13px; font-weight: 700; color: var(--text-sub); text-decoration: none; white-space: nowrap; cursor: pointer; }
         .cat-link.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: -12px; }
 
-        #dashboard { max-width: 600px; margin: auto; padding: 10px; }
+        #dashboard { max-width: 600px; margin: auto; padding: 10px; min-height: 200px; }
         
         .market-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; animation: slideUp 0.4s ease-out; }
         .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
@@ -100,7 +100,9 @@
         </div>
     </div>
 
-    <div id="dashboard"><div id="feed"></div></div>
+    <div id="dashboard">
+        <div id="feed"></div>
+    </div>
 
     <div id="authModal" class="overlay">
         <div class="modal">
@@ -168,7 +170,6 @@
         let currentCat = 'All';
         let markets = [];
 
-        // Complete set of localized base markets for distinct categories
         const baseMarkets = [
             { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" },
             { type: 'm', cat: "Entertainment", q: "Will Marvel announce Black Panther 3 this year?", p: 55, id: "ent-bp3" },
@@ -178,19 +179,30 @@
             { type: 'n', cat: "News", h: "Digital Finance Surge", p: "Decentralized prediction tools experience a worldwide 15% increase in user volume.", id: "news-global-2" }
         ];
 
-        window.onload = () => { 
-            loadPersistedMarkets();
-            syncState(); 
-            render('All');
-        };
+        // FORCED DOM CONTENT LOAD TRIGGER: Failsafe to display even if SDKs stall
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                loadPersistedMarkets();
+                syncState(); 
+                render('All');
+            } catch(err) {
+                console.error("Initialization error. Using fallback initialization.");
+                // Fallback reset if parsing failed completely
+                markets = [...baseMarkets];
+                saveMarkets();
+                render('All');
+            }
+        });
 
         function loadPersistedMarkets() {
             const stored = localStorage.getItem('nx_markets');
-            if (stored) {
+            if (stored && stored.trim() !== "") {
                 try {
                     markets = JSON.parse(stored);
                 } catch(e) {
+                    // Reset localStorage immediately if corrupt JSON detected
                     markets = [...baseMarkets];
+                    saveMarkets();
                 }
             } else {
                 markets = [...baseMarkets];
@@ -338,15 +350,4 @@
                     const winnings = wager.amt * 2;
                     let curBal = parseFloat(localStorage.getItem('nx_balance') || 0);
                     localStorage.setItem('nx_balance', curBal + winnings);
-                    alertMsg += `🎉 Correct! You won Ksh ${winnings.toLocaleString()}!`;
-                } else {
-                    alertMsg += `❌ Incorrect. You lost your Ksh ${wager.amt} stake.`;
-                }
-                const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
-                delete wagers[marketId];
-                localStorage.setItem('nx_wagers', JSON.stringify(wagers));
-            } else {
-                alertMsg += `You didn't have an active stake on this market.`;
-            }
-
-            markets = ma
+                    al

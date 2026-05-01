@@ -3,106 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexGen | Professional Terminal</title>
+    <title>NexGen | Professional Prediction Terminal</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
+
     <style>
         :root { 
-            --primary: #2ebd85; --border: #f1f5f9; --text-main: #0f172a;
-            --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #cf304a;
+            --primary: #2ebd85; 
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --yes: #f0fdf4; 
+            --yes-text: #166534; 
+            --no: #fef2f2; 
+            --no-text: #cf304a;
         }
-        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 130px; font-family: -apple-system, sans-serif; }
 
-        /* --- HEADER --- */
-        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; }
-        .logo { font-weight: 900; font-size: 22px; color: #000; letter-spacing: -1.2px; }
-        .bar-right { display: flex; align-items: center; gap: 6px; }
-        .auth-group { display: flex; background: #f1f5f9; padding: 3px; border-radius: 8px; }
-        .btn-auth { font-size: 12px; font-weight: 700; border: none; background: transparent; padding: 6px 12px; border-radius: 6px; color: #475569; cursor: pointer; }
-        .btn-auth.active { background: #fff; color: #000; }
-        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 2px 2px 2px 10px; border-radius: 10px; gap: 8px; font-size: 13px; font-weight: 700; }
-        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; cursor: pointer; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text-main); margin: 0; padding-top: 135px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; overflow-x: hidden; }
+
+        /* --- PROFESSIONAL HEADER --- */
+        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid #e2e8f0; }
+        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+        .logo { font-weight: 900; font-size: 24px; color: #000; letter-spacing: -1.5px; }
         
-        .cat-bar { display: flex; overflow-x: auto; padding: 12px 16px; gap: 20px; background: #fff; border-top: 1px solid var(--border); }
-        .cat-item { font-size: 14px; font-weight: 600; color: #64748b; white-space: nowrap; cursor: pointer; }
-        .cat-item.active { color: var(--primary); font-weight: 700; border-bottom: 3px solid var(--primary); padding-bottom: 5px; }
+        .wallet-ui { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 4px 4px 4px 12px; border-radius: 12px; gap: 8px; font-size: 14px; font-weight: 700; }
+        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; transition: transform 0.1s; }
+        .btn-deposit:active { transform: scale(0.95); }
 
-        /* --- CARDS --- */
-        #dashboard { max-width: 500px; margin: auto; padding: 12px; }
-        .card { background: #fff; border-radius: 20px; border: 1px solid var(--border); padding: 18px; margin-bottom: 14px; }
-        .m-title { font-size: 17px; font-weight: 700; line-height: 1.4; margin-bottom: 16px; }
-        .stat-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
-        .p-val { font-size: 26px; font-weight: 800; color: #000; }
+        .cat-bar { display: flex; overflow-x: auto; padding: 12px 16px; gap: 20px; background: #fff; scrollbar-width: none; }
+        .cat-bar::-webkit-scrollbar { display: none; }
+        .cat-item { font-size: 14px; font-weight: 600; color: var(--text-muted); white-space: nowrap; cursor: pointer; padding-bottom: 4px; }
+        .cat-item.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+
+        /* --- FEED LAYOUT --- */
+        #dashboard { max-width: 550px; margin: auto; padding: 10px; }
+        .card { background: var(--card-bg); border-radius: 24px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .m-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin: 0 0 15px 0; }
+        
+        .stat-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
+        .p-val { font-size: 32px; font-weight: 900; color: #000; letter-spacing: -1px; }
+        .vol-tag { font-size: 11px; font-weight: 700; color: var(--text-muted); background: #f1f5f9; padding: 4px 8px; border-radius: 6px; }
+        
         .btn-row { display: flex; gap: 10px; }
-        .m-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; font-size: 15px; }
+        .m-btn { flex: 1; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; font-size: 15px; transition: 0.1s; }
         .btn-yes { background: var(--yes); color: var(--yes-text); }
         .btn-no { background: var(--no); color: var(--no-text); }
+        .m-btn:active { transform: scale(0.97); opacity: 0.8; }
+
+        /* --- AUTH MODAL --- */
+        #auth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+        .modal-content { background: #fff; width: 100%; max-width: 350px; padding: 30px; border-radius: 28px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .m-input { width: 100%; padding: 16px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 16px; outline: none; }
+        .m-btn-main { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; }
+
+        #load-more { width: 100%; padding: 15px; background: transparent; border: 2px dashed #cbd5e1; border-radius: 15px; color: var(--text-muted); font-weight: 700; margin-bottom: 50px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
+    <header class="header">
         <div class="top-nav">
             <div class="logo">NEXGEN</div>
-            <div class="bar-right">
-                <div class="auth-group">
-                    <button class="btn-auth active">Sign In</button>
-                    <button class="btn-auth">Sign Up</button>
-                </div>
-                <div class="wallet-pill">
-                    Ksh <span id="balance">0</span>
+            <div class="bar-right" style="display: flex; gap: 10px;">
+                <button onclick="openAuth()" style="background: none; border: none; font-weight: 700; font-size: 13px;">Login</button>
+                <div class="wallet-ui">
+                    Ksh <span id="balance">0.00</span>
                     <button class="btn-deposit" onclick="triggerDeposit()">Deposit</button>
                 </div>
             </div>
         </div>
-        <div class="cat-bar">
-            <div class="cat-item active">All</div>
+        <nav class="cat-bar">
+            <div class="cat-item active">Featured</div>
             <div class="cat-item">Politics</div>
+            <div class="cat-item">Sports</div>
             <div class="cat-item">Crypto</div>
             <div class="cat-item">Kenya</div>
-            <div class="cat-item">Global</div>
+        </nav>
+    </header>
+
+    <main id="dashboard">
+        <div id="market-feed"></div>
+        <button id="load-more" onclick="renderMarkets(10)">Load More Markets</button>
+    </main>
+
+    <div id="auth-modal">
+        <div class="modal-content">
+            <h2 style="margin-top:0; font-weight: 900;">Sign In</h2>
+            <input type="email" class="m-input" placeholder="Email Address">
+            <input type="password" class="m-input" placeholder="Password">
+            <button class="m-btn-main" onclick="closeAuth()">Continue</button>
+            <p onclick="closeAuth()" style="margin-top:20px; font-size:13px; color:var(--text-muted); cursor:pointer;">Dismiss</p>
         </div>
     </div>
 
-    <div id="dashboard">
-        <div class="card"><div class="m-title">Will Arsenal win the Premier League?</div><div class="stat-row"><div><span class="p-val">45%</span></div></div><div class="btn-row"><button class="m-btn btn-yes">YES</button><button class="m-btn btn-no">NO</button></div></div>
-        <div id="extra-feed"></div>
-    </div>
-
     <script>
-        // --- THE REDIRECT DEPOSIT SYSTEM ---
+        // 1. SECURE DEPOSIT REDIRECT
         function triggerDeposit() {
-            const instance = new window.IntaSend({
+            const intasend = new window.IntaSend({
                 public_key: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
                 live: false
             });
             
-            // This triggers a full redirect to the payment page
-            instance.run({
-                amount: 10,
+            intasend.run({
+                amount: 50,
                 currency: "KES",
-                redirect: true // Stuctural change: forces a new page/tab
+                redirect: true // SMOOTH REDIRECT: Avoids popup blockers on Android
             })
             .on("COMPLETE", (results) => {
-                document.getElementById('balance').innerText = results.amount;
-            })
-            .on("FAILED", () => {
-                alert("Payment was not completed.");
+                document.getElementById('balance').innerText = results.amount.toFixed(2);
             });
         }
 
-        // Fill background feed
-        let cardsHtml = '';
-        for(let i=1; i<=20; i++) {
-            cardsHtml += `
-            <div class="card">
-                <div class="m-title">Live Market Prediction #${i}</div>
-                <div class="stat-row"><div><span class="p-val">${Math.floor(Math.random()*99)}%</span></div></div>
-                <div class="btn-row"><button class="m-btn btn-yes">YES</button><button class="m-btn btn-no">NO</button></div>
-            </div>`;
+        // 2. MARKET GENERATOR (Android Optimized)
+        const marketTitles = [
+            "Will Bitcoin hit $100,000 by June?",
+            "Will Arsenal win the Premier League title?",
+            "Will the Kenyan Shilling reach 120 per USD?",
+            "Will AI replace 20% of dev jobs by 2027?",
+            "Will Solana flip Ethereum in Volume?",
+            "Will the Finance Bill 2026 be amended?",
+            "Will Eliud Kipchoge win his next Marathon?"
+        ];
+
+        function renderMarkets(count) {
+            const container = document.getElementById('market-feed');
+            for(let i=0; i<count; i++) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                const randomProb = Math.floor(Math.random() * 90) + 5;
+                const randomVol = (Math.random() * 10).toFixed(1);
+                
+                card.innerHTML = `
+                    <h2 class="m-title">${marketTitles[Math.floor(Math.random()*marketTitles.length)]}</h2>
+                    <div class="stat-row">
+                        <div><span class="p-val" id="prob-${i}">${randomProb}%</span></div>
+                        <div class="vol-tag">VOL: $${randomVol}M</div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="m-btn btn-yes" onclick="bet()">YES</button>
+                        <button class="m-btn btn-no" onclick="bet()">NO</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            }
         }
-        document.getElementById('extra-feed').innerHTML = cardsHtml;
+
+        // 3. UI HELPERS
+        function bet() { alert("Transaction Sent to Blockchain..."); }
+        function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
+        function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
+
+        // Initial Load
+        renderMarkets(15);
+
+        // Professional Touch: Live Probability Fluctuations
+        setInterval(() => {
+            const vals = document.querySelectorAll('.p-val');
+            const target = vals[Math.floor(Math.random() * vals.length)];
+            if(target) {
+                let current = parseInt(target.innerText);
+                let change = Math.random() > 0.5 ? 1 : -1;
+                target.innerText = (current + change) + "%";
+            }
+        }, 2000);
     </script>
 </body>
 </html>

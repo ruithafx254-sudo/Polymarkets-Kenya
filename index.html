@@ -150,23 +150,13 @@
         // --- DATA & INITIALIZATION ---
         let currentCat = 'All';
         
-        // Exactly 15 base prediction markets
+        // Consolidated down to 5 main/permanent prediction markets
         let markets = [
             { type: 'm', cat: "Kenya", q: "Will Jesus come back before June?", p: 4, isPermanent: true },
             { type: 'm', cat: "Kenya", q: "Will William Ruto reshuffle the cabinet by June?", p: 62 },
             { type: 'm', cat: "Crypto", q: "Will Bitcoin stay above $100k until June?", p: 72 },
             { type: 'm', cat: "Kenya", q: "Will Kenya launch a digital ID system by end of 2026?", p: 81 },
-            { type: 'm', cat: "Crypto", q: "Will Ethereum transition to gasless transactions before Q3?", p: 35 },
-            { type: 'm', cat: "Kenya", q: "Will Kenya host the next regional EA economic talks?", p: 58 },
-            { type: 'm', cat: "Crypto", q: "Will the SEC approve a spot Solana ETF by August?", p: 44 },
-            { type: 'm', cat: "Kenya", q: "Will the NSE derivatives volume break 2025 records?", p: 76 },
-            { type: 'm', cat: "Kenya", q: "Will any East African country adopt BTC as legal tender?", p: 12 },
-            { type: 'm', cat: "Kenya", q: "Will Nairobi implement electric-only bus lines by Q4?", p: 52 },
-            { type: 'm', cat: "Crypto", q: "Will stablecoins capture 15% of African cross-border trade?", p: 68 },
-            { type: 'm', cat: "Kenya", q: "Will a new trade deal be finalized between Kenya and the US?", p: 65 },
-            { type: 'm', cat: "Kenya", q: "Will coffee exports double under the new regulatory act?", p: 71 },
-            { type: 'm', cat: "Crypto", q: "Will DeFi lending rates in Africa exceed 14% APR?", p: 40 },
-            { type: 'm', cat: "Kenya", q: "Will global faith-based assets grow by 10% in 2026?", p: 55 }
+            { type: 'm', cat: "Crypto", q: "Will Ethereum transition to gasless transactions before Q3?", p: 35 }
         ];
 
         const deliveredNews = new Set();
@@ -175,14 +165,12 @@
             Kenya: [
                 "I&M Bank launches KSh 10 billion fixed-rate note offer.",
                 "NSE derivatives turnover hits record high in February 2026.",
-                "KMRC launches KES 3bn sustainability bond for green home loans.",
-                "Nairobi to host 'AI Everything Kenya' summit in 4 days."
+                "KMRC launches KES 3bn sustainability bond for green home loans."
             ],
             Crypto: [
                 "Coinbase Q1 2026 earnings expectations set at conservative levels.",
                 "Prediction market volume grew 9.2x in 2025; Kalshi and Polymarket lead.",
-                "Phemex expands prediction market with daily crypto forecasts.",
-                "Institutional adoption of Digital Asset Treasuries (DATs) expands in 2026."
+                "Phemex expands prediction market with daily crypto forecasts."
             ]
         };
 
@@ -223,8 +211,7 @@
 
             const qTemplates = [
                 `Will the ${rCat} trend following "${signal.substring(0, 15)}..." hold through May 2026?`,
-                `Intelligence Alert: Will ${rCat} volatility exceed 12% by June?`,
-                `Will the outcome of the ${signal.split(' ')[0]} development reach 'Target A' by Q3?`
+                `Intelligence Alert: Will ${rCat} volatility exceed 12% by June?`
             ];
 
             const newItem = {
@@ -340,4 +327,30 @@
             
             document.getElementById('wConfirmBtn').onclick = () => {
                 const amount = parseFloat(document.getElementById('wAmount').value);
-           
+                const currentBalance = parseFloat(localStorage.getItem('nx_balance') || 0);
+
+                if (isNaN(amount) || amount < 50) return alert("Min allowed: Ksh 50");
+                if (amount > currentBalance) return alert("Insufficient balance! Please fund your account.");
+
+                localStorage.setItem('nx_balance', currentBalance - amount);
+                syncState();
+                closeModal('wagerModal');
+                document.getElementById('wAmount').value = '';
+                alert(`Prediction confirmed! Wagered Ksh ${amount.toLocaleString()} on '${side}'.`);
+            };
+        }
+
+        function payNow() {
+            const amt = document.getElementById('depAmt').value;
+            if(!localStorage.getItem('nx_user')) return openModal('authModal');
+            if(amt < 200) return alert("Min required: Ksh 200");
+            document.body.classList.add('hide-header');
+            closeModal('depositModal');
+            
+            if (typeof window.IntaSend === 'undefined') {
+                alert("Payment system initializing. Fallback direct manual credit processed.");
+                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
+                localStorage.setItem('nx_balance', cur + Number(amt));
+                syncState();
+                return;
+                 

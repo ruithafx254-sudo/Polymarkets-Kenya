@@ -16,7 +16,6 @@
         
         body { background: #ffffff; color: var(--text-main); margin: 0; padding-top: 130px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
 
-        /* --- HEADER SYSTEM --- */
         .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); transition: transform 0.4s ease; }
         body.hide-header .header-stack { transform: translateY(-100%); }
 
@@ -32,12 +31,10 @@
         .user-id { width: 36px; height: 36px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .person-icon { width: 20px; height: 20px; fill: currentColor; }
 
-        /* --- SUB NAV --- */
         .sub-nav { display: flex; gap: 20px; padding: 12px 20px; overflow-x: auto; background: #fff; border-bottom: 1px solid var(--border); scrollbar-width: none; }
         .cat-link { font-size: 13px; font-weight: 700; color: var(--text-sub); text-decoration: none; white-space: nowrap; cursor: pointer; }
         .cat-link.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: -12px; }
 
-        /* --- CONTENT FEED --- */
         #dashboard { max-width: 600px; margin: auto; padding: 10px; }
         
         .market-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; animation: slideUp 0.4s ease-out; }
@@ -50,6 +47,8 @@
         .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; }
         .trade-btn.yes { background: var(--yes); color: var(--yes-text); }
         .trade-btn.no { background: var(--no); color: var(--no-text); }
+        
+        .resolve-btn { width: 100%; margin-top: 10px; background: #f1f5f9; border: 1px dashed var(--border); padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text-sub); }
 
         .news-card { border-left: 3px solid var(--accent); background: #f8fafc; padding: 16px; border-radius: 0 12px 12px 0; margin-bottom: 12px; animation: slideUp 0.4s ease-out; }
         .news-tag { font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
@@ -59,7 +58,6 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* MODALS */
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
         .modal { background: #fff; width: 100%; max-width: 360px; padding: 32px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         .auth-nav { display: flex; background: #f1f5f9; padding: 6px; border-radius: 14px; margin-bottom: 24px; }
@@ -147,26 +145,42 @@
     </div>
 
     <script>
-        // --- DATA & INITIALIZATION ---
         let currentCat = 'All';
-        let markets = [
-            { type: 'm', cat: "Kenya", q: "Will Jesus come back before June?", p: 4, id: 1 }
+        let markets = [];
+
+        const baseMarkets = [
+            { type: 'm', cat: "Kenya", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" }
         ];
 
         const intelligenceSignals = {
-            Kenya: [
-                "I&M Bank launches KSh 10 billion fixed-rate note offer.",
-                "NSE derivatives turnover hits record high in February 2026."
-            ]
+            Kenya: ["I&M Bank launches KSh 10 billion fixed-rate note offer.", "NSE derivatives turnover hits record high."]
         };
 
         window.onload = () => { 
+            loadPersistedMarkets();
             syncState(); 
             render('All');
-            setInterval(generateGeminiPulse, 6000); 
+            setInterval(generateGeminiPulse, 12000); // 12 seconds
         };
 
-        // --- CORE UI ENGINE ---
+        function loadPersistedMarkets() {
+            const stored = localStorage.getItem('nx_markets');
+            if (stored) {
+                try {
+                    markets = JSON.parse(stored);
+                } catch(e) {
+                    markets = [...baseMarkets];
+                }
+            } else {
+                markets = [...baseMarkets];
+                saveMarkets();
+            }
+        }
+
+        function saveMarkets() {
+            localStorage.setItem('nx_markets', JSON.stringify(markets));
+        }
+
         function render(cat) {
             currentCat = cat;
             const f = document.getElementById('feed'); f.innerHTML = '';
@@ -180,7 +194,6 @@
             render(cat);
         }
 
-        // --- GEMINI INTELLIGENCE ENGINE ---
         function generateGeminiPulse() {
             const cats = Object.keys(intelligenceSignals);
             const rCat = cats[Math.floor(Math.random() * cats.length)];
@@ -191,6 +204,7 @@
                 cat: rCat,
                 q: `Will trends follow "${signal.substring(0, 15)}..." this week?`,
                 p: Math.floor(Math.random() * 70 + 15),
+                id: 'ai-' + Date.now(),
                 isAI: true
             };
 
@@ -198,16 +212,16 @@
                 type: 'n',
                 cat: 'News',
                 h: `Live Signal: ${rCat}`,
-                p: signal
+                p: signal,
+                id: 'news-' + Date.now()
             };
 
             markets.push(newItem);
-            injectToTerminal(newItem, true);
+            markets.push(newNews);
+            saveMarkets();
             
-            setTimeout(() => {
-                markets.push(newNews);
-                injectToTerminal(newNews, true);
-            }, 2500);
+            injectToTerminal(newItem, true);
+            setTimeout(() => injectToTerminal(newNews, true), 2500);
         }
 
         function injectToTerminal(item, isNew) {
@@ -217,23 +231,32 @@
             if (isNew && currentCat !== 'All' && currentCat !== 'News' && currentCat !== item.cat) return;
 
             const card = document.createElement('div');
+            card.id = 'market-el-' + item.id;
+            
             if(item.type === 'm') {
                 card.className = 'market-card';
                 if(item.isAI) card.style.borderTop = "2px solid var(--gemini)";
                 
                 const safeQ = item.q.replace(/'/g, "\\'");
+                
+                // Fetch existing wager status
+                const wager = getActiveWager(item.id);
+                const activeStakeStatus = wager ? `<br><span style="color:var(--accent); font-size:11px; font-weight:700;">Wager placed: Ksh ${wager.amt} on '${wager.side}'</span>` : '';
+
                 card.innerHTML = `
                     <div class="m-header">
                         <div class="m-title">
                             ${item.isAI ? '<span style="color:var(--gemini); font-size:9px; font-weight:900;">AI PREDICTION</span><br>' : ''}
                             ${item.q}
+                            ${activeStakeStatus}
                         </div>
                         <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
-                        <button class="trade-btn yes" onclick="openStakeModal('YES', '${safeQ}')">Yes</button>
-                        <button class="trade-btn no" onclick="openStakeModal('NO', '${safeQ}')">No</button>
-                    </div>`;
+                        <button class="trade-btn yes" onclick="openStakeModal('YES', '${safeQ}', '${item.id}')">Yes</button>
+                        <button class="trade-btn no" onclick="openStakeModal('NO', '${safeQ}', '${item.id}')">No</button>
+                    </div>
+                    <button class="resolve-btn" onclick="resolvePrediction('${item.id}')">Resolve & Payout</button>`;
             } else {
                 card.className = 'news-card';
                 card.innerHTML = `
@@ -245,13 +268,17 @@
                     <p class="news-p">${item.p}</p>`;
             }
 
-            // Appends to the bottom as requested
             f.appendChild(card);
-            if(f.children.length > 25) f.removeChild(f.firstChild); 
+            if(f.children.length > 30) f.removeChild(f.firstChild); 
         }
 
-        // --- STAKING ENGINE ---
-        function openStakeModal(side, question) {
+        // --- STAKING & OUTCOME ENGINE ---
+        function getActiveWager(marketId) {
+            const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
+            return wagers[marketId];
+        }
+
+        function openStakeModal(side, question, marketId) {
             if(!localStorage.getItem('nx_user')) return openModal('authModal');
             document.getElementById('sTitle').innerText = `Predicting '${side}'`;
             document.getElementById('sQuestion').innerText = question;
@@ -265,11 +292,55 @@
                 if(!amt || amt < 50) return alert("Minimum stake is Ksh 50");
                 if(amt > currentBalance) return alert("Insufficient balance to place stake.");
 
-                localStorage.setItem('nx_balance', currentBalance - amt);
+                // Subtract balance
+                const newBalance = currentBalance - amt;
+                localStorage.setItem('nx_balance', newBalance);
+                
+                // Save specific wager
+                const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
+                wagers[marketId] = { side: side, amt: amt };
+                localStorage.setItem('nx_wagers', JSON.stringify(wagers));
+
                 syncState();
                 closeModal('stakeModal');
+                
+                // Instantly re-render to reflect the stake
+                render(currentCat);
                 alert(`Stake successfully placed on '${side}'!`);
             };
+        }
+
+        function resolvePrediction(marketId) {
+            const outcomes = ["YES", "NO"];
+            const resolvedOutcome = outcomes[Math.floor(Math.random() * outcomes.length)];
+            const wager = getActiveWager(marketId);
+
+            let alertMsg = `The prediction is settled as '${resolvedOutcome}'.\n`;
+
+            if (wager) {
+                if (wager.side === resolvedOutcome) {
+                    const winnings = wager.amt * 2;
+                    let curBal = parseFloat(localStorage.getItem('nx_balance') || 0);
+                    localStorage.setItem('nx_balance', curBal + winnings);
+                    alertMsg += `🎉 Correct! You won Ksh ${winnings.toLocaleString()}!`;
+                } else {
+                    alertMsg += `❌ Incorrect. You lost your Ksh ${wager.amt} stake.`;
+                }
+                // Clear the used wager
+                const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
+                delete wagers[marketId];
+                localStorage.setItem('nx_wagers', JSON.stringify(wagers));
+            } else {
+                alertMsg += `You didn't have an active stake on this market.`;
+            }
+
+            // Remove market from local storage
+            markets = markets.filter(m => m.id !== marketId);
+            saveMarkets();
+            
+            syncState();
+            render(currentCat);
+            alert(alertMsg);
         }
 
         // --- ACCOUNT & WALLET ---
@@ -292,48 +363,4 @@
             } else {
                 up.classList.add('hidden'); tIn.classList.add('active'); tUp.classList.remove('active');
                 title.innerText = "Terminal Access";
-            }
-        }
-
-        function doAuth() {
-            const email = document.getElementById('aEmail').value;
-            if(!email.includes('@')) return alert("Invalid Credentials");
-            localStorage.setItem('nx_user', email);
-            closeModal('authModal');
-            syncState();
-        }
-
-        function setAmt(v) { document.getElementById('depAmt').value = v; }
-
-        function payNow() {
-            const amt = document.getElementById('depAmt').value;
-            if(!localStorage.getItem('nx_user')) return openModal('authModal');
-            if(amt < 200) return alert("Min required: Ksh 200");
-            document.body.classList.add('hide-header');
-            closeModal('depositModal');
-            
-            // Safe direct fallback if SDK fails to respond
-            if (typeof window.IntaSend === 'undefined') {
-                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-                localStorage.setItem('nx_balance', cur + Number(amt));
-                syncState();
-                return;
-            }
-
-            const intasend = new window.IntaSend({ publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad", live: false });
-            intasend.run({ amount: Number(amt), currency: "KES" })
-            .on("COMPLETE", () => {
-                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-                localStorage.setItem('nx_balance', cur + Number(amt));
-                document.body.classList.remove('hide-header');
-                syncState();
-            })
-            .on("CLOSE", () => document.body.classList.remove('hide-header'));
-        }
-
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function logout() { if(confirm("Sign out?")) { localStorage.clear(); location.reload(); } }
-    </script>
-</body>
-</html>
+       

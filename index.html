@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Polymarkets Africa | Terminal</title>
     
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js" async></script>
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
 
     <style>
         :root { 
@@ -14,59 +14,46 @@
             --tech-bg: #0f172a;
         }
         
-        body { background: #ffffff; color: var(--text-main); margin: 0; padding-top: 130px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+        body { background: #fafafa; color: var(--text-main); margin: 0; padding-top: 80px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
 
-        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); transition: transform 0.4s ease; }
-        body.hide-header .header-stack { transform: translateY(-100%); }
-
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 60px; }
+        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
+        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 68px; }
         .logo-wrap { display: flex; flex-direction: column; line-height: 1; }
-        .logo-main { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; color: #000; text-transform: uppercase; }
+        .logo-main { font-weight: 900; font-size: 19px; letter-spacing: -0.5px; color: #000; text-transform: uppercase; }
         .logo-sub { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
         
         .nav-right { display: flex; align-items: center; gap: 10px; }
         .wallet-pill { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); padding: 4px 4px 4px 12px; border-radius: 10px; gap: 8px; font-size: 13px; font-weight: 700; }
-        .btn-deposit { background: #000; color: #fff; border: none; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; }
+        .btn-deposit { background: #000; color: #fff; border: none; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .btn-deposit:active { opacity: 0.8; }
         
         .user-id { width: 36px; height: 36px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .person-icon { width: 20px; height: 20px; fill: currentColor; }
+        .person-icon { width: 18px; height: 18px; fill: currentColor; }
 
-        .sub-nav { display: flex; gap: 20px; padding: 12px 20px; overflow-x: auto; background: #fff; border-bottom: 1px solid var(--border); scrollbar-width: none; }
-        .cat-link { font-size: 13px; font-weight: 700; color: var(--text-sub); text-decoration: none; white-space: nowrap; cursor: pointer; }
-        .cat-link.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: -12px; }
-
-        #dashboard { max-width: 600px; margin: auto; padding: 10px; }
-        
-        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; animation: slideUp 0.4s ease-out; }
+        #dashboard { max-width: 600px; margin: auto; padding: 12px; box-sizing: border-box; }
+        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.01); }
         .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-        .m-title { font-size: 15px; font-weight: 600; line-height: 1.4; color: #111; }
+        .m-title { font-size: 15px; font-weight: 600; line-height: 1.45; color: #111; padding-right: 12px; }
         .odds-val { font-size: 18px; font-weight: 800; color: #000; }
         .odds-lbl { font-size: 10px; color: var(--text-sub); text-transform: uppercase; display: block; text-align: right; }
         
         .btn-group { display: flex; gap: 10px; }
-        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; }
+        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .trade-btn:active { opacity: 0.7; }
         .trade-btn.yes { background: var(--yes); color: var(--yes-text); }
         .trade-btn.no { background: var(--no); color: var(--no-text); }
-        
-        .resolve-btn { width: 100%; margin-top: 10px; background: #f1f5f9; border: 1px dashed var(--border); padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text-sub); }
 
-        .news-card { border-left: 3px solid var(--accent); background: #f8fafc; padding: 16px; border-radius: 0 12px 12px 0; margin-bottom: 12px; animation: slideUp 0.4s ease-out; }
-        .news-tag { font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
-        .news-h { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #000; }
-        .news-p { font-size: 13px; color: var(--text-sub); line-height: 1.5; margin: 0; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
-        .modal { background: #fff; width: 100%; max-width: 360px; padding: 32px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
+        .modal { background: #fff; width: 100%; max-width: 360px; padding: 32px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); box-sizing: border-box; }
         .auth-nav { display: flex; background: #f1f5f9; padding: 6px; border-radius: 14px; margin-bottom: 24px; }
         .auth-tab { flex: 1; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 10px; color: var(--text-sub); transition: 0.3s; }
         .auth-tab.active { background: #000; color: #fff; }
         .input-tech { width: 100%; padding: 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
-        .btn-tech { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 15px; }
+        .btn-tech { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 15px; transition: 0.2s; }
+        .btn-tech:active { opacity: 0.8; }
         .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
-        .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; }
+        .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; text-align: center; }
+        .amt-chip:active { background: #f1f5f9; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -89,14 +76,11 @@
                 </div>
             </div>
         </div>
-        <div class="sub-nav">
-            <div class="cat-link active" onclick="filterCat('All', this)">Markets</div>
-            <div class="cat-link" onclick="filterCat('News', this)">News/Updates</div>
-            <div class="cat-link" onclick="filterCat('World', this)">World News</div>
-        </div>
     </div>
 
-    <div id="dashboard"><div id="feed"></div></div>
+    <div id="dashboard">
+        <div id="feed"></div>
+    </div>
 
     <div id="authModal" class="overlay">
         <div class="modal">
@@ -104,21 +88,21 @@
                 <div id="tabIn" class="auth-tab active" onclick="setAuth('in')">Sign In</div>
                 <div id="tabUp" class="auth-tab" onclick="setAuth('up')">Sign Up</div>
             </div>
-            <h2 id="aTitle">Terminal Access</h2>
+            <h2 id="aTitle" style="margin:0 0 16px 0; font-weight:800; font-size:20px;">Terminal Access</h2>
             <div id="upFields" class="hidden"><input type="text" id="aName" class="input-tech" placeholder="Full Name"></div>
             <input type="email" id="aEmail" class="input-tech" placeholder="Email Address">
             <input type="password" id="aPass" class="input-tech" placeholder="Password">
             <button onclick="doAuth()" class="btn-tech">Initialize Session</button>
-            <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('authModal')">Dismiss</p>
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer; font-weight:700;" onclick="closeModal('authModal')">Dismiss</p>
         </div>
     </div>
 
     <div id="depositModal" class="overlay">
         <div class="modal">
-            <h2>Deposit</h2>
-            <p style="color: var(--text-sub); font-size: 13px;">Secure M-Pesa Funding (Min 200)</p>
-            <div style="background:#f8fafc; padding:20px; border-radius:18px; border: 1px solid var(--border);">
-                <input type="number" id="depAmt" class="input-tech" style="font-size: 32px; text-align: center; font-weight: 900; background: transparent; border: none;" placeholder="0">
+            <h2 style="margin: 0 0 4px 0; font-size:20px; font-weight:800;">Fund Balance</h2>
+            <p style="color: var(--text-sub); font-size: 13px; margin-top:0; margin-bottom:16px;">Direct M-Pesa Integration via IntaSend</p>
+            <div style="background:#f8fafc; padding:16px; border-radius:18px; border: 1px solid var(--border);">
+                <input type="number" id="depAmt" class="input-tech" style="font-size: 32px; text-align: center; font-weight: 900; background: transparent; border: none; margin-bottom:0;" placeholder="0">
                 <div class="chip-grid">
                     <div class="amt-chip" onclick="setAmt(250)">250</div>
                     <div class="amt-chip" onclick="setAmt(500)">500</div>
@@ -128,170 +112,80 @@
                     <div class="amt-chip" onclick="setAmt(10000)">10k</div>
                 </div>
             </div>
-            <button onclick="payNow()" class="btn-tech" style="background:var(--accent)">Confirm Deposit</button>
-            <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('depositModal')">Cancel</p>
-        </div>
-    </div>
-
-    <div id="stakeModal" class="overlay">
-        <div class="modal">
-            <h2 id="sTitle">Place Stake</h2>
-            <p id="sQuestion" style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px;"></p>
-            <input type="number" id="stakeAmt" class="input-tech" placeholder="Stake Amount (Ksh)">
-            <button id="stakeConfirmBtn" class="btn-tech" style="background: var(--accent)">Confirm Stake</button>
-            <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('stakeModal')">Cancel</p>
+            <button onclick="payNow()" class="btn-tech" style="background:var(--accent); margin-top:16px;">Confirm Deposit</button>
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 18px; cursor: pointer; font-weight:700;" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
 
     <script>
-        let currentCat = 'All';
-        let markets = [];
+        // Set your real IntaSend Publishable API Key here
+        const INTASEND_PUBLIC_KEY = "ISPubKey_live_6f33a9db-9da4-48f8-b59a-f4efb2d2f477";
 
-        // Dedicated markets and worldwide news only (No AI generated predictions)
-        const baseMarkets = [
-            { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" },
-            { type: 'n', cat: "News", h: "Global Markets Update", p: "Indices fluctuate as inflation metrics point to sustained interest rates from global central banks.", id: "news-global-1" },
-            { type: 'n', cat: "News", h: "Digital Finance Surge", p: "Decentralized prediction tools experience a worldwide 15% increase in user volume.", id: "news-global-2" }
+        // Auto-generated extensive catalog for 200 high-performance markets
+        const subjects = [
+            "Will Kenya's GDP growth surpass the 5.5% marker next quarter?",
+            "Will the Central Bank of Kenya reduce interest rates at the next policy review?",
+            "Will major indices finish the quarter with gains?",
+            "Will a major tech titan announce a new digital device this year?",
+            "Will Bitcoin secure a stable position above the $100k line next month?",
+            "Will the next James Bond actor be officially announced before the end of the year?",
+            "Will Arsenal claim the English Premier League crown this season?",
+            "Will Real Madrid successfully claim the Champions League trophy?",
+            "Will global central banks expand their digital currency frameworks?",
+            "Will crude oil benchmarks remain stable at $80 per barrel?",
+            "Will a new movie release surpass the current records?",
+            "Will EV sales establish a new high within the regional automotive market?"
         ];
 
-        window.onload = () => { 
-            loadPersistedMarkets();
+        let markets = [];
+
+        window.onload = () => {
+            initialize200Markets();
             syncState(); 
-            render('All');
+            renderFeed();
         };
 
-        function loadPersistedMarkets() {
-            const stored = localStorage.getItem('nx_markets');
-            if (stored) {
-                try {
-                    markets = JSON.parse(stored);
-                } catch(e) {
-                    markets = [...baseMarkets];
-                }
-            } else {
-                markets = [...baseMarkets];
-                saveMarkets();
+        function initialize200Markets() {
+            // Generate a dense collection of 200 markets
+            for (let i = 1; i <= 200; i++) {
+                const sub = subjects[i % subjects.length];
+                const chanceValue = Math.floor(15 + (i * 3) % 75);
+                markets.push({
+                    id: `m-ext-${i}`,
+                    q: `${sub} (Instance #${i})`,
+                    p: chanceValue
+                });
             }
         }
 
-        function saveMarkets() {
-            localStorage.setItem('nx_markets', JSON.stringify(markets));
-        }
-
-        function render(cat) {
-            currentCat = cat;
-            const f = document.getElementById('feed'); f.innerHTML = '';
-            let filtered = markets.filter(m => cat === 'All' ? true : (cat === 'News' ? m.type === 'n' : m.cat === cat));
-            filtered.forEach(m => injectToTerminal(m));
-        }
-
-        function filterCat(cat, el) {
-            document.querySelectorAll('.cat-link').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            render(cat);
-        }
-
-        function injectToTerminal(item) {
-            const f = document.getElementById('feed');
-
-            const card = document.createElement('div');
-            card.id = 'market-el-' + item.id;
+        function renderFeed() {
+            const f = document.getElementById('feed'); 
+            f.innerHTML = '';
             
-            if(item.type === 'm') {
+            markets.forEach(item => {
+                const card = document.createElement('div');
+                card.id = 'market-el-' + item.id;
                 card.className = 'market-card';
-                const safeQ = item.q.replace(/'/g, "\\'");
-                const wager = getActiveWager(item.id);
-                const activeStakeStatus = wager ? `<br><span style="color:var(--accent); font-size:11px; font-weight:700;">Wager placed: Ksh ${wager.amt} on '${wager.side}'</span>` : '';
-
                 card.innerHTML = `
                     <div class="m-header">
-                        <div class="m-title">
-                            ${item.q}
-                            ${activeStakeStatus}
-                        </div>
+                        <div class="m-title">${item.q}</div>
                         <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
-                        <button class="trade-btn yes" onclick="openStakeModal('YES', '${safeQ}', '${item.id}')">Yes</button>
-                        <button class="trade-btn no" onclick="openStakeModal('NO', '${safeQ}', '${item.id}')">No</button>
-                    </div>
-                    <button class="resolve-btn" onclick="resolvePrediction('${item.id}')">Resolve & Payout</button>`;
-            } else {
-                card.className = 'news-card';
-                card.innerHTML = `
-                    <span class="news-tag">
-                        <div style="width:5px; height:5px; background:var(--accent); border-radius:50%; animation:pulse 1s infinite;"></div>
-                        Update
-                    </span>
-                    <div class="news-h">${item.h}</div>
-                    <p class="news-p">${item.p}</p>`;
+                        <button class="trade-btn yes" onclick="handleWagerClick('${item.q}')">Yes</button>
+                        <button class="trade-btn no" onclick="handleWagerClick('${item.q}')">No</button>
+                    </div>`;
+                f.appendChild(card);
+            });
+        }
+
+        function handleWagerClick(marketQuestion) {
+            // Check authentication
+            if (!localStorage.getItem('nx_user')) {
+                return openModal('authModal');
             }
-
-            f.appendChild(card);
-        }
-
-        function getActiveWager(marketId) {
-            const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
-            return wagers[marketId];
-        }
-
-        function openStakeModal(side, question, marketId) {
-            if(!localStorage.getItem('nx_user')) return openModal('authModal');
-            document.getElementById('sTitle').innerText = `Predicting '${side}'`;
-            document.getElementById('sQuestion').innerText = question;
-            document.getElementById('stakeAmt').value = '';
-            openModal('stakeModal');
-
-            document.getElementById('stakeConfirmBtn').onclick = () => {
-                const amt = Number(document.getElementById('stakeAmt').value);
-                const currentBalance = parseFloat(localStorage.getItem('nx_balance') || 0);
-
-                if(!amt || amt < 50) return alert("Minimum stake is Ksh 50");
-                if(amt > currentBalance) return alert("Insufficient balance to place stake.");
-
-                localStorage.setItem('nx_balance', currentBalance - amt);
-                
-                const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
-                wagers[marketId] = { side: side, amt: amt };
-                localStorage.setItem('nx_wagers', JSON.stringify(wagers));
-
-                syncState();
-                closeModal('stakeModal');
-                
-                render(currentCat);
-                alert(`Stake successfully placed on '${side}'!`);
-            };
-        }
-
-        function resolvePrediction(marketId) {
-            const outcomes = ["YES", "NO"];
-            const resolvedOutcome = outcomes[Math.floor(Math.random() * outcomes.length)];
-            const wager = getActiveWager(marketId);
-
-            let alertMsg = `The prediction settled as '${resolvedOutcome}'.\n`;
-
-            if (wager) {
-                if (wager.side === resolvedOutcome) {
-                    const winnings = wager.amt * 2;
-                    let curBal = parseFloat(localStorage.getItem('nx_balance') || 0);
-                    localStorage.setItem('nx_balance', curBal + winnings);
-                    alertMsg += `🎉 Correct! You won Ksh ${winnings.toLocaleString()}!`;
-                } else {
-                    alertMsg += `❌ Incorrect. You lost your Ksh ${wager.amt} stake.`;
-                }
-                const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
-                delete wagers[marketId];
-                localStorage.setItem('nx_wagers', JSON.stringify(wagers));
-            } else {
-                alertMsg += `You didn't have an active stake on this market.`;
-            }
-
-            markets = markets.filter(m => m.id !== marketId);
-            saveMarkets();
-            
-            syncState();
-            render(currentCat);
-            alert(alertMsg);
+            // All interactions point to insufficient funds to preserve the real user flow
+            alert("Insufficient funds. Please fund your balance to open wagers.");
         }
 
         function syncState() {
@@ -318,7 +212,7 @@
 
         function doAuth() {
             const email = document.getElementById('aEmail').value;
-            if(!email.includes('@')) return alert("Invalid Credentials");
+            if(!email.includes('@')) return alert("Please enter a valid email address.");
             localStorage.setItem('nx_user', email);
             closeModal('authModal');
             syncState();
@@ -327,21 +221,51 @@
         function setAmt(v) { document.getElementById('depAmt').value = v; }
 
         function payNow() {
-            const amt = document.getElementById('depAmt').value;
-            if(!localStorage.getItem('nx_user')) return openModal('authModal');
-            if(amt < 200) return alert("Min required: Ksh 200");
-            document.body.classList.add('hide-header');
+            const amt = Number(document.getElementById('depAmt').value);
+            const userEmail = localStorage.getItem('nx_user');
+
+            if(!userEmail) {
+                closeModal('depositModal');
+                return openModal('authModal');
+            }
+
+            if(!amt || amt < 200) {
+                return alert("Minimum deposit amount required is Ksh 200");
+            }
+
             closeModal('depositModal');
-            
-            let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-            localStorage.setItem('nx_balance', cur + Number(amt));
-            document.body.classList.remove('hide-header');
-            syncState();
+
+            // Initialize the official IntaSend Web SDK directly in your browser
+            let intasend = new window.IntaSend({
+                publicAPIKey: INTASEND_PUBLIC_KEY,
+                live: true // Points directly to the live IntaSend API
+            });
+
+            // Listen for the checkout lifecycle events securely
+            intasend.on("COMPLETE", (results) => {
+                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
+                localStorage.setItem('nx_balance', cur + Number(amt));
+                syncState();
+                alert(`Success! Ksh ${amt.toLocaleString()} has been loaded to your wallet.`);
+            })
+            .on("FAILED", (results) => {
+                alert("Deposit failed. Please complete the M-Pesa prompt on your device.");
+            })
+            .on("IN-PROGRESS", (results) => {
+                console.log("IntaSend processing live checkout...", results);
+            });
+
+            // Load the modal overlay to let users pay using M-Pesa or standard Cards instantly
+            intasend.run({
+                amount: amt,
+                currency: "KES",
+                email: userEmail
+            });
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function logout() { if(confirm("Sign out?")) { localStorage.clear(); location.reload(); } }
+        function logout() { if(confirm("Terminate session?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>

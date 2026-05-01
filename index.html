@@ -4,34 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NexGen Terminal</title>
-    
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
 
     <style>
         :root { 
             --primary: #2ebd85; --border: #f1f5f9; --text: #0f172a;
             --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #cf304a;
         }
-        body { background: #f8fafc; color: var(--text); margin: 0; padding-top: 90px; font-family: system-ui, -apple-system, sans-serif; }
+        body { background: #f8fafc; color: var(--text); margin: 0; padding-top: 80px; font-family: system-ui, -apple-system, sans-serif; }
 
-        /* --- HEADER --- */
-        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
+        /* --- FIXED HEADER --- */
+        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; height: 60px; }
         .logo { font-weight: 900; font-size: 22px; letter-spacing: -1.2px; }
         
         .nav-right { display: flex; align-items: center; gap: 8px; }
         .auth-btn { background: #f1f5f9; border: none; padding: 8px 12px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; }
 
-        .wallet { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
-        .deposit-trigger { background: var(--primary); color: #fff; border: none; padding: 7px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+        .wallet { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 2px 2px 2px 10px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
+        
+        /* THE REDIRECT BUTTON */
+        .deposit-link { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; text-decoration: none; font-size: 13px; }
 
         /* --- AUTH SWITCH MODAL --- */
         #auth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
         .modal-box { background: #fff; width: 100%; max-width: 340px; padding: 25px; border-radius: 30px; text-align: center; }
         
-        .toggle-switch { display: flex; background: #f1f5f9; padding: 4px; border-radius: 14px; margin-bottom: 20px; position: relative; border: 1px solid #e2e8f0; cursor: pointer; }
+        .toggle-switch { display: flex; background: #f1f5f9; padding: 4px; border-radius: 14px; margin-bottom: 20px; position: relative; cursor: pointer; border: 1px solid #e2e8f0; }
         .t-btn { flex: 1; padding: 12px; font-size: 14px; font-weight: 700; color: #64748b; z-index: 1; }
         .t-btn.active { color: #000; }
-        .slider { position: absolute; width: calc(50% - 4px); height: calc(100% - 8px); background: #fff; border-radius: 11px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .slider { position: absolute; width: calc(50% - 4px); height: calc(100% - 8px); background: #fff; border-radius: 11px; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .signup-active .slider { transform: translateX(100%); }
 
         .m-input { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 16px; box-sizing: border-box; outline: none; }
@@ -56,7 +56,7 @@
             <button class="auth-btn" onclick="openAuth()">Sign In</button>
             <div class="wallet">
                 Ksh <span id="bal">0.00</span>
-                <button onclick="redirectToPayment()" class="deposit-trigger">Deposit</button>
+                <a href="https://payment.intasend.com/pay/254-sudo/" class="deposit-link">Deposit</a>
             </div>
         </div>
     </header>
@@ -84,40 +84,23 @@
             <input type="email" class="m-input" placeholder="Email Address">
             <input type="password" class="m-input" placeholder="Password">
             <button class="m-submit" onclick="closeAuth()">Continue</button>
-            <p onclick="closeAuth()" style="margin-top:20px; font-size:13px; color:#94a3b8; cursor:pointer;">Cancel</p>
         </div>
     </div>
 
     <script>
-        // --- PAYMENT REDIRECT LOGIC ---
-        function redirectToPayment() {
-            // This initializes IntaSend and immediately redirects to their hosted checkout page
-            const intasend = new window.IntaSend({
-                publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
-                live: false 
-            });
-
-            intasend.run({
-                amount: 50,
-                currency: "KES",
-                email: "user@nexgen.com",
-                force_redirect: true // This forces the browser to open the payment page as a link
-            });
-        }
-
-        // --- AUTH TOGGLE LOGIC ---
+        // --- AUTH TOGGLE ---
         function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
         function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
         
-        let isSignupMode = false;
+        let isSignup = false;
         function toggleAuthMode() {
-            isSignupMode = !isSignupMode;
+            isSignup = !isSignup;
             const container = document.getElementById('authSwitch');
             const head = document.getElementById('auth-head');
             const tin = document.getElementById('tIn');
             const tup = document.getElementById('tUp');
 
-            if(isSignupMode) {
+            if(isSignup) {
                 container.classList.add('signup-active');
                 head.innerText = "Create Account";
                 tup.classList.add('active');
@@ -131,44 +114,27 @@
         }
 
         // --- PREDICTIONS FEED (30 INITIAL) ---
-        const marketItems = [
-            "Will Bitcoin hit $100k by Christmas?",
-            "Will Kenya Shilling reach 120 per USD?",
-            "Will Arsenal win the Premier League?",
-            "Will AI solve Nuclear Fusion by 2027?",
-            "Will Solana flip Ethereum in Volume?",
-            "Will GPT-5 be released this year?",
-            "Will Starship reach Mars by 2026?"
-        ];
-
-        let totalMarkets = 0;
-        function renderPredictions(num) {
+        const marketItems = ["Bitcoin to $100k?", "Ksh to 120?", "Arsenal Win?", "AI Solves Fusion?", "Solana Flip ETH?"];
+        let total = 0;
+        function render(num) {
             const container = document.getElementById('dynamic');
             for(let i=0; i<num; i++) {
-                if(totalMarkets >= 1000) break;
-                totalMarkets++;
+                if(total >= 1000) break;
+                total++;
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
                     <div class="m-title">${marketItems[Math.floor(Math.random()*marketItems.length)]}</div>
                     <span class="p-val">${Math.floor(Math.random()*85)+5}%</span>
-                    <div class="btn-row">
-                        <button class="act-btn btn-yes">YES</button>
-                        <button class="act-btn btn-no">NO</button>
-                    </div>
+                    <div class="btn-row"><button class="act-btn btn-yes">YES</button><button class="act-btn btn-no">NO</button></div>
                 `;
                 container.appendChild(card);
             }
         }
 
-        // Initial Load
-        window.onload = () => renderPredictions(30);
-
-        // Infinite Scroll
+        window.onload = () => render(30);
         window.onscroll = () => {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 800) {
-                renderPredictions(15);
-            }
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 800) render(15);
         };
     </script>
 </body>

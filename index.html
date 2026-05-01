@@ -150,7 +150,6 @@
         let currentCat = 'All';
         let markets = [];
 
-        // Complete set of diverse, default markets for quick testing
         const baseMarkets = [
             { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" },
             { type: 'm', cat: "Entertainment", q: "Will Marvel announce Black Panther 3 this year?", p: 55, id: "ent-bp3" },
@@ -161,9 +160,8 @@
         ];
 
         window.onload = () => { 
-            // Wipes the cached, blank markets from browser memory once on startup
-            localStorage.clear();
-            
+            // Wipes existing cache completely so fresh default markets load in safely
+            localStorage.removeItem('nx_markets');
             loadPersistedMarkets();
             syncState(); 
             render('All');
@@ -189,8 +187,16 @@
 
         function render(cat) {
             currentCat = cat;
-            const f = document.getElementById('feed'); f.innerHTML = '';
-            let filtered = markets.filter(m => cat === 'All' ? true : (cat === 'News' ? m.type === 'n' : m.cat === cat));
+            const f = document.getElementById('feed'); 
+            f.innerHTML = '';
+            
+            // Fixed, foolproof filtering logic
+            let filtered = markets.filter(m => {
+                if (cat === 'All') return true;
+                if (cat === 'News') return m.type === 'n';
+                return m.cat === cat && m.type === 'm';
+            });
+
             filtered.forEach(m => injectToTerminal(m));
         }
 
@@ -202,7 +208,6 @@
 
         function injectToTerminal(item) {
             const f = document.getElementById('feed');
-
             const card = document.createElement('div');
             card.id = 'market-el-' + item.id;
             
@@ -348,6 +353,4 @@
             syncState();
         }
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function logout() 
+        function openModal(id) { document.getElementById(id).style.display = 'flex'

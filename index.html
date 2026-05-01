@@ -149,37 +149,39 @@
         let currentCat = 'All';
         let markets = [];
 
-        // Seed exactly with real top 2026 Polymarket choices
+        // Exact real-world active high-volume Polymarket choices
         const baseMarkets = [
             { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" },
             { type: 'm', cat: "Crypto", q: "Will Bitcoin outperform gold in 2026?", p: 59, id: "poly-btc-gold" },
-            { type: 'm', cat: "Elections", q: "Will U.S. fall into a recession in 2026?", p: 27, id: "poly-us-recession" },
+            { type: 'm', cat: "Elections", q: "Will U.S. fall into a formal recession in 2026?", p: 27, id: "poly-us-recession" },
             { type: 'm', cat: "Crypto", q: "Will the AI bubble burst by the end of 2026?", p: 40, id: "poly-ai-bubble" },
             { type: 'm', cat: "World", q: "Will Spain win the 2026 FIFA World Cup?", p: 16, id: "poly-wc-spain" },
             { type: 'n', cat: "News", h: "Prediction Market Growth", p: "Trading records surged globally, reaching an all-time daily high volume of $425 million.", id: "news-1" },
             { type: 'n', cat: "News", h: "Global Economic Easing", p: "Bettors maintain an outlook of 0.50% total cumulative cuts from the Fed in 2026.", id: "news-2" }
         ];
 
-        window.onload = () => { 
+        // Core startup initialization
+        window.addEventListener('DOMContentLoaded', () => { 
             loadPersistedMarkets();
             syncState(); 
             render('All');
-        };
+        });
 
         function loadPersistedMarkets() {
-            const stored = localStorage.getItem('nx_markets');
-            if (stored) {
-                try {
+            try {
+                const stored = localStorage.getItem('nx_markets');
+                if (stored) {
                     markets = JSON.parse(stored);
                     if (!Array.isArray(markets) || markets.length === 0) {
                         markets = [...baseMarkets];
                         saveMarkets();
                     }
-                } catch(e) {
+                } else {
                     markets = [...baseMarkets];
                     saveMarkets();
                 }
-            } else {
+            } catch(e) {
+                // Instantly wipe bad data and restore if error pops up
                 markets = [...baseMarkets];
                 saveMarkets();
             }
@@ -191,7 +193,10 @@
 
         function render(cat) {
             currentCat = cat;
-            const f = document.getElementById('feed'); f.innerHTML = '';
+            const f = document.getElementById('feed'); 
+            if (!f) return;
+            
+            f.innerHTML = '';
             let filtered = markets.filter(m => cat === 'All' ? true : (cat === 'News' ? m.type === 'n' : m.cat === cat));
             
             if (filtered.length === 0) {
@@ -204,7 +209,7 @@
 
         function filterCat(cat, el) {
             document.querySelectorAll('.cat-link').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
+            if(el) el.classList.add('active');
             render(cat);
         }
 
@@ -247,8 +252,12 @@
         }
 
         function getActiveWager(marketId) {
-            const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
-            return wagers[marketId];
+            try {
+                const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
+                return wagers[marketId];
+            } catch(e) {
+                return null;
+            }
         }
 
         function openStakeModal(side, question, marketId) {
@@ -267,7 +276,11 @@
 
                 localStorage.setItem('nx_balance', currentBalance - amt);
                 
-                const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
+                let wagers = {};
+                try {
+                    wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
+                } catch(e) { wagers = {}; }
+
                 wagers[marketId] = { side: side, amt: amt };
                 localStorage.setItem('nx_wagers', JSON.stringify(wagers));
 
@@ -295,14 +308,15 @@
                 } else {
                     alertMsg += `❌ Incorrect. You lost your Ksh ${wager.amt} stake.`;
                 }
-                const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
-                delete wagers[marketId];
-                localStorage.setItem('nx_wagers', JSON.stringify(wagers));
+                try {
+                    const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
+                    delete wagers[marketId];
+                    localStorage.setItem('nx_wagers', JSON.stringify(wagers));
+                } catch(e) {}
             } else {
                 alertMsg += `You didn't have an active stake on this market.`;
             }
 
-            // Remove market from global array
             markets = markets.filter(m => m.id !== marketId);
             saveMarkets();
             
@@ -317,6 +331,9 @@
             if(user) {
                 document.getElementById('signBtn').classList.add('hidden');
                 document.getElementById('userIcon').classList.remove('hidden');
+            } else {
+                document.getElementById('signBtn').classList.remove('hidden');
+                document.getElementById('userIcon').classList.add('hidden');
             }
             document.getElementById('balance').innerText = parseFloat(bal).toLocaleString(undefined, {minimumFractionDigits: 2});
         }
@@ -336,18 +353,3 @@
         function doAuth() {
             const email = document.getElementById('aEmail').value;
             if(!email.includes('@')) return alert("Invalid Credentials");
-            localStorage.setItem('nx_user', email);
-            closeModal('authModal');
-            syncState();
-        }
-
-        function setAmt(v) { document.getElementById('depAmt').value = v; }
-
-        function payNow() {
-            const amt = document.getElementById('depAmt').value;
-            if(!localStorage.getItem('nx_user')) return openModal('authModal');
-            if(amt < 200) return alert("Min required: Ksh 200");
-            document.body.classList.add('hide-header');
-            closeModal('depositModal');
-            
-            let cur = parseFloat(localStorage.getIte

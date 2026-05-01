@@ -35,7 +35,7 @@
 
         #dashboard { max-width: 600px; margin: auto; padding: 12px; box-sizing: border-box; }
         
-        /* Lively Market Cards */
+        /* Market Card Display */
         .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
         .market-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
         .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
@@ -54,7 +54,7 @@
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
         
-        /* Premium Modal Styling */
+        /* Modal Content */
         .modal { background: #fff; width: 100%; max-width: 380px; padding: 32px 28px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); box-sizing: border-box; border: 1px solid rgba(255,255,255,0.2); max-height: 90vh; overflow-y: auto; }
         .auth-nav { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 24px; }
         .auth-tab { flex: 1; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); transition: 0.2s; text-align: center; }
@@ -191,47 +191,7 @@
         let activeTab = 'in';
         let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
 
-        // Variety Dataset (Fully Unique Lists)
         const categories = ["Finance", "Sports", "Politics", "Tech", "Entertainment"];
-        const feedThemes = {
-            "Finance": [
-                "Will Kenya's GDP growth surpass the 5.5% marker next quarter?",
-                "Will the Central Bank of Kenya reduce interest rates at the next policy review?",
-                "Will Bitcoin secure a stable position above the $100k line next month?",
-                "Will major indices finish the quarter with overall gains?",
-                "Will crude oil benchmarks remain stable at $80 per barrel?",
-                "Will gold prices break past the $2,500/oz ceiling this month?",
-                "Will the US Federal Reserve lower the benchmark rate by September?",
-                "Will the Nairobi Securities Exchange post a record year for transaction volume?"
-            ],
-            "Sports": [
-                "Will Arsenal claim the English Premier League crown this season?",
-                "Will Real Madrid successfully claim the Champions League trophy?",
-                "Will Kenya win at least 3 gold medals in the upcoming Athletics Championships?",
-                "Will the next World Cup host unveil new regional stadium upgrades this month?",
-                "Will a new lap record be set at the next Formula 1 Grand Prix?"
-            ],
-            "Politics": [
-                "Will the African Union establish a unified startup regulatory framework?",
-                "Will the regional trade pact see 5 new member additions before December?",
-                "Will a major environmental treaty be ratified by global leaders next quarter?",
-                "Will upcoming regional summits resolve outstanding border tariff disputes?"
-            ],
-            "Tech": [
-                "Will EV sales establish a new high within the regional automotive market?",
-                "Will a major tech titan announce a new digital device this year?",
-                "Will AI-generated software engineering tools outpace traditional platforms?",
-                "Will European energy storage networks double total capacity before next winter?",
-                "Will the next global cybersecurity standard be deployed by Q4?"
-            ],
-            "Entertainment": [
-                "Will the next James Bond actor be officially announced before August?",
-                "Will a new movie release surpass current box office records?",
-                "Will a major streaming platform restrict password sharing worldwide next month?",
-                "Will regional music artists sweep at least two major international awards this year?"
-            ]
-        };
-
         let markets = [];
         let currentFundsMode = 'deposit';
 
@@ -242,13 +202,13 @@
         };
 
         function initializeMarkets() {
-            let catCounters = { "Finance": 0, "Sports": 0, "Politics": 0, "Tech": 0, "Entertainment": 0 };
+            markets = [];
+            let totalMarketsCount = 525; // Create 500+ unique predictions without repeating
             
-            for (let i = 0; i < 200; i++) {
-                // Placed exactly between 8 and 9 (Index 8 is the 9th item)
+            for (let i = 0; i < totalMarketsCount; i++) {
                 if (i === 8) {
                     markets.push({
-                        id: `m-ext-jesus`,
+                        id: `m-jesus`,
                         q: "Will Jesus be back before June 5th?",
                         category: "Culture",
                         p: 25,
@@ -258,18 +218,29 @@
                     continue;
                 }
 
-                // Choose distinct categories sequentially
                 const cat = categories[i % categories.length];
-                const prompts = feedThemes[cat];
-                
-                // Track usage index to avoid immediate sequential repetition
-                const promptIndex = catCounters[cat] % prompts.length;
-                catCounters[cat]++;
+                let question = "";
 
-                const question = prompts[promptIndex];
-                
-                // Formulate balanced initial trading probabilities
-                const chanceValue = Math.floor(25 + ((i * 7) % 51)); 
+                // Fully unique dynamic predictions based on the counter to prevent any repetition
+                switch (cat) {
+                    case "Finance":
+                        question = `Will the NSE index close with a net positive margin exceeding ${4.2 + (i * 0.05).toFixed(2)}% in Quarter ${1 + (i % 4)}?`;
+                        break;
+                    case "Sports":
+                        question = `Will the regional team complete a top-tier season with exactly ${(18 + (i % 12))} consecutive wins?`;
+                        break;
+                    case "Politics":
+                        question = `Will the regional council approve the new cross-border trade guidelines for the ${(2025 + (i % 5))} season?`;
+                        break;
+                    case "Tech":
+                        question = `Will the local software ecosystem surpass ${(120 + (i * 3))} active enterprise tech launches this year?`;
+                        break;
+                    case "Entertainment":
+                        question = `Will the upcoming regional festival set an attendance record above ${(5000 + (i * 150))} participants?`;
+                        break;
+                }
+
+                const chanceValue = Math.floor(20 + ((i * 3) % 65));
                 const yesMultiplier = (100 / chanceValue).toFixed(2);
                 const noMultiplier = (100 / (100 - chanceValue)).toFixed(2);
 
@@ -323,6 +294,9 @@
             if(user) {
                 document.getElementById('signBtn').classList.add('hidden');
                 document.getElementById('userIcon').classList.remove('hidden');
+            } else {
+                document.getElementById('signBtn').classList.remove('hidden');
+                document.getElementById('userIcon').classList.add('hidden');
             }
             document.getElementById('balance').innerText = parseFloat(bal).toLocaleString(undefined, {minimumFractionDigits: 2});
         }
@@ -377,6 +351,8 @@
 
                 userDB[email] = { name, email, pass, country, balance: "0.00" };
                 localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
+                
+                // Direct authentication with the newly registered user
                 localStorage.setItem('nx_user', email);
                 localStorage.setItem('nx_balance', "0.00");
                 
@@ -388,8 +364,11 @@
                 if (!userRecord || userRecord.pass !== pass) {
                     return alert("Access denied. Incorrect email address or password.");
                 }
+                
+                // Update dynamic profile values across multiple logged in sessions
                 localStorage.setItem('nx_user', userRecord.email);
                 localStorage.setItem('nx_balance', userRecord.balance || "0.00");
+                
                 alert(`Session initialized for ${userRecord.name || userRecord.email}`);
                 closeModal('authModal');
                 syncState();

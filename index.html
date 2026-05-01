@@ -147,7 +147,7 @@
             </div>
             
             <button onclick="doAuth()" class="btn-tech">Initialize Session</button>
-            <p style="font-size: 13px; color: var(--text-sub); margin-top: 22px; cursor: pointer; font-weight:700;" onclick="onclick=closeModal('authModal')">Dismiss</p>
+            <p style="font-size: 13px; color: var(--text-sub); margin-top: 22px; cursor: pointer; font-weight:700;" onclick="closeModal('authModal')">Dismiss</p>
         </div>
     </div>
 
@@ -162,10 +162,23 @@
             <p id="fundsDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Direct M-Pesa Integration via IntaSend</p>
             
             <div style="background:#f8fafc; padding:18px; border-radius:18px; border: 1px solid var(--border); margin-bottom:16px;">
+                
+                <div id="withdrawalFields" class="hidden">
+                    <div class="input-group">
+                        <label>M-Pesa Registered Name</label>
+                        <input type="text" id="withName" class="input-tech" placeholder="First and Last Name">
+                    </div>
+                    <div class="input-group">
+                        <label>M-Pesa Phone Number</label>
+                        <input type="tel" id="withPhone" class="input-tech" placeholder="e.g. 0712345678">
+                    </div>
+                </div>
+
                 <div class="input-group">
                     <label id="amtLabel">Deposit Amount (Ksh)</label>
                     <input type="text" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800; color: #000;" value="0.00" onfocus="if(this.value==='0.00')this.value='';" onblur="if(this.value==='')this.value='0.00';">
                 </div>
+                
                 <div id="fundsChips" class="chip-grid">
                     <div class="amt-chip" onclick="setAmt(250)">250</div>
                     <div class="amt-chip" onclick="setAmt(500)">500</div>
@@ -206,7 +219,6 @@
         function initializeMarkets() {
             markets = [];
             
-            // 1. Initial true baseline prediction topics trending on Polymarket
             const baseMarkets = [
                 { q: "Will Spain win the FIFA World Cup?", category: "Sports", p: 16 },
                 { q: "Will Super Bowl LX be won by the Los Angeles Rams?", category: "Sports", p: 14 },
@@ -218,14 +230,12 @@
                 { q: "Will 2026 be the hottest year on record according to NASA?", category: "Global Affairs", p: 9 }
             ];
 
-            // Specific real names & topics to combine dynamically for 1000+ unique questions
-            const realTech = ["OpenAI", "Microsoft", "Google", "Apple", "Tesla", "Meta", "Nvidia", "X (Twitter)"];
-            const realCoins = ["Solana", "Ethereum", "Cardano", "XRP", "DOGE", "Binance Coin", "Avalanche", "Polkadot"];
-            const realNations = ["US", "United Kingdom", "France", "Germany", "China", "India", "Japan", "Brazil"];
-            const realCompanies = ["Saudi Aramco", "ExxonMobil", "Amazon", "Walmart", "TSMC", "LVMH", "Berkshire Hathaway"];
-            const realTournaments = ["Premier League", "NBA Finals", "Formula 1 Championship", "UEFA Champions League"];
+            const realTech = ["OpenAI", "Microsoft", "Google", "Apple", "Tesla", "Meta", "Nvidia", "X (Twitter)", "Anthropic", "Oracle", "Amazon AWS"];
+            const realCoins = ["Solana", "Ethereum", "Cardano", "XRP", "DOGE", "Binance Coin", "Avalanche", "Polkadot", "Chainlink", "Near Protocol", "Sui"];
+            const realNations = ["US", "United Kingdom", "France", "Germany", "China", "India", "Japan", "Brazil", "Kenya", "South Africa", "Nigeria"];
+            const realCompanies = ["Saudi Aramco", "ExxonMobil", "Amazon", "Walmart", "TSMC", "LVMH", "Berkshire Hathaway", "Safaricom", "KCB Bank"];
+            const realTournaments = ["Premier League", "NBA Finals", "Formula 1 Championship", "UEFA Champions League", "CAF Champions League"];
 
-            // Load baseline questions first
             baseMarkets.forEach((bm, i) => {
                 const yesMult = (100 / bm.p).toFixed(2);
                 const noMult = (100 / (100 - bm.p)).toFixed(2);
@@ -239,7 +249,7 @@
                 });
             });
 
-            // Keep index 8 locked exclusively to your specific prediction
+            // Keep Jesus prediction fixed exactly at index 8
             markets.splice(8, 0, {
                 id: "m-jesus",
                 q: "Will Jesus be back before June 5th?",
@@ -249,11 +259,11 @@
                 noMult: "1.33"
             });
 
-            // Generate remaining up to 1010 completely unique questions without repeating templates
-            for (let i = 1; i <= 1001; i++) {
+            // Added an additional 500+ items to reach 1,500+ highly varied, realistic predictions
+            for (let i = 1; i <= 1502; i++) {
                 let cat = "Global Affairs";
                 let q = "";
-                let p = Math.floor(12 + ((i * 7) % 76));
+                let p = Math.floor(12 + ((i * 11) % 76));
 
                 const techCompany = realTech[i % realTech.length];
                 const coin = realCoins[i % realCoins.length];
@@ -261,38 +271,43 @@
                 const firm = realCompanies[i % realCompanies.length];
                 const cup = realTournaments[i % realTournaments.length];
 
-                // Rotate through completely distinct, non-repetitive real-world templates
-                const mod = i % 10;
+                const mod = i % 12;
                 if (mod === 0) {
                     cat = "Crypto";
-                    q = `Will ${coin} outperform the performance of Bitcoin over the next trading quarter?`;
+                    q = `Will ${coin} decouple or outperform Bitcoin's localized trajectory over the upcoming fiscal quarter?`;
                 } else if (mod === 1) {
                     cat = "Politics";
-                    q = `Will the ${country} Parliament ratify the new digital assets framework before November?`;
+                    q = `Will the ${country} trade commission endorse and enforce the upcoming regional digital assets roadmap?`;
                 } else if (mod === 2) {
                     cat = "Sports";
-                    q = `Will the leading scorer in the ${cup} exceed ${(24 + (i % 8))} total points this season?`;
+                    q = `Will the leading scorer or title winner in the ${cup} attain a record score margin this season?`;
                 } else if (mod === 3) {
                     cat = "Pop Culture";
-                    q = `Will the new summer blockbuster released by ${techCompany} Studios exceed $${(180 + (i % 450))} million domestically?`;
+                    q = `Will the next production or streaming exclusive release by ${techCompany} exceed $${(180 + (i % 380))} million in global licensing?`;
                 } else if (mod === 4) {
                     cat = "Business";
-                    q = `Will ${firm} announce a stock split or buyback program in their upcoming annual statement?`;
+                    q = `Will ${firm} announce a major cross-border acquisition or buyback initiative during their next earnings call?`;
                 } else if (mod === 5) {
                     cat = "Finance";
-                    q = `Will the annual inflation rate in ${country} drop below ${(2.5 + (i * 0.02)).toFixed(2)}% in the next CPI release?`;
+                    q = `Will the local inflation benchmark across ${country} adjust below ${(2.2 + (i * 0.015)).toFixed(2)}% following the next consensus report?`;
                 } else if (mod === 6) {
                     cat = "Global Affairs";
-                    q = `Will ${country} and its trade partners finalize the green energy treaty by the end of Q3?`;
+                    q = `Will ${country} and its immediate trade allies ratify the newly proposed green logistics accord before Q4?`;
                 } else if (mod === 7) {
                     cat = "Crypto";
-                    q = `Will the total capital locked (TVL) within the ${coin} ecosystem surpass $${(3 + (i % 12))} Billion this year?`;
+                    q = `Will the active volume within the ${coin} DeFi ecosystem expand past $${(2.8 + (i % 14))} Billion this fiscal year?`;
                 } else if (mod === 8) {
                     cat = "Business";
-                    q = `Will ${techCompany} receive approval for their latest generative AI enterprise software patent?`;
-                } else {
+                    q = `Will ${techCompany} successfully clear antitrust or data privacy reviews for their new machine learning architecture?`;
+                } else if (mod === 9) {
                     cat = "Pop Culture";
-                    q = `Will the headline artist at the global music gala announce a tour through ${country} this year?`;
+                    q = `Will the highest performing international album this season come from a native artist hailing from ${country}?`;
+                } else if (mod === 10) {
+                    cat = "Finance";
+                    q = `Will the core equity indices across ${country} register a total upward momentum above ${(4.1 + (i * 0.01)).toFixed(2)}%?`;
+                } else {
+                    cat = "Global Affairs";
+                    q = `Will ${firm} lead the joint renewable expansion initiatives with the government of ${country} this fall?`;
                 }
 
                 const yesMult = (100 / p).toFixed(2);
@@ -374,17 +389,20 @@
             const tDep = document.getElementById('tabDeposit'), tWith = document.getElementById('tabWithdraw');
             const fTitle = document.getElementById('fundsTitle'), fDesc = document.getElementById('fundsDesc');
             const amtLabel = document.getElementById('amtLabel'), fSubmit = document.getElementById('fundsSubmit');
+            const withFields = document.getElementById('withdrawalFields');
 
             if(mode === 'withdraw') {
                 tWith.classList.add('active'); tDep.classList.remove('active');
-                fTitle.innerText = "Withdraw Balance"; fDesc.innerText = "Direct settlement to your M-Pesa account";
+                fTitle.innerText = "Withdraw Balance"; fDesc.innerText = "Enter your details to finalize the withdrawal";
                 amtLabel.innerText = "Withdrawal Amount (Ksh)"; fSubmit.innerText = "Confirm Withdrawal";
                 fSubmit.style.background = "#000";
+                withFields.classList.remove('hidden');
             } else {
                 tDep.classList.add('active'); tWith.classList.remove('active');
                 fTitle.innerText = "Fund Balance"; fDesc.innerText = "Direct M-Pesa Integration via IntaSend";
                 amtLabel.innerText = "Deposit Amount (Ksh)"; fSubmit.innerText = "Confirm Deposit";
                 fSubmit.style.background = "var(--yes-blue)";
+                withFields.classList.add('hidden');
             }
         }
 
@@ -435,10 +453,13 @@
 
         function withdrawNow() {
             const amt = Number(document.getElementById('depAmt').value);
+            const wName = document.getElementById('withName').value.trim();
+            const wPhone = document.getElementById('withPhone').value.trim();
             const userEmail = localStorage.getItem('nx_user');
             let curBal = parseFloat(localStorage.getItem('nx_balance') || 0);
 
             if(!userEmail) { closeModal('depositModal'); return openModal('authModal'); }
+            if(!wName || !wPhone) return alert("Both M-Pesa account name and number are required to process withdrawals.");
             if(!amt || amt < 100) return alert("Minimum withdrawal amount required is Ksh 100");
             if(amt > curBal) return alert("Insufficient funds");
 
@@ -451,7 +472,7 @@
                 localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
             }
             syncState();
-            alert("Withdrawal complete");
+            alert(`Withdrawal request successful. Ksh ${amt.toLocaleString()} will be settled to ${wName} (${wPhone}) shortly.`);
         }
 
         function payNow() {

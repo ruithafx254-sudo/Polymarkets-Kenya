@@ -14,52 +14,81 @@
             --bg: #f8fafc; --card-bg: #ffffff;
         }
         
-        body { background: var(--bg); color: var(--text-main); margin: 0; padding-top: 140px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        /* Fixed: Added overflow-y: auto and ensured body height isn't restricted */
+        body { 
+            background: var(--bg); 
+            color: var(--text-main); 
+            margin: 0; 
+            padding-top: 170px; /* Adjusted for the new header height */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow-x: hidden;
+            overflow-y: auto; 
+            min-height: 100vh;
+        }
 
         /* --- STICKY HEADER SYSTEM --- */
-        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
+        .header-stack { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            background: #fff; 
+            z-index: 2000; 
+            border-bottom: 1px solid var(--border);
+            pointer-events: auto; /* Ensures you can click things in the header */
+        }
         
         .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; height: 50px; }
         .logo { font-weight: 900; font-size: 22px; letter-spacing: -1px; }
         
-        /* --- SEARCH & CATEGORIES --- */
         .search-container { padding: 8px 16px; background: #fff; }
-        .search-bar { background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; padding: 10px 15px; gap: 10px; border: 1px solid transparent; transition: 0.2s; }
-        .search-bar:focus-within { border-color: #cbd5e1; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .search-bar { background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; padding: 10px 15px; gap: 10px; border: 1px solid transparent; }
         .search-input { border: none; background: transparent; outline: none; width: 100%; font-size: 14px; font-weight: 500; }
 
-        .category-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 10px 16px; white-space: nowrap; scrollbar-width: none; }
+        .category-scroller { 
+            display: flex; 
+            gap: 10px; 
+            overflow-x: auto; 
+            padding: 10px 16px; 
+            white-space: nowrap; 
+            -webkit-overflow-scrolling: touch; /* Smooth scroll for iOS */
+        }
         .category-scroller::-webkit-scrollbar { display: none; }
-        .cat-chip { padding: 8px 16px; background: #fff; border: 1px solid var(--border); border-radius: 100px; font-size: 13px; font-weight: 700; color: var(--text-sub); cursor: pointer; }
+        .cat-chip { padding: 8px 16px; background: #fff; border: 1px solid var(--border); border-radius: 100px; font-size: 13px; font-weight: 700; color: var(--text-sub); flex-shrink: 0; }
         .cat-chip.active { background: #000; color: #fff; border-color: #000; }
 
-        /* --- POLYMARKET CARDS --- */
-        .market-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); padding: 16px; margin: 12px; }
+        /* --- DASHBOARD & CARDS --- */
+        #dashboard { 
+            max-width: 500px; 
+            margin: 0 auto; 
+            position: relative; 
+            z-index: 10; /* Lower than header but higher than nothing */
+            padding-bottom: 50px; /* Space at the bottom */
+        }
+
+        .market-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); padding: 16px; margin: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .card-header { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
         .card-icon { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; background: #f1f5f9; }
         .card-title-area { flex: 1; }
-        .m-title { font-size: 16px; font-weight: 700; line-height: 1.3; margin-bottom: 4px; }
-        .m-chance { font-size: 18px; font-weight: 800; text-align: right; min-width: 60px; }
-        .m-chance span { font-size: 11px; display: block; color: var(--text-sub); font-weight: 600; }
+        .m-title { font-size: 16px; font-weight: 700; line-height: 1.3; margin-bottom: 4px; color: #1e293b; }
+        .m-chance { font-size: 18px; font-weight: 800; text-align: right; min-width: 60px; color: #000; }
+        .m-chance span { font-size: 11px; display: block; color: var(--text-sub); font-weight: 600; text-transform: uppercase; }
 
         .order-btn-group { display: flex; gap: 8px; margin-bottom: 12px; }
-        .order-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; font-size: 14px; }
+        .order-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; font-size: 14px; transition: opacity 0.2s; }
+        .order-btn:active { opacity: 0.7; }
         .btn-yes { background: #effef6; color: #065f46; }
         .btn-no { background: #fff1f2; color: #9f1239; }
         
         .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f8fafc; padding-top: 12px; font-size: 12px; color: var(--text-sub); font-weight: 600; }
 
-        /* --- MODALS & OVERLAYS --- */
+        /* --- MODALS --- */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 5000; align-items: center; justify-content: center; padding: 15px; }
         .modal-card { background: #fff; width: 100%; max-width: 360px; padding: 30px; border-radius: 28px; text-align: center; }
         .wallet-pill { background: #0f172a; color: #fff; padding: 4px 4px 4px 12px; border-radius: 100px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; }
         .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 6px 12px; border-radius: 80px; font-weight: 800; cursor: pointer; }
 
-        /* --- UI STATES --- */
-        body.hide-header .header-stack { display: none; }
-        body.hide-header { padding-top: 0; }
         .hidden { display: none !important; }
-        #dashboard { max-width: 500px; margin: auto; }
     </style>
 </head>
 <body>
@@ -68,7 +97,7 @@
         <div class="top-nav">
             <div class="logo">NEXGEN</div>
             <div class="bar-right" style="display:flex; gap:10px; align-items:center;">
-                <button id="loginBtn" class="cat-chip" style="border:none; background:#f1f5f9; color:#000" onclick="openModal('auth-overlay')">Sign In</button>
+                <button id="loginBtn" class="cat-chip" style="border:none; background:#f1f5f9; color:#000; padding: 6px 12px;" onclick="openModal('auth-overlay')">Sign In</button>
                 <div id="userIcon" class="hidden" style="width:34px; height:34px; background:#000; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800">??</div>
                 <div class="wallet-pill">
                     Ksh <span id="balance">0.00</span>
@@ -100,13 +129,13 @@
 
     <div id="order-overlay" class="modal-overlay">
         <div class="modal-card">
-            <h3 id="order-title" style="text-align:left; margin-bottom:15px">Market</h3>
+            <h3 id="order-title" style="text-align:left; margin-bottom:15px">Market Trade</h3>
             <div style="background:#f8fafc; padding:20px; border-radius:18px; margin-bottom:20px">
                 <input type="number" id="betAmount" style="width:100%; border:none; background:transparent; font-size:32px; font-weight:900; text-align:center" placeholder="0" oninput="calcPayout()">
                 <div id="payout-amt" style="font-size:12px; font-weight:700; color:var(--text-sub); margin-top:10px">Est. Payout: Ksh 0.00</div>
             </div>
-            <button class="btn-deposit" style="width:100%; padding:18px; font-size:16px" onclick="confirmBet()">Place Trade</button>
-            <p onclick="closeModal('order-overlay')" style="margin-top:20px; cursor:pointer; color:#999">Cancel</p>
+            <button class="btn-deposit" style="width:100%; padding:18px; font-size:16px; border-radius:18px;" onclick="confirmBet()">Place Trade</button>
+            <p onclick="closeModal('order-overlay')" style="margin-top:20px; cursor:pointer; color:#999; font-weight:600">Cancel</p>
         </div>
     </div>
 
@@ -115,14 +144,16 @@
             <h2>Sign In</h2>
             <input type="email" id="authEmail" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px" placeholder="Email">
             <button onclick="handleAuth()" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:12px; border:none; font-weight:800">Continue</button>
+            <p onclick="closeModal('auth-overlay')" style="margin-top:15px; cursor:pointer; color:#999">Dismiss</p>
         </div>
     </div>
 
     <div id="deposit-overlay" class="modal-overlay">
         <div class="modal-card">
             <h2>Deposit Ksh</h2>
-            <input type="number" id="customAmount" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px" placeholder="Amount">
-            <button onclick="startPayment()" class="btn-deposit" style="width:100%; padding:15px">Authorize</button>
+            <input type="number" id="customAmount" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px" placeholder="Enter Amount">
+            <button onclick="startPayment()" class="btn-deposit" style="width:100%; padding:15px; border-radius:15px">Authorize with IntaSend</button>
+            <p onclick="closeModal('deposit-overlay')" style="margin-top:15px; cursor:pointer; color:#999">Close</p>
         </div>
     </div>
 
@@ -134,8 +165,9 @@
             const bal = localStorage.getItem('nx_balance');
             if(user) {
                 document.getElementById('loginBtn').classList.add('hidden');
-                document.getElementById('userIcon').classList.remove('hidden');
-                document.getElementById('userIcon').innerText = user;
+                const ui = document.getElementById('userIcon');
+                ui.classList.remove('hidden');
+                ui.innerText = user;
             }
             if(bal) document.getElementById('balance').innerText = parseFloat(bal).toFixed(2);
             render();
@@ -152,7 +184,7 @@
 
         function calcPayout() {
             const amt = document.getElementById('betAmount').value;
-            if(!amt) return;
+            if(!amt || !activeMarket) return;
             const est = (amt / (activeMarket.price / 100));
             document.getElementById('payout-amt').innerText = `Est. Payout: Ksh ${est.toFixed(2)}`;
         }
@@ -160,17 +192,24 @@
         function confirmBet() {
             const amt = parseFloat(document.getElementById('betAmount').value);
             const bal = parseFloat(localStorage.getItem('nx_balance') || 0);
-            if(amt > bal) return alert("Low balance");
-            localStorage.setItem('nx_balance', bal - amt);
+            if(amt > bal) return alert("Insufficient balance to place trade.");
+            if(!amt || amt <= 0) return alert("Please enter a valid amount.");
+            
+            localStorage.setItem('nx_balance', (bal - amt).toFixed(2));
+            alert("Trade successful!");
             location.reload();
         }
 
         function render() {
             const feed = document.getElementById('dynamic-feed');
+            feed.innerHTML = '';
+            
             const data = [
                 { q: "James Comey sentenced to Prison in 2026?", p: 9, vol: "93K", img: "https://api.dicebear.com/7.x/avataaars/svg?seed=politics" },
                 { q: "Bitcoin to stay above $100k until June?", p: 72, vol: "1.4M", img: "https://cryptologos.cc/logos/bitcoin-btc-logo.png" },
-                { q: "Arsenal to win Premier League 2026?", p: 46, vol: "400K", img: "https://api.dicebear.com/7.x/initials/svg?seed=AFC" }
+                { q: "Arsenal to win Premier League 2026?", p: 46, vol: "400K", img: "https://api.dicebear.com/7.x/initials/svg?seed=AFC" },
+                { q: "Will Jesus come back before June?", p: 75, vol: "1.2M", img: "https://api.dicebear.com/7.x/shapes/svg?seed=faith" },
+                { q: "KES to drop vs USD by end of year?", p: 31, vol: "2.1M", img: "https://api.dicebear.com/7.x/initials/svg?seed=KES" }
             ];
 
             data.forEach(m => {
@@ -199,16 +238,24 @@
 
         function handleAuth() {
             const email = document.getElementById('authEmail').value;
+            if(!email.includes('@')) return alert("Enter a valid email");
             localStorage.setItem('nx_user', email.substring(0,2).toUpperCase());
             location.reload();
         }
 
         function startPayment() {
             const amt = document.getElementById('customAmount').value;
-            const intasend = new window.IntaSend({ publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad", live: false });
-            intasend.run({ amount: Number(amt), currency: "KES" }).on("COMPLETE", () => {
+            if(!amt || amt < 10) return alert("Min deposit is Ksh 10");
+            
+            const intasend = new window.IntaSend({ 
+                publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad", 
+                live: false 
+            });
+            
+            intasend.run({ amount: Number(amt), currency: "KES" })
+            .on("COMPLETE", () => {
                 const cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-                localStorage.setItem('nx_balance', cur + Number(amt));
+                localStorage.setItem('nx_balance', (cur + Number(amt)).toFixed(2));
                 location.reload();
             });
         }

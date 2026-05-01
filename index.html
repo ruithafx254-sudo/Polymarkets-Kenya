@@ -164,10 +164,6 @@
                 </span>
             </div>
 
-            <div id="withdrawBadge" class="badge-wrap hidden">
-                <span style="display:block; text-align: center">        <a href="https://intasend.com/security" target="_blank"><img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-no-mpesa-hr-dark.png" width="375px" alt="IntaSend Secure Payments (PCI-DSS Compliant)"></a>        <strong><a style="display: block; color: #fafafa; text-decoration: none; font-size: 0.8em; margin-top: 0.6em;" href="https://intasend.com/security" target="_blank">Secured by IntaSend Payments</a></strong>        </span>
-            </div>
-
             <p style="font-size: 13px; color: var(--text-sub); margin-top: 14px; cursor: pointer; font-weight:700;" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
@@ -289,7 +285,6 @@
             const fTitle = document.getElementById('fundsTitle'), fDesc = document.getElementById('fundsDesc');
             const amtLabel = document.getElementById('amtLabel'), fSubmit = document.getElementById('fundsSubmit');
             const fChips = document.getElementById('fundsChips'), fBadge = document.getElementById('fundsBadge');
-            const wBadge = document.getElementById('withdrawBadge');
 
             if(mode === 'withdraw') {
                 tWith.classList.add('active'); tDep.classList.remove('active');
@@ -300,7 +295,6 @@
                 fSubmit.style.background = "#000";
                 fChips.classList.remove('hidden');
                 fBadge.classList.add('hidden');
-                wBadge.classList.remove('hidden');
             } else {
                 tDep.classList.add('active'); tWith.classList.remove('active');
                 fTitle.innerText = "Fund Balance";
@@ -310,7 +304,6 @@
                 fSubmit.style.background = "var(--accent)";
                 fChips.classList.remove('hidden');
                 fBadge.classList.remove('hidden');
-                wBadge.classList.add('hidden');
             }
         }
 
@@ -330,4 +323,28 @@
             } else {
                 payNow();
             }
-      
+        }
+
+        function withdrawNow() {
+            const amt = Number(document.getElementById('depAmt').value);
+            const userEmail = localStorage.getItem('nx_user');
+            let curBal = parseFloat(localStorage.getItem('nx_balance') || 0);
+
+            if(!userEmail) {
+                closeModal('depositModal');
+                return openModal('authModal');
+            }
+
+            if(!amt || amt < 100) {
+                return alert("Minimum withdrawal amount required is Ksh 100");
+            }
+
+            if(amt > curBal) {
+                return alert("Insufficient funds");
+            }
+
+            closeModal('depositModal');
+            localStorage.setItem('nx_balance', curBal - amt);
+            syncState();
+            alert("Withdrawal complete");
+        

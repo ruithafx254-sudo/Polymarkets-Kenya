@@ -3,37 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexGen | High-Tech Terminal</title>
+    <title>Polymarkets Africa | Terminal</title>
     
     <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
 
     <style>
         :root { 
-            --neon-green: #2ebd85; --border: #eceef2; --text-main: #0f172a; --text-sub: #64748b;
+            --accent: #2ebd85; --border: #eceef2; --text-main: #0f172a; --text-sub: #64748b;
             --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #991b1b;
             --tech-bg: #0f172a;
         }
         
         body { background: #ffffff; color: var(--text-main); margin: 0; padding-top: 130px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
 
-        /* --- NAV STACK --- */
-        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* --- STRATEGIC HEADER --- */
+        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); transition: transform 0.4s ease; }
         body.hide-header .header-stack { transform: translateY(-100%); }
 
         .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 60px; }
-        .logo { font-weight: 800; font-size: 22px; letter-spacing: -1px; color: #000; text-transform: uppercase; }
+        
+        /* Strategic Logo Styling */
+        .logo-wrap { display: flex; flex-direction: column; line-height: 1; }
+        .logo-main { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; color: #000; text-transform: uppercase; }
+        .logo-sub { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
         
         .nav-right { display: flex; align-items: center; gap: 10px; }
         .wallet-pill { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); padding: 4px 4px 4px 12px; border-radius: 10px; gap: 8px; font-size: 13px; font-weight: 700; }
         .btn-deposit { background: #000; color: #fff; border: none; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; }
-        .user-id { width: 34px; height: 34px; background: var(--tech-bg); color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .user-id { width: 34px; height: 34px; background: var(--tech-bg); color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; cursor: pointer; }
 
-        /* --- SUB-NAV CATEGORIES --- */
+        /* --- CATEGORIES --- */
         .sub-nav { display: flex; gap: 20px; padding: 12px 20px; overflow-x: auto; background: #fff; border-bottom: 1px solid var(--border); scrollbar-width: none; }
-        .cat-link { font-size: 13px; font-weight: 700; color: var(--text-sub); text-decoration: none; white-space: nowrap; cursor: pointer; transition: 0.2s; }
+        .cat-link { font-size: 13px; font-weight: 700; color: var(--text-sub); text-decoration: none; white-space: nowrap; cursor: pointer; }
         .cat-link.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: -12px; }
 
-        /* --- MARKET CARDS --- */
+        /* --- CARDS --- */
         #dashboard { max-width: 600px; margin: auto; padding: 10px; }
         .market-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; }
         .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
@@ -47,7 +51,7 @@
         .trade-btn.yes { background: var(--yes); color: var(--yes-text); }
         .trade-btn.no { background: var(--no); color: var(--no-text); }
 
-        /* --- HIGH-TECH MODALS --- */
+        /* --- MODALS --- */
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
         .modal { background: #fff; width: 100%; max-width: 360px; padding: 32px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         
@@ -55,15 +59,11 @@
         .auth-tab { flex: 1; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 10px; color: var(--text-sub); transition: 0.3s; }
         .auth-tab.active { background: #000; color: #fff; }
 
-        .input-tech { width: 100%; padding: 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; outline: none; transition: 0.2s; }
-        .input-tech:focus { border-color: #000; box-shadow: 0 0 0 3px rgba(0,0,0,0.05); }
-
+        .input-tech { width: 100%; padding: 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
         .btn-tech { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 15px; margin-top: 10px; }
 
-        /* --- DEPOSIT CHIPS --- */
         .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
-        .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.2s; background: #fff; }
-        .amt-chip:active { transform: scale(0.95); background: #f1f5f9; }
+        .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; }
 
         .hidden { display: none !important; }
     </style>
@@ -72,7 +72,10 @@
 
     <div class="header-stack">
         <div class="top-nav">
-            <div class="logo">NexGen</div>
+            <div class="logo-wrap">
+                <div class="logo-main">Polymarkets</div>
+                <div class="logo-sub">Africa</div>
+            </div>
             <div class="nav-right">
                 <button id="signBtn" class="btn-deposit" style="background:#f1f5f9; color:#000;" onclick="openModal('authModal')">Sign In</button>
                 <div id="userIcon" class="user-id hidden" onclick="logout()">??</div>
@@ -100,8 +103,8 @@
                 <div id="tabIn" class="auth-tab active" onclick="setAuth('in')">Sign In</div>
                 <div id="tabUp" class="auth-tab" onclick="setAuth('up')">Sign Up</div>
             </div>
-            <h2 id="aTitle" style="margin: 0 0 8px 0; font-size: 22px;">Welcome</h2>
-            <p style="color: var(--text-sub); font-size: 13px; margin-bottom: 24px;">Secure Terminal Authorization</p>
+            <h2 id="aTitle" style="margin: 0 0 8px 0; font-size: 22px;">Terminal Access</h2>
+            <p style="color: var(--text-sub); font-size: 13px; margin-bottom: 24px;">Polymarkets Africa Secure Node</p>
             
             <div id="upFields" class="hidden">
                 <input type="text" id="aName" class="input-tech" placeholder="Full Name">
@@ -109,15 +112,15 @@
             <input type="email" id="aEmail" class="input-tech" placeholder="Email Address">
             <input type="password" id="aPass" class="input-tech" placeholder="Password">
             
-            <button onclick="doAuth()" class="btn-tech">Authorize Session</button>
+            <button onclick="doAuth()" class="btn-tech">Initialize Session</button>
             <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('authModal')">Dismiss</p>
         </div>
     </div>
 
     <div id="depositModal" class="overlay">
         <div class="modal">
-            <h2 style="margin: 0 0 4px 0;">Deposit</h2>
-            <p style="color: var(--text-sub); font-size: 13px; margin-bottom: 20px;">Secure M-Pesa Funding (Min 200)</p>
+            <h2 style="margin: 0 0 4px 0;">Liquidity</h2>
+            <p style="color: var(--text-sub); font-size: 13px; margin-bottom: 20px;">Secure Funding (Min 200)</p>
             
             <div style="background:#f8fafc; padding:20px; border-radius:18px; border: 1px solid var(--border);">
                 <input type="number" id="depAmt" class="input-tech" style="font-size: 32px; text-align: center; font-weight: 900; background: transparent; border: none;" placeholder="0">
@@ -131,7 +134,7 @@
                 </div>
             </div>
             
-            <button onclick="payNow()" class="btn-tech" style="background:var(--neon-green)">Confirm Deposit</button>
+            <button onclick="payNow()" class="btn-tech" style="background:var(--accent)">Confirm Deposit</button>
             <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
@@ -164,16 +167,16 @@
             const tIn = document.getElementById('tabIn'), tUp = document.getElementById('tabUp');
             if(mode === 'up') {
                 up.classList.remove('hidden'); tUp.classList.add('active'); tIn.classList.remove('active');
-                title.innerText = "Create Identity";
+                title.innerText = "Register Identity";
             } else {
                 up.classList.add('hidden'); tIn.classList.add('active'); tUp.classList.remove('active');
-                title.innerText = "Welcome Back";
+                title.innerText = "Terminal Access";
             }
         }
 
         function doAuth() {
             const email = document.getElementById('aEmail').value;
-            if(!email.includes('@')) return alert("Invalid Terminal ID");
+            if(!email.includes('@')) return alert("Invalid Credentials");
             localStorage.setItem('nx_user', email);
             closeModal('authModal');
             syncState();
@@ -184,7 +187,7 @@
         function payNow() {
             const amt = document.getElementById('depAmt').value;
             if(!localStorage.getItem('nx_user')) return openModal('authModal');
-            if(amt < 200) return alert("Minimum required: Ksh 200");
+            if(amt < 200) return alert("Min required: Ksh 200");
 
             document.body.classList.add('hide-header');
             closeModal('depositModal');
@@ -230,7 +233,7 @@
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function logout() { if(confirm("Terminate Session?")) { localStorage.clear(); location.reload(); } }
+        function logout() { if(confirm("Sign out of Africa Terminal?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>

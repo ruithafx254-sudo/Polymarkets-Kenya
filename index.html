@@ -22,15 +22,17 @@
         .logo-main { font-weight: 900; font-size: 19px; letter-spacing: -0.5px; color: #000; text-transform: uppercase; }
         .logo-sub { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
         
-        .nav-right { display: flex; align-items: center; gap: 10px; }
-        .wallet-pill { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); padding: 4px 4px 4px 12px; border-radius: 10px; gap: 8px; font-size: 13px; font-weight: 700; }
-        .btn-deposit { background: #000; color: #fff; border: none; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .nav-right { display: flex; align-items: center; gap: 8px; }
+        .wallet-pill { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); padding: 4px 4px 4px 12px; border-radius: 12px; gap: 6px; font-size: 13px; font-weight: 700; }
+        .btn-deposit { background: #000; color: #fff; border: none; padding: 7px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
         .btn-deposit:active { opacity: 0.8; }
+        .btn-withdraw { background: #fff; color: #000; border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-withdraw:active { opacity: 0.7; }
         
-        .user-id { width: 36px; height: 36px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .person-icon { width: 18px; height: 18px; fill: currentColor; }
+        .user-id { width: 34px; height: 34px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .person-icon { width: 16px; height: 16px; fill: currentColor; }
 
-        /* Hide header when payment window or modals are active */
+        /* Hide header on active modals or payments */
         body.hide-header .header-stack { transform: translateY(-100%); }
         body.hide-header { padding-top: 20px; }
 
@@ -49,13 +51,21 @@
         .multiplier { font-size: 11px; font-weight: 700; opacity: 0.8; }
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
-        .modal { background: #fff; width: 100%; max-width: 390px; padding: 28px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); box-sizing: border-box; }
-        .auth-nav { display: flex; background: #f1f5f9; padding: 6px; border-radius: 14px; margin-bottom: 24px; }
-        .auth-tab { flex: 1; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 10px; color: var(--text-sub); transition: 0.3s; }
-        .auth-tab.active { background: #000; color: #fff; }
-        .input-tech { width: 100%; padding: 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
-        .btn-tech { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 15px; transition: 0.2s; }
+        
+        /* Revamped Professional Auth Modal */
+        .modal { background: #fff; width: 100%; max-width: 380px; padding: 32px 28px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); box-sizing: border-box; border: 1px solid rgba(255,255,255,0.2); }
+        .auth-nav { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 24px; }
+        .auth-tab { flex: 1; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); transition: 0.2s; text-align: center; }
+        .auth-tab.active { background: #fff; color: #000; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+        
+        .input-group { position: relative; margin-bottom: 14px; text-align: left; }
+        .input-group label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .input-tech { width: 100%; padding: 14px 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; box-sizing: border-box; outline: none; transition: 0.2s; color: #0f172a; font-family: inherit; }
+        .input-tech:focus { border-color: #cbd5e1; background: #fff; }
+        
+        .btn-tech { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 14px; transition: 0.2s; letter-spacing: 0.5px; text-transform: uppercase; margin-top: 8px; }
         .btn-tech:active { opacity: 0.8; }
+        
         .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
         .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; text-align: center; }
         .amt-chip:active { background: #f1f5f9; }
@@ -80,6 +90,7 @@
                 <div class="wallet-pill">
                     Ksh <span id="balance">0.00</span>
                     <button onclick="openModal('depositModal')" class="btn-deposit">Deposit</button>
+                    <button onclick="openModal('withdrawModal')" class="btn-withdraw">Withdraw</button>
                 </div>
             </div>
         </div>
@@ -95,21 +106,38 @@
                 <div id="tabIn" class="auth-tab active" onclick="setAuth('in')">Sign In</div>
                 <div id="tabUp" class="auth-tab" onclick="setAuth('up')">Sign Up</div>
             </div>
-            <h2 id="aTitle" style="margin:0 0 16px 0; font-weight:800; font-size:20px;">Terminal Access</h2>
-            <div id="upFields" class="hidden"><input type="text" id="aName" class="input-tech" placeholder="Full Name"></div>
-            <input type="email" id="aEmail" class="input-tech" placeholder="Email Address">
-            <input type="password" id="aPass" class="input-tech" placeholder="Password">
+            
+            <h2 id="aTitle" style="margin:0 0 8px 0; font-weight:800; font-size:20px; letter-spacing:-0.5px;">Terminal Access</h2>
+            <p id="aDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Enter credentials to connect to terminal</p>
+            
+            <div id="upFields" class="hidden">
+                <div class="input-group">
+                    <label>Your Full Name</label>
+                    <input type="text" id="aName" class="input-tech" placeholder="e.g. Jane Doe">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="aEmail" class="input-tech" placeholder="name@domain.com">
+            </div>
+            
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="aPass" class="input-tech" placeholder="••••••••">
+            </div>
+            
             <button onclick="doAuth()" class="btn-tech">Initialize Session</button>
-            <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer; font-weight:700;" onclick="closeModal('authModal')">Dismiss</p>
+            <p style="font-size: 13px; color: var(--text-sub); margin-top: 22px; cursor: pointer; font-weight:700;" onclick="closeModal('authModal')">Dismiss</p>
         </div>
     </div>
 
     <div id="depositModal" class="overlay">
         <div class="modal">
-            <h2 style="margin: 0 0 4px 0; font-size:20px; font-weight:800;">Fund Balance</h2>
+            <h2 style="margin: 0 0 4px 0; font-size:20px; font-weight:800; letter-spacing:-0.5px;">Fund Balance</h2>
             <p style="color: var(--text-sub); font-size: 13px; margin-top:0; margin-bottom:16px;">Direct M-Pesa Integration via IntaSend</p>
             <div style="background:#f8fafc; padding:16px; border-radius:18px; border: 1px solid var(--border);">
-                <input type="number" id="depAmt" class="input-tech" style="font-size: 32px; text-align: center; font-weight: 900; background: transparent; border: none; margin-bottom:0;" placeholder="0">
+                <input type="number" id="depAmt" class="input-tech" style="font-size: 32px; text-align: center; font-weight: 900; background: transparent; border: none; margin-bottom:0; color:#000;" placeholder="0">
                 <div class="chip-grid">
                     <div class="amt-chip" onclick="setAmt(250)">250</div>
                     <div class="amt-chip" onclick="setAmt(500)">500</div>
@@ -134,10 +162,28 @@
         </div>
     </div>
 
+    <div id="withdrawModal" class="overlay">
+        <div class="modal">
+            <h2 style="margin: 0 0 4px 0; font-size:20px; font-weight:800; letter-spacing:-0.5px;">Withdrawal</h2>
+            <p style="color: var(--text-sub); font-size: 13px; margin-top:0; margin-bottom:18px;">Minimum withdrawal limit is Ksh 1,000</p>
+            <div style="background:#f8fafc; padding:18px; border-radius:18px; border: 1px solid var(--border); text-align: left;">
+                <div class="input-group" style="margin-bottom:12px;">
+                    <label>Amount to Withdraw (Ksh)</label>
+                    <input type="number" id="witAmt" class="input-tech" placeholder="1000">
+                </div>
+                <div class="input-group" style="margin-bottom:0;">
+                    <label>M-Pesa Number</label>
+                    <input type="tel" id="witPhone" class="input-tech" placeholder="e.g. 0712345678">
+                </div>
+            </div>
+            <button onclick="payoutNow()" class="btn-tech" style="background:#000; margin-top:16px;">Initiate Transfer</button>
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 18px; cursor: pointer; font-weight:700;" onclick="closeModal('withdrawModal')">Cancel</p>
+        </div>
+    </div>
+
     <script>
         const INTASEND_PUBLIC_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad";
 
-        // Extensive dummy card markets for 200 high-performance predictions
         const predictionThemes = [
             "Will Kenya's GDP growth surpass the 5.5% marker next quarter?",
             "Will the Central Bank of Kenya reduce interest rates at the next policy review?",
@@ -156,7 +202,9 @@
             "Will the African Union establish a unified startup regulatory framework?",
             "Will total global daily flights exceed pre-pandemic highs by December?",
             "Will a major streaming platform restrict password sharing worldwide next month?",
-            "Will AI-generated software engineering tools outpace traditional platforms this year?"
+            "Will AI-generated software engineering tools outpace traditional platforms this year?",
+            "Will European energy storage networks double total capacity before next winter?",
+            "Will the Nairobi Securities Exchange (NSE) post a record year for transaction volume?"
         ];
 
         let markets = [];
@@ -168,11 +216,10 @@
         };
 
         function initialize200Markets() {
-            for (let i = 1; i <= 200; i++) {
+            for (let i = 1; i <= 350; i++) {
                 const sub = predictionThemes[i % predictionThemes.length];
-                const chanceValue = Math.floor(15 + (i * 3) % 75);
+                const chanceValue = Math.floor(15 + (i * 2.3) % 75);
                 
-                // Calculate realistic multipliers based on the probability percentage
                 const yesMultiplier = (100 / chanceValue).toFixed(2);
                 const noMultiplier = (100 / (100 - chanceValue)).toFixed(2);
 
@@ -231,20 +278,23 @@
         }
 
         function setAuth(mode) {
-            const up = document.getElementById('upFields'), title = document.getElementById('aTitle');
+            const up = document.getElementById('upFields'), title = document.getElementById('aTitle'), desc = document.getElementById('aDesc');
             const tIn = document.getElementById('tabIn'), tUp = document.getElementById('tabUp');
             if(mode === 'up') {
                 up.classList.remove('hidden'); tUp.classList.add('active'); tIn.classList.remove('active');
                 title.innerText = "Register Identity";
+                desc.innerText = "Create an account to begin using the terminal";
             } else {
                 up.classList.add('hidden'); tIn.classList.add('active'); tUp.classList.remove('active');
                 title.innerText = "Terminal Access";
+                desc.innerText = "Enter credentials to connect to terminal";
             }
         }
 
         function doAuth() {
             const email = document.getElementById('aEmail').value;
-            if(!email.includes('@')) return alert("Please enter a valid email address.");
+            const pass = document.getElementById('aPass').value;
+            if(!email.includes('@') || pass.length < 4) return alert("Please enter valid credentials.");
             localStorage.setItem('nx_user', email);
             closeModal('authModal');
             syncState();
@@ -266,8 +316,6 @@
             }
 
             closeModal('depositModal');
-            
-            // Instantly hide the header before initiating the IntaSend Checkout
             document.body.classList.add('hide-header');
 
             let intasend = new window.IntaSend({
@@ -279,6 +327,7 @@
                 document.body.classList.remove('hide-header');
                 let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
                 localStorage.setItem('nx_balance', cur + Number(amt));
+                localStorage.setItem('nx_has_deposited', 'true'); // Flag to authorize withdrawals
                 syncState();
                 alert(`Success! Ksh ${amt.toLocaleString()} has been added to your balance.`);
             })
@@ -286,34 +335,4 @@
                 document.body.classList.remove('hide-header');
                 alert("The transaction was not completed.");
             })
-            .on("IN-PROGRESS", () => {
-                // Keep header hidden during transaction processing
-                document.body.classList.add('hide-header');
-            });
-
-            intasend.run({
-                amount: amt,
-                currency: "KES",
-                email: userEmail
-            });
-        }
-
-        function openModal(id) { 
-            document.body.classList.add('hide-header');
-            document.getElementById(id).style.display = 'flex'; 
-        }
-
-        function closeModal(id) { 
-            document.body.classList.remove('hide-header');
-            document.getElementById(id).style.display = 'none'; 
-        }
-
-        function logout() { 
-            if(confirm("Terminate session?")) { 
-                localStorage.clear(); 
-                location.reload(); 
-            } 
-        }
-    </script>
-</body>
-</html>
+            .on("IN-PROGRESS",

@@ -13,46 +13,48 @@
             --primary: #2ebd85; --border: #f1f5f9; --text-main: #0f172a;
             --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #cf304a;
         }
-        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 100px; font-family: -apple-system, sans-serif; }
+        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 100px; font-family: -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
 
         /* --- HEADER --- */
-        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
         .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
-        .logo { font-weight: 900; font-size: 22px; color: #000; letter-spacing: -1.2px; }
+        .logo { font-weight: 900; font-size: 24px; color: #000; letter-spacing: -1.5px; }
         
         .bar-right { display: flex; align-items: center; gap: 8px; }
         .auth-trigger-btn { background: #f1f5f9; color: #475569; border: none; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
 
-        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 2px 2px 2px 10px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
+        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 14px; font-weight: 700; }
         
-        /* DEPOSIT BUTTON - MPESA ENABLED */
-        .intaSendPayButton { background: var(--primary); color: #fff; border: none; padding: 7px 15px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+        /* DEPOSIT BUTTON - UPDATED TO UNBLOCK MPESA */
+        .intaSendPayButton { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .intaSendPayButton:active { transform: scale(0.95); }
 
         /* --- AUTH SLIDING SWITCH --- */
-        #auth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
+        #auth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
         .modal-content { background: #fff; width: 100%; max-width: 340px; padding: 25px; border-radius: 30px; text-align: center; }
         
-        .switch-container { display: flex; background: #f1f5f9; padding: 4px; border-radius: 14px; margin-bottom: 25px; position: relative; cursor: pointer; }
+        .switch-container { display: flex; background: #f1f5f9; padding: 4px; border-radius: 14px; margin-bottom: 25px; position: relative; cursor: pointer; border: 1px solid #e2e8f0; }
         .switch-tab { flex: 1; padding: 12px; font-size: 14px; font-weight: 700; color: #64748b; z-index: 1; transition: 0.3s; }
         .switch-tab.active { color: #000; }
         .slider { position: absolute; width: calc(50% - 4px); height: calc(100% - 8px); background: #fff; border-radius: 11px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .signup-mode .slider { transform: translateX(100%); }
 
-        .m-input { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 16px; outline: none; box-sizing: border-box; }
+        .m-input { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 16px; outline: none; box-sizing: border-box; background: #fcfdfe; }
         .m-btn-main { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; margin-top: 10px; }
 
         /* --- CARDS --- */
         #dashboard { max-width: 500px; margin: auto; padding: 12px; }
-        .card { background: #fff; border-radius: 24px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; }
-        .m-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 18px; color: #1e293b; }
+        .card { background: #fff; border-radius: 24px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; transition: transform 0.2s; }
+        .m-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 18px; color: #1e293b; letter-spacing: -0.3px; }
         .stat-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
-        .p-val { font-size: 28px; font-weight: 800; color: #000; }
-        .vol { font-size: 11px; color: #94a3b8; font-weight: 700; }
+        .p-val { font-size: 30px; font-weight: 800; color: #000; letter-spacing: -1px; }
+        .vol { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; }
         
         .btn-row { display: flex; gap: 12px; }
-        .m-btn { flex: 1; padding: 16px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; font-size: 15px; }
+        .m-btn { flex: 1; padding: 16px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; font-size: 15px; transition: opacity 0.1s; }
         .btn-yes { background: var(--yes); color: var(--yes-text); }
         .btn-no { background: var(--no); color: var(--no-text); }
+        .m-btn:active { opacity: 0.7; }
     </style>
 </head>
 <body>
@@ -68,7 +70,7 @@
                             data-amount="50" 
                             data-currency="KES"
                             data-email="user@nexgen.com"
-                            data-method="M-PESA">Deposit</button>
+                            data-method="CARD-MPESA">Deposit</button>
                 </div>
             </div>
         </div>
@@ -97,7 +99,7 @@
                 <div class="switch-tab" id="tabUp">Sign Up</div>
             </div>
             
-            <h2 id="auth-title" style="margin-top:0; font-size: 22px;">Welcome Back</h2>
+            <h2 id="auth-title" style="margin-top:0; font-size: 24px; letter-spacing: -1px;">Welcome Back</h2>
             <input type="email" class="m-input" placeholder="Email Address">
             <input type="password" class="m-input" placeholder="Password">
             <button class="m-btn-main" id="authSubmit" onclick="closeAuth()">Sign In</button>
@@ -114,9 +116,11 @@
                     live: false 
                 }).buttons("#deposit-btn").on("COMPLETE", (res) => {
                     document.getElementById('balance').innerText = res.amount;
+                }).on("FAILED", () => {
+                    alert("Payment Canceled or Failed");
                 });
             }
-            renderMarkets(15); // Start with 15 for instant speed
+            renderMarkets(30); // Initial 30 predictions for immediate impact
         };
 
         // --- AUTH SWITCH LOGIC ---
@@ -147,41 +151,44 @@
             }
         }
 
-        // --- MAX PERFORMANCE FEED (Handles up to 1000) ---
-        const topics = [
-            "Will Bitcoin reach $150k this year?",
+        // --- MAX PERFORMANCE FEED ---
+        const marketPool = [
+            "Will BTC reach $150k this year?",
             "Will the Finance Bill 2026 pass fully?",
             "Will Arsenal win the Champions League?",
-            "Will Kenya Shilling stay below 130 per USD?",
+            "Will Kenya Shilling stay below 120 per USD?",
             "Will Solana flip Ethereum in daily volume?",
-            "Will AI pass the Bar Exam with 99% score?"
+            "Will AI pass the Bar Exam with 99% score?",
+            "Will a new pandemic be declared by WHO in 2026?",
+            "Will Mars landing happen before 2030?",
+            "Will GTA VI sell 20M copies on day one?"
         ];
 
         let marketCount = 0;
         function renderMarkets(num) {
             const feed = document.getElementById('dynamic-feed');
-            if (marketCount >= 1000) return; // Hard limit for phone safety
+            if (marketCount >= 1000) return; 
 
             for(let i=0; i<num; i++) {
                 marketCount++;
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="m-title">${topics[Math.floor(Math.random()*topics.length)]} #${marketCount}</div>
+                    <div class="m-title">${marketPool[Math.floor(Math.random()*marketPool.length)]}</div>
                     <div class="stat-row">
                         <span class="p-val">${Math.floor(Math.random()*85)+5}%</span>
                         <span class="vol">VOL: $${(Math.random()*2).toFixed(1)}M</span>
                     </div>
                     <div class="btn-row">
-                        <button class="m-btn btn-yes" onclick="alert('Trade placed!')">YES</button>
-                        <button class="m-btn btn-no" onclick="alert('Trade placed!')">NO</button>
+                        <button class="m-btn btn-yes" onclick="alert('Order processing...')">YES</button>
+                        <button class="m-btn btn-no" onclick="alert('Order processing...')">NO</button>
                     </div>
                 `;
                 feed.appendChild(card);
             }
         }
 
-        // Infinite Scroll to reach 1000 without crashing
+        // Infinite Scroll to reach 1000
         window.onscroll = () => {
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 800) {
                 renderMarkets(10);

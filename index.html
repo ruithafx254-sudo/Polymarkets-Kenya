@@ -3,54 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexGen | Professional Terminal</title>
+    <title>NexGen | Institutional Terminal</title>
     
     <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
 
     <style>
         :root { 
-            --primary: #2ebd85; --border: #f1f5f9; --text-main: #0f172a;
+            --primary: #2ebd85; --border: #f1f5f9; --text-main: #0f172a; --text-sub: #64748b;
             --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #cf304a;
         }
         
-        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 100px; font-family: -apple-system, sans-serif; overflow-x: hidden; transition: padding 0.3s; }
+        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 100px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; transition: 0.3s ease; }
 
         /* --- THE NAV ESCAPE BUTTON --- */
         #return-btn {
             display: none; position: fixed; top: 20px; left: 20px;
-            background: #000; color: #fff; padding: 12px 20px; border-radius: 50px;
+            background: #000; color: #fff; padding: 12px 24px; border-radius: 50px;
             font-weight: 800; z-index: 4000; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            cursor: pointer; font-size: 13px;
+            cursor: pointer; font-size: 13px; letter-spacing: 0.5px;
         }
 
-        /* --- MODAL SYSTEM --- */
+        /* --- PROFESSIONAL MODAL SYSTEM --- */
         .modal-overlay { 
-            display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); 
-            backdrop-filter: blur(8px); z-index: 3000; align-items: center; justify-content: center; padding: 20px; 
+            display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(12px); z-index: 3000; align-items: center; justify-content: center; padding: 15px; 
         }
         .modal-card { 
-            background: #fff; width: 100%; max-width: 380px; padding: 32px; border-radius: 28px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2); text-align: center;
+            background: #fff; width: 100%; max-width: 400px; padding: 32px; border-radius: 32px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); position: relative;
         }
 
-        /* --- FANCY DEPOSIT INPUT --- */
-        .amount-chips { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-        .chip { 
-            padding: 15px; border: 1.5px solid #e2e8f0; border-radius: 16px; 
-            font-weight: 800; cursor: pointer; transition: 0.2s; 
+        /* --- AUTH TOGGLE --- */
+        .auth-toggle { 
+            display: flex; background: #f1f5f9; padding: 4px; border-radius: 14px; margin-bottom: 24px; position: relative;
         }
-        .chip:hover { border-color: var(--primary); background: var(--yes); }
+        .auth-tab { 
+            flex: 1; padding: 10px; font-size: 14px; font-weight: 700; color: var(--text-sub); 
+            cursor: pointer; z-index: 2; transition: 0.3s; text-align: center;
+        }
+        .auth-tab.active { color: #000; }
+        .auth-slider { 
+            position: absolute; width: calc(50% - 4px); height: calc(100% - 8px); 
+            background: #fff; border-radius: 10px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); z-index: 1;
+        }
+        .signup-active .auth-slider { transform: translateX(100%); }
+
+        /* --- PROFESSIONAL INPUTS --- */
+        .input-group { text-align: left; margin-bottom: 16px; }
+        .input-label { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 6px; display: block; margin-left: 4px; }
+        .auth-input { 
+            width: 100%; padding: 14px 18px; border: 1.5px solid #e2e8f0; 
+            border-radius: 14px; font-size: 16px; box-sizing: border-box; outline: none; transition: 0.2s;
+            background: #fcfdfe;
+        }
+        .auth-input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(46, 189, 133, 0.1); }
+
+        /* --- DEPOSIT TERMINAL DESIGN --- */
+        .deposit-terminal { background: #f8fafc; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .amount-chips { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
+        .chip { 
+            background: #fff; padding: 14px; border: 1.5px solid #e2e8f0; border-radius: 14px; 
+            font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 14px;
+        }
+        .chip:hover { border-color: var(--primary); }
         .chip.active { background: #000; color: #fff; border-color: #000; }
 
-        .auth-input { 
-            width: 100%; padding: 16px; margin-bottom: 12px; border: 1.5px solid #e2e8f0; 
-            border-radius: 14px; font-size: 16px; box-sizing: border-box; outline: none; text-align: center;
-        }
-        
         .btn-main { 
-            width: 100%; padding: 18px; background: var(--primary); color: #fff; border: none; 
-            border-radius: 16px; font-weight: 800; font-size: 16px; cursor: pointer;
+            width: 100%; padding: 16px; background: #000; color: #fff; border: none; 
+            border-radius: 16px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s;
         }
+        .btn-main.deposit { background: var(--primary); }
+        .btn-main:active { transform: scale(0.98); }
 
         /* --- UI HELPERS --- */
         body.hide-header .header { display: none !important; }
@@ -58,63 +82,85 @@
         body.hide-header #return-btn { display: block !important; }
         .hidden { display: none !important; }
 
-        /* --- INTASEND TWEAKS --- */
-        #intasend-inline-container .intasend-modal-content { display: flex !important; flex-direction: column !important; }
-        #intasend-inline-container .intasend-payment-nav { order: 2 !important; margin-top: 20px !important; }
-
         /* --- HEADER --- */
         .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; height: 60px; }
+        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; height: 64px; }
         .logo { font-weight: 900; font-size: 24px; letter-spacing: -1.5px; }
         .bar-right { display: flex; align-items: center; gap: 10px; }
         
-        .btn-login-trigger { background: #f1f5f9; border: none; padding: 10px 18px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-        .user-profile { width: 38px; height: 38px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; }
+        .btn-login-trigger { background: #f1f5f9; border: none; padding: 10px 16px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 13px; }
+        .user-profile { width: 36px; height: 36px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; font-size: 12px; }
 
-        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 14px; font-weight: 700; }
-        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
+        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; }
 
         /* --- CARDS --- */
         #dashboard { max-width: 500px; margin: auto; padding: 12px; }
         .card { background: #fff; border-radius: 24px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; }
-        .m-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 18px; }
-        .p-val { font-size: 30px; font-weight: 800; }
-        .btn-row { display: flex; gap: 12px; }
-        .m-btn { flex: 1; padding: 16px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; }
+        .m-title { font-size: 17px; font-weight: 700; line-height: 1.4; margin-bottom: 18px; }
+        .p-val { font-size: 28px; font-weight: 800; margin-bottom: 15px; display: block; }
+        .btn-row { display: flex; gap: 10px; }
+        .m-btn { flex: 1; padding: 14px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; font-size: 14px; }
         .btn-yes { background: var(--yes); color: var(--yes-text); }
         .btn-no { background: var(--no); color: var(--no-text); }
     </style>
 </head>
 <body>
 
-    <button id="return-btn" onclick="cleanupUI()">← Back to Markets</button>
-
-    <div id="deposit-overlay" class="modal-overlay">
-        <div class="modal-card">
-            <h2 style="margin: 0 0 10px 0; letter-spacing: -1px;">Refill Wallet</h2>
-            <p style="color: #64748b; font-size: 14px; margin-bottom: 25px;">Min deposit: Ksh 200</p>
-            
-            <div class="amount-chips">
-                <div class="chip" onclick="selectAmount(250)">Ksh 250</div>
-                <div class="chip" onclick="selectAmount(500)">Ksh 500</div>
-                <div class="chip" onclick="selectAmount(1000)">Ksh 1000</div>
-                <div class="chip" onclick="selectAmount(2000)">Ksh 2000</div>
-            </div>
-
-            <input type="number" id="customAmount" class="auth-input" placeholder="Custom Amount (Ksh)">
-            
-            <button class="btn-main" onclick="startPayment()">Proceed to Checkout</button>
-            <p onclick="closeModal('deposit-overlay')" style="margin-top:15px; font-size:13px; color:#94a3b8; cursor:pointer;">Cancel</p>
-        </div>
-    </div>
+    <button id="return-btn" onclick="cleanupUI()">← Return to Markets</button>
 
     <div id="auth-overlay" class="modal-overlay">
         <div class="modal-card">
-            <h2 id="authTitle">Welcome Back</h2>
-            <input type="email" id="authEmail" class="auth-input" placeholder="Email Address">
-            <input type="password" id="authPass" class="auth-input" placeholder="Password">
-            <button class="btn-main" style="background:#000" onclick="handleAuth()">Continue</button>
-            <p onclick="closeModal('auth-overlay')" style="margin-top:15px; font-size:13px; color:#94a3b8; cursor:pointer;">Cancel</p>
+            <div class="auth-toggle" id="authToggle">
+                <div class="auth-slider"></div>
+                <div class="auth-tab active" onclick="switchAuth('in')">Sign In</div>
+                <div class="auth-tab" onclick="switchAuth('up')">Sign Up</div>
+            </div>
+
+            <h2 id="authTitle" style="margin: 0 0 8px 0; letter-spacing: -0.5px;">Welcome back</h2>
+            <p id="authSub" style="color: var(--text-sub); font-size: 14px; margin-bottom: 24px;">Enter your credentials to trade.</p>
+            
+            <div id="signupOnly" class="hidden">
+                <div class="input-group">
+                    <label class="input-label">FULL NAME</label>
+                    <input type="text" id="authName" class="auth-input" placeholder="John Doe">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">EMAIL ADDRESS</label>
+                <input type="email" id="authEmail" class="auth-input" placeholder="name@company.com">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">PASSWORD</label>
+                <input type="password" id="authPass" class="auth-input" placeholder="••••••••">
+            </div>
+
+            <button class="btn-main" onclick="handleAuth()">Continue</button>
+            <p onclick="closeModal('auth-overlay')" style="margin-top:20px; font-size:13px; color:var(--text-sub); cursor:pointer; font-weight: 600;">Cancel</p>
+        </div>
+    </div>
+
+    <div id="deposit-overlay" class="modal-overlay">
+        <div class="modal-card">
+            <h2 style="margin: 0 0 8px 0; letter-spacing: -0.5px;">Deposit Funds</h2>
+            <p style="color: var(--text-sub); font-size: 14px; margin-bottom: 24px;">Instant refill via M-Pesa or Card.</p>
+            
+            <div class="deposit-terminal">
+                <label class="input-label">AMOUNT (KSH)</label>
+                <input type="number" id="customAmount" class="auth-input" placeholder="0" style="text-align: left; font-size: 24px; font-weight: 800;">
+                
+                <div class="amount-chips">
+                    <div class="chip" onclick="setAmt(250, this)">250</div>
+                    <div class="chip" onclick="setAmt(500, this)">500</div>
+                    <div class="chip" onclick="setAmt(1000, this)">1,000</div>
+                    <div class="chip" onclick="setAmt(2000, this)">2,000</div>
+                </div>
+            </div>
+            
+            <button class="btn-main deposit" onclick="startPayment()">Confirm Deposit</button>
+            <p onclick="closeModal('deposit-overlay')" style="margin-top:20px; font-size:13px; color:var(--text-sub); cursor:pointer; font-weight: 600;">Close</p>
         </div>
     </div>
 
@@ -123,7 +169,7 @@
             <div class="logo">NEXGEN</div>
             <div class="bar-right">
                 <button id="loginBtn" class="btn-login-trigger" onclick="openModal('auth-overlay')">Sign In</button>
-                <div id="userIcon" class="user-profile hidden">UN</div>
+                <div id="userIcon" class="user-profile hidden">JD</div>
                 
                 <div class="wallet-pill">
                     Ksh <span id="balance">0.00</span>
@@ -138,11 +184,36 @@
     </div>
 
     <script>
-        // --- MODAL CONTROL ---
+        let isSignup = false;
+
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // --- AUTH LOGIC ---
+        function switchAuth(mode) {
+            const slider = document.getElementById('authToggle');
+            const title = document.getElementById('authTitle');
+            const sub = document.getElementById('authSub');
+            const signupFields = document.getElementById('signupOnly');
+            
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            
+            if(mode === 'up') {
+                isSignup = true;
+                slider.classList.add('signup-active');
+                event.target.classList.add('active');
+                title.innerText = "Create Account";
+                sub.innerText = "Join the NexGen trading community.";
+                signupFields.classList.remove('hidden');
+            } else {
+                isSignup = false;
+                slider.classList.remove('signup-active');
+                event.target.classList.add('active');
+                title.innerText = "Welcome back";
+                sub.innerText = "Enter your credentials to trade.";
+                signupFields.classList.add('hidden');
+            }
+        }
+
         function handleAuth() {
             const email = document.getElementById('authEmail').value;
             if(!email.includes('@')) return alert("Enter valid email");
@@ -152,16 +223,15 @@
             closeModal('auth-overlay');
         }
 
-        // --- DEPOSIT LOGIC ---
-        function selectAmount(val) {
+        function setAmt(val, el) {
             document.getElementById('customAmount').value = val;
             document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
+            el.classList.add('active');
         }
 
         function startPayment() {
             const amt = document.getElementById('customAmount').value;
-            if(amt < 200) return alert("Minimum deposit is Ksh 200");
+            if(amt < 200) return alert("Min deposit Ksh 200");
 
             closeModal('deposit-overlay');
             document.body.classList.add('hide-header');
@@ -171,11 +241,7 @@
                 live: false 
             });
 
-            intasend.run({
-                amount: Number(amt),
-                currency: "KES",
-                redirect: false 
-            })
+            intasend.run({ amount: Number(amt), currency: "KES", redirect: false })
             .on("COMPLETE", (res) => {
                 const bal = document.getElementById('balance');
                 bal.innerText = (parseFloat(bal.innerText) + Number(amt)).toFixed(2);
@@ -190,22 +256,21 @@
             if (container) container.style.display = 'none';
         }
 
-        // --- RENDER ---
-        const marketPool = ["Bitcoin to Ksh 15M?", "KES to strengthen vs USD?", "Arsenal Win League?", "AI Solves Cancer?", "Tesla Robot Launch?"];
-        function renderMarkets(num) {
+        function render() {
             const feed = document.getElementById('dynamic-feed');
-            for(let i=0; i<num; i++) {
+            const markets = ["Will BTC hit Ksh 15M in 2026?", "Will KES drop below 120 vs USD?", "Arsenal to win Premier League?", "SpaceX Mars Landing by Dec?"];
+            for(let i=0; i<15; i++) {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="m-title">${marketPool[Math.floor(Math.random()*marketPool.length)]}</div>
-                    <div class="stat-row"><span class="p-val">${Math.floor(Math.random()*80)+10}%</span></div>
+                    <div class="m-title">${markets[Math.floor(Math.random()*markets.length)]}</div>
+                    <span class="p-val">${Math.floor(Math.random()*80)+10}%</span>
                     <div class="btn-row"><button class="m-btn btn-yes">YES</button><button class="m-btn btn-no">NO</button></div>
                 `;
                 feed.appendChild(card);
             }
         }
-        window.onload = () => renderMarkets(15);
+        window.onload = render;
     </script>
 </body>
 </html>

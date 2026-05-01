@@ -169,7 +169,6 @@
     </div>
 
     <script>
-        // Ensure test environment explicit public key
         const INTASEND_PUBLIC_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad";
 
         const predictionThemes = [
@@ -346,4 +345,72 @@
 
             closeModal('depositModal');
             localStorage.setItem('nx_balance', curBal - amt);
-            syncState()
+            syncState();
+            alert("Withdrawal complete");
+        }
+
+        function payNow() {
+            const amt = Number(document.getElementById('depAmt').value);
+            const userEmail = localStorage.getItem('nx_user');
+
+            if(!userEmail) {
+                closeModal('depositModal');
+                return openModal('authModal');
+            }
+
+            if(!amt || amt < 100) {
+                return alert("Minimum deposit amount required is Ksh 100");
+            }
+
+            closeModal('depositModal');
+            document.body.classList.add('hide-header');
+
+            let intasend = new window.IntaSend({
+                publicAPIKey: INTASEND_PUBLIC_KEY,
+                live: false 
+            });
+
+            intasend.on("COMPLETE", (results) => {
+                document.body.classList.remove('hide-header');
+                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
+                localStorage.setItem('nx_balance', cur + Number(amt));
+                syncState();
+                alert(`Success! Ksh ${amt.toLocaleString()} has been added to your balance.`);
+            })
+            .on("FAILED", (results) => {
+                document.body.classList.remove('hide-header');
+                alert("The transaction was not completed.");
+            })
+            .on("IN-PROGRESS", () => {
+                document.body.classList.add('hide-header');
+            });
+
+            intasend.run({
+                amount: amt,
+                currency: "KES",
+                email: userEmail
+            });
+        }
+
+        function openModal(id) { 
+            document.body.classList.add('hide-header');
+            document.getElementById(id).style.display = 'flex'; 
+        }
+
+        function closeModal(id) { 
+            document.body.classList.remove('hide-header');
+            document.getElementById(id).style.display = 'none'; 
+            if(id === 'depositModal') {
+                document.getElementById('depAmt').value = '0.00';
+            }
+        }
+
+        function logout() { 
+            if(confirm("Terminate session?")) { 
+                localStorage.clear(); 
+                location.reload(); 
+            } 
+        }
+    </script>
+</body>
+</html>

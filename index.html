@@ -22,7 +22,6 @@
 
         .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 60px; }
         
-        /* Strategic Logo Styling */
         .logo-wrap { display: flex; flex-direction: column; line-height: 1; }
         .logo-main { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; color: #000; text-transform: uppercase; }
         .logo-sub { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
@@ -30,14 +29,17 @@
         .nav-right { display: flex; align-items: center; gap: 10px; }
         .wallet-pill { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); padding: 4px 4px 4px 12px; border-radius: 10px; gap: 8px; font-size: 13px; font-weight: 700; }
         .btn-deposit { background: #000; color: #fff; border: none; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; }
-        .user-id { width: 34px; height: 34px; background: var(--tech-bg); color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; cursor: pointer; }
+        
+        /* --- PERSON ICON --- */
+        .user-id { width: 36px; height: 36px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .person-icon { width: 20px; height: 20px; fill: currentColor; }
 
         /* --- CATEGORIES --- */
         .sub-nav { display: flex; gap: 20px; padding: 12px 20px; overflow-x: auto; background: #fff; border-bottom: 1px solid var(--border); scrollbar-width: none; }
         .cat-link { font-size: 13px; font-weight: 700; color: var(--text-sub); text-decoration: none; white-space: nowrap; cursor: pointer; }
         .cat-link.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: -12px; }
 
-        /* --- CARDS --- */
+        /* --- MARKET CARDS --- */
         #dashboard { max-width: 600px; margin: auto; padding: 10px; }
         .market-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; }
         .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
@@ -78,7 +80,11 @@
             </div>
             <div class="nav-right">
                 <button id="signBtn" class="btn-deposit" style="background:#f1f5f9; color:#000;" onclick="openModal('authModal')">Sign In</button>
-                <div id="userIcon" class="user-id hidden" onclick="logout()">??</div>
+                <div id="userIcon" class="user-id hidden" onclick="logout()">
+                    <svg class="person-icon" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </div>
                 <div class="wallet-pill">
                     Ksh <span id="balance">0.00</span>
                     <button onclick="openModal('depositModal')" class="btn-deposit">Deposit</button>
@@ -119,8 +125,8 @@
 
     <div id="depositModal" class="overlay">
         <div class="modal">
-            <h2 style="margin: 0 0 4px 0;">Liquidity</h2>
-            <p style="color: var(--text-sub); font-size: 13px; margin-bottom: 20px;">Secure Funding (Min 200)</p>
+            <h2 style="margin: 0 0 4px 0;">Deposit</h2>
+            <p style="color: var(--text-sub); font-size: 13px; margin-bottom: 20px;">Secure M-Pesa Funding (Min 200)</p>
             
             <div style="background:#f8fafc; padding:20px; border-radius:18px; border: 1px solid var(--border);">
                 <input type="number" id="depAmt" class="input-tech" style="font-size: 32px; text-align: center; font-weight: 900; background: transparent; border: none;" placeholder="0">
@@ -157,7 +163,9 @@
             if(user) {
                 document.getElementById('signBtn').classList.add('hidden');
                 document.getElementById('userIcon').classList.remove('hidden');
-                document.getElementById('userIcon').innerText = user.substring(0,2).toUpperCase();
+            } else {
+                document.getElementById('signBtn').classList.remove('hidden');
+                document.getElementById('userIcon').classList.add('hidden');
             }
             document.getElementById('balance').innerText = parseFloat(bal).toLocaleString(undefined, {minimumFractionDigits: 2});
         }

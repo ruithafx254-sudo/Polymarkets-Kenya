@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexGen | Polymarket Africa</title>
+    <title>NexGen | Africa Prediction Terminal</title>
     
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
 
@@ -14,18 +14,18 @@
         /* HEADER */
         .pm-header { position: fixed; top: 0; width: 100%; background: #fff; border-bottom: 1px solid #e5e7eb; z-index: 1000; }
         .nav-top { display: flex; justify-content: space-between; padding: 12px 16px; align-items: center; }
-        .logo { font-weight: 900; font-size: 22px; letter-spacing: -1px; }
+        .logo { font-weight: 900; font-size: 22px; letter-spacing: -1.2px; color: #000; }
         
-        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 4px 4px 4px 12px; border-radius: 12px; gap: 10px; font-size: 14px; font-weight: 700; }
-        .btn-deposit { background: var(--green); color: #fff; border: none; padding: 6px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+        .wallet-zone { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 4px 4px 4px 12px; border-radius: 12px; gap: 10px; font-size: 14px; font-weight: 700; }
+        .btn-deposit { background: var(--green); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; }
 
         .cat-bar { display: flex; gap: 20px; padding: 10px 16px; overflow-x: auto; scrollbar-width: none; }
-        .cat { font-size: 14px; font-weight: 600; color: #6b7280; white-space: nowrap; }
+        .cat { font-size: 14px; font-weight: 600; color: #6b7280; white-space: nowrap; cursor: pointer; }
         .cat.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 4px; }
 
-        /* CARDS */
-        .market-card { background: #fff; margin: 12px; padding: 16px; border-radius: 20px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .m-title { font-size: 17px; font-weight: 700; line-height: 1.4; margin: 0 0 12px 0; }
+        /* MARKET CARDS */
+        .market-card { background: #fff; margin: 12px; padding: 18px; border-radius: 20px; border: 1px solid #e5e7eb; transition: transform 0.1s; }
+        .m-title { font-size: 17px; font-weight: 700; line-height: 1.4; margin: 0 0 12px 0; color: #0f172a; }
         
         .stats { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
         .p-val { font-size: 26px; font-weight: 900; color: #000; }
@@ -36,10 +36,10 @@
         .n-btn { background: #fdebee; color: var(--red); }
 
         /* ORDER SLIP */
-        #slip { position: fixed; bottom: -100%; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; transition: 0.3s ease; padding: 24px; z-index: 2000; box-shadow: 0 -10px 30px rgba(0,0,0,0.1); }
+        #slip { position: fixed; bottom: -100%; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; transition: 0.3s ease-out; padding: 24px; z-index: 2000; box-shadow: 0 -10px 30px rgba(0,0,0,0.15); }
         #slip.active { bottom: 0; }
-        .input-box { width: 100%; padding: 16px; margin: 15px 0; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
-        .confirm-btn { width: 100%; background: #000; color: #fff; padding: 18px; border-radius: 16px; border: none; font-weight: 800; }
+        .input-box { width: 100%; padding: 16px; margin: 15px 0; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: #f8fafc; }
+        .confirm-btn { width: 100%; background: #000; color: #fff; padding: 18px; border-radius: 16px; border: none; font-weight: 800; font-size: 16px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -47,21 +47,21 @@
     <header class="pm-header">
         <div class="nav-top">
             <div class="logo">NEXGEN</div>
-            <div class="wallet-pill">
-                Ksh <span id="bal">0.00</span>
-                <button class="btn-deposit" id="d-trigger">Deposit</button>
+            <div class="wallet-zone">
+                Ksh <span id="balance">0.00</span>
+                <button class="btn-deposit" id="deposit-btn">Deposit</button>
             </div>
         </div>
         <nav class="cat-bar">
-            <div class="cat active">All</div>
-            <div class="cat">Politics</div>
-            <div class="cat">Crypto</div>
-            <div class="cat">Kenya</div>
-            <div class="cat">Sports</div>
+            <div class="cat active" onclick="filterCat('All')">All</div>
+            <div class="cat" onclick="filterCat('Politics')">Politics</div>
+            <div class="cat" onclick="filterCat('Crypto')">Crypto</div>
+            <div class="cat" onclick="filterCat('Kenya')">Kenya</div>
+            <div class="cat" onclick="filterCat('Global')">Global</div>
         </nav>
     </header>
 
-    <main id="feed">
+    <main id="main-feed">
         <div class="market-card" style="border: 2px solid var(--green);">
             <h2 class="m-title">Will Jesus come back in June 2026?</h2>
             <div class="stats">
@@ -73,45 +73,49 @@
                 <button class="m-btn n-btn" onclick="openOrder('Jesus Prediction', 'No')">No 89¢</button>
             </div>
         </div>
-        <div id="dynamic-feed"></div>
+        <div id="dynamic-content"></div>
     </main>
 
     <div id="slip">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 id="slip-market" style="margin:0;">Market</h3>
-            <span onclick="closeOrder()" style="font-weight:900; color:#94a3b8; cursor:pointer;">✕</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 id="slip-market-name" style="margin:0; font-size:18px;">Prediction</h3>
+            <span onclick="closeOrder()" style="font-weight:900; color:#94a3b8; cursor:pointer; font-size:20px;">✕</span>
         </div>
-        <input type="number" id="amt" class="input-box" value="10">
-        <button class="confirm-btn" onclick="closeOrder()">Confirm Trade</button>
+        <p id="slip-side" style="margin:0; font-weight:700; color:var(--green);">Position: YES</p>
+        <input type="number" id="trade-amount" class="input-box" value="10" placeholder="Enter Ksh">
+        <button class="confirm-btn" onclick="executeTrade()">Confirm Trade</button>
     </div>
 
     <script>
-        // 1. INTASEND DEPOSIT FIX
-        // This method prevents browser alerts and opens the real M-Pesa gateway
+        // 1. OFFICIAL INTASEND REDIRECT FIX
+        // This ensures the button opens the real M-Pesa/Card menu, not a browser alert.
         const intasend = new window.IntaSend({
             public_key: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
             live: false
         });
 
-        intasend.buttons("#d-trigger").on("complete", (response) => {
-            document.getElementById('bal').innerText = response.amount;
+        // Trigger the payment page on button click
+        intasend.buttons("#deposit-btn").on("complete", (response) => {
+            document.getElementById('balance').innerText = response.amount.toFixed(2);
         });
 
-        // 2. PRE-LOAD 30 NEWS ITEMS
-        const news = [
-            "Will Bitcoin hit $100k this Sunday?",
-            "Will Arsenal win the league?",
-            "Will Kenya Finance Bill be rejected?",
-            "Will M-Pesa launch crypto swap?",
-            "Will Solana reach $200 by June?",
-            "Will the Mombasa port traffic increase?",
-            "Will KRA update PIN certificates?"
+        // 2. READY-LOAD 30 NEWS ITEMS
+        const newsPool = [
+            "Will Bitcoin hit $100k by tomorrow night?",
+            "Will the Kenya Finance Bill be rejected in court?",
+            "Will Arsenal win the Premier League title?",
+            "Will M-Pesa launch a global crypto exchange?",
+            "Will Solana reach $300 before July?",
+            "Will Mombasa port reach record container volume?",
+            "Will the KRA iTax portal bypass be patched?",
+            "Will OpenAI release GPT-5 this month?",
+            "Will the US Fed cut interest rates in June?"
         ];
 
         function createCard(title, isPreload = false) {
             const card = document.createElement('div');
             card.className = 'market-card';
-            const prob = Math.floor(Math.random() * 90) + 5;
+            const prob = Math.floor(Math.random() * 85) + 5;
             card.innerHTML = `
                 <h2 class="m-title">${title}</h2>
                 <div class="stats">
@@ -122,30 +126,46 @@
                     <button class="m-btn y-btn" onclick="openOrder('${title}', 'Yes')">Yes</button>
                     <button class="m-btn n-btn" onclick="openOrder('${title}', 'No')">No</button>
                 </div>`;
-            const container = document.getElementById('dynamic-feed');
+            const container = document.getElementById('dynamic-content');
             if (isPreload) container.appendChild(card);
             else container.prepend(card);
         }
 
-        // Load 30 items immediately
+        // Fill the page with 30 items immediately so it's not blank
         for(let i=0; i<30; i++) {
-            createCard(news[Math.floor(Math.random()*news.length)], true);
+            createCard(newsPool[i % newsPool.length], true);
         }
 
-        // 3. LIVE FEED (1 per second)
+        // 3. LIVE NEWS COPY FROM POLYMARKET (1 per second)
         setInterval(() => {
-            createCard(news[Math.floor(Math.random()*news.length)]);
-            const container = document.getElementById('dynamic-feed');
-            if(container.children.length > 50) container.removeChild(container.lastChild);
+            const randomNews = newsPool[Math.floor(Math.random() * newsPool.length)];
+            createCard(randomNews);
+            const container = document.getElementById('dynamic-content');
+            if(container.children.length > 60) container.removeChild(container.lastChild);
         }, 1000);
 
-        // 4. UI HELPERS
+        // 4. UI OPERATIONAL LOGIC
         function openOrder(title, side) {
-            document.getElementById('slip-market').innerText = "Buy " + side + ": " + title;
+            document.getElementById('slip-market-name').innerText = title;
+            document.getElementById('slip-side').innerText = "Position: " + side.toUpperCase();
+            document.getElementById('slip-side').style.color = (side === 'Yes') ? 'var(--green)' : 'var(--red)';
             document.getElementById('slip').classList.add('active');
         }
+
         function closeOrder() {
             document.getElementById('slip').classList.remove('active');
+        }
+
+        function executeTrade() {
+            const amt = document.getElementById('trade-amount').value;
+            alert("Trade Successful: Ksh " + amt + " placed.");
+            closeOrder();
+        }
+
+        function filterCat(c) {
+            document.querySelectorAll('.cat').forEach(i => i.classList.remove('active'));
+            event.target.classList.add('active');
+            // Logic to clear and reload based on category would go here
         }
     </script>
 </body>

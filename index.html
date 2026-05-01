@@ -11,62 +11,54 @@
         :root { 
             --accent: #2ebd85; --border: #eceef2; --text-main: #0f172a; --text-sub: #64748b;
             --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #991b1b;
-            --tech-bg: #0f172a;
         }
         
-        body { background: #ffffff; color: var(--text-main); margin: 0; padding-top: 130px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+        body { background: #ffffff; color: var(--text-main); margin: 0; padding-top: 120px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
 
-        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); transition: transform 0.4s ease; }
-        body.hide-header .header-stack { transform: translateY(-100%); }
+        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
 
         .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 60px; }
         .logo-wrap { display: flex; flex-direction: column; line-height: 1; }
         .logo-main { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; color: #000; text-transform: uppercase; }
         .logo-sub { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
         
-        .nav-right { display: flex; align-items: center; gap: 10px; }
-        .wallet-pill { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); padding: 4px 4px 4px 12px; border-radius: 10px; gap: 8px; font-size: 13px; font-weight: 700; }
-        .btn-deposit { background: #000; color: #fff; border: none; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; }
+        .nav-right { display: flex; align-items: center; gap: 8px; }
+        .wallet-pill { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); padding: 4px 4px 4px 12px; border-radius: 8px; gap: 8px; font-size: 13px; font-weight: 700; }
+        .btn-deposit { background: #000; color: #fff; border: none; padding: 7px 14px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
         
-        .user-id { width: 36px; height: 36px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .person-icon { width: 20px; height: 20px; fill: currentColor; }
+        .user-id { width: 34px; height: 34px; background: #0f172a; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; font-weight: bold; }
 
-        .sub-nav { display: flex; gap: 20px; padding: 12px 20px; overflow-x: auto; background: #fff; border-bottom: 1px solid var(--border); scrollbar-width: none; }
+        .sub-nav { display: flex; gap: 16px; padding: 10px 16px; overflow-x: auto; background: #fff; border-bottom: 1px solid var(--border); scrollbar-width: none; }
+        .sub-nav::-webkit-scrollbar { display: none; }
         .cat-link { font-size: 13px; font-weight: 700; color: var(--text-sub); text-decoration: none; white-space: nowrap; cursor: pointer; }
-        .cat-link.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: -12px; }
+        .cat-link.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: -10px; }
 
-        #dashboard { max-width: 600px; margin: auto; padding: 10px; min-height: 200px; }
+        #dashboard { max-width: 550px; margin: auto; padding: 12px; }
         
-        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; animation: slideUp 0.4s ease-out; }
-        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
         .m-title { font-size: 15px; font-weight: 600; line-height: 1.4; color: #111; }
         .odds-val { font-size: 18px; font-weight: 800; color: #000; }
         .odds-lbl { font-size: 10px; color: var(--text-sub); text-transform: uppercase; display: block; text-align: right; }
         
-        .btn-group { display: flex; gap: 10px; }
-        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; }
+        .btn-group { display: flex; gap: 8px; }
+        .trade-btn { flex: 1; padding: 11px; border-radius: 8px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; }
         .trade-btn.yes { background: var(--yes); color: var(--yes-text); }
         .trade-btn.no { background: var(--no); color: var(--no-text); }
         
-        .resolve-btn { width: 100%; margin-top: 10px; background: #f1f5f9; border: 1px dashed var(--border); padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text-sub); }
+        .resolve-btn { width: 100%; margin-top: 10px; background: #f8fafc; border: 1px dashed var(--border); padding: 7px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text-sub); }
 
-        .news-card { border-left: 3px solid var(--accent); background: #f8fafc; padding: 16px; border-radius: 0 12px 12px 0; margin-bottom: 12px; animation: slideUp 0.4s ease-out; }
-        .news-tag { font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
-        .news-h { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #000; }
-        .news-p { font-size: 13px; color: var(--text-sub); line-height: 1.5; margin: 0; }
+        .news-card { border-left: 3px solid var(--accent); background: #f8fafc; padding: 14px; border-radius: 0 10px 10px 0; margin-bottom: 12px; }
+        .news-tag { font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; display: block; }
+        .news-h { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: #000; }
+        .news-p { font-size: 13px; color: var(--text-sub); line-height: 1.4; margin: 0; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
-        .modal { background: #fff; width: 100%; max-width: 360px; padding: 32px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
-        .auth-nav { display: flex; background: #f1f5f9; padding: 6px; border-radius: 14px; margin-bottom: 24px; }
-        .auth-tab { flex: 1; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 10px; color: var(--text-sub); transition: 0.3s; }
-        .auth-tab.active { background: #000; color: #fff; }
-        .input-tech { width: 100%; padding: 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
-        .btn-tech { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 15px; }
-        .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
-        .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; }
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
+        .modal { background: #fff; width: 100%; max-width: 340px; padding: 24px; border-radius: 16px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .input-tech { width: 100%; padding: 12px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
+        .btn-tech { width: 100%; padding: 14px; background: #000; color: #fff; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 14px; }
+        .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
+        .amt-chip { border: 1px solid var(--border); padding: 10px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; background: #fff; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -80,9 +72,7 @@
             </div>
             <div class="nav-right">
                 <button id="signBtn" class="btn-deposit" style="background:#f1f5f9; color:#000;" onclick="openModal('authModal')">Sign In</button>
-                <div id="userIcon" class="user-id hidden" onclick="logout()">
-                    <svg class="person-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                </div>
+                <div id="userIcon" class="user-id hidden" onclick="logout()">ID</div>
                 <div class="wallet-pill">
                     Ksh <span id="balance">0.00</span>
                     <button onclick="openModal('depositModal')" class="btn-deposit">Deposit</button>
@@ -90,13 +80,11 @@
             </div>
         </div>
         <div class="sub-nav">
-            <div class="cat-link active" onclick="filterCat('All', this)">Markets</div>
-            <div class="cat-link" onclick="filterCat('News', this)">News/Updates</div>
-            <div class="cat-link" onclick="filterCat('World', this)">World News</div>
-            <div class="cat-link" onclick="filterCat('Entertainment', this)">Entertainment</div>
+            <div class="cat-link active" onclick="filterCat('All', this)">All Markets</div>
+            <div class="cat-link" onclick="filterCat('News', this)">News</div>
+            <div class="cat-link" onclick="filterCat('World', this)">World</div>
             <div class="cat-link" onclick="filterCat('Sports', this)">Sports</div>
             <div class="cat-link" onclick="filterCat('Tech', this)">Tech</div>
-            <div class="cat-link" style="color: var(--accent); font-weight: bold;" onclick="openModal('createMarketModal')">+ Add</div>
         </div>
     </div>
 
@@ -106,63 +94,38 @@
 
     <div id="authModal" class="overlay">
         <div class="modal">
-            <div class="auth-nav">
-                <div id="tabIn" class="auth-tab active" onclick="setAuth('in')">Sign In</div>
-                <div id="tabUp" class="auth-tab" onclick="setAuth('up')">Sign Up</div>
-            </div>
-            <h2 id="aTitle">Terminal Access</h2>
-            <div id="upFields" class="hidden"><input type="text" id="aName" class="input-tech" placeholder="Full Name"></div>
+            <h3 style="margin: 0 0 16px 0;">Sign In</h3>
             <input type="email" id="aEmail" class="input-tech" placeholder="Email Address">
             <input type="password" id="aPass" class="input-tech" placeholder="Password">
-            <button onclick="doAuth()" class="btn-tech">Initialize Session</button>
-            <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('authModal')">Dismiss</p>
+            <button onclick="doAuth()" class="btn-tech">Open Session</button>
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 14px; cursor: pointer; margin-bottom: 0;" onclick="closeModal('authModal')">Dismiss</p>
         </div>
     </div>
 
     <div id="depositModal" class="overlay">
         <div class="modal">
-            <h2>Deposit</h2>
-            <p style="color: var(--text-sub); font-size: 13px;">Secure M-Pesa Funding (Min 200)</p>
-            <div style="background:#f8fafc; padding:20px; border-radius:18px; border: 1px solid var(--border);">
-                <input type="number" id="depAmt" class="input-tech" style="font-size: 32px; text-align: center; font-weight: 900; background: transparent; border: none;" placeholder="0">
+            <h3 style="margin: 0 0 6px 0;">Secure Deposit</h3>
+            <p style="color: var(--text-sub); font-size: 12px; margin-top: 0;">M-Pesa Express Payment</p>
+            <div style="background:#f8fafc; padding:12px; border-radius:12px; border: 1px solid var(--border);">
+                <input type="number" id="depAmt" class="input-tech" style="font-size: 24px; text-align: center; font-weight: 800; background: transparent; border: none; margin:0;" placeholder="0">
                 <div class="chip-grid">
                     <div class="amt-chip" onclick="setAmt(250)">250</div>
                     <div class="amt-chip" onclick="setAmt(500)">500</div>
                     <div class="amt-chip" onclick="setAmt(1000)">1k</div>
-                    <div class="amt-chip" onclick="setAmt(2000)">2k</div>
-                    <div class="amt-chip" onclick="setAmt(5000)">5k</div>
-                    <div class="amt-chip" onclick="setAmt(10000)">10k</div>
                 </div>
             </div>
-            <button onclick="payNow()" class="btn-tech" style="background:var(--accent)">Confirm Deposit</button>
-            <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('depositModal')">Cancel</p>
+            <button onclick="payNow()" class="btn-tech" style="background:var(--accent); margin-top:12px;">Confirm Deposit</button>
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 14px; cursor: pointer; margin-bottom: 0;" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
 
     <div id="stakeModal" class="overlay">
         <div class="modal">
-            <h2 id="sTitle">Place Stake</h2>
-            <p id="sQuestion" style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px;"></p>
-            <input type="number" id="stakeAmt" class="input-tech" placeholder="Stake Amount (Ksh)">
-            <button id="stakeConfirmBtn" class="btn-tech" style="background: var(--accent)">Confirm Stake</button>
-            <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('stakeModal')">Cancel</p>
-        </div>
-    </div>
-
-    <div id="createMarketModal" class="overlay">
-        <div class="modal">
-            <h2>Create New Prediction</h2>
-            <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Deploy directly to the feed</p>
-            <select id="cmCat" class="input-tech">
-                <option value="World">World News</option>
-                <option value="Entertainment">Entertainment</option>
-                <option value="Sports">Sports</option>
-                <option value="Tech">Tech</option>
-            </select>
-            <input type="text" id="cmTitle" class="input-tech" placeholder="Prediction Question (e.g., Will it rain?)">
-            <input type="number" id="cmProb" class="input-tech" placeholder="Odds % (e.g., 55)" min="1" max="99">
-            <button onclick="deployMarket()" class="btn-tech" style="background: var(--accent)">Deploy to Live Feed</button>
-            <p style="font-size: 12px; color: var(--text-sub); margin-top: 16px; cursor: pointer;" onclick="closeModal('createMarketModal')">Cancel</p>
+            <h3 id="sTitle" style="margin: 0 0 6px 0;">Place Stake</h3>
+            <p id="sQuestion" style="font-size: 12px; color: var(--text-sub); margin-bottom: 16px;"></p>
+            <input type="number" id="stakeAmt" class="input-tech" placeholder="Amount (Ksh)">
+            <button id="stakeConfirmBtn" class="btn-tech" style="background: var(--accent)">Place Bet</button>
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 14px; cursor: pointer; margin-bottom: 0;" onclick="closeModal('stakeModal')">Cancel</p>
         </div>
     </div>
 
@@ -171,36 +134,25 @@
         let markets = [];
 
         const baseMarkets = [
-            { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" },
-            { type: 'm', cat: "Entertainment", q: "Will Marvel announce Black Panther 3 this year?", p: 55, id: "ent-bp3" },
-            { type: 'm', cat: "Sports", q: "Will Arsenal win their next Premier League match?", p: 68, id: "sports-ars" },
-            { type: 'm', cat: "Tech", q: "Will Apple release a foldable iPhone next year?", p: 35, id: "tech-fold" },
-            { type: 'n', cat: "News", h: "Global Markets Update", p: "Indices fluctuate as inflation metrics point to sustained interest rates from global central banks.", id: "news-global-1" },
-            { type: 'n', cat: "News", h: "Digital Finance Surge", p: "Decentralized prediction tools experience a worldwide 15% increase in user volume.", id: "news-global-2" }
+            { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "m-jesus" },
+            { type: 'm', cat: "Sports", q: "Will Arsenal win their next Premier League match?", p: 68, id: "m-arsenal" },
+            { type: 'm', cat: "Tech", q: "Will OpenAI release GPT-5 before July?", p: 58, id: "m-gpt" },
+            { type: 'n', cat: "News", h: "Global Markets Update", p: "Prediction markets experience high volume globally this week.", id: "n-global" }
         ];
 
-        // FORCED DOM CONTENT LOAD TRIGGER: Failsafe to display even if SDKs stall
+        // EXECUTES ON FIRST LOAD REGARDLESS OF EXTERNAL ASSETS
         document.addEventListener('DOMContentLoaded', () => {
-            try {
-                loadPersistedMarkets();
-                syncState(); 
-                render('All');
-            } catch(err) {
-                console.error("Initialization error. Using fallback initialization.");
-                // Fallback reset if parsing failed completely
-                markets = [...baseMarkets];
-                saveMarkets();
-                render('All');
-            }
+            loadPersistedMarkets();
+            syncState(); 
+            render('All');
         });
 
         function loadPersistedMarkets() {
-            const stored = localStorage.getItem('nx_markets');
-            if (stored && stored.trim() !== "") {
+            const stored = localStorage.getItem('nx_lite_markets');
+            if (stored) {
                 try {
                     markets = JSON.parse(stored);
                 } catch(e) {
-                    // Reset localStorage immediately if corrupt JSON detected
                     markets = [...baseMarkets];
                     saveMarkets();
                 }
@@ -211,7 +163,7 @@
         }
 
         function saveMarkets() {
-            localStorage.setItem('nx_markets', JSON.stringify(markets));
+            localStorage.setItem('nx_lite_markets', JSON.stringify(markets));
         }
 
         function render(cat) {
@@ -227,11 +179,38 @@
             });
 
             if (filtered.length === 0) {
-                f.innerHTML = `<p style="text-align:center; color:var(--text-sub); padding:40px 0; font-size:14px; font-weight:600;">No active items found in this category.</p>`;
+                f.innerHTML = `<p style="text-align:center; color:var(--text-sub); padding:30px 0; font-size:13px;">No active listings in this category.</p>`;
                 return;
             }
 
-            filtered.forEach(m => injectToTerminal(m));
+            filtered.forEach(m => {
+                const card = document.createElement('div');
+                card.id = 'market-' + m.id;
+                
+                if(m.type === 'm') {
+                    card.className = 'market-card';
+                    const wager = getActiveWager(m.id);
+                    const activeStakeStatus = wager ? `<br><span style="color:var(--accent); font-size:11px; font-weight:700;">Active: Ksh ${wager.amt} on '${wager.side}'</span>` : '';
+
+                    card.innerHTML = `
+                        <div class="m-header">
+                            <div class="m-title">${m.q}${activeStakeStatus}</div>
+                            <div><span class="odds-val">${m.p}%</span><span class="odds-lbl">odds</span></div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="trade-btn yes" onclick="openStakeModal('YES', '${m.q.replace(/'/g, "\\'")}', '${m.id}')">Yes</button>
+                            <button class="trade-btn no" onclick="openStakeModal('NO', '${m.q.replace(/'/g, "\\'")}', '${m.id}')">No</button>
+                        </div>
+                        <button class="resolve-btn" onclick="resolvePrediction('${m.id}')">Determine Outcome & Claim</button>`;
+                } else {
+                    card.className = 'news-card';
+                    card.innerHTML = `
+                        <span class="news-tag">Update</span>
+                        <div class="news-h">${m.h}</div>
+                        <p class="news-p">${m.p}</p>`;
+                }
+                f.appendChild(card);
+            });
         }
 
         function filterCat(cat, el) {
@@ -240,101 +219,35 @@
             render(cat);
         }
 
-        function injectToTerminal(item) {
-            const f = document.getElementById('feed');
-            if (!f) return;
-            const card = document.createElement('div');
-            card.id = 'market-el-' + item.id;
-            
-            if(item.type === 'm') {
-                card.className = 'market-card';
-                const safeQ = item.q.replace(/'/g, "\\'");
-                const wager = getActiveWager(item.id);
-                const activeStakeStatus = wager ? `<br><span style="color:var(--accent); font-size:11px; font-weight:700;">Wager placed: Ksh ${wager.amt} on '${wager.side}'</span>` : '';
-
-                card.innerHTML = `
-                    <div class="m-header">
-                        <div class="m-title">
-                            ${item.q}
-                            ${activeStakeStatus}
-                        </div>
-                        <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
-                    </div>
-                    <div class="btn-group">
-                        <button class="trade-btn yes" onclick="openStakeModal('YES', '${safeQ}', '${item.id}')">Yes</button>
-                        <button class="trade-btn no" onclick="openStakeModal('NO', '${safeQ}', '${item.id}')">No</button>
-                    </div>
-                    <button class="resolve-btn" onclick="resolvePrediction('${item.id}')">Resolve & Payout</button>`;
-            } else {
-                card.className = 'news-card';
-                card.innerHTML = `
-                    <span class="news-tag">
-                        <div style="width:5px; height:5px; background:var(--accent); border-radius:50%; animation:pulse 1s infinite;"></div>
-                        Update
-                    </span>
-                    <div class="news-h">${item.h}</div>
-                    <p class="news-p">${item.p}</p>`;
-            }
-
-            f.appendChild(card);
-        }
-
-        function deployMarket() {
-            const cat = document.getElementById('cmCat').value;
-            const q = document.getElementById('cmTitle').value;
-            const p = parseInt(document.getElementById('cmProb').value);
-
-            if (!q || !p || p < 1 || p > 99) {
-                return alert("Please check your inputs and enter valid odds between 1% and 99%");
-            }
-
-            const newMarket = {
-                type: 'm',
-                cat: cat,
-                q: q,
-                p: p,
-                id: 'custom-' + Date.now()
-            };
-
-            markets.unshift(newMarket);
-            saveMarkets();
-            closeModal('createMarketModal');
-            document.getElementById('cmTitle').value = '';
-            document.getElementById('cmProb').value = '';
-            render(currentCat);
-            alert("Prediction deployed successfully!");
-        }
-
         function getActiveWager(marketId) {
-            const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
+            const wagers = JSON.parse(localStorage.getItem('nx_lite_wagers') || '{}');
             return wagers[marketId];
         }
 
         function openStakeModal(side, question, marketId) {
-            if(!localStorage.getItem('nx_user')) return openModal('authModal');
-            document.getElementById('sTitle').innerText = `Predicting '${side}'`;
+            if(!localStorage.getItem('nx_lite_user')) return openModal('authModal');
+            document.getElementById('sTitle').innerText = `Bet '${side}'`;
             document.getElementById('sQuestion').innerText = question;
             document.getElementById('stakeAmt').value = '';
             openModal('stakeModal');
 
             document.getElementById('stakeConfirmBtn').onclick = () => {
                 const amt = Number(document.getElementById('stakeAmt').value);
-                const currentBalance = parseFloat(localStorage.getItem('nx_balance') || 0);
+                const currentBalance = parseFloat(localStorage.getItem('nx_lite_balance') || 0);
 
                 if(!amt || amt < 50) return alert("Minimum stake is Ksh 50");
-                if(amt > currentBalance) return alert("Insufficient balance to place stake.");
+                if(amt > currentBalance) return alert("Insufficient account balance.");
 
-                localStorage.setItem('nx_balance', currentBalance - amt);
+                localStorage.setItem('nx_lite_balance', currentBalance - amt);
                 
-                const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
+                const wagers = JSON.parse(localStorage.getItem('nx_lite_wagers') || '{}');
                 wagers[marketId] = { side: side, amt: amt };
-                localStorage.setItem('nx_wagers', JSON.stringify(wagers));
+                localStorage.setItem('nx_lite_wagers', JSON.stringify(wagers));
 
                 syncState();
                 closeModal('stakeModal');
-                
                 render(currentCat);
-                alert(`Stake successfully placed on '${side}'!`);
+                alert(`Success! Stake placed on ${side}.`);
             };
         }
 
@@ -343,11 +256,92 @@
             const resolvedOutcome = outcomes[Math.floor(Math.random() * outcomes.length)];
             const wager = getActiveWager(marketId);
 
-            let alertMsg = `The prediction settled as '${resolvedOutcome}'.\n`;
+            let alertMsg = `Settled as '${resolvedOutcome}'.\n`;
 
             if (wager) {
                 if (wager.side === resolvedOutcome) {
                     const winnings = wager.amt * 2;
-                    let curBal = parseFloat(localStorage.getItem('nx_balance') || 0);
-                    localStorage.setItem('nx_balance', curBal + winnings);
-                    al
+                    let curBal = parseFloat(localStorage.getItem('nx_lite_balance') || 0);
+                    localStorage.setItem('nx_lite_balance', curBal + winnings);
+                    alertMsg += `🎉 Correct! You earned Ksh ${winnings.toLocaleString()}!`;
+                } else {
+                    alertMsg += `❌ Incorrect. Wager lost.`;
+                }
+                const wagers = JSON.parse(localStorage.getItem('nx_lite_wagers') || '{}');
+                delete wagers[marketId];
+                localStorage.setItem('nx_lite_wagers', JSON.stringify(wagers));
+            } else {
+                alertMsg += `No active position found.`;
+            }
+
+            markets = markets.filter(m => m.id !== marketId);
+            saveMarkets();
+            syncState();
+            render(currentCat);
+            alert(alertMsg);
+        }
+
+        function syncState() {
+            const user = localStorage.getItem('nx_lite_user');
+            const bal = localStorage.getItem('nx_lite_balance') || "0.00";
+            if(user) {
+                document.getElementById('signBtn').classList.add('hidden');
+                document.getElementById('userIcon').classList.remove('hidden');
+            }
+            document.getElementById('balance').innerText = parseFloat(bal).toLocaleString(undefined, {minimumFractionDigits: 2});
+        }
+
+        function doAuth() {
+            const email = document.getElementById('aEmail').value;
+            if(!email.includes('@')) return alert("Enter valid credentials");
+            localStorage.setItem('nx_lite_user', email);
+            closeModal('authModal');
+            syncState();
+        }
+
+        function setAmt(v) { document.getElementById('depAmt').value = v; }
+
+        function payNow() {
+            const amt = document.getElementById('depAmt').value;
+            if(!localStorage.getItem('nx_lite_user')) return openModal('authModal');
+            if(amt < 200) return alert("Minimum deposit is Ksh 200");
+            
+            if (typeof window.IntaSend !== "undefined") {
+                const intasend = new window.IntaSend({
+                    publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
+                    live: false 
+                });
+
+                intasend.on("COMPLETE", (resp) => {
+                    let cur = parseFloat(localStorage.getItem('nx_lite_balance') || 0);
+                    localStorage.setItem('nx_lite_balance', cur + Number(amt));
+                    syncState();
+                    closeModal('depositModal');
+                    alert("Deposit confirmed!");
+                });
+
+                intasend.on("FAILED", (resp) => {
+                    alert("Payment attempt failed.");
+                });
+
+                intasend.checkout({
+                    amount: amt,
+                    currency: "KES",
+                    email: localStorage.getItem('nx_lite_user'),
+                    api_ref: "nx-terminal-dep"
+                });
+            } else {
+                alert("IntaSend SDK loading offline. Adding locally.");
+                let cur = parseFloat(localStorage.getItem('nx_lite_balance') || 0);
+                localStorage.setItem('nx_lite_balance', cur + Number(amt));
+                closeModal('depositModal');
+                syncState();
+            }
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function logout() { if(confirm("Sign out?")) { localStorage.clear(); location.reload(); } }
+    </script>
+</body>
+</html>

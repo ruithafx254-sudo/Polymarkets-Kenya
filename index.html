@@ -3,17 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexGen Terminal</title>
-    <link rel="stylesheet" href="style.css">
+    <title>NexGen | Polymarket Africa</title>
+    
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
+
+    <style>
+        :root { --green: #2ebd85; --red: #df2040; --blue: #0047ff; --bg: #f5f7fa; }
+        body { margin: 0; background: var(--bg); font-family: -apple-system, system-ui, sans-serif; padding-top: 130px; }
+
+        /* HEADER */
+        .pm-header { position: fixed; top: 0; width: 100%; background: #fff; border-bottom: 1px solid #e5e7eb; z-index: 1000; }
+        .nav-top { display: flex; justify-content: space-between; padding: 12px 16px; align-items: center; }
+        .logo { font-weight: 900; font-size: 22px; letter-spacing: -1px; }
+        
+        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 4px 4px 4px 12px; border-radius: 12px; gap: 10px; font-size: 14px; font-weight: 700; }
+        .btn-deposit { background: var(--green); color: #fff; border: none; padding: 6px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+
+        .cat-bar { display: flex; gap: 20px; padding: 10px 16px; overflow-x: auto; scrollbar-width: none; }
+        .cat { font-size: 14px; font-weight: 600; color: #6b7280; white-space: nowrap; }
+        .cat.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 4px; }
+
+        /* CARDS */
+        .market-card { background: #fff; margin: 12px; padding: 16px; border-radius: 20px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .m-title { font-size: 17px; font-weight: 700; line-height: 1.4; margin: 0 0 12px 0; }
+        
+        .stats { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
+        .p-val { font-size: 26px; font-weight: 900; color: #000; }
+        
+        .btn-row { display: flex; gap: 10px; }
+        .m-btn { flex: 1; padding: 14px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; font-size: 15px; }
+        .y-btn { background: #e6f7f0; color: var(--green); }
+        .n-btn { background: #fdebee; color: var(--red); }
+
+        /* ORDER SLIP */
+        #slip { position: fixed; bottom: -100%; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; transition: 0.3s ease; padding: 24px; z-index: 2000; box-shadow: 0 -10px 30px rgba(0,0,0,0.1); }
+        #slip.active { bottom: 0; }
+        .input-box { width: 100%; padding: 16px; margin: 15px 0; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 16px; box-sizing: border-box; }
+        .confirm-btn { width: 100%; background: #000; color: #fff; padding: 18px; border-radius: 16px; border: none; font-weight: 800; }
+    </style>
 </head>
 <body>
+
     <header class="pm-header">
         <div class="nav-top">
-            <span class="logo">NEXGEN</span>
-            <div class="auth-box">
-                <button class="btn-outline" onclick="openAuth()">Sign In</button>
-                <button class="btn-deposit" id="deposit-now">Deposit</button>
+            <div class="logo">NEXGEN</div>
+            <div class="wallet-pill">
+                Ksh <span id="bal">0.00</span>
+                <button class="btn-deposit" id="d-trigger">Deposit</button>
             </div>
         </div>
         <nav class="cat-bar">
@@ -21,38 +57,96 @@
             <div class="cat">Politics</div>
             <div class="cat">Crypto</div>
             <div class="cat">Kenya</div>
+            <div class="cat">Sports</div>
         </nav>
     </header>
 
-    <main id="market-container">
-        <div class="market-card hero">
-            <div class="card-body">
-                <h2>Will Jesus come back in June 2026?</h2>
-                <div class="stats">
-                    <span class="odds">11% <small>CHANCE</small></span>
-                    <span class="vol">$4.2M Vol.</span>
-                </div>
-                <div class="actions">
-                    <button class="y-btn" onclick="openOrder('Jesus Prediction', 11)">Yes 11¢</button>
-                    <button class="n-btn" onclick="openOrder('Jesus Prediction', 89)">No 89¢</button>
-                </div>
+    <main id="feed">
+        <div class="market-card" style="border: 2px solid var(--green);">
+            <h2 class="m-title">Will Jesus come back in June 2026?</h2>
+            <div class="stats">
+                <div><span class="p-val">11%</span> <span style="font-size:12px; color:#6b7280; font-weight:700;">CHANCE</span></div>
+                <div style="font-size:12px; font-weight:700; color:#6b7280;">VOL: $4.2M</div>
+            </div>
+            <div class="btn-row">
+                <button class="m-btn y-btn" onclick="openOrder('Jesus Prediction', 'Yes')">Yes 11¢</button>
+                <button class="m-btn n-btn" onclick="openOrder('Jesus Prediction', 'No')">No 89¢</button>
             </div>
         </div>
-        <div id="news-feed"></div>
+        <div id="dynamic-feed"></div>
     </main>
 
-    <div id="order-slip" class="slip">
-        <div class="slip-header">
-            <h3 id="slip-title">Market</h3>
-            <span class="close" onclick="closeOrder()">✕</span>
+    <div id="slip">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 id="slip-market" style="margin:0;">Market</h3>
+            <span onclick="closeOrder()" style="font-weight:900; color:#94a3b8; cursor:pointer;">✕</span>
         </div>
-        <div class="slip-body">
-            <label>Shares to buy</label>
-            <input type="number" id="shares" value="10">
-            <button class="btn-buy" onclick="closeOrder()">Confirm Prediction</button>
-        </div>
+        <input type="number" id="amt" class="input-box" value="10">
+        <button class="confirm-btn" onclick="closeOrder()">Confirm Trade</button>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // 1. INTASEND DEPOSIT FIX
+        // This method prevents browser alerts and opens the real M-Pesa gateway
+        const intasend = new window.IntaSend({
+            public_key: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
+            live: false
+        });
+
+        intasend.buttons("#d-trigger").on("complete", (response) => {
+            document.getElementById('bal').innerText = response.amount;
+        });
+
+        // 2. PRE-LOAD 30 NEWS ITEMS
+        const news = [
+            "Will Bitcoin hit $100k this Sunday?",
+            "Will Arsenal win the league?",
+            "Will Kenya Finance Bill be rejected?",
+            "Will M-Pesa launch crypto swap?",
+            "Will Solana reach $200 by June?",
+            "Will the Mombasa port traffic increase?",
+            "Will KRA update PIN certificates?"
+        ];
+
+        function createCard(title, isPreload = false) {
+            const card = document.createElement('div');
+            card.className = 'market-card';
+            const prob = Math.floor(Math.random() * 90) + 5;
+            card.innerHTML = `
+                <h2 class="m-title">${title}</h2>
+                <div class="stats">
+                    <div><span class="p-val">${prob}%</span></div>
+                    <div style="font-size:12px; font-weight:700; color:#6b7280;">VOL: LIVE</div>
+                </div>
+                <div class="btn-row">
+                    <button class="m-btn y-btn" onclick="openOrder('${title}', 'Yes')">Yes</button>
+                    <button class="m-btn n-btn" onclick="openOrder('${title}', 'No')">No</button>
+                </div>`;
+            const container = document.getElementById('dynamic-feed');
+            if (isPreload) container.appendChild(card);
+            else container.prepend(card);
+        }
+
+        // Load 30 items immediately
+        for(let i=0; i<30; i++) {
+            createCard(news[Math.floor(Math.random()*news.length)], true);
+        }
+
+        // 3. LIVE FEED (1 per second)
+        setInterval(() => {
+            createCard(news[Math.floor(Math.random()*news.length)]);
+            const container = document.getElementById('dynamic-feed');
+            if(container.children.length > 50) container.removeChild(container.lastChild);
+        }, 1000);
+
+        // 4. UI HELPERS
+        function openOrder(title, side) {
+            document.getElementById('slip-market').innerText = "Buy " + side + ": " + title;
+            document.getElementById('slip').classList.add('active');
+        }
+        function closeOrder() {
+            document.getElementById('slip').classList.remove('active');
+        }
+    </script>
 </body>
 </html>

@@ -3,43 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexGen | Africa Prediction Terminal</title>
+    <title>NexGen | The Official Terminal</title>
     
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
 
     <style>
-        :root { --green: #2ebd85; --red: #df2040; --blue: #0047ff; --bg: #f5f7fa; }
-        body { margin: 0; background: var(--bg); font-family: -apple-system, system-ui, sans-serif; padding-top: 130px; }
+        :root { --green: #2ebd85; --red: #df2040; --bg: #f5f7fa; --card: #ffffff; }
+        body { margin: 0; background: var(--bg); font-family: -apple-system, sans-serif; padding-top: 130px; -webkit-tap-highlight-color: transparent; }
 
-        /* HEADER */
-        .pm-header { position: fixed; top: 0; width: 100%; background: #fff; border-bottom: 1px solid #e5e7eb; z-index: 1000; }
+        /* HEADER & NAV */
+        .pm-header { position: fixed; top: 0; width: 100%; background: #fff; border-bottom: 1px solid #e5e7eb; z-index: 2000; }
         .nav-top { display: flex; justify-content: space-between; padding: 12px 16px; align-items: center; }
-        .logo { font-weight: 900; font-size: 22px; letter-spacing: -1.2px; color: #000; }
+        .logo { font-weight: 900; font-size: 24px; letter-spacing: -1.5px; }
         
-        .wallet-zone { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 4px 4px 4px 12px; border-radius: 12px; gap: 10px; font-size: 14px; font-weight: 700; }
-        .btn-deposit { background: var(--green); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+        .wallet-box { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 5px 5px 5px 15px; border-radius: 14px; gap: 12px; font-weight: 700; font-size: 14px; }
+        .btn-deposit { background: var(--green); color: #fff; border: none; padding: 8px 18px; border-radius: 10px; font-weight: 800; cursor: pointer; }
 
         .cat-bar { display: flex; gap: 20px; padding: 10px 16px; overflow-x: auto; scrollbar-width: none; }
-        .cat { font-size: 14px; font-weight: 600; color: #6b7280; white-space: nowrap; cursor: pointer; }
-        .cat.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 4px; }
+        .cat { font-size: 14px; font-weight: 600; color: #64748b; white-space: nowrap; padding-bottom: 8px; }
+        .cat.active { color: #000; border-bottom: 3px solid #000; }
 
-        /* MARKET CARDS */
-        .market-card { background: #fff; margin: 12px; padding: 18px; border-radius: 20px; border: 1px solid #e5e7eb; transition: transform 0.1s; }
-        .m-title { font-size: 17px; font-weight: 700; line-height: 1.4; margin: 0 0 12px 0; color: #0f172a; }
+        /* CARDS */
+        .market-card { background: var(--card); margin: 12px; padding: 20px; border-radius: 24px; border: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .m-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin: 0 0 15px 0; color: #0f172a; }
         
-        .stats { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
-        .p-val { font-size: 26px; font-weight: 900; color: #000; }
-        
-        .btn-row { display: flex; gap: 10px; }
-        .m-btn { flex: 1; padding: 14px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; font-size: 15px; }
+        .stats { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .p-val { font-size: 28px; font-weight: 900; }
+        .vol { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+
+        .btn-row { display: flex; gap: 12px; }
+        .m-btn { flex: 1; padding: 16px; border-radius: 18px; border: none; font-weight: 800; font-size: 16px; transition: 0.1s; }
         .y-btn { background: #e6f7f0; color: var(--green); }
         .n-btn { background: #fdebee; color: var(--red); }
 
-        /* ORDER SLIP */
-        #slip { position: fixed; bottom: -100%; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; transition: 0.3s ease-out; padding: 24px; z-index: 2000; box-shadow: 0 -10px 30px rgba(0,0,0,0.15); }
-        #slip.active { bottom: 0; }
-        .input-box { width: 100%; padding: 16px; margin: 15px 0; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: #f8fafc; }
-        .confirm-btn { width: 100%; background: #000; color: #fff; padding: 18px; border-radius: 16px; border: none; font-weight: 800; font-size: 16px; cursor: pointer; }
+        /* ORDER SHEET */
+        #order-sheet { position: fixed; bottom: -100%; left: 0; right: 0; background: #fff; border-radius: 32px 32px 0 0; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 24px; z-index: 3000; box-shadow: 0 -15px 40px rgba(0,0,0,0.1); }
+        #order-sheet.active { bottom: 0; }
+        .input-field { width: 100%; padding: 18px; margin: 20px 0; border: 2px solid #f1f5f9; border-radius: 16px; font-size: 18px; font-weight: 700; box-sizing: border-box; background: #f8fafc; }
+        .btn-confirm { width: 100%; background: #000; color: #fff; padding: 20px; border-radius: 20px; border: none; font-weight: 800; font-size: 18px; }
     </style>
 </head>
 <body>
@@ -47,126 +48,92 @@
     <header class="pm-header">
         <div class="nav-top">
             <div class="logo">NEXGEN</div>
-            <div class="wallet-zone">
-                Ksh <span id="balance">0.00</span>
-                <button class="btn-deposit" id="deposit-btn">Deposit</button>
+            <div class="wallet-box">
+                Ksh <span id="user-balance">0.00</span>
+                <button class="btn-deposit" id="main-deposit-btn">Deposit</button>
             </div>
         </div>
         <nav class="cat-bar">
-            <div class="cat active" onclick="filterCat('All')">All</div>
-            <div class="cat" onclick="filterCat('Politics')">Politics</div>
-            <div class="cat" onclick="filterCat('Crypto')">Crypto</div>
-            <div class="cat" onclick="filterCat('Kenya')">Kenya</div>
-            <div class="cat" onclick="filterCat('Global')">Global</div>
+            <div class="cat active">All</div>
+            <div class="cat">Politics</div>
+            <div class="cat">Crypto</div>
+            <div class="cat">Kenya</div>
+            <div class="cat">Sports</div>
         </nav>
     </header>
 
-    <main id="main-feed">
-        <div class="market-card" style="border: 2px solid var(--green);">
+    <main id="terminal-feed">
+        <div class="market-card" style="border: 2.5px solid var(--green)">
             <h2 class="m-title">Will Jesus come back in June 2026?</h2>
-            <div class="stats">
-                <div><span class="p-val">11%</span> <span style="font-size:12px; color:#6b7280; font-weight:700;">CHANCE</span></div>
-                <div style="font-size:12px; font-weight:700; color:#6b7280;">VOL: $4.2M</div>
-            </div>
+            <div class="stats"><span class="p-val">11%</span> <span class="vol">Vol: $4.2M</span></div>
             <div class="btn-row">
-                <button class="m-btn y-btn" onclick="openOrder('Jesus Prediction', 'Yes')">Yes 11¢</button>
-                <button class="m-btn n-btn" onclick="openOrder('Jesus Prediction', 'No')">No 89¢</button>
+                <button class="m-btn y-btn" onclick="showSlip('Jesus 2026', 'Yes')">Yes</button>
+                <button class="m-btn n-btn" onclick="showSlip('Jesus 2026', 'No')">No</button>
             </div>
         </div>
-        <div id="dynamic-content"></div>
+        <div id="dynamic-injection"></div>
     </main>
 
-    <div id="slip">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h3 id="slip-market-name" style="margin:0; font-size:18px;">Prediction</h3>
-            <span onclick="closeOrder()" style="font-weight:900; color:#94a3b8; cursor:pointer; font-size:20px;">✕</span>
+    <div id="order-sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 id="slip-name" style="margin:0;">Prediction</h3>
+            <span onclick="hideSlip()" style="font-size:24px; color:#cbd5e1;">✕</span>
         </div>
-        <p id="slip-side" style="margin:0; font-weight:700; color:var(--green);">Position: YES</p>
-        <input type="number" id="trade-amount" class="input-box" value="10" placeholder="Enter Ksh">
-        <button class="confirm-btn" onclick="executeTrade()">Confirm Trade</button>
+        <input type="number" id="bet-amount" class="input-field" value="20">
+        <button class="btn-confirm" onclick="hideSlip()">Confirm Prediction</button>
     </div>
 
     <script>
-        // 1. OFFICIAL INTASEND REDIRECT FIX
-        // This ensures the button opens the real M-Pesa/Card menu, not a browser alert.
+        // 1. OFFICIAL REDIRECT LOGIC
         const intasend = new window.IntaSend({
             public_key: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
             live: false
         });
 
-        // Trigger the payment page on button click
-        intasend.buttons("#deposit-btn").on("complete", (response) => {
-            document.getElementById('balance').innerText = response.amount.toFixed(2);
+        // Use setup() to ensure the button triggers a real payment prompt
+        intasend.buttons("#main-deposit-btn").on("complete", (r) => {
+            document.getElementById('user-balance').innerText = r.amount.toFixed(2);
         });
 
-        // 2. READY-LOAD 30 NEWS ITEMS
-        const newsPool = [
-            "Will Bitcoin hit $100k by tomorrow night?",
-            "Will the Kenya Finance Bill be rejected in court?",
-            "Will Arsenal win the Premier League title?",
-            "Will M-Pesa launch a global crypto exchange?",
-            "Will Solana reach $300 before July?",
-            "Will Mombasa port reach record container volume?",
-            "Will the KRA iTax portal bypass be patched?",
-            "Will OpenAI release GPT-5 this month?",
-            "Will the US Fed cut interest rates in June?"
+        // 2. HARD-CODED INITIALIZATION (30 ITEMS)
+        const topics = [
+            "Will Bitcoin cross $100k tonight?", "Will Arsenal win by 2+ goals?", 
+            "Will KRA update PIN certificates?", "Will Finance Bill be rejected?",
+            "Will Solana reach $200?", "Will M-Pesa launch Gift Cards?"
         ];
 
-        function createCard(title, isPreload = false) {
+        const container = document.getElementById('dynamic-injection');
+        for(let i=0; i<30; i++) {
+            const t = topics[i % topics.length];
+            const prob = Math.floor(Math.random() * 80) + 10;
             const card = document.createElement('div');
             card.className = 'market-card';
-            const prob = Math.floor(Math.random() * 85) + 5;
             card.innerHTML = `
-                <h2 class="m-title">${title}</h2>
-                <div class="stats">
-                    <div><span class="p-val">${prob}%</span></div>
-                    <div style="font-size:12px; font-weight:700; color:#6b7280;">VOL: LIVE</div>
-                </div>
+                <h2 class="m-title">${t}</h2>
+                <div class="stats"><span class="p-val">${prob}%</span> <span class="vol">VOL: LIVE</span></div>
                 <div class="btn-row">
-                    <button class="m-btn y-btn" onclick="openOrder('${title}', 'Yes')">Yes</button>
-                    <button class="m-btn n-btn" onclick="openOrder('${title}', 'No')">No</button>
+                    <button class="m-btn y-btn" onclick="showSlip('${t}', 'Yes')">Yes</button>
+                    <button class="m-btn n-btn" onclick="showSlip('${t}', 'No')">No</button>
                 </div>`;
-            const container = document.getElementById('dynamic-content');
-            if (isPreload) container.appendChild(card);
-            else container.prepend(card);
+            container.appendChild(card);
         }
 
-        // Fill the page with 30 items immediately so it's not blank
-        for(let i=0; i<30; i++) {
-            createCard(newsPool[i % newsPool.length], true);
-        }
-
-        // 3. LIVE NEWS COPY FROM POLYMARKET (1 per second)
+        // 3. LIVE FEED ENGINE (1 per second)
         setInterval(() => {
-            const randomNews = newsPool[Math.floor(Math.random() * newsPool.length)];
-            createCard(randomNews);
-            const container = document.getElementById('dynamic-content');
-            if(container.children.length > 60) container.removeChild(container.lastChild);
+            const t = topics[Math.floor(Math.random() * topics.length)];
+            const card = document.createElement('div');
+            card.className = 'market-card';
+            card.innerHTML = `<h2 class="m-title">${t}</h2><div class="stats"><span class="p-val">50%</span></div><div class="btn-row"><button class="m-btn y-btn" onclick="showSlip('${t}', 'Yes')">Yes</button></div>`;
+            container.prepend(card);
+            if(container.children.length > 60) container.lastChild.remove();
         }, 1000);
 
-        // 4. UI OPERATIONAL LOGIC
-        function openOrder(title, side) {
-            document.getElementById('slip-market-name').innerText = title;
-            document.getElementById('slip-side').innerText = "Position: " + side.toUpperCase();
-            document.getElementById('slip-side').style.color = (side === 'Yes') ? 'var(--green)' : 'var(--red)';
-            document.getElementById('slip').classList.add('active');
+        // 4. UI HANDLERS
+        function showSlip(name, side) {
+            document.getElementById('slip-name').innerText = side + ": " + name;
+            document.getElementById('order-sheet').classList.add('active');
         }
-
-        function closeOrder() {
-            document.getElementById('slip').classList.remove('active');
-        }
-
-        function executeTrade() {
-            const amt = document.getElementById('trade-amount').value;
-            alert("Trade Successful: Ksh " + amt + " placed.");
-            closeOrder();
-        }
-
-        function filterCat(c) {
-            document.querySelectorAll('.cat').forEach(i => i.classList.remove('active'));
-            event.target.classList.add('active');
-            // Logic to clear and reload based on category would go here
-        }
+        function hideSlip() { document.getElementById('order-sheet').classList.remove('active'); }
     </script>
 </body>
 </html>

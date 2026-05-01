@@ -55,8 +55,6 @@
         .news-h { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #000; }
         .news-p { font-size: 13px; color: var(--text-sub); line-height: 1.5; margin: 0; }
 
-        .add-market-card { background: #fafafa; border: 2px dashed var(--border); border-radius: 14px; padding: 20px; margin-bottom: 12px; text-align: center; }
-
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
@@ -65,7 +63,7 @@
         .auth-nav { display: flex; background: #f1f5f9; padding: 6px; border-radius: 14px; margin-bottom: 24px; }
         .auth-tab { flex: 1; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 10px; color: var(--text-sub); transition: 0.3s; }
         .auth-tab.active { background: #000; color: #fff; }
-        .input-tech { width: 100%; padding: 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
+        .input-tech { width: 100%; padding: 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
         .btn-tech { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 15px; }
         .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
         .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; }
@@ -98,7 +96,7 @@
             <div class="cat-link" onclick="filterCat('Entertainment', this)">Entertainment</div>
             <div class="cat-link" onclick="filterCat('Sports', this)">Sports</div>
             <div class="cat-link" onclick="filterCat('Tech', this)">Tech</div>
-            <div class="cat-link" style="color: var(--accent); font-weight: bold;" onclick="openModal('createMarketModal')">+ Add Market</div>
+            <div class="cat-link" style="color: var(--accent); font-weight: bold;" onclick="openModal('createMarketModal')">+ Add</div>
         </div>
     </div>
 
@@ -151,16 +149,16 @@
 
     <div id="createMarketModal" class="overlay">
         <div class="modal">
-            <h2>New Prediction</h2>
-            <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Deploy directly to feed</p>
+            <h2>Create New Prediction</h2>
+            <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Deploy directly to the feed</p>
             <select id="cmCat" class="input-tech">
                 <option value="World">World News</option>
                 <option value="Entertainment">Entertainment</option>
                 <option value="Sports">Sports</option>
                 <option value="Tech">Tech</option>
             </select>
-            <input type="text" id="cmTitle" class="input-tech" placeholder="Question Title (e.g., Will it rain?)">
-            <input type="number" id="cmProb" class="input-tech" placeholder="Starting Odds / Probability %" min="1" max="99">
+            <input type="text" id="cmTitle" class="input-tech" placeholder="Prediction Question (e.g., Will it rain?)">
+            <input type="number" id="cmProb" class="input-tech" placeholder="Odds % (e.g., 55)" min="1" max="99">
             <button onclick="deployMarket()" class="btn-tech" style="background: var(--accent)">Deploy to Live Feed</button>
             <p style="font-size: 12px; color: var(--text-sub); margin-top: 16px; cursor: pointer;" onclick="closeModal('createMarketModal')">Cancel</p>
         </div>
@@ -170,7 +168,7 @@
         let currentCat = 'All';
         let markets = [];
 
-        // Standalone Local Base Markets
+        // Complete set of localized base markets for distinct categories
         const baseMarkets = [
             { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" },
             { type: 'm', cat: "Entertainment", q: "Will Marvel announce Black Panther 3 this year?", p: 55, id: "ent-bp3" },
@@ -207,14 +205,19 @@
         function render(cat) {
             currentCat = cat;
             const f = document.getElementById('feed'); 
+            if (!f) return;
             f.innerHTML = '';
             
-            // Solid, filter system for the complete standalone layout
             let filtered = markets.filter(m => {
                 if (cat === 'All') return true;
                 if (cat === 'News') return m.type === 'n';
                 return m.cat === cat && m.type === 'm';
             });
+
+            if (filtered.length === 0) {
+                f.innerHTML = `<p style="text-align:center; color:var(--text-sub); padding:40px 0; font-size:14px; font-weight:600;">No active items found in this category.</p>`;
+                return;
+            }
 
             filtered.forEach(m => injectToTerminal(m));
         }
@@ -227,6 +230,7 @@
 
         function injectToTerminal(item) {
             const f = document.getElementById('feed');
+            if (!f) return;
             const card = document.createElement('div');
             card.id = 'market-el-' + item.id;
             
@@ -269,7 +273,7 @@
             const p = parseInt(document.getElementById('cmProb').value);
 
             if (!q || !p || p < 1 || p > 99) {
-                return alert("Please check title and enter valid odds between 1% and 99%");
+                return alert("Please check your inputs and enter valid odds between 1% and 99%");
             }
 
             const newMarket = {
@@ -345,8 +349,4 @@
                 alertMsg += `You didn't have an active stake on this market.`;
             }
 
-            markets = markets.filter(m => m.id !== marketId);
-            saveMarkets();
-            
-            syncState();
-            ren
+            markets = ma

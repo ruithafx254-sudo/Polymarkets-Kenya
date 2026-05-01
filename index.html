@@ -224,21 +224,14 @@
             
             <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--accent);">Confirm Deposit</button>
             
-            <div id="fundsBadge" class="badge-wrap">
+            <div id="sharedBadge" class="badge-wrap">
                 <span style="display:block; text-align: center">
                     <a href="https://intasend.com/security" target="_blank">
-                        <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-no-mpesa-hr-light.png" style="width:100%; max-width:320px; height:auto; display:inline-block;" alt="IntaSend Secure Payments">
+                        <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" width="375px" style="max-width:100%; height:auto;" alt="IntaSend Secure Payments (PCI-DSS Compliant)">
                     </a>
-                    <strong><a style="display: block; color: #454545; text-decoration: none; font-size: 0.75em; margin-top: 0.5em;" href="https://intasend.com/security" target="_blank">Secured by IntaSend Payments</a></strong>
-                </span>
-            </div>
-
-            <div id="withdrawBadge" class="badge-wrap hidden">
-                <span style="display:block; text-align: center">
-                    <a href="https://intasend.com/security" target="_blank">
-                        <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" width="375px" alt="IntaSend Secure Payments (PCI-DSS Compliant)">
-                    </a>
-                    <strong><a style="display: block; color: #454545; text-decoration: none; font-size: 0.8em; margin-top: 0.6em;" href="https://intasend.com/security" target="_blank">Secured by IntaSend Payments</a></strong>
+                    <strong>
+                        <a style="display: block; color: #454545; text-decoration: none; font-size: 0.8em; margin-top: 0.6em;" href="https://intasend.com/security" target="_blank">Secured by IntaSend Payments</a>
+                    </strong>
                 </span>
             </div>
 
@@ -400,8 +393,6 @@
             const fTitle = document.getElementById('fundsTitle'), fDesc = document.getElementById('fundsDesc');
             const amtLabel = document.getElementById('amtLabel'), fSubmit = document.getElementById('fundsSubmit');
             const fChips = document.getElementById('fundsChips');
-            const fBadge = document.getElementById('fundsBadge');
-            const wBadge = document.getElementById('withdrawBadge');
 
             if(mode === 'withdraw') {
                 tWith.classList.add('active'); tDep.classList.remove('active');
@@ -411,8 +402,6 @@
                 fSubmit.innerText = "Confirm Withdrawal";
                 fSubmit.style.background = "#000";
                 fChips.classList.remove('hidden');
-                fBadge.classList.add('hidden');
-                wBadge.classList.remove('hidden');
             } else {
                 tDep.classList.add('active'); tWith.classList.remove('active');
                 fTitle.innerText = "Fund Balance";
@@ -421,8 +410,6 @@
                 fSubmit.innerText = "Confirm Deposit";
                 fSubmit.style.background = "var(--accent)";
                 fChips.classList.remove('hidden');
-                fBadge.classList.remove('hidden');
-                wBadge.classList.add('hidden');
             }
         }
 

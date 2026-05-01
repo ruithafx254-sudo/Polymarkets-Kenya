@@ -5,212 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Polymarkets Africa | Terminal</title>
     
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js" async onerror="console.warn('IntaSend CDN failed to load. Operating in local mode.')"></script>
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js" async onerror="console.warn('Intasend script unavailable')"></script>
 
     <style>
         :root { 
-            --accent: #2ebd85; 
-            --border: #e2e8f0; 
-            --text-main: #0f172a; 
-            --text-sub: #64748b;
-            --yes: #f0fdf4; 
-            --yes-text: #166534; 
-            --no: #fef2f2; 
-            --no-text: #991b1b;
-            --tech-bg: #0f172a; 
-            --gemini: #6366f1;
+            --accent: #2ebd85; --border: #eceef2; --text-main: #0f172a; --text-sub: #64748b;
+            --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #991b1b;
+            --tech-bg: #0f172a; --gemini: #6366f1;
         }
         
-        body { 
-            background: #f8fafc; 
-            color: var(--text-main); 
-            margin: 0; 
-            padding-top: 135px; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            -webkit-font-smoothing: antialiased; 
-        }
+        body { background: #ffffff; color: var(--text-main); margin: 0; padding-top: 130px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
 
         /* --- HEADER SYSTEM --- */
-        .header-stack { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            background: #ffffff; 
-            z-index: 2000; 
-            border-bottom: 1px solid var(--border); 
-            transition: transform 0.4s ease; 
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
-        }
+        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); transition: transform 0.4s ease; }
         body.hide-header .header-stack { transform: translateY(-100%); }
 
-        .top-nav { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 0 20px; 
-            height: 64px; 
-            max-width: 1200px; 
-            margin: 0 auto;
-        }
-        .logo-wrap { display: flex; flex-direction: column; line-height: 1.1; }
-        .logo-main { font-weight: 900; font-size: 20px; letter-spacing: -0.5px; color: #000; text-transform: uppercase; }
-        .logo-sub { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 1px; }
+        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 60px; }
+        .logo-wrap { display: flex; flex-direction: column; line-height: 1; }
+        .logo-main { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; color: #000; text-transform: uppercase; }
+        .logo-sub { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
         
-        .nav-right { display: flex; align-items: center; gap: 12px; }
-        .wallet-pill { 
-            display: flex; 
-            align-items: center; 
-            background: #f1f5f9; 
-            border: 1px solid var(--border); 
-            padding: 4px 4px 4px 14px; 
-            border-radius: 20px; 
-            gap: 10px; 
-            font-size: 13px; 
-            font-weight: 700; 
-        }
-        .btn-deposit { 
-            background: #0f172a; 
-            color: #fff; 
-            border: none; 
-            padding: 8px 16px; 
-            border-radius: 16px; 
-            font-weight: 700; 
-            font-size: 12px; 
-            cursor: pointer; 
-            transition: background 0.2s;
-        }
-        .btn-deposit:hover { background: #1e293b; }
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+        .wallet-pill { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); padding: 4px 4px 4px 12px; border-radius: 10px; gap: 8px; font-size: 13px; font-weight: 700; }
+        .btn-deposit { background: #000; color: #fff; border: none; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; }
         
-        .user-id { 
-            width: 38px; 
-            height: 38px; 
-            background: var(--tech-bg); 
-            color: #fff; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: pointer; 
-            border: 2px solid #fff; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
-        }
-        .person-icon { width: 18px; height: 18px; fill: currentColor; }
+        .user-id { width: 36px; height: 36px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .person-icon { width: 20px; height: 20px; fill: currentColor; }
 
-        /* --- PROFESSIONAL SUB NAV --- */
-        .sub-nav { 
-            display: flex; 
-            gap: 28px; 
-            padding: 0 20px; 
-            height: 48px;
-            align-items: center;
-            overflow-x: auto; 
-            background: #fff; 
-            border-top: 1px solid #f1f5f9;
-            scrollbar-width: none; 
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .sub-nav::-webkit-scrollbar { display: none; }
-        .cat-link { 
-            font-size: 13px; 
-            font-weight: 600; 
-            color: var(--text-sub); 
-            text-decoration: none; 
-            white-space: nowrap; 
-            cursor: pointer; 
-            height: 100%;
-            display: flex;
-            align-items: center;
-            position: relative;
-            transition: color 0.2s;
-        }
-        .cat-link:hover { color: #000; }
-        .cat-link.active { 
-            color: #000; 
-            font-weight: 700;
-        }
-        .cat-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #000;
-        }
+        /* --- SUB NAV --- */
+        .sub-nav { display: flex; gap: 20px; padding: 12px 20px; overflow-x: auto; background: #fff; border-bottom: 1px solid var(--border); scrollbar-width: none; }
+        .cat-link { font-size: 13px; font-weight: 700; color: var(--text-sub); text-decoration: none; white-space: nowrap; cursor: pointer; }
+        .cat-link.active { color: #000; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: -12px; }
 
         /* --- CONTENT FEED --- */
-        #dashboard { max-width: 620px; margin: 0 auto; padding: 12px; }
+        #dashboard { max-width: 600px; margin: auto; padding: 10px; }
         
-        .market-card { 
-            background: #fff; 
-            border: 1px solid var(--border); 
-            border-radius: 16px; 
-            padding: 20px; 
-            margin-bottom: 14px; 
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.02);
-            animation: slideUp 0.3s ease-out; 
-        }
-        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 14px; }
-        .m-title { font-size: 15px; font-weight: 600; line-height: 1.45; color: #0f172a; }
-        .m-odds { text-align: right; min-width: 75px; }
-        .odds-val { font-size: 20px; font-weight: 800; color: #000; }
-        .odds-lbl { font-size: 10px; color: var(--text-sub); text-transform: uppercase; display: block; font-weight: 600; letter-spacing: 0.5px; }
+        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; animation: slideUp 0.4s ease-out; }
+        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .m-title { font-size: 15px; font-weight: 600; line-height: 1.4; color: #111; }
+        .odds-val { font-size: 18px; font-weight: 800; color: #000; }
+        .odds-lbl { font-size: 10px; color: var(--text-sub); text-transform: uppercase; display: block; text-align: right; }
         
-        .btn-group { display: flex; gap: 12px; }
-        .trade-btn { 
-            flex: 1; 
-            padding: 14px; 
-            border-radius: 12px; 
-            border: 1px solid transparent; 
-            font-weight: 700; 
-            font-size: 14px; 
-            cursor: pointer; 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.2s ease;
-        }
+        .btn-group { display: flex; gap: 10px; }
+        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .trade-btn.yes { background: var(--yes); color: var(--yes-text); }
-        .trade-btn.yes:hover { background: #dcfce7; border-color: #bbf7d0; }
         .trade-btn.no { background: var(--no); color: var(--no-text); }
-        .trade-btn.no:hover { background: #fee2e2; border-color: #fecaca; }
 
-        .multiplier-tag { font-size: 11px; font-weight: 800; opacity: 0.8; }
-
-        .news-card { 
-            border-left: 4px solid var(--accent); 
-            background: #fff; 
-            border-top: 1px solid var(--border);
-            border-right: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 20px; 
-            border-radius: 16px; 
-            margin-bottom: 14px; 
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.01);
-            animation: slideUp 0.3s ease-out; 
-        }
-        .news-tag { font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px; }
-        .news-h { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: #0f172a; }
+        .news-card { border-left: 3px solid var(--accent); background: #f8fafc; padding: 16px; border-radius: 0 12px 12px 0; margin-bottom: 12px; animation: slideUp 0.4s ease-out; }
+        .news-tag { font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+        .news-h { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #000; }
         .news-p { font-size: 13px; color: var(--text-sub); line-height: 1.5; margin: 0; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
         /* MODALS */
-        .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
-        .modal { background: #fff; width: 100%; max-width: 360px; padding: 28px; border-radius: 20px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); border: 1px solid var(--border); }
-        .auth-nav { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 20px; }
-        .auth-tab { flex: 1; padding: 10px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 8px; color: var(--text-sub); transition: 0.2s; }
-        .auth-tab.active { background: #fff; color: #000; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .input-tech { width: 100%; padding: 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
-        .input-tech:focus { border-color: #94a3b8; background: #fff; }
-        .btn-tech { width: 100%; padding: 14px; background: #0f172a; color: #fff; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 14px; transition: background 0.2s; }
-        .btn-tech:hover { background: #1e293b; }
-        .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; }
-        .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; background: #fff; transition: background 0.2s; }
-        .amt-chip:hover { background: #f8fafc; }
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
+        .modal { background: #fff; width: 100%; max-width: 360px; padding: 32px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .auth-nav { display: flex; background: #f1f5f9; padding: 6px; border-radius: 14px; margin-bottom: 24px; }
+        .auth-tab { flex: 1; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 10px; color: var(--text-sub); transition: 0.3s; }
+        .auth-tab.active { background: #000; color: #fff; }
+        .input-tech { width: 100%; padding: 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
+        .btn-tech { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 15px; }
+        .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
+        .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -238,7 +96,6 @@
             <div class="cat-link" onclick="filterCat('News', this)">News/Updates</div>
             <div class="cat-link" onclick="filterCat('Kenya', this)">Kenya</div>
             <div class="cat-link" onclick="filterCat('Crypto', this)">Crypto</div>
-            <div class="cat-link" onclick="filterCat('Spirituality', this)">Spirituality</div>
         </div>
     </div>
 
@@ -250,21 +107,21 @@
                 <div id="tabIn" class="auth-tab active" onclick="setAuth('in')">Sign In</div>
                 <div id="tabUp" class="auth-tab" onclick="setAuth('up')">Sign Up</div>
             </div>
-            <h2 id="aTitle" style="font-size: 18px; font-weight: 800; margin-bottom: 16px;">Terminal Access</h2>
+            <h2 id="aTitle">Terminal Access</h2>
             <div id="upFields" class="hidden"><input type="text" id="aName" class="input-tech" placeholder="Full Name"></div>
             <input type="email" id="aEmail" class="input-tech" placeholder="Email Address">
             <input type="password" id="aPass" class="input-tech" placeholder="Password">
             <button onclick="doAuth()" class="btn-tech">Initialize Session</button>
-            <p style="font-size: 12px; color: var(--text-sub); margin-top: 16px; cursor: pointer; font-weight: 600;" onclick="closeModal('authModal')">Dismiss</p>
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('authModal')">Dismiss</p>
         </div>
     </div>
 
     <div id="depositModal" class="overlay">
         <div class="modal">
-            <h2 style="font-size: 18px; font-weight: 800;">Deposit Funds</h2>
-            <p style="color: var(--text-sub); font-size: 13px; margin-bottom: 16px; font-weight: 500;">Secure M-Pesa Funding (Min 200)</p>
-            <div style="background:#f8fafc; padding:16px; border-radius:14px; border: 1px solid var(--border);">
-                <input type="number" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800; background: transparent; border: none; margin-bottom: 0;" placeholder="0">
+            <h2>Deposit</h2>
+            <p style="color: var(--text-sub); font-size: 13px;">Secure M-Pesa Funding (Min 200)</p>
+            <div style="background:#f8fafc; padding:20px; border-radius:18px; border: 1px solid var(--border);">
+                <input type="number" id="depAmt" class="input-tech" style="font-size: 32px; text-align: center; font-weight: 900; background: transparent; border: none;" placeholder="0">
                 <div class="chip-grid">
                     <div class="amt-chip" onclick="setAmt(250)">250</div>
                     <div class="amt-chip" onclick="setAmt(500)">500</div>
@@ -274,43 +131,42 @@
                     <div class="amt-chip" onclick="setAmt(10000)">10k</div>
                 </div>
             </div>
-            <button onclick="payNow()" class="btn-tech" style="background:var(--accent); margin-top:16px;">Confirm Deposit</button>
-            <p style="font-size: 12px; color: var(--text-sub); margin-top: 16px; cursor: pointer; font-weight: 600;" onclick="closeModal('depositModal')">Cancel</p>
+            <button onclick="payNow()" class="btn-tech" style="background:var(--accent)">Confirm Deposit</button>
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
 
     <div id="wagerModal" class="overlay">
         <div class="modal">
-            <h2 id="wTitle" style="font-size: 16px; font-weight: 800; text-align: left; margin-bottom: 8px;">Place Stake</h2>
+            <h2 id="wTitle" style="font-size: 16px; font-weight: 800; text-align: left; margin-bottom: 8px;">Predict Side</h2>
             <p id="wQuestion" style="font-size: 13px; color: var(--text-sub); text-align: left; margin-bottom: 16px; font-weight: 500;"></p>
-            <input type="number" id="wAmount" class="input-tech" placeholder="Enter Ksh Amount (Min 50)" style="font-size: 15px; font-weight: 700;">
-            <button id="wConfirmBtn" class="btn-tech" style="margin-top: 4px;">Confirm Order</button>
-            <p style="font-size: 12px; color: var(--text-sub); margin-top: 16px; cursor: pointer; font-weight: 600;" onclick="closeModal('wagerModal')">Cancel</p>
+            <input type="number" id="wAmount" class="input-tech" placeholder="Enter Wager (Min Ksh 50)" style="font-size: 15px; font-weight: 700;">
+            <button id="wConfirmBtn" class="btn-tech" style="margin-top: 4px;">Confirm Wager</button>
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 16px; cursor: pointer;" onclick="closeModal('wagerModal')">Cancel</p>
         </div>
     </div>
 
     <script>
+        // --- DATA & INITIALIZATION ---
         let currentCat = 'All';
         
+        // Permanent market is protected and always available
         let markets = [
-            { id: 'jesus-return-permanent-99', type: 'm', cat: "Spirituality", q: "Will Jesus come back before June?", p: 69, isPermanent: true, xYes: 9, xNo: 4 },
-            { id: 'ruto-reshuffle-june', type: 'm', cat: "Kenya", q: "Will William Ruto reshuffle the cabinet by June?", p: 62 },
-            { id: 'bitcoin-100k-june', type: 'm', cat: "Crypto", q: "Will Bitcoin stay above $100k until June?", p: 72 },
-            { id: 'n-kes-variance', type: 'n', cat: "News", h: "Ksh Volatility Alert", p: "The KES has shown 0.4% variance in the last 24h. Local markets reacting to export data." }
+            { type: 'm', cat: "Spirituality", q: "Will Jesus come back before June?", p: 69, isPermanent: true },
+            { type: 'm', cat: "Kenya", q: "Will William Ruto reshuffle the cabinet by June?", p: 62 },
+            { type: 'm', cat: "Crypto", q: "Will Bitcoin stay above $100k until June?", p: 72 },
+            { type: 'n', cat: "News", h: "Ksh Volatility Alert", p: "The KES has shown 0.4% variance in the last 24h. Local markets reacting to export data." }
         ];
 
-        let usedQuestionsRegistry = new Set([
-            "Will Jesus come back before June?",
-            "Will William Ruto reshuffle the cabinet by June?",
-            "Will Bitcoin stay above $100k until June?"
-        ]);
+        // Ensure distinct news stories do not duplicate
+        const deliveredNews = new Set(["Ksh Volatility Alert"]);
 
         const intelligenceSignals = {
             Kenya: [
                 "I&M Bank launches KSh 10 billion fixed-rate note offer.",
                 "NSE derivatives turnover hits record high in February 2026.",
                 "KMRC launches KES 3bn sustainability bond for green home loans.",
-                "Nairobi to host 'AI Everything Kenya' summit soon."
+                "Nairobi to host 'AI Everything Kenya' summit in 4 days."
             ],
             Crypto: [
                 "Coinbase Q1 2026 earnings expectations set at conservative levels.",
@@ -323,19 +179,14 @@
         window.onload = () => { 
             syncState(); 
             render('All');
-            setInterval(generateGeminiPulse, 7000); 
+            setInterval(generateGeminiPulse, 6000); 
         };
 
+        // --- CORE UI ENGINE ---
         function render(cat) {
             currentCat = cat;
             const f = document.getElementById('feed'); f.innerHTML = '';
-            
-            let filtered = markets.filter(m => {
-                if(cat === 'All') return m.type === 'm';
-                if(cat === 'News') return m.type === 'n';
-                return m.cat === cat;
-            });
-            
+            let filtered = markets.filter(m => cat === 'All' ? m.type === 'm' : (cat === 'News' ? m.type === 'n' : m.cat === cat));
             filtered.forEach(m => injectToTerminal(m, false));
         }
 
@@ -345,73 +196,155 @@
             render(cat);
         }
 
+        // --- GEMINI INTELLIGENCE ENGINE ---
         function generateGeminiPulse() {
             const cats = Object.keys(intelligenceSignals);
             const rCat = cats[Math.floor(Math.random() * cats.length)];
             const signal = intelligenceSignals[rCat][Math.floor(Math.random() * intelligenceSignals[rCat].length)];
             
+            // Duplicate News Guard
+            if (deliveredNews.has(signal)) return;
+            deliveredNews.add(signal);
+
             const qTemplates = [
-                `Will the ${rCat} market stabilization trend following "${signal.substring(0, 14)}..." persist through June 2026?`,
-                `Intelligence Alert: Will regional ${rCat} capital deployment volume increase by July?`,
-                `Based on ${rCat} signals: Will the current trade volume hit expectations by next month?`
+                `Will the ${rCat} trend following "${signal.substring(0, 15)}..." hold through May 2026?`,
+                `Intelligence Alert: Will ${rCat} volatility exceed 12% by June?`,
+                `Will the outcome of the ${signal.split(' ')[0]} development reach 'Target A' by Q3?`
             ];
 
-            const question = qTemplates[Math.floor(Math.random() * qTemplates.length)];
-
-            if (usedQuestionsRegistry.has(question)) return;
-            usedQuestionsRegistry.add(question);
-
             const newItem = {
-                id: 'ai-gen-' + Date.now(),
                 type: 'm',
                 cat: rCat,
-                q: question,
-                p: Math.floor(Math.random() * 65 + 15),
+                q: qTemplates[Math.floor(Math.random() * qTemplates.length)],
+                p: Math.floor(Math.random() * 70 + 15),
                 isAI: true
             };
 
             const newNews = {
-                id: 'ai-news-' + Date.now(),
                 type: 'n',
                 cat: 'News',
-                h: `Live Market Signal: ${rCat}`,
+                h: `Live Signal: ${rCat}`,
                 p: signal
             };
 
             markets.unshift(newItem);
             injectToTerminal(newItem, true);
-
+            
             setTimeout(() => {
                 markets.unshift(newNews);
                 injectToTerminal(newNews, true);
-            }, 3000);
+            }, 2500);
         }
 
         function injectToTerminal(item, isNew) {
             const f = document.getElementById('feed');
+            
             if (!isNew && currentCat !== 'All' && currentCat !== 'News' && currentCat !== item.cat) return;
             if (isNew && currentCat !== 'All' && currentCat !== 'News' && currentCat !== item.cat) return;
 
             const card = document.createElement('div');
             if(item.type === 'm') {
                 card.className = 'market-card';
-                if(item.isAI) card.style.borderTop = "2.5px solid var(--gemini)";
-                if(item.isPermanent) card.style.borderTop = "2.5px solid var(--accent)";
+                if(item.isAI) card.style.borderTop = "2px solid var(--gemini)";
+                if(item.isPermanent) card.style.borderTop = "2px solid var(--accent)";
                 
-                const yesMultiplier = item.xYes ? `<span class="multiplier-tag">×${item.xYes}</span>` : '';
-                const noMultiplier = item.xNo ? `<span class="multiplier-tag">×${item.xNo}</span>` : '';
-
                 card.innerHTML = `
                     <div class="m-header">
                         <div class="m-title">
-                            ${item.isPermanent ? '<span style="color:var(--accent); font-size:9px; font-weight:900; letter-spacing:0.5px;">STABLE POOL</span><br>' : ''}
-                            ${item.isAI ? '<span style="color:var(--gemini); font-size:9px; font-weight:900; letter-spacing:0.5px;">AI INTELLIGENCE</span><br>' : ''}
+                            ${item.isPermanent ? '<span style="color:var(--accent); font-size:9px; font-weight:900;">PERMANENT POOL</span><br>' : ''}
+                            ${item.isAI ? '<span style="color:var(--gemini); font-size:9px; font-weight:900;">AI PREDICTION</span><br>' : ''}
                             ${item.q}
                         </div>
                         <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
-                        <button class="trade-btn yes" onclick="wagerDialog('${item.id}', 'YES', '${item.q.replace(/'/g, "\\'")}')">
-                            Yes ${yesMultiplier}
-                        </button>
-                        <button class="trade-btn no" onclick="wagerDialog('${item.id}', 'NO', '${item.q.r
+                        <button class="trade-btn yes" onclick="wagerDialog('YES', '${item.q.replace(/'/g, "\\'")}')">Yes</button>
+                        <button class="trade-btn no" onclick="wagerDialog('NO', '${item.q.replace(/'/g, "\\'")}')">No</button>
+                    </div>`;
+            } else {
+                card.className = 'news-card';
+                card.innerHTML = `
+                    <span class="news-tag">
+                        <div style="width:5px; height:5px; background:var(--accent); border-radius:50%; animation:pulse 1s infinite;"></div>
+                        Update
+                    </span>
+                    <div class="news-h">${item.h}</div>
+                    <p class="news-p">${item.p}</p>`;
+            }
+
+            if (isNew) {
+                f.prepend(card);
+                // Evict oldest dynamic element while safely preserving any permanent items
+                if (f.children.length > 20) {
+                    for (let i = f.children.length - 1; i >= 0; i--) {
+                        if (!markets[i]?.isPermanent) {
+                            f.removeChild(f.children[i]);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                f.appendChild(card);
+            }
+        }
+
+        // --- ACCOUNT & WALLET ---
+        function syncState() {
+            const user = localStorage.getItem('nx_user');
+            const bal = localStorage.getItem('nx_balance') || "0.00";
+            if(user) {
+                document.getElementById('signBtn').classList.add('hidden');
+                document.getElementById('userIcon').classList.remove('hidden');
+            }
+            document.getElementById('balance').innerText = parseFloat(bal).toLocaleString(undefined, {minimumFractionDigits: 2});
+        }
+
+        function setAuth(mode) {
+            const up = document.getElementById('upFields'), title = document.getElementById('aTitle');
+            const tIn = document.getElementById('tabIn'), tUp = document.getElementById('tabUp');
+            if(mode === 'up') {
+                up.classList.remove('hidden'); tUp.classList.add('active'); tIn.classList.remove('active');
+                title.innerText = "Register Identity";
+            } else {
+                up.classList.add('hidden'); tIn.classList.add('active'); tUp.classList.remove('active');
+                title.innerText = "Terminal Access";
+            }
+        }
+
+        function doAuth() {
+            const email = document.getElementById('aEmail').value;
+            if(!email.includes('@')) return alert("Invalid Credentials");
+            localStorage.setItem('nx_user', email);
+            closeModal('authModal');
+            syncState();
+        }
+
+        function setAmt(v) { document.getElementById('depAmt').value = v; }
+
+        function wagerDialog(side, text) {
+            if(!localStorage.getItem('nx_user')) return openModal('authModal');
+            document.getElementById('wTitle').innerText = `Make '${side}' Prediction`;
+            document.getElementById('wQuestion').innerText = text;
+            document.getElementById('wagerModal').style.display = 'flex';
+            
+            document.getElementById('wConfirmBtn').onclick = () => {
+                const amount = parseFloat(document.getElementById('wAmount').value);
+                const currentBalance = parseFloat(localStorage.getItem('nx_balance') || 0);
+
+                if (isNaN(amount) || amount < 50) return alert("Min allowed: Ksh 50");
+                if (amount > currentBalance) return alert("Insufficient balance! Please fund your account.");
+
+                localStorage.setItem('nx_balance', currentBalance - amount);
+                syncState();
+                closeModal('wagerModal');
+                document.getElementById('wAmount').value = '';
+                alert(`Order filled! Predicted '${side}' using Ksh ${amount.toLocaleString()}.`);
+            };
+        }
+
+        function payNow() {
+            const amt = document.getElementById('depAmt').value;
+            if(!localStorage.getItem('nx_user')) return openModal('authModal');
+            if(amt < 200) return alert("Min required: Ksh 200");
+            document.body.classList.add('hide-header');
+        

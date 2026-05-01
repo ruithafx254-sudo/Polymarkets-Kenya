@@ -93,8 +93,6 @@
             <div class="cat-link active" onclick="filterCat('All', this)">Markets</div>
             <div class="cat-link" onclick="filterCat('News', this)">News/Updates</div>
             <div class="cat-link" onclick="filterCat('World', this)">World News</div>
-            <div class="cat-link" onclick="filterCat('Elections', this)">Politics</div>
-            <div class="cat-link" onclick="filterCat('Crypto', this)">Crypto</div>
         </div>
     </div>
 
@@ -149,23 +147,20 @@
         let currentCat = 'All';
         let markets = [];
 
-        // Exact real-world active high-volume Polymarket choices
+        // Exact real-world active high-volume Polymarket choices & news
         const baseMarkets = [
             { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" },
-            { type: 'm', cat: "Crypto", q: "Will Bitcoin outperform gold in 2026?", p: 59, id: "poly-btc-gold" },
-            { type: 'm', cat: "Elections", q: "Will U.S. fall into a formal recession in 2026?", p: 27, id: "poly-us-recession" },
-            { type: 'm', cat: "Crypto", q: "Will the AI bubble burst by the end of 2026?", p: 40, id: "poly-ai-bubble" },
-            { type: 'm', cat: "World", q: "Will Spain win the 2026 FIFA World Cup?", p: 16, id: "poly-wc-spain" },
-            { type: 'n', cat: "News", h: "Prediction Market Growth", p: "Trading records surged globally, reaching an all-time daily high volume of $425 million.", id: "news-1" },
-            { type: 'n', cat: "News", h: "Global Economic Easing", p: "Bettors maintain an outlook of 0.50% total cumulative cuts from the Fed in 2026.", id: "news-2" }
+            { type: 'm', cat: "World", q: "Will Oklahoma City Thunder win the NBA Finals?", p: 38, id: "poly-nba-thunder" },
+            { type: 'm', cat: "World", q: "Will China initiate a blockade on Taiwan in 2026?", p: 21, id: "poly-china-taiwan" },
+            { type: 'n', cat: "News", h: "Global Markets Update", p: "Indices fluctuate as inflation metrics point to sustained interest rates from global central banks.", id: "news-global-1" },
+            { type: 'n', cat: "News", h: "Digital Finance Surge", p: "Decentralized prediction tools experience a worldwide 15% increase in user volume.", id: "news-global-2" }
         ];
 
-        // Core startup initialization
-        window.addEventListener('DOMContentLoaded', () => { 
+        window.onload = () => { 
             loadPersistedMarkets();
             syncState(); 
             render('All');
-        });
+        };
 
         function loadPersistedMarkets() {
             try {
@@ -181,7 +176,7 @@
                     saveMarkets();
                 }
             } catch(e) {
-                // Instantly wipe bad data and restore if error pops up
+                // Instantly wipe bad data and restore if unexpected error occurs
                 markets = [...baseMarkets];
                 saveMarkets();
             }
@@ -209,7 +204,7 @@
 
         function filterCat(cat, el) {
             document.querySelectorAll('.cat-link').forEach(c => c.classList.remove('active'));
-            if(el) el.classList.add('active');
+            if (el) el.classList.add('active');
             render(cat);
         }
 
@@ -255,9 +250,7 @@
             try {
                 const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
                 return wagers[marketId];
-            } catch(e) {
-                return null;
-            }
+            } catch(e) { return null; }
         }
 
         function openStakeModal(side, question, marketId) {
@@ -317,6 +310,7 @@
                 alertMsg += `You didn't have an active stake on this market.`;
             }
 
+            // Remove and persist
             markets = markets.filter(m => m.id !== marketId);
             saveMarkets();
             
@@ -353,3 +347,14 @@
         function doAuth() {
             const email = document.getElementById('aEmail').value;
             if(!email.includes('@')) return alert("Invalid Credentials");
+            localStorage.setItem('nx_user', email);
+            closeModal('authModal');
+            syncState();
+        }
+
+        function setAmt(v) { document.getElementById('depAmt').value = v; }
+
+        function payNow() {
+            const amt = document.getElementById('depAmt').value;
+            if(!localStorage.getItem('nx_user')) return openModal('authModal');
+            if(amt < 200) return alert("Min 

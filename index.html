@@ -87,7 +87,7 @@
                 </div>
                 <div class="wallet-pill">
                     Ksh <span id="balance">0.00</span>
-                    <button onclick="openModal('depositModal')" class="btn-deposit">Deposit</button>
+                    <button onclick="openModal('depositModal')" class="btn-deposit">Funds</button>
                 </div>
             </div>
         </div>
@@ -130,15 +130,20 @@
 
     <div id="depositModal" class="overlay">
         <div class="modal">
-            <h2 style="margin: 0 0 6px 0; font-weight:800; font-size:20px; letter-spacing:-0.5px;">Fund Balance</h2>
-            <p style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Direct M-Pesa Integration via IntaSend</p>
+            <div class="auth-nav">
+                <div id="tabDeposit" class="auth-tab active" onclick="setFundsMode('deposit')">Deposit</div>
+                <div id="tabWithdraw" class="auth-tab" onclick="setFundsMode('withdraw')">Withdraw</div>
+            </div>
+            
+            <h2 id="fundsTitle" style="margin: 0 0 6px 0; font-weight:800; font-size:20px; letter-spacing:-0.5px;">Fund Balance</h2>
+            <p id="fundsDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Direct M-Pesa Integration via IntaSend</p>
             
             <div style="background:#f8fafc; padding:18px; border-radius:18px; border: 1px solid var(--border); margin-bottom:16px;">
                 <div class="input-group">
-                    <label>Deposit Amount (Ksh)</label>
-                    <input type="number" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800; color: #000;" placeholder="0">
+                    <label id="amtLabel">Deposit Amount (Ksh)</label>
+                    <input type="number" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800; color: #000;" value="0.00" onfocus="if(this.value==='0.00')this.value='';" onblur="if(this.value==='')this.value='0.00';">
                 </div>
-                <div class="chip-grid">
+                <div id="fundsChips" class="chip-grid">
                     <div class="amt-chip" onclick="setAmt(250)">250</div>
                     <div class="amt-chip" onclick="setAmt(500)">500</div>
                     <div class="amt-chip" onclick="setAmt(1000)">1k</div>
@@ -148,9 +153,9 @@
                 </div>
             </div>
             
-            <button onclick="payNow()" class="btn-tech" style="background:var(--accent);">Confirm Deposit</button>
+            <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--accent);">Confirm Deposit</button>
             
-            <div class="badge-wrap">
+            <div id="fundsBadge" class="badge-wrap">
                 <span style="display:block; text-align: center">
                     <a href="https://intasend.com/security" target="_blank">
                         <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-no-mpesa-hr-light.png" style="width:100%; max-width:320px; height:auto; display:inline-block;" alt="IntaSend Secure Payments">
@@ -190,6 +195,7 @@
         ];
 
         let markets = [];
+        let currentFundsMode = 'deposit';
 
         window.onload = () => {
             initialize200Markets();
@@ -273,6 +279,34 @@
             }
         }
 
+        function setFundsMode(mode) {
+            currentFundsMode = mode;
+            const tDep = document.getElementById('tabDeposit'), tWith = document.getElementById('tabWithdraw');
+            const fTitle = document.getElementById('fundsTitle'), fDesc = document.getElementById('fundsDesc');
+            const amtLabel = document.getElementById('amtLabel'), fSubmit = document.getElementById('fundsSubmit');
+            const fChips = document.getElementById('fundsChips'), fBadge = document.getElementById('fundsBadge');
+
+            if(mode === 'withdraw') {
+                tWith.classList.add('active'); tDep.classList.remove('active');
+                fTitle.innerText = "Withdraw Balance";
+                fDesc.innerText = "Direct settlement to your M-Pesa account";
+                amtLabel.innerText = "Withdrawal Amount (Ksh)";
+                fSubmit.innerText = "Confirm Withdrawal";
+                fSubmit.style.background = "#000";
+                fChips.classList.add('hidden');
+                fBadge.classList.add('hidden');
+            } else {
+                tDep.classList.add('active'); tWith.classList.remove('active');
+                fTitle.innerText = "Fund Balance";
+                fDesc.innerText = "Direct M-Pesa Integration via IntaSend";
+                amtLabel.innerText = "Deposit Amount (Ksh)";
+                fSubmit.innerText = "Confirm Deposit";
+                fSubmit.style.background = "var(--accent)";
+                fChips.classList.remove('hidden');
+                fBadge.classList.remove('hidden');
+            }
+        }
+
         function doAuth() {
             const email = document.getElementById('aEmail').value;
             if(!email.includes('@')) return alert("Please enter a valid email address.");
@@ -281,67 +315,36 @@
             syncState();
         }
 
-        function setAmt(v) { document.getElementById('depAmt').value = v; }
+        function setAmt(v) { document.getElementById('depAmt').value = parseFloat(v).toFixed(2); }
 
-        function payNow() {
+        function handleFundsAction() {
+            if (currentFundsMode === 'withdraw') {
+                withdrawNow();
+            } else {
+                payNow();
+            }
+        }
+
+        function withdrawNow() {
             const amt = Number(document.getElementById('depAmt').value);
             const userEmail = localStorage.getItem('nx_user');
+            let curBal = parseFloat(localStorage.getItem('nx_balance') || 0);
 
             if(!userEmail) {
                 closeModal('depositModal');
                 return openModal('authModal');
             }
 
-            if(!amt || amt < 200) {
-                return alert("Minimum deposit amount required is Ksh 200");
+            if(!amt || amt < 100) {
+                return alert("Minimum withdrawal amount required is Ksh 100");
+            }
+
+            if(amt > curBal) {
+                return alert("Insufficient funds");
             }
 
             closeModal('depositModal');
-            document.body.classList.add('hide-header');
-
-            let intasend = new window.IntaSend({
-                publicAPIKey: INTASEND_PUBLIC_KEY,
-                live: false 
-            });
-
-            intasend.on("COMPLETE", (results) => {
-                document.body.classList.remove('hide-header');
-                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-                localStorage.setItem('nx_balance', cur + Number(amt));
-                syncState();
-                alert(`Success! Ksh ${amt.toLocaleString()} has been added to your balance.`);
-            })
-            .on("FAILED", (results) => {
-                document.body.classList.remove('hide-header');
-                alert("The transaction was not completed.");
-            })
-            .on("IN-PROGRESS", () => {
-                document.body.classList.add('hide-header');
-            });
-
-            intasend.run({
-                amount: amt,
-                currency: "KES",
-                email: userEmail
-            });
+            localStorage.setItem('nx_balance', curBal - amt);
+            syncState();
+            alert("Withdrawal complete");
         }
-
-        function openModal(id) { 
-            document.body.classList.add('hide-header');
-            document.getElementById(id).style.display = 'flex'; 
-        }
-
-        function closeModal(id) { 
-            document.body.classList.remove('hide-header');
-            document.getElementById(id).style.display = 'none'; 
-        }
-
-        function logout() { 
-            if(confirm("Terminate session?")) { 
-                localStorage.clear(); 
-                location.reload(); 
-            } 
-        }
-    </script>
-</body>
-</html>

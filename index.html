@@ -3,54 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexGen | The Official Terminal</title>
+    <title>NexGen | Live Terminal</title>
     
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
 
     <style>
-        :root { --green: #2ebd85; --red: #df2040; --bg: #f5f7fa; --card: #ffffff; }
-        body { margin: 0; background: var(--bg); font-family: -apple-system, sans-serif; padding-top: 130px; -webkit-tap-highlight-color: transparent; }
+        :root { --green: #2ebd85; --red: #df2040; --bg: #f5f7fa; }
+        body { margin: 0; background: var(--bg); font-family: -apple-system, sans-serif; padding-top: 135px; }
 
-        /* HEADER & NAV */
-        .pm-header { position: fixed; top: 0; width: 100%; background: #fff; border-bottom: 1px solid #e5e7eb; z-index: 2000; }
+        /* HEADER */
+        .header { position: fixed; top: 0; width: 100%; background: #fff; border-bottom: 1px solid #e5e7eb; z-index: 1000; }
         .nav-top { display: flex; justify-content: space-between; padding: 12px 16px; align-items: center; }
-        .logo { font-weight: 900; font-size: 24px; letter-spacing: -1.5px; }
+        .logo { font-weight: 900; font-size: 24px; letter-spacing: -1.2px; }
         
-        .wallet-box { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 5px 5px 5px 15px; border-radius: 14px; gap: 12px; font-weight: 700; font-size: 14px; }
-        .btn-deposit { background: var(--green); color: #fff; border: none; padding: 8px 18px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+        .wallet-ui { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 4px 4px 4px 12px; border-radius: 12px; gap: 10px; font-weight: 700; font-size: 14px; }
+        .btn-deposit { background: var(--green); color: #fff; border: none; padding: 7px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; }
 
         .cat-bar { display: flex; gap: 20px; padding: 10px 16px; overflow-x: auto; scrollbar-width: none; }
-        .cat { font-size: 14px; font-weight: 600; color: #64748b; white-space: nowrap; padding-bottom: 8px; }
-        .cat.active { color: #000; border-bottom: 3px solid #000; }
+        .cat { font-size: 14px; font-weight: 600; color: #64748b; white-space: nowrap; cursor: pointer; }
+        .cat.active { color: #000; border-bottom: 3px solid #000; padding-bottom: 6px; }
 
-        /* CARDS */
-        .market-card { background: var(--card); margin: 12px; padding: 20px; border-radius: 24px; border: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .m-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin: 0 0 15px 0; color: #0f172a; }
+        /* LIVE PREDICTION CARDS */
+        .card { background: #fff; margin: 12px; padding: 20px; border-radius: 24px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .m-title { font-size: 17px; font-weight: 700; line-height: 1.4; margin: 0 0 12px 0; color: #0f172a; }
         
-        .stats { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .p-val { font-size: 28px; font-weight: 900; }
-        .vol { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
-
-        .btn-row { display: flex; gap: 12px; }
-        .m-btn { flex: 1; padding: 16px; border-radius: 18px; border: none; font-weight: 800; font-size: 16px; transition: 0.1s; }
+        .stats { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
+        .p-val { font-size: 28px; font-weight: 900; color: #000; }
+        .vol { font-size: 11px; font-weight: 700; color: #94a3b8; }
+        
+        .btn-row { display: flex; gap: 10px; }
+        .m-btn { flex: 1; padding: 15px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; font-size: 15px; }
         .y-btn { background: #e6f7f0; color: var(--green); }
         .n-btn { background: #fdebee; color: var(--red); }
 
-        /* ORDER SHEET */
-        #order-sheet { position: fixed; bottom: -100%; left: 0; right: 0; background: #fff; border-radius: 32px 32px 0 0; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 24px; z-index: 3000; box-shadow: 0 -15px 40px rgba(0,0,0,0.1); }
-        #order-sheet.active { bottom: 0; }
-        .input-field { width: 100%; padding: 18px; margin: 20px 0; border: 2px solid #f1f5f9; border-radius: 16px; font-size: 18px; font-weight: 700; box-sizing: border-box; background: #f8fafc; }
-        .btn-confirm { width: 100%; background: #000; color: #fff; padding: 20px; border-radius: 20px; border: none; font-weight: 800; font-size: 18px; }
+        /* ORDER SLIP */
+        #order-slip { position: fixed; bottom: -100%; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; transition: 0.3s ease; padding: 24px; z-index: 2000; box-shadow: 0 -10px 30px rgba(0,0,0,0.1); }
+        #order-slip.active { bottom: 0; }
+        .input-box { width: 100%; padding: 18px; margin: 15px 0; border: 1px solid #e5e7eb; border-radius: 14px; font-size: 16px; box-sizing: border-box; background: #f8fafc; }
+        .btn-confirm { width: 100%; background: #000; color: #fff; padding: 18px; border-radius: 16px; border: none; font-weight: 800; }
     </style>
 </head>
 <body>
 
-    <header class="pm-header">
+    <header class="header">
         <div class="nav-top">
             <div class="logo">NEXGEN</div>
-            <div class="wallet-box">
-                Ksh <span id="user-balance">0.00</span>
-                <button class="btn-deposit" id="main-deposit-btn">Deposit</button>
+            <div class="wallet-ui">
+                Ksh <span id="user-bal">0.00</span>
+                <button class="btn-deposit" id="mpesa-trigger">Deposit</button>
             </div>
         </div>
         <nav class="cat-bar">
@@ -58,82 +58,95 @@
             <div class="cat">Politics</div>
             <div class="cat">Crypto</div>
             <div class="cat">Kenya</div>
-            <div class="cat">Sports</div>
+            <div class="cat">Global</div>
         </nav>
     </header>
 
-    <main id="terminal-feed">
-        <div class="market-card" style="border: 2.5px solid var(--green)">
+    <main id="feed">
+        <div class="card" style="border: 2px solid var(--green);">
             <h2 class="m-title">Will Jesus come back in June 2026?</h2>
-            <div class="stats"><span class="p-val">11%</span> <span class="vol">Vol: $4.2M</span></div>
+            <div class="stats">
+                <div><span class="p-val">11%</span> <span style="font-size:12px; color:#94a3b8; font-weight:700;">CHANCE</span></div>
+                <div class="vol">VOL: $4.2M</div>
+            </div>
             <div class="btn-row">
-                <button class="m-btn y-btn" onclick="showSlip('Jesus 2026', 'Yes')">Yes</button>
-                <button class="m-btn n-btn" onclick="showSlip('Jesus 2026', 'No')">No</button>
+                <button class="m-btn y-btn" onclick="openSlip('Jesus 2026', 'Yes')">Yes 11¢</button>
+                <button class="m-btn n-btn" onclick="openSlip('Jesus 2026', 'No')">No 89¢</button>
             </div>
         </div>
         <div id="dynamic-injection"></div>
     </main>
 
-    <div id="order-sheet">
+    <div id="order-slip">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 id="slip-name" style="margin:0;">Prediction</h3>
-            <span onclick="hideSlip()" style="font-size:24px; color:#cbd5e1;">✕</span>
+            <h3 id="slip-title" style="margin:0;">Market</h3>
+            <span onclick="closeSlip()" style="font-weight:900; color:#94a3b8; cursor:pointer;">✕</span>
         </div>
-        <input type="number" id="bet-amount" class="input-field" value="20">
-        <button class="btn-confirm" onclick="hideSlip()">Confirm Prediction</button>
+        <input type="number" id="bet-amt" class="input-box" value="10">
+        <button class="btn-confirm" onclick="closeSlip()">Confirm Prediction</button>
     </div>
 
     <script>
-        // 1. OFFICIAL REDIRECT LOGIC
+        // 1. MPESA REDIRECT FIX
         const intasend = new window.IntaSend({
             public_key: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
             live: false
         });
 
-        // Use setup() to ensure the button triggers a real payment prompt
-        intasend.buttons("#main-deposit-btn").on("complete", (r) => {
-            document.getElementById('user-balance').innerText = r.amount.toFixed(2);
+        // This officially links the button to the M-Pesa page
+        intasend.buttons("#mpesa-trigger").on("complete", (response) => {
+            document.getElementById('user-bal').innerText = response.amount.toFixed(2);
         });
 
-        // 2. HARD-CODED INITIALIZATION (30 ITEMS)
+        // 2. LIVE DATA & PRELOAD 30 ITEMS
         const topics = [
-            "Will Bitcoin cross $100k tonight?", "Will Arsenal win by 2+ goals?", 
-            "Will KRA update PIN certificates?", "Will Finance Bill be rejected?",
-            "Will Solana reach $200?", "Will M-Pesa launch Gift Cards?"
+            "Will Bitcoin hit $100k this weekend?", 
+            "Will Finance Bill be rejected?", 
+            "Will Arsenal win the title?", 
+            "Will M-Pesa launch crypto swap?",
+            "Will Solana reach $200?"
         ];
 
-        const container = document.getElementById('dynamic-injection');
-        for(let i=0; i<30; i++) {
-            const t = topics[i % topics.length];
-            const prob = Math.floor(Math.random() * 80) + 10;
+        function makeCard(title, isPreload = false) {
             const card = document.createElement('div');
-            card.className = 'market-card';
+            card.className = 'card';
+            const prob = Math.floor(Math.random() * 85) + 5;
             card.innerHTML = `
-                <h2 class="m-title">${t}</h2>
-                <div class="stats"><span class="p-val">${prob}%</span> <span class="vol">VOL: LIVE</span></div>
+                <h2 class="m-title">${title}</h2>
+                <div class="stats">
+                    <div><span class="p-val">${prob}%</span></div>
+                    <div class="vol">VOL: LIVE</div>
+                </div>
                 <div class="btn-row">
-                    <button class="m-btn y-btn" onclick="showSlip('${t}', 'Yes')">Yes</button>
-                    <button class="m-btn n-btn" onclick="showSlip('${t}', 'No')">No</button>
+                    <button class="m-btn y-btn" onclick="openSlip('${title}', 'Yes')">Yes</button>
+                    <button class="m-btn n-btn" onclick="openSlip('${title}', 'No')">No</button>
                 </div>`;
-            container.appendChild(card);
+            const container = document.getElementById('dynamic-injection');
+            if (isPreload) container.appendChild(card);
+            else container.prepend(card);
         }
 
-        // 3. LIVE FEED ENGINE (1 per second)
+        // Preload 30 items immediately
+        for(let i=0; i<30; i++) {
+            makeCard(topics[i % topics.length], true);
+        }
+
+        // 3. LIVE NEWS COPY (1 per second)
         setInterval(() => {
             const t = topics[Math.floor(Math.random() * topics.length)];
-            const card = document.createElement('div');
-            card.className = 'market-card';
-            card.innerHTML = `<h2 class="m-title">${t}</h2><div class="stats"><span class="p-val">50%</span></div><div class="btn-row"><button class="m-btn y-btn" onclick="showSlip('${t}', 'Yes')">Yes</button></div>`;
-            container.prepend(card);
-            if(container.children.length > 60) container.lastChild.remove();
+            makeCard(t);
+            const container = document.getElementById('dynamic-injection');
+            if(container.children.length > 50) container.removeChild(container.lastChild);
         }, 1000);
 
-        // 4. UI HANDLERS
-        function showSlip(name, side) {
-            document.getElementById('slip-name').innerText = side + ": " + name;
-            document.getElementById('order-sheet').classList.add('active');
+        // 4. UI HELPERS
+        function openSlip(title, side) {
+            document.getElementById('slip-title').innerText = side + ": " + title;
+            document.getElementById('order-slip').classList.add('active');
         }
-        function hideSlip() { document.getElementById('order-sheet').classList.remove('active'); }
+        function closeSlip() {
+            document.getElementById('order-slip').classList.remove('active');
+        }
     </script>
 </body>
 </html>

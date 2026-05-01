@@ -22,8 +22,6 @@
         .btn-auth { font-size: 12px; font-weight: 700; border: none; background: transparent; padding: 6px 12px; border-radius: 6px; color: #475569; cursor: pointer; }
         .btn-auth.active { background: #fff; color: #000; }
         .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 2px 2px 2px 10px; border-radius: 10px; gap: 8px; font-size: 13px; font-weight: 700; }
-        
-        /* UPDATED DEPOSIT BUTTON STYLE */
         .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; cursor: pointer; }
         
         .cat-bar { display: flex; overflow-x: auto; padding: 12px 16px; gap: 20px; background: #fff; border-top: 1px solid var(--border); }
@@ -60,10 +58,7 @@
                 </div>
                 <div class="wallet-pill">
                     Ksh <span id="balance">0</span>
-                    <button class="btn-deposit intaSendPayButton" 
-                        data-amount="10" 
-                        data-currency="KES" 
-                        id="mpesa-trigger">Deposit</button>
+                    <button class="btn-deposit" onclick="triggerDeposit()">Deposit</button>
                 </div>
             </div>
         </div>
@@ -95,19 +90,25 @@
     </div>
 
     <script>
-        // --- DEPOSIT SYSTEM START ---
-        // Ensuring the SDK is ready before initializing
-        const intasend = new window.IntaSend({
-            public_key: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
-            live: false
-        });
-
-        intasend.buttons("#mpesa-trigger").on("complete", (response) => {
-            document.getElementById('balance').innerText = response.amount;
-        }).on("failed", (response) => {
-            console.error("Payment failed", response);
-        });
-        // --- DEPOSIT SYSTEM END ---
+        // --- THE DEPOSIT SYSTEM ---
+        function triggerDeposit() {
+            const instance = new window.IntaSend({
+                public_key: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
+                live: false
+            });
+            
+            // Force the payment window to open
+            instance.run({
+                amount: 10,
+                currency: "KES"
+            })
+            .on("COMPLETE", (results) => {
+                document.getElementById('balance').innerText = results.amount;
+            })
+            .on("FAILED", (results) => {
+                alert("Payment Failed");
+            });
+        }
 
         // 1. Modal Logic
         function openAuth(type) {

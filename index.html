@@ -3,86 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexGen | The Global Prediction Market</title>
+    <title>NexGen Terminal</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
 </head>
 <body>
-
     <header class="pm-header">
-        <div class="top-row">
-            <div class="brand">NEXGEN</div>
-            <div class="user-zone">
-                <div id="logged-out-ui">
-                    <button class="btn-secondary" onclick="toggleAuth('signin')">Log In</button>
-                    <button class="btn-primary" onclick="toggleAuth('signup')">Sign Up</button>
-                </div>
-                <div id="logged-in-ui" style="display: none;">
-                    <div class="wallet-pill">
-                        <span class="balance">Ksh <span id="user-bal">0.00</span></span>
-                        <button id="intasend-btn" class="deposit-trigger">Deposit</button>
-                    </div>
-                </div>
+        <div class="nav-top">
+            <span class="logo">NEXGEN</span>
+            <div class="auth-box">
+                <button class="btn-outline" onclick="openAuth()">Sign In</button>
+                <button class="btn-deposit" id="deposit-now">Deposit</button>
             </div>
         </div>
-        <nav class="cat-nav">
-            <div class="cat-item active" onclick="filterCat('all')">All</div>
-            <div class="cat-item" onclick="filterCat('politics')">Politics</div>
-            <div class="cat-item" onclick="filterCat('crypto')">Crypto</div>
-            <div class="cat-item" onclick="filterCat('kenya')">Kenya</div>
+        <nav class="cat-bar">
+            <div class="cat active">All</div>
+            <div class="cat">Politics</div>
+            <div class="cat">Crypto</div>
+            <div class="cat">Kenya</div>
         </nav>
     </header>
 
-    <main id="app-shell">
-        <section id="market-feed">
-            <div class="market-card hero">
-                <img src="https://images.unsplash.com/photo-1544427928-c49cdfebf194?auto=format&fit=crop&w=500&q=80" alt="News" class="card-img">
-                <div class="card-content">
-                    <h3>Will Jesus come back in June 2026?</h3>
-                    <div class="market-stats">
-                        <span class="prob">11% <small>CHANCE</small></span>
-                        <span class="vol">$4.2M Vol.</span>
-                    </div>
-                    <div class="trade-actions">
-                        <button class="btn-yes" onclick="openOrder('Jesus Prediction', 'Yes', 11)">Yes 11¢</button>
-                        <button class="btn-no" onclick="openOrder('Jesus Prediction', 'No', 89)">No 89¢</button>
-                    </div>
+    <main id="market-container">
+        <div class="market-card hero">
+            <div class="card-body">
+                <h2>Will Jesus come back in June 2026?</h2>
+                <div class="stats">
+                    <span class="odds">11% <small>CHANCE</small></span>
+                    <span class="vol">$4.2M Vol.</span>
+                </div>
+                <div class="actions">
+                    <button class="y-btn" onclick="openOrder('Jesus Prediction', 11)">Yes 11¢</button>
+                    <button class="n-btn" onclick="openOrder('Jesus Prediction', 89)">No 89¢</button>
                 </div>
             </div>
-            
-            <div id="dynamic-news"></div>
-        </section>
+        </div>
+        <div id="news-feed"></div>
     </main>
 
-    <div id="order-sheet" class="sheet">
-        <div class="sheet-handle" onclick="closeOrder()"></div>
-        <div class="sheet-content">
-            <h2 id="order-market-name">Market Name</h2>
-            <div class="order-toggle">
-                <button id="order-yes-tab" class="tab active">Buy Yes</button>
-                <button id="order-no-tab" class="tab">Buy No</button>
-            </div>
-            <div class="input-group">
-                <label>Amount (Ksh)</label>
-                <input type="number" id="order-amount" placeholder="0.00">
-            </div>
-            <button class="btn-confirm" onclick="executeTrade()">Confirm Prediction</button>
+    <div id="order-slip" class="slip">
+        <div class="slip-header">
+            <h3 id="slip-title">Market</h3>
+            <span class="close" onclick="closeOrder()">✕</span>
+        </div>
+        <div class="slip-body">
+            <label>Shares to buy</label>
+            <input type="number" id="shares" value="10">
+            <button class="btn-buy" onclick="closeOrder()">Confirm Prediction</button>
         </div>
     </div>
 
-    <div id="auth-overlay" class="modal-overlay">
-        <div class="auth-modal">
-            <div class="modal-header">
-                <h2 id="auth-title">Welcome</h2>
-                <span class="close" onclick="toggleAuth()">✕</span>
-            </div>
-            <input type="email" id="email" placeholder="Email Address">
-            <input type="password" id="pass" placeholder="Password">
-            <button class="btn-confirm" onclick="processAuth()">Continue</button>
-        </div>
-    </div>
-
-    <script src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

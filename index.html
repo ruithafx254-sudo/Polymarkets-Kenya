@@ -3,102 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen | Secure Deposit</title>
+    <title>NexGen | Deposit</title>
     
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
 
     <style>
-        body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f5f7fa;
-            font-family: -apple-system, system-ui, sans-serif;
-        }
-
-        .deposit-card {
-            background: white;
-            padding: 30px;
-            border-radius: 24px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            text-align: center;
-            width: 90%;
-            max-width: 350px;
-            border: 1px solid #e5e7eb;
-        }
-
-        .logo {
-            font-weight: 900;
-            font-size: 24px;
-            letter-spacing: -1.5px;
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .balance-label {
-            color: #64748b;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .balance-amount {
-            font-size: 32px;
-            font-weight: 900;
-            margin-bottom: 30px;
-        }
-
-        /* The Button that triggers M-Pesa */
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f1f5f9; font-family: sans-serif; }
+        .box { background: white; padding: 40px; border-radius: 24px; text-align: center; width: 320px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { font-size: 22px; margin-bottom: 10px; letter-spacing: -1px; }
+        .status { font-size: 12px; color: #64748b; margin-bottom: 20px; }
+        
+        /* Official M-Pesa Green */
         .intaSendPayButton {
-            background-color: #2ebd85;
+            background: #2ebd85;
             color: white;
             border: none;
             padding: 18px;
             width: 100%;
-            border-radius: 16px;
-            font-size: 18px;
+            border-radius: 12px;
+            font-size: 16px;
             font-weight: 800;
             cursor: pointer;
-            transition: transform 0.1s ease;
-        }
-
-        .intaSendPayButton:active {
-            transform: scale(0.96);
         }
     </style>
 </head>
 <body>
 
-    <div class="deposit-card">
-        <span class="logo">NEXGEN</span>
-        <div class="balance-label">Current Balance</div>
-        <div class="balance-amount">Ksh <span id="balance">0.00</span></div>
-
-        <button id="deposit-button" class="intaSendPayButton" data-amount="10" data-currency="KES">
-            Deposit with M-Pesa
+    <div class="box">
+        <h1>NEXGEN</h1>
+        <div id="script-status" class="status">Connecting to M-Pesa...</div>
+        
+        <button class="intaSendPayButton" 
+                data-amount="10" 
+                data-currency="KES" 
+                data-email="user@example.com" 
+                data-first_name="User" 
+                data-last_name="NexGen" 
+                data-phone_number="254700000000">
+            Deposit Ksh 10
         </button>
     </div>
 
     <script>
-        // Initialize IntaSend
-        const intasend = new window.IntaSend({
-            public_key: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
-            live: false // Set to true when you use your live key
-        });
-
-        // Attach the payment trigger to the button
-        // This opens the official IntaSend checkout page
-        intasend.buttons("#deposit-button").on("complete", (response) => {
-            console.log("Success:", response);
-            document.getElementById('balance').innerText = response.amount.toFixed(2);
-        }).on("failed", (response) => {
-            console.log("Payment Failed:", response);
-        }).on("in-progress", () => {
-            console.log("Payment in progress...");
-        });
+        // Check if the script loaded correctly
+        window.onload = function() {
+            if (window.IntaSend) {
+                document.getElementById('script-status').innerText = "System Ready ✅";
+                
+                // Initialize the listener
+                new window.IntaSend({
+                    publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
+                    live: false
+                })
+                .on("COMPLETE", (results) => { 
+                    alert("Success! Ksh " + results.amount + " received."); 
+                })
+                .on("FAILED", (results) => { 
+                    alert("Payment failed. Please try again."); 
+                })
+                .on("IN-PROGRESS", () => { 
+                    console.log("Payment initiated..."); 
+                });
+            } else {
+                document.getElementById('script-status').innerText = "Connection Error ❌ (Refresh Page)";
+            }
+        };
     </script>
-
 </body>
 </html>

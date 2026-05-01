@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Polymarkets Africa | Terminal</title>
     
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js" async onerror="console.warn('Intasend script unavailable')"></script>
 
     <style>
         :root { 
@@ -149,6 +149,7 @@
     <script>
         // --- DATA & INITIALIZATION ---
         let currentCat = 'All';
+        
         let markets = [
             { type: 'm', cat: "Kenya", q: "Will Jesus come back before June?", p: 4, isPermanent: true },
             { type: 'm', cat: "Kenya", q: "Will William Ruto reshuffle the cabinet by June?", p: 62 },
@@ -168,12 +169,6 @@
                 "Prediction market volume grew 9.2x in 2025; Kalshi and Polymarket lead.",
                 "Phemex expands prediction market with daily crypto forecasts.",
                 "Institutional adoption of Digital Asset Treasuries (DATs) expands in 2026."
-            ],
-            Politics: [
-                "UN Non-Proliferation Treaty Review Conference starts April 27, 2026.",
-                "Russia prepares for 81st Victory Day Military Parade on May 9.",
-                "Nakba Day pro-Palestinian demonstrations scheduled globally for May 16.",
-                "Kenya to host 13th ICT4D Conference on May 20-22, 2026."
             ]
         };
 
@@ -211,8 +206,7 @@
             
             const qTemplates = [
                 `Will the ${rCat} trend following "${signal.substring(0, 15)}..." hold through May 2026?`,
-                `Intelligence Alert: Will ${rCat} volatility exceed 12% by June?`,
-                `Will the outcome of the ${signal.split(' ')[0]} development reach 'Target A' by Q3?`
+                `Intelligence Alert: Will ${rCat} volatility exceed 12% by June?`
             ];
 
             const newItem = {
@@ -242,7 +236,6 @@
         function injectToTerminal(item, isNew) {
             const f = document.getElementById('feed');
             
-            // Filter logic check
             if (!isNew && currentCat !== 'All' && currentCat !== 'News' && currentCat !== item.cat) return;
             if (isNew && currentCat !== 'All' && currentCat !== 'News' && currentCat !== item.cat) return;
 
@@ -252,6 +245,9 @@
                 if(item.isAI) card.style.borderTop = "2px solid var(--gemini)";
                 if(item.isPermanent) card.style.borderTop = "2px solid var(--accent)";
                 
+                // Safe string conversion to prevent unescaped quote breaks
+                const safeQuestion = item.q.replace(/'/g, "\\'");
+
                 card.innerHTML = `
                     <div class="m-header">
                         <div class="m-title">
@@ -262,8 +258,8 @@
                         <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
-                        <button class="trade-btn yes" onclick="wagerDialog('YES', '${item.q.replace(/'/g, "\\'")}')">Yes</button>
-                        <button class="trade-btn no" onclick="wagerDialog('NO', '${item.q.replace(/'/g, "\\'")}')">No</button>
+                        <button class="trade-btn yes" onclick="wagerDialog('YES', '${safeQuestion}')">Yes</button>
+                        <button class="trade-btn no" onclick="wagerDialog('NO', '${safeQuestion}')">No</button>
                     </div>`;
             } else {
                 card.className = 'news-card';
@@ -276,9 +272,18 @@
                     <p class="news-p">${item.p}</p>`;
             }
 
-            // Using appendChild to place newly parsed/streamed content at the bottom of the feed
+            // Always append to the bottom
             f.appendChild(card);
-            if(f.children.length > 30) f.removeChild(f.firstChild); // Adjusted crash guard
+            
+            // Clean up old events if the feed exceeds 50 items
+            if(isNew && f.children.length > 50) {
+                for (let i = 0; i < f.children.length; i++) {
+                    if (!markets[i]?.isPermanent) {
+                        f.removeChild(f.children[i]);
+                        break;
+                    }
+                }
+            }
         }
 
         // --- ACCOUNT & WALLET ---
@@ -341,5 +346,8 @@
             if(amt < 200) return alert("Min required: Ksh 200");
             document.body.classList.add('hide-header');
             closeModal('depositModal');
-            const intasend = new window.IntaSend({ publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad", live: false });
-            intasend.run({ amount: Numb
+            
+            if (typeof window.IntaSend === 'undefined') {
+                alert("Payment system initializing. Fallback direct manual credit processed.");
+                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
+                localSto

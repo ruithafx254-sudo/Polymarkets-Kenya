@@ -13,58 +13,73 @@
             --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #cf304a;
         }
         
-        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 100px; font-family: -apple-system, sans-serif; overflow-x: hidden; }
+        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 100px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
 
-        /* --- PERMANENT BOTTOM RETURN BUTTON --- */
+        /* --- THE PERMANENT RETURN BUTTON --- */
         #return-btn {
-            display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: #000; color: #fff; padding: 18px 40px; border-radius: 100px;
-            font-weight: 800; z-index: 9999; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            cursor: pointer; font-size: 14px; letter-spacing: 0.5px; white-space: nowrap;
+            display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #000; color: #fff; padding: 16px 36px; border-radius: 50px;
+            font-weight: 800; z-index: 9999; border: none; box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            cursor: pointer; font-size: 14px; letter-spacing: 0.5px;
         }
 
-        /* --- AUTH SWITCH (BRIGHT VS DULL) --- */
+        /* --- FIXED AUTH SWITCH --- */
         .auth-switch { 
             display: flex; background: #f1f5f9; padding: 4px; border-radius: 100px; margin-bottom: 30px; width: 240px; margin-inline: auto; border: 1px solid #e2e8f0;
         }
-        .auth-tab { flex: 1; padding: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; text-align: center; border-radius: 100px; }
-        .auth-tab.active { color: #fff; background: #0f172a; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .auth-tab { 
+            flex: 1; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; text-align: center; border-radius: 100px;
+        }
+        .auth-tab.active { color: #fff; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .auth-tab.inactive { color: #94a3b8; background: transparent; }
 
-        /* --- PROFESSIONAL CURRENCY INPUT --- */
-        .currency-terminal { background: #fff; padding: 25px; border-radius: 24px; border: 1.5px solid #e2e8f0; margin-bottom: 20px; text-align: left; }
-        .input-label { font-size: 11px; font-weight: 900; color: var(--text-sub); letter-spacing: 1px; margin-bottom: 10px; display: block; }
-        .input-wrapper { display: flex; align-items: baseline; border-bottom: 2px solid #000; padding-bottom: 8px; }
-        .currency-prefix { font-size: 22px; font-weight: 900; margin-right: 12px; }
-        .amount-field { border: none; outline: none; font-size: 38px; font-weight: 900; width: 100%; background: transparent; }
+        /* --- PROFESSIONAL AMOUNT INPUT --- */
+        .currency-terminal { 
+            background: #fff; padding: 25px; border-radius: 24px; border: 1.5px solid #e2e8f0; margin-bottom: 25px; 
+        }
+        .input-wrapper { display: flex; align-items: baseline; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 5px; }
+        .currency-prefix { font-size: 20px; font-weight: 800; color: #000; margin-right: 10px; }
+        .amount-field { 
+            border: none; outline: none; font-size: 36px; font-weight: 900; width: 100%; color: #000; background: transparent; 
+        }
         
-        .chip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
-        .chip { background: #f1f5f9; padding: 12px 5px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; text-align: center; transition: 0.2s; }
+        .chip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .chip { 
+            background: #f1f5f9; padding: 10px 5px; border-radius: 10px; font-size: 12px; font-weight: 700; 
+            cursor: pointer; text-align: center; transition: 0.2s; border: 1px solid transparent;
+        }
         .chip.active { background: #000; color: #fff; }
 
-        /* --- MODALS --- */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); z-index: 5000; align-items: center; justify-content: center; padding: 15px; }
+        .modal-overlay { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(10px); z-index: 5000; align-items: center; justify-content: center; padding: 15px; 
+        }
         .modal-card { background: #fff; width: 100%; max-width: 380px; padding: 35px; border-radius: 35px; text-align: center; }
-        .btn-main { width: 100%; padding: 18px; background: #000; color: #fff; border: none; border-radius: 18px; font-weight: 700; font-size: 16px; cursor: pointer; }
 
-        /* --- HEADER & CARDS --- */
-        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; height: 64px; }
-        .logo { font-weight: 950; font-size: 24px; letter-spacing: -1.5px; }
-        .user-profile { width: 38px; height: 38px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; }
-        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
-        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; }
-        
-        #dashboard { max-width: 500px; margin: auto; padding: 12px; }
-        .card { background: #fff; border-radius: 24px; border: 1px solid var(--border); padding: 22px; margin-bottom: 16px; }
-        .p-val { font-size: 32px; font-weight: 900; display: block; margin-bottom: 15px; }
-        .btn-row { display: flex; gap: 10px; }
-        .m-btn { flex: 1; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; }
+        .btn-main { width: 100%; padding: 18px; background: #000; color: #fff; border: none; border-radius: 18px; font-weight: 700; font-size: 16px; cursor: pointer; }
+        .btn-main.deposit { background: var(--primary); }
 
         body.hide-header .header { display: none !important; }
         body.hide-header { padding-top: 0 !important; }
         body.hide-header #return-btn { display: block !important; }
         .hidden { display: none !important; }
+
+        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
+        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; height: 64px; }
+        .logo { font-weight: 950; font-size: 24px; letter-spacing: -1.5px; }
+        .bar-right { display: flex; align-items: center; gap: 10px; }
+        .user-profile { width: 38px; height: 38px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; font-size: 12px; }
+        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
+        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+
+        #dashboard { max-width: 500px; margin: auto; padding: 12px; }
+        .card { background: #fff; border-radius: 24px; border: 1px solid var(--border); padding: 22px; margin-bottom: 16px; }
+        .m-title { font-size: 17px; font-weight: 700; line-height: 1.4; margin-bottom: 18px; }
+        .p-val { font-size: 30px; font-weight: 900; display: block; margin-bottom: 15px; }
+        .btn-row { display: flex; gap: 10px; }
+        .m-btn { flex: 1; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; font-size: 14px; }
+        .btn-yes { background: var(--yes); color: var(--yes-text); }
+        .btn-no { background: var(--no); color: var(--no-text); }
     </style>
 </head>
 <body>
@@ -77,24 +92,27 @@
                 <div id="tab-in" class="auth-tab active" onclick="switchAuth('in')">Sign In</div>
                 <div id="tab-up" class="auth-tab inactive" onclick="switchAuth('up')">Sign Up</div>
             </div>
-            <h2 id="authTitle" style="margin-bottom:20px">Login</h2>
+
+            <h2 id="authTitle" style="margin:0 0 20px 0; letter-spacing: -1px;">Login</h2>
+            
             <div id="signupOnly" class="hidden">
-                <input type="text" id="authName" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:12px;" placeholder="Full Name">
+                <input type="text" id="authName" oninput="saveDraft()" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:12px;" placeholder="Full Name">
             </div>
-            <input type="email" id="authEmail" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:12px;" placeholder="Email Address">
+            <input type="email" id="authEmail" oninput="saveDraft()" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:12px;" placeholder="Email Address">
             <input type="password" id="authPass" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:20px;" placeholder="Password">
+
             <button class="btn-main" onclick="handleAuth()">Access Terminal</button>
+            <p onclick="closeModal('auth-overlay')" style="margin-top:20px; font-size:13px; color:#999; cursor:pointer; font-weight:700;">Dismiss</p>
         </div>
     </div>
 
     <div id="deposit-overlay" class="modal-overlay">
         <div class="modal-card">
-            <h2 style="margin-bottom:25px">Deposit KES</h2>
+            <h2 style="margin:0 0 25px 0; letter-spacing: -1px;">Deposit KES</h2>
             <div class="currency-terminal">
-                <label class="input-label">SPECIFY AMOUNT</label>
                 <div class="input-wrapper">
                     <span class="currency-prefix">Ksh</span>
-                    <input type="number" id="customAmount" class="amount-field" placeholder="0">
+                    <input type="number" id="customAmount" class="amount-field" placeholder="0" min="200">
                 </div>
                 <div class="chip-grid">
                     <div class="chip" onclick="setAmt(250, this)">250</div>
@@ -103,8 +121,8 @@
                     <div class="chip" onclick="setAmt(2000, this)">2k</div>
                 </div>
             </div>
-            <button class="btn-main" style="background:var(--primary)" onclick="startPayment()">Authorize Deposit</button>
-            <p onclick="closeModal('deposit-overlay')" style="margin-top:20px; font-size:13px; color:#999; cursor:pointer;">Cancel</p>
+            <button class="btn-main deposit" onclick="startPayment()">Authorize Deposit</button>
+            <p onclick="closeModal('deposit-overlay')" style="margin-top:20px; font-size:13px; color:#999; cursor:pointer;">Close</p>
         </div>
     </div>
 
@@ -112,7 +130,7 @@
         <div class="top-nav">
             <div class="logo">NEXGEN</div>
             <div class="bar-right">
-                <button id="loginBtn" class="btn-deposit" style="background:#f1f5f9; color:#000" onclick="openModal('auth-overlay')">Sign In</button>
+                <button id="loginBtn" class="btn-login-trigger" onclick="openModal('auth-overlay')">Sign In</button>
                 <div id="userIcon" class="user-profile hidden" onclick="logout()">??</div>
                 <div class="wallet-pill">
                     Ksh <span id="balance">0.00</span>
@@ -127,25 +145,34 @@
     </div>
 
     <script>
-        // --- SESSION PERSISTENCE ---
+        // --- PERSISTENCE & DRAFT SAVING ---
         window.onload = () => {
-            const user = localStorage.getItem('nx_user');
-            const bal = localStorage.getItem('nx_balance');
-            if(user) {
+            const savedUser = localStorage.getItem('nx_user');
+            const savedBal = localStorage.getItem('nx_balance');
+            const draftEmail = localStorage.getItem('nx_draft_email');
+            const draftName = localStorage.getItem('nx_draft_name');
+            
+            if(savedUser) {
                 document.getElementById('loginBtn').classList.add('hidden');
                 document.getElementById('userIcon').classList.remove('hidden');
-                document.getElementById('userIcon').innerText = user;
+                document.getElementById('userIcon').innerText = savedUser;
             }
-            if(bal) document.getElementById('balance').innerText = parseFloat(bal).toFixed(2);
+            if(savedBal) document.getElementById('balance').innerText = parseFloat(savedBal).toFixed(2);
+            if(draftEmail) document.getElementById('authEmail').value = draftEmail;
+            if(draftName) document.getElementById('authName').value = draftName;
+
             render();
         };
 
+        function saveDraft() {
+            localStorage.setItem('nx_draft_email', document.getElementById('authEmail').value);
+            localStorage.setItem('nx_draft_name', document.getElementById('authName').value);
+        }
+
         // --- BACK BUTTON INTERCEPTION ---
-        window.addEventListener('popstate', function(event) {
-            // If the header is hidden, we are in "Payment Mode"
+        window.addEventListener('popstate', function (event) {
             if (document.body.classList.contains('hide-header')) {
                 cleanupUI();
-                // Prevent the browser from actually going back to the previous site
                 history.pushState(null, null, window.location.pathname);
             }
         });
@@ -156,22 +183,27 @@
         function switchAuth(mode) {
             const tIn = document.getElementById('tab-in');
             const tUp = document.getElementById('tab-up');
+            const signup = document.getElementById('signupOnly');
+            const title = document.getElementById('authTitle');
+
             if(mode === 'up') {
                 tUp.className = "auth-tab active"; tIn.className = "auth-tab inactive";
-                document.getElementById('signupOnly').classList.remove('hidden');
+                signup.classList.remove('hidden'); title.innerText = "Register";
             } else {
                 tIn.className = "auth-tab active"; tUp.className = "auth-tab inactive";
-                document.getElementById('signupOnly').classList.add('hidden');
+                signup.classList.add('hidden'); title.innerText = "Login";
             }
         }
 
         function handleAuth() {
-            const initial = document.getElementById('authEmail').value.substring(0,2).toUpperCase();
+            const email = document.getElementById('authEmail').value;
+            if(!email.includes('@')) return alert("Invalid email");
+            const initial = email.substring(0,2).toUpperCase();
             localStorage.setItem('nx_user', initial);
             location.reload();
         }
 
-        function logout() { localStorage.removeItem('nx_user'); location.reload(); }
+        function logout() { if(confirm("Logout?")) { localStorage.removeItem('nx_user'); location.reload(); } }
 
         function setAmt(val, el) {
             document.getElementById('customAmount').value = val;
@@ -181,12 +213,11 @@
 
         function startPayment() {
             const amt = document.getElementById('customAmount').value;
-            if(amt < 200) return alert("Min Ksh 200");
-            
+            if(amt < 200) return alert("Min deposit Ksh 200");
             closeModal('deposit-overlay');
             document.body.classList.add('hide-header');
             
-            // Push a fake state so the next "Back" press triggers our popstate listener
+            // Push state for back button handling
             history.pushState({paying: true}, null, "");
 
             const intasend = new window.IntaSend({
@@ -196,8 +227,10 @@
 
             intasend.run({ amount: Number(amt), currency: "KES", redirect: false })
             .on("COMPLETE", (res) => {
-                const newBal = parseFloat(document.getElementById('balance').innerText) + Number(amt);
+                const current = parseFloat(document.getElementById('balance').innerText);
+                const newBal = current + Number(amt);
                 localStorage.setItem('nx_balance', newBal);
+                cleanupUI();
                 location.reload();
             })
             .on("FAILED", cleanupUI);
@@ -207,17 +240,15 @@
             document.body.classList.remove('hide-header');
             const container = document.getElementById('intasend-inline-container');
             if (container) container.style.display = 'none';
-            // Remove the return button from view
-            document.getElementById('return-btn').style.display = 'none';
         }
 
         function render() {
             const feed = document.getElementById('dynamic-feed');
-            const m = ["BTC to reach Ksh 15M?", "Arsenal Premier League?", "KES to 110 vs USD?"];
-            for(let i=0; i<10; i++) {
+            const m = ["BTC to reach Ksh 15M?", "KES to drop vs USD?", "Arsenal Premier League?", "AI Solves Cancer?"];
+            for(let i=0; i<15; i++) {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.innerHTML = `<div style="font-weight:700;margin-bottom:10px">${m[i%3]}</div><span class="p-val">${Math.floor(Math.random()*80)+10}%</span><div class="btn-row"><button class="m-btn btn-yes">YES</button><button class="m-btn btn-no">NO</button></div>`;
+                card.innerHTML = `<div class="m-title">${m[Math.floor(Math.random()*m.length)]}</div><span class="p-val">${Math.floor(Math.random()*80)+10}%</span><div class="btn-row"><button class="m-btn btn-yes">YES</button><button class="m-btn btn-no">NO</button></div>`;
                 feed.appendChild(card);
             }
         }

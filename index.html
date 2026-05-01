@@ -6,6 +6,7 @@
     <title>Polymarkets Africa | Terminal</title>
     
     <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root { 
@@ -30,13 +31,11 @@
         .user-id { width: 36px; height: 36px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .person-icon { width: 18px; height: 18px; fill: currentColor; }
 
-        /* Hide header when payment window or modals are active */
         body.hide-header .header-stack { transform: translateY(-100%); }
         body.hide-header { padding-top: 20px; }
 
         #dashboard { max-width: 600px; margin: auto; padding: 12px; box-sizing: border-box; }
         
-        /* Lively Market Cards */
         .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
         .market-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
         .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
@@ -55,7 +54,6 @@
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
         
-        /* Premium Modal Styling */
         .modal { background: #fff; width: 100%; max-width: 380px; padding: 32px 28px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); box-sizing: border-box; border: 1px solid rgba(255,255,255,0.2); max-height: 90vh; overflow-y: auto; }
         .auth-nav { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 24px; }
         .auth-tab { flex: 1; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); transition: 0.2s; text-align: center; }
@@ -117,66 +115,14 @@
                     <input type="text" id="aName" class="input-tech" placeholder="e.g. Wanny Doe">
                 </div>
                 <div class="input-group">
-                    <label>Confirm Email</label>
-                    <input type="email" id="aConfirmEmail" class="input-tech" placeholder="Confirm your email address">
-                </div>
-                <div class="input-group">
                     <label>Country</label>
                     <select id="aCountry" class="input-tech">
-                        <option value="Algeria">Algeria</option>
-                        <option value="Angola">Angola</option>
-                        <option value="Benin">Benin</option>
-                        <option value="Botswana">Botswana</option>
-                        <option value="Burkina Faso">Burkina Faso</option>
-                        <option value="Burundi">Burundi</option>
-                        <option value="Cabo Verde">Cabo Verde</option>
-                        <option value="Cameroon">Cameroon</option>
-                        <option value="Central African Republic">Central African Republic</option>
-                        <option value="Chad">Chad</option>
-                        <option value="Comoros">Comoros</option>
-                        <option value="Congo">Congo</option>
-                        <option value="Democratic Republic of the Congo">DR Congo</option>
-                        <option value="Djibouti">Djibouti</option>
-                        <option value="Egypt">Egypt</option>
-                        <option value="Equatorial Guinea">Equatorial Guinea</option>
-                        <option value="Eritrea">Eritrea</option>
-                        <option value="Eswatini">Eswatini</option>
-                        <option value="Ethiopia">Ethiopia</option>
-                        <option value="Gabon">Gabon</option>
-                        <option value="Gambia">Gambia</option>
-                        <option value="Ghana">Ghana</option>
-                        <option value="Guinea">Guinea</option>
-                        <option value="Guinea-Bissau">Guinea-Bissau</option>
-                        <option value="Ivory Coast">Ivory Coast</option>
                         <option value="Kenya" selected>Kenya</option>
-                        <option value="Lesotho">Lesotho</option>
-                        <option value="Liberia">Liberia</option>
-                        <option value="Libya">Libya</option>
-                        <option value="Madagascar">Madagascar</option>
-                        <option value="Malawi">Malawi</option>
-                        <option value="Mali">Mali</option>
-                        <option value="Mauritania">Mauritania</option>
-                        <option value="Mauritius">Mauritius</option>
-                        <option value="Morocco">Morocco</option>
-                        <option value="Mozambique">Mozambique</option>
-                        <option value="Namibia">Namibia</option>
-                        <option value="Niger">Niger</option>
                         <option value="Nigeria">Nigeria</option>
-                        <option value="Rwanda">Rwanda</option>
-                        <option value="Sao Tome and Principe">Sao Tome and Principe</option>
-                        <option value="Senegal">Senegal</option>
-                        <option value="Seychelles">Seychelles</option>
-                        <option value="Sierra Leone">Sierra Leone</option>
-                        <option value="Somalia">Somalia</option>
+                        <option value="Ghana">Ghana</option>
                         <option value="South Africa">South Africa</option>
-                        <option value="South Sudan">South Sudan</option>
-                        <option value="Sudan">Sudan</option>
-                        <option value="Tanzania">Tanzania</option>
-                        <option value="Togo">Togo</option>
-                        <option value="Tunisia">Tunisia</option>
                         <option value="Uganda">Uganda</option>
-                        <option value="Zambia">Zambia</option>
-                        <option value="Zimbabwe">Zimbabwe</option>
+                        <option value="Tanzania">Tanzania</option>
                     </select>
                 </div>
             </div>
@@ -190,8 +136,13 @@
                 <label>Password</label>
                 <input type="password" id="aPass" class="input-tech" placeholder="••••••••">
             </div>
+
+            <div id="confirmPassWrapper" class="input-group hidden">
+                <label>Confirm Password</label>
+                <input type="password" id="aConfirmPass" class="input-tech" placeholder="••••••••">
+            </div>
             
-            <button onclick="doAuth()" class="btn-tech">Initialize Session</button>
+            <button id="authActionBtn" onclick="doAuth()" class="btn-tech">Initialize Session</button>
             <p style="font-size: 13px; color: var(--text-sub); margin-top: 22px; cursor: pointer; font-weight:700;" onclick="closeModal('authModal')">Dismiss</p>
         </div>
     </div>
@@ -247,60 +198,24 @@
 
     <script>
         const INTASEND_PUBLIC_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad";
+        const SUPABASE_URL = "https://hwxnfzuwaeseszgsjeny.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL";
+
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         let activeTab = 'in';
-
-        // Synchronize and validate across LocalStorage fallback 
-        let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
-
-        // Global Prediction Dataset
-        const categories = ["Finance", "Sports", "Politics", "Tech", "Entertainment"];
-        const feedThemes = {
-            "Finance": [
-                "Will Kenya's GDP growth surpass the 5.5% marker next quarter?",
-                "Will the Central Bank of Kenya reduce interest rates at the next policy review?",
-                "Will Bitcoin secure a stable position above the $100k line next month?",
-                "Will major indices finish the quarter with gains?",
-                "Will crude oil benchmarks remain stable at $80 per barrel?",
-                "Will gold prices break past the $2,500/oz ceiling this month?",
-                "Will the US Federal Reserve lower the benchmark rate by September?",
-                "Will the Nairobi Securities Exchange post a record year for transaction volume?"
-            ],
-            "Sports": [
-                "Will Arsenal claim the English Premier League crown this season?",
-                "Will Real Madrid successfully claim the Champions League trophy?",
-                "Will Kenya win at least 3 gold medals in the upcoming Athletics Championships?",
-                "Will the next World Cup host unveil new regional stadium upgrades this month?",
-                "Will a new lap record be set at the next Formula 1 Grand Prix?"
-            ],
-            "Politics": [
-                "Will the African Union establish a unified startup regulatory framework?",
-                "Will the regional trade pact see 5 new member additions before December?",
-                "Will a major environmental treaty be ratified by global leaders next quarter?"
-            ],
-            "Tech": [
-                "Will EV sales establish a new high within the regional automotive market?",
-                "Will a major tech titan announce a new digital device this year?",
-                "Will AI-generated software engineering tools outpace traditional platforms?",
-                "Will European energy storage networks double total capacity before next winter?"
-            ],
-            "Entertainment": [
-                "Will the next James Bond actor be officially announced before August?",
-                "Will a new movie release surpass the current box office records?",
-                "Will a major streaming platform restrict password sharing worldwide next month?"
-            ]
-        };
-
         let markets = [];
         let currentFundsMode = 'deposit';
 
-        window.onload = () => {
+        window.onload = async () => {
             initializeMarkets();
-            syncState(); 
+            await syncState(); 
             renderFeed();
         };
 
         function initializeMarkets() {
-            // Priority Jesus Market
+            // Predict Jesus back before June 5th
             markets.push({
                 id: `m-ext-0`,
                 q: "Will Jesus be back before June 5th?",
@@ -310,12 +225,21 @@
                 noMult: "3.00"
             });
 
-            // Generates remaining dynamic markets
+            // 3,000 algorithmic dynamic markets 
+            const categories = ["Finance", "Sports", "Politics", "Tech", "Entertainment"];
+            const feedThemes = {
+                "Finance": ["Will Kenya's GDP growth surpass the 5.5% marker next quarter?", "Will the CBK reduce rates at next policy review?"],
+                "Sports": ["Will Arsenal claim the English Premier League crown this season?", "Will Real Madrid successfully claim the Champions League trophy?"],
+                "Politics": ["Will the African Union establish a unified startup regulatory framework?"],
+                "Tech": ["Will EV sales establish a new high within the regional automotive market?"],
+                "Entertainment": ["Will the next James Bond actor be officially announced before August?"]
+            };
+
             for (let i = 1; i <= 3000; i++) {
                 const cat = categories[i % categories.length];
                 const prompts = feedThemes[cat];
                 const basePrompt = prompts[i % prompts.length];
-                const question = `${basePrompt} (Market Variant #${1000 + i})`;
+                const question = `${basePrompt} (Variant #${1000 + i})`;
                 
                 const chanceValue = Math.floor(10 + (i * 3.7) % 80);
                 const yesMultiplier = (100 / chanceValue).toFixed(2);
@@ -347,11 +271,11 @@
                         <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
-                        <button class="trade-btn yes" onclick="handleWagerClick('${item.q}')">
+                        <button class="trade-btn yes" onclick="handleWagerClick()">
                             <span>Yes</span>
                             <span class="multiplier">${item.yesMult}x</span>
                         </button>
-                        <button class="trade-btn no" onclick="handleWagerClick('${item.q}')">
+                        <button class="trade-btn no" onclick="handleWagerClick()">
                             <span>No</span>
                             <span class="multiplier">${item.noMult}x</span>
                         </button>
@@ -360,20 +284,31 @@
             });
         }
 
-        function handleWagerClick(marketQuestion) {
+        function handleWagerClick() {
             if (!localStorage.getItem('nx_user')) {
                 return openModal('authModal');
             }
-            alert("Insufficient funds. Please fund your balance to open wagers.");
+            alert("Insufficient funds. Please deposit to your balance to place a wager.");
         }
 
-        function syncState() {
+        async function syncState() {
             const user = localStorage.getItem('nx_user');
-            const bal = localStorage.getItem('nx_balance') || "0.00";
-            if(user) {
+            if (user) {
                 document.getElementById('signBtn').classList.add('hidden');
                 document.getElementById('userIcon').classList.remove('hidden');
+
+                // Pull latest database state directly from Supabase
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('balance')
+                    .eq('email', user)
+                    .single();
+
+                if (data && !error) {
+                    localStorage.setItem('nx_balance', data.balance);
+                }
             }
+            const bal = localStorage.getItem('nx_balance') || "0.00";
             document.getElementById('balance').innerText = parseFloat(bal).toLocaleString(undefined, {minimumFractionDigits: 2});
         }
 
@@ -381,12 +316,14 @@
             activeTab = mode;
             const up = document.getElementById('upFields'), title = document.getElementById('aTitle'), desc = document.getElementById('aDesc');
             const tIn = document.getElementById('tabIn'), tUp = document.getElementById('tabUp');
+            const confirmPass = document.getElementById('confirmPassWrapper');
+            
             if(mode === 'up') {
-                up.classList.remove('hidden'); tUp.classList.add('active'); tIn.classList.remove('active');
+                up.classList.remove('hidden'); confirmPass.classList.remove('hidden'); tUp.classList.add('active'); tIn.classList.remove('active');
                 title.innerText = "Register Identity";
                 desc.innerText = "Create an account to begin using the terminal";
             } else {
-                up.classList.add('hidden'); tIn.classList.add('active'); tUp.classList.remove('active');
+                up.classList.add('hidden'); confirmPass.classList.add('hidden'); tIn.classList.add('active'); tUp.classList.remove('active');
                 title.innerText = "Terminal Access";
                 desc.innerText = "Enter credentials to connect to the terminal";
             }
@@ -397,9 +334,7 @@
             const tDep = document.getElementById('tabDeposit'), tWith = document.getElementById('tabWithdraw');
             const fTitle = document.getElementById('fundsTitle'), fDesc = document.getElementById('fundsDesc');
             const amtLabel = document.getElementById('amtLabel'), fSubmit = document.getElementById('fundsSubmit');
-            const fChips = document.getElementById('fundsChips');
-            const fBadge = document.getElementById('fundsBadge');
-            const wBadge = document.getElementById('withdrawBadge');
+            const fBadge = document.getElementById('fundsBadge'), wBadge = document.getElementById('withdrawBadge');
 
             if(mode === 'withdraw') {
                 tWith.classList.add('active'); tDep.classList.remove('active');
@@ -408,7 +343,6 @@
                 amtLabel.innerText = "Withdrawal Amount (Ksh)";
                 fSubmit.innerText = "Confirm Withdrawal";
                 fSubmit.style.background = "#000";
-                fChips.classList.remove('hidden');
                 fBadge.classList.add('hidden');
                 wBadge.classList.remove('hidden');
             } else {
@@ -418,48 +352,86 @@
                 amtLabel.innerText = "Deposit Amount (Ksh)";
                 fSubmit.innerText = "Confirm Deposit";
                 fSubmit.style.background = "var(--accent)";
-                fChips.classList.remove('hidden');
                 fBadge.classList.remove('hidden');
                 wBadge.classList.add('hidden');
             }
         }
 
-        function doAuth() {
+        async function doAuth() {
             const email = document.getElementById('aEmail').value.trim().toLowerCase();
             const pass = document.getElementById('aPass').value.trim();
 
             if (!email.includes('@') || email.length < 5) return alert("Please enter a valid email address.");
-            if (pass.length < 4) return alert("Password should be at least 4 characters long.");
+            if (pass.length < 4) return alert("Password must be at least 4 characters long.");
 
-            if (activeTab === 'up') {
-                const name = document.getElementById('aName').value.trim();
-                const confirmEmail = document.getElementById('aConfirmEmail').value.trim().toLowerCase();
-                const country = document.getElementById('aCountry').value;
+            const authBtn = document.getElementById('authActionBtn');
+            authBtn.innerText = "Processing...";
+            authBtn.disabled = true;
 
-                if (!name) return alert("Full Name is required.");
-                if (email !== confirmEmail) return alert("Email confirmation does not match.");
+            try {
+                if (activeTab === 'up') {
+                    const name = document.getElementById('aName').value.trim();
+                    const confirmPass = document.getElementById('aConfirmPass').value.trim();
+                    const country = document.getElementById('aCountry').value;
 
-                // Save user record securely to database
-                userDB[email] = { name, email, pass, country, balance: "0.00" };
-                localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
+                    if (!name) throw new Error("Full name is required.");
+                    if (pass !== confirmPass) throw new Error("Passwords do not match.");
 
-                localStorage.setItem('nx_user', email);
-                localStorage.setItem('nx_balance', "0.00");
-                alert(`Account created successfully! Country set to ${country}.`);
-                closeModal('authModal');
-                syncState();
-            } else {
-                // Validate if user exists
-                const userRecord = userDB[email];
-                if (!userRecord || userRecord.pass !== pass) {
-                    return alert("Access denied. Incorrect email address or password.");
+                    // Sign up user via Supabase Auth
+                    const { data: authData, error: authError } = await supabase.auth.signUp({
+                        email: email,
+                        password: pass
+                    });
+
+                    if (authError) throw authError;
+
+                    // Insert or upsert user details in custom Supabase 'profiles' table
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .upsert({ 
+                            id: authData.user.id,
+                            email: email, 
+                            full_name: name, 
+                            country: country, 
+                            balance: 0 
+                        });
+
+                    if (profileError) throw profileError;
+
+                    localStorage.setItem('nx_user', email);
+                    localStorage.setItem('nx_balance', "0.00");
+                    alert(`Account created successfully! Session linked.`);
+                    closeModal('authModal');
+                    await syncState();
+                } else {
+                    // Log in via Supabase Auth
+                    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                        email: email,
+                        password: pass
+                    });
+
+                    if (authError) throw new Error("Access denied. Incorrect credentials or user does not exist.");
+
+                    // Retrieve profile to fetch balance
+                    const { data: prof, error: profError } = await supabase
+                        .from('profiles')
+                        .select('balance')
+                        .eq('id', authData.user.id)
+                        .single();
+
+                    if (profError) throw profError;
+
+                    localStorage.setItem('nx_user', email);
+                    localStorage.setItem('nx_balance', prof.balance.toFixed(2));
+                    alert(`Access granted.`);
+                    closeModal('authModal');
+                    await syncState();
                 }
-
-                localStorage.setItem('nx_user', userRecord.email);
-                localStorage.setItem('nx_balance', userRecord.balance || "0.00");
-                alert(`Session initialized for ${userRecord.name || userRecord.email}`);
-                closeModal('authModal');
-                syncState();
+            } catch (err) {
+                alert(err.message);
+            } finally {
+                authBtn.innerText = "Initialize Session";
+                authBtn.disabled = false;
             }
         }
 
@@ -473,7 +445,7 @@
             }
         }
 
-        function withdrawNow() {
+        async function withdrawNow() {
             const amt = Number(document.getElementById('depAmt').value);
             const userEmail = localStorage.getItem('nx_user');
             let curBal = parseFloat(localStorage.getItem('nx_balance') || 0);
@@ -482,27 +454,28 @@
                 closeModal('depositModal');
                 return openModal('authModal');
             }
-
-            if(!amt || amt < 100) {
-                return alert("Minimum withdrawal amount required is Ksh 100");
-            }
-
-            if(amt > curBal) {
-                return alert("Insufficient funds");
-            }
+            if(!amt || amt < 100) return alert("Minimum withdrawal amount required is Ksh 100");
+            if(amt > curBal) return alert("Insufficient funds available.");
 
             closeModal('depositModal');
             
             const newBal = (curBal - amt).toFixed(2);
-            localStorage.setItem('nx_balance', newBal);
-            
-            if (userDB[userEmail]) {
-                userDB[userEmail].balance = newBal;
-                localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
-            }
 
-            syncState();
-            alert("Withdrawal complete");
+            try {
+                // Deduct from Supabase
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ balance: parseFloat(newBal) })
+                    .eq('email', userEmail);
+
+                if (error) throw error;
+
+                localStorage.setItem('nx_balance', newBal);
+                await syncState();
+                alert("Withdrawal initiated successfully");
+            } catch (err) {
+                alert("Withdrawal failed to process: " + err.message);
+            }
         }
 
         function payNow() {
@@ -513,10 +486,7 @@
                 closeModal('depositModal');
                 return openModal('authModal');
             }
-
-            if(!amt || amt < 100) {
-                return alert("Minimum deposit amount required is Ksh 100");
-            }
+            if(!amt || amt < 100) return alert("Minimum deposit amount required is Ksh 100");
 
             closeModal('depositModal');
             document.body.classList.add('hide-header');
@@ -526,22 +496,29 @@
                 live: false 
             });
 
-            intasend.on("COMPLETE", (results) => {
+            intasend.on("COMPLETE", async (results) => {
                 document.body.classList.remove('hide-header');
-                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-                const newBal = (cur + Number(amt)).toFixed(2);
                 
-                localStorage.setItem('nx_balance', newBal);
+                try {
+                    let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
+                    const newBal = (cur + Number(amt)).toFixed(2);
 
-                if (userDB[userEmail]) {
-                    userDB[userEmail].balance = newBal;
-                    localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
+                    // Update balance directly inside the profiles table in Supabase
+                    const { error } = await supabase
+                        .from('profiles')
+                        .update({ balance: parseFloat(newBal) })
+                        .eq('email', userEmail);
+
+                    if (error) throw error;
+
+                    localStorage.setItem('nx_balance', newBal);
+                    await syncState();
+                    alert(`Payment Complete! Ksh ${amt.toLocaleString()} added to your account.`);
+                } catch (err) {
+                    alert("Balance failed to update: " + err.message);
                 }
-
-                syncState();
-                alert(`Success! Ksh ${amt.toLocaleString()} has been added to your balance.`);
             })
-            .on("FAILED", (results) => {
+            .on("FAILED", () => {
                 document.body.classList.remove('hide-header');
                 alert("The transaction was not completed.");
             })
@@ -564,9 +541,7 @@
         function closeModal(id) { 
             document.body.classList.remove('hide-header');
             document.getElementById(id).style.display = 'none'; 
-            if(id === 'depositModal') {
-                document.getElementById('depAmt').value = '0.00';
-            }
+            if(id === 'depositModal') document.getElementById('depAmt').value = '0.00';
         }
 
         function logout() { 

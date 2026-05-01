@@ -35,12 +35,17 @@
         body.hide-header { padding-top: 20px; }
 
         #dashboard { max-width: 600px; margin: auto; padding: 12px; box-sizing: border-box; }
-        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.01); }
-        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-        .m-title { font-size: 15px; font-weight: 600; line-height: 1.45; color: #111; padding-right: 12px; }
+        
+        /* Lively Market Cards */
+        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
+        .market-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+        .m-title { font-size: 15px; font-weight: 600; line-height: 1.45; color: #0f172a; padding-right: 12px; }
         .odds-val { font-size: 18px; font-weight: 800; color: #000; }
         .odds-lbl { font-size: 10px; color: var(--text-sub); text-transform: uppercase; display: block; text-align: right; }
         
+        .m-category { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent); background: #f0fdf4; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 12px; letter-spacing: 0.5px; }
+
         .btn-group { display: flex; gap: 10px; }
         .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .trade-btn:active { opacity: 0.7; }
@@ -51,7 +56,7 @@
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
         
         /* Premium Modal Styling */
-        .modal { background: #fff; width: 100%; max-width: 380px; padding: 32px 28px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); box-sizing: border-box; border: 1px solid rgba(255,255,255,0.2); }
+        .modal { background: #fff; width: 100%; max-width: 380px; padding: 32px 28px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); box-sizing: border-box; border: 1px solid rgba(255,255,255,0.2); max-height: 90vh; overflow-y: auto; }
         .auth-nav { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 24px; }
         .auth-tab { flex: 1; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); transition: 0.2s; text-align: center; }
         .auth-tab.active { background: #fff; color: #000; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
@@ -111,6 +116,65 @@
                     <label>Your Full Name</label>
                     <input type="text" id="aName" class="input-tech" placeholder="e.g. Wanny Doe">
                 </div>
+                <div class="input-group">
+                    <label>Country</label>
+                    <select id="aCountry" class="input-tech">
+                        <option value="Algeria">Algeria</option>
+                        <option value="Angola">Angola</option>
+                        <option value="Benin">Benin</option>
+                        <option value="Botswana">Botswana</option>
+                        <option value="Burkina Faso">Burkina Faso</option>
+                        <option value="Burundi">Burundi</option>
+                        <option value="Cabo Verde">Cabo Verde</option>
+                        <option value="Cameroon">Cameroon</option>
+                        <option value="Central African Republic">Central African Republic</option>
+                        <option value="Chad">Chad</option>
+                        <option value="Comoros">Comoros</option>
+                        <option value="Congo">Congo</option>
+                        <option value="Democratic Republic of the Congo">DR Congo</option>
+                        <option value="Djibouti">Djibouti</option>
+                        <option value="Egypt">Egypt</option>
+                        <option value="Equatorial Guinea">Equatorial Guinea</option>
+                        <option value="Eritrea">Eritrea</option>
+                        <option value="Eswatini">Eswatini</option>
+                        <option value="Ethiopia">Ethiopia</option>
+                        <option value="Gabon">Gabon</option>
+                        <option value="Gambia">Gambia</option>
+                        <option value="Ghana">Ghana</option>
+                        <option value="Guinea">Guinea</option>
+                        <option value="Guinea-Bissau">Guinea-Bissau</option>
+                        <option value="Ivory Coast">Ivory Coast</option>
+                        <option value="Kenya" selected>Kenya</option>
+                        <option value="Lesotho">Lesotho</option>
+                        <option value="Liberia">Liberia</option>
+                        <option value="Libya">Libya</option>
+                        <option value="Madagascar">Madagascar</option>
+                        <option value="Malawi">Malawi</option>
+                        <option value="Mali">Mali</option>
+                        <option value="Mauritania">Mauritania</option>
+                        <option value="Mauritius">Mauritius</option>
+                        <option value="Morocco">Morocco</option>
+                        <option value="Mozambique">Mozambique</option>
+                        <option value="Namibia">Namibia</option>
+                        <option value="Niger">Niger</option>
+                        <option value="Nigeria">Nigeria</option>
+                        <option value="Rwanda">Rwanda</option>
+                        <option value="Sao Tome and Principe">Sao Tome and Principe</option>
+                        <option value="Senegal">Senegal</option>
+                        <option value="Seychelles">Seychelles</option>
+                        <option value="Sierra Leone">Sierra Leone</option>
+                        <option value="Somalia">Somalia</option>
+                        <option value="South Africa">South Africa</option>
+                        <option value="South Sudan">South Sudan</option>
+                        <option value="Sudan">Sudan</option>
+                        <option value="Tanzania">Tanzania</option>
+                        <option value="Togo">Togo</option>
+                        <option value="Tunisia">Tunisia</option>
+                        <option value="Uganda">Uganda</option>
+                        <option value="Zambia">Zambia</option>
+                        <option value="Zimbabwe">Zimbabwe</option>
+                    </select>
+                </div>
             </div>
             
             <div class="input-group">
@@ -164,10 +228,12 @@
                 </span>
             </div>
 
-            <div id="withdrawBadge" class="badge-wrap hidden">
+            <div id="withdrawBadge" class="badge-wrap hidden" style="background: #0f172a; padding: 16px; border-radius: 16px; margin-top: 14px;">
                 <span style="display:block; text-align: center">
-                    <a href="https://intasend.com/security" target="_blank"><img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-v-light.png" width="375px" alt="IntaSend Secure Payments (PCI-DSS Compliant)"></a>
-                    <strong><a style="display: block; color: #454545; text-decoration: none; font-size: 0.8em; margin-top: 0.6em;" href="https://intasend.com/security" target="_blank">Secured by IntaSend Payments</a></strong>
+                    <a href="https://intasend.com/security" target="_blank">
+                        <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-dark.png" style="width:100%; max-width:320px; height:auto; display:inline-block;" alt="IntaSend Secure Payments (PCI-DSS Compliant)">
+                    </a>
+                    <strong><a style="display: block; color: #fafafa; text-decoration: none; font-size: 0.75em; margin-top: 0.6em;" href="https://intasend.com/security" target="_blank">Secured by IntaSend Payments</a></strong>
                 </span>
             </div>
 
@@ -178,49 +244,69 @@
     <script>
         const INTASEND_PUBLIC_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad";
 
-        const predictionThemes = [
-            "Will Kenya's GDP growth surpass the 5.5% marker next quarter?",
-            "Will the Central Bank of Kenya reduce interest rates at the next policy review?",
-            "Will major indices finish the quarter with gains?",
-            "Will Bitcoin secure a stable position above the $100k line next month?",
-            "Will Arsenal claim the English Premier League crown this season?",
-            "Will Real Madrid successfully claim the Champions League trophy?",
-            "Will global central banks expand their digital currency frameworks?",
-            "Will crude oil benchmarks remain stable at $80 per barrel?",
-            "Will EV sales establish a new high within the regional automotive market?",
-            "Will a major tech titan announce a new digital device this year?",
-            "Will the next James Bond actor be officially announced before August?",
-            "Will a new movie release surpass the current records?",
-            "Will gold prices break past the $2,500/oz ceiling this month?",
-            "Will the US Federal Reserve lower the benchmark rate by September?",
-            "Will the African Union establish a unified startup regulatory framework?",
-            "Will total global daily flights exceed pre-pandemic highs by December?",
-            "Will a major streaming platform restrict password sharing worldwide next month?",
-            "Will AI-generated software engineering tools outpace traditional platforms this year?",
-            "Will European energy storage networks double total capacity before next winter?",
-            "Will the Nairobi Securities Exchange (NSE) post a record year for transaction volume?"
-        ];
+        // Categorized prediction news datasets
+        const categories = ["Finance", "Sports", "Politics", "Tech", "Entertainment"];
+        const feedThemes = {
+            "Finance": [
+                "Will Kenya's GDP growth surpass the 5.5% marker next quarter?",
+                "Will the Central Bank of Kenya reduce interest rates at the next policy review?",
+                "Will Bitcoin secure a stable position above the $100k line next month?",
+                "Will major indices finish the quarter with gains?",
+                "Will crude oil benchmarks remain stable at $80 per barrel?",
+                "Will gold prices break past the $2,500/oz ceiling this month?",
+                "Will the US Federal Reserve lower the benchmark rate by September?",
+                "Will the Nairobi Securities Exchange post a record year for transaction volume?"
+            ],
+            "Sports": [
+                "Will Arsenal claim the English Premier League crown this season?",
+                "Will Real Madrid successfully claim the Champions League trophy?",
+                "Will Kenya win at least 3 gold medals in the upcoming Athletics Championships?",
+                "Will the next World Cup host unveil new regional stadium upgrades this month?",
+                "Will a new lap record be set at the next Formula 1 Grand Prix?"
+            ],
+            "Politics": [
+                "Will the African Union establish a unified startup regulatory framework?",
+                "Will the regional trade pact see 5 new member additions before December?",
+                "Will a major environmental treaty be ratified by global leaders next quarter?"
+            ],
+            "Tech": [
+                "Will EV sales establish a new high within the regional automotive market?",
+                "Will a major tech titan announce a new digital device this year?",
+                "Will AI-generated software engineering tools outpace traditional platforms?",
+                "Will European energy storage networks double total capacity before next winter?"
+            ],
+            "Entertainment": [
+                "Will the next James Bond actor be officially announced before August?",
+                "Will a new movie release surpass the current box office records?",
+                "Will a major streaming platform restrict password sharing worldwide next month?"
+            ]
+        };
 
         let markets = [];
         let currentFundsMode = 'deposit';
 
         window.onload = () => {
-            initialize200Markets();
+            initialize3000Markets();
             syncState(); 
             renderFeed();
         };
 
-        function initialize200Markets() {
-            for (let i = 1; i <= 350; i++) {
-                const sub = predictionThemes[i % predictionThemes.length];
-                const chanceValue = Math.floor(15 + (i * 2.3) % 75);
+        function initialize3000Markets() {
+            // Generates up to 3000 dynamic prediction topics
+            for (let i = 1; i <= 3000; i++) {
+                const cat = categories[i % categories.length];
+                const prompts = feedThemes[cat];
+                const basePrompt = prompts[i % prompts.length];
+                const question = `${basePrompt} (Market Variant #${1000 + i})`;
                 
+                const chanceValue = Math.floor(10 + (i * 3.7) % 80);
                 const yesMultiplier = (100 / chanceValue).toFixed(2);
                 const noMultiplier = (100 / (100 - chanceValue)).toFixed(2);
 
                 markets.push({
                     id: `m-ext-${i}`,
-                    q: sub,
+                    q: question,
+                    category: cat,
                     p: chanceValue,
                     yesMult: yesMultiplier,
                     noMult: noMultiplier
@@ -237,6 +323,7 @@
                 card.id = 'market-el-' + item.id;
                 card.className = 'market-card';
                 card.innerHTML = `
+                    <div class="m-category">${item.category}</div>
                     <div class="m-header">
                         <div class="m-title">${item.q}</div>
                         <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
@@ -282,7 +369,7 @@
             } else {
                 up.classList.add('hidden'); tIn.classList.add('active'); tUp.classList.remove('active');
                 title.innerText = "Terminal Access";
-                desc.innerText = "Enter credentials to connect to terminal";
+                desc.innerText = "Enter credentials to connect to the terminal";
             }
         }
 
@@ -291,7 +378,8 @@
             const tDep = document.getElementById('tabDeposit'), tWith = document.getElementById('tabWithdraw');
             const fTitle = document.getElementById('fundsTitle'), fDesc = document.getElementById('fundsDesc');
             const amtLabel = document.getElementById('amtLabel'), fSubmit = document.getElementById('fundsSubmit');
-            const fChips = document.getElementById('fundsChips'), fBadge = document.getElementById('fundsBadge');
+            const fChips = document.getElementById('fundsChips');
+            const fBadge = document.getElementById('fundsBadge');
             const wBadge = document.getElementById('withdrawBadge');
 
             if(mode === 'withdraw') {

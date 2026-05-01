@@ -15,8 +15,11 @@
         
         body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 175px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
 
-        /* --- HEADER STACK --- */
-        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
+        /* --- HEADER CONTROL --- */
+        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); transition: transform 0.3s ease; }
+        body.hide-header .header-stack { transform: translateY(-100%); }
+        body.hide-header { padding-top: 0 !important; }
+
         .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; height: 64px; }
         .logo { font-weight: 950; font-size: 24px; letter-spacing: -1.5px; display: flex; align-items: center; gap: 8px; }
         .live-dot { width: 8px; height: 8px; background: #ff4757; border-radius: 50%; animation: pulse 1.5s infinite; }
@@ -33,39 +36,43 @@
         .search-input { border: none; background: transparent; outline: none; width: 100%; font-size: 14px; font-weight: 500; }
 
         .category-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 10px 16px; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-        .category-scroller::-webkit-scrollbar { display: none; }
-        .cat-chip { padding: 8px 16px; background: #fff; border: 1px solid var(--border); border-radius: 100px; font-size: 13px; font-weight: 700; color: var(--text-sub); flex-shrink: 0; }
+        .cat-chip { padding: 8px 16px; background: #fff; border: 1px solid var(--border); border-radius: 100px; font-size: 13px; font-weight: 700; color: var(--text-sub); flex-shrink: 0; cursor: pointer; }
         .cat-chip.active { background: #000; color: #fff; border-color: #000; }
 
         /* --- DASHBOARD & CARDS --- */
         #dashboard { max-width: 500px; margin: auto; padding-bottom: 80px; }
-        .market-card { background: #fff; border-radius: 20px; border: 1.5px solid var(--border); padding: 18px; margin: 12px; position: relative; overflow: hidden; }
+        .market-card { background: #fff; border-radius: 20px; border: 1.5px solid var(--border); padding: 18px; margin: 12px; position: relative; }
         .card-header { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
-        .letter-icon { width: 44px; height: 44px; border-radius: 12px; background: #f1f5f9; color: #64748b; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; flex-shrink: 0; border: 1px solid #e2e8f0; }
         .m-title { font-size: 16px; font-weight: 700; line-height: 1.35; flex: 1; text-align: left; color: #1e293b; }
         .m-chance { font-size: 18px; font-weight: 800; text-align: right; min-width: 65px; }
         .m-chance span { font-size: 10px; display: block; color: var(--text-sub); text-transform: uppercase; }
         .order-btn-group { display: flex; gap: 10px; }
-        .order-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; transition: opacity 0.2s; }
-        .order-btn:active { opacity: 0.7; }
+        .order-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; }
+
+        /* --- MODERN PREMIUM MODALS --- */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 5000; align-items: center; justify-content: center; padding: 15px; }
+        .modal-card { background: #fff; width: 100%; max-width: 400px; padding: 32px; border-radius: 28px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+
+        .auth-switch { display: flex; background: #f8fafc; padding: 6px; border-radius: 16px; margin-bottom: 28px; border: 1px solid #e2e8f0; }
+        .auth-tab { flex: 1; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: 12px; transition: 0.2s; color: #64748b; }
+        .auth-tab.active { background: #0f172a; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        .modal-input { width: 100%; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; margin-bottom: 12px; font-size: 15px; outline: none; box-sizing: border-box; transition: border-color 0.2s; }
+        .modal-input:focus { border-color: #0f172a; }
+
+        .btn-primary-modal { width: 100%; padding: 18px; background: #0f172a; color: #fff; border: none; border-radius: 16px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        .modal-dismiss { margin-top: 20px; font-size: 14px; color: #94a3b8; cursor: pointer; font-weight: 500; }
 
         /* --- SKELETONS --- */
-        .skeleton { background: #eee; background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%); border-radius: 20px; background-size: 200% 100%; animation: shine 1.5s linear infinite; height: 140px; margin: 12px; }
-        @keyframes shine { to { background-position-x: -200%; } }
+        .skeleton { background: #eee; border-radius: 20px; height: 140px; margin: 12px; animation: shine 1.5s infinite; }
+        @keyframes shine { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
-        /* --- MODALS --- */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); z-index: 5000; align-items: center; justify-content: center; padding: 15px; }
-        .modal-card { background: #fff; width: 100%; max-width: 380px; padding: 35px; border-radius: 35px; text-align: center; }
-        .auth-switch { display: flex; background: #f1f5f9; padding: 4px; border-radius: 100px; margin-bottom: 25px; border: 1px solid #e2e8f0; }
-        .auth-tab { flex: 1; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 100px; }
-        .auth-tab.active { color: #fff; background: #000; }
-        
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="header-stack">
+    <div class="header-stack" id="mainHeader">
         <div class="top-nav">
             <div class="logo">NEXGEN <div class="live-dot"></div></div>
             <div class="bar-right">
@@ -85,16 +92,12 @@
             <div class="cat-chip" onclick="filterCat('Kenya', this)">Kenya</div>
             <div class="cat-chip" onclick="filterCat('Politics', this)">Politics</div>
             <div class="cat-chip" onclick="filterCat('Crypto', this)">Crypto</div>
-            <div class="cat-chip" onclick="filterCat('Sports', this)">Sports</div>
         </div>
     </div>
 
     <div id="dashboard">
         <div id="dynamic-feed"></div>
-        <div id="skeleton-container" class="hidden">
-            <div class="skeleton"></div>
-            <div class="skeleton"></div>
-        </div>
+        <div id="skeleton-container" class="hidden"><div class="skeleton"></div></div>
     </div>
 
     <div id="auth-overlay" class="modal-overlay">
@@ -103,125 +106,114 @@
                 <div id="tab-in" class="auth-tab active" onclick="switchAuth('in')">Sign In</div>
                 <div id="tab-up" class="auth-tab" onclick="switchAuth('up')">Sign Up</div>
             </div>
-            <h2 id="authTitle" style="margin-bottom:20px;">Access Terminal</h2>
+            <h2 id="authTitle" style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Welcome Back</h2>
+            <p style="color: #64748b; margin-bottom: 24px; font-size: 14px;">Access the institutional terminal</p>
+            
             <div id="signupOnly" class="hidden">
-                <input type="text" id="authName" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:12px;" placeholder="Full Name">
+                <input type="text" id="authName" class="modal-input" placeholder="Full Name">
             </div>
-            <input type="email" id="authEmail" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:12px;" placeholder="Email Address">
-            <button onclick="handleAuth()" style="width:100%; padding:18px; background:#000; color:#fff; border-radius:18px; border:none; font-weight:700">Enter NexGen</button>
-            <p onclick="closeModal('auth-overlay')" style="margin-top:20px; font-size:13px; color:#999; cursor:pointer;">Dismiss</p>
+            <input type="email" id="authEmail" class="modal-input" placeholder="Email Address">
+            <input type="password" id="authPass" class="modal-input" placeholder="Password">
+            
+            <button onclick="handleAuth()" class="btn-primary-modal">Initialize Session</button>
+            <div class="modal-dismiss" onclick="closeModal('auth-overlay')">Dismiss</div>
         </div>
     </div>
 
     <div id="deposit-overlay" class="modal-overlay">
         <div class="modal-card">
-            <h2 style="margin-bottom:25px;">Deposit KES</h2>
-            <div style="background:#f1f5f9; padding:25px; border-radius:24px; margin-bottom:20px">
-                <input type="number" id="customAmount" style="width:100%; border:none; background:transparent; font-size:36px; font-weight:900; text-align:center" placeholder="0">
-                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:15px">
-                    <div style="background:#fff; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer" onclick="document.getElementById('customAmount').value=250">250</div>
-                    <div style="background:#fff; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer" onclick="document.getElementById('customAmount').value=500">500</div>
-                    <div style="background:#fff; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer" onclick="document.getElementById('customAmount').value=1000">1k</div>
-                    <div style="background:#fff; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer" onclick="document.getElementById('customAmount').value=2000">2k</div>
+            <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Add Liquidity</h2>
+            <p style="color: #64748b; margin-bottom: 24px; font-size: 14px;">Instant M-Pesa & Card Funding</p>
+            
+            <div style="background:#f8fafc; padding:24px; border-radius:20px; border: 1px solid #e2e8f0; margin-bottom: 20px">
+                <div style="font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase;">Amount (Ksh)</div>
+                <input type="number" id="customAmount" style="width:100%; border:none; background:transparent; font-size:36px; font-weight:900; text-align:center; outline:none" placeholder="0">
+                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:20px">
+                    <div style="background:#fff; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; border:1px solid #e2e8f0" onclick="document.getElementById('customAmount').value=250">250</div>
+                    <div style="background:#fff; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; border:1px solid #e2e8f0" onclick="document.getElementById('customAmount').value=500">500</div>
+                    <div style="background:#fff; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; border:1px solid #e2e8f0" onclick="document.getElementById('customAmount').value=1000">1k</div>
+                    <div style="background:#fff; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; border:1px solid #e2e8f0" onclick="document.getElementById('customAmount').value=2000">2k</div>
                 </div>
             </div>
-            <button class="btn-deposit" style="width:100%; padding:18px; border-radius:18px" onclick="startPayment()">Authorize Deposit</button>
-            <p onclick="closeModal('deposit-overlay')" style="margin-top:15px; cursor:pointer; color:#999">Close</p>
+            
+            <button class="btn-primary-modal" style="background:var(--primary)" onclick="startPayment()">Continue to Payment</button>
+            <div class="modal-dismiss" onclick="closeModal('deposit-overlay')">Back to Dashboard</div>
         </div>
     </div>
 
     <script>
         const API_KEY = "AIzaSyDG43yZQXSg2maFzrQR92L3vxmkhu5H0hc";
         let selectedCategory = 'All';
-        let isLoading = false;
-        let seenQuestions = []; // Anti-suspicion memory bank
-
         let markets = [
             { cat: "Kenya", q: "Will William Ruto reshuffle the cabinet by June?", p: 62 },
             { cat: "Crypto", q: "Will Bitcoin stay above $100k until June?", p: 72 },
-            { cat: "Sports", q: "Will Arsenal win the Premier League title in 2026?", p: 46 }
+            { cat: "Sports", q: "Arsenal to win PL in 2026?", p: 46 }
         ];
-
-        // Seed the memory bank with initial questions
-        markets.forEach(m => seenQuestions.push(m.q));
 
         window.onload = () => {
             const user = localStorage.getItem('nx_user');
-            const bal = localStorage.getItem('nx_balance');
             if(user) {
                 document.getElementById('loginBtn').classList.add('hidden');
                 document.getElementById('userIcon').classList.remove('hidden');
-                document.getElementById('userIcon').innerText = user;
+                document.getElementById('userIcon').innerText = user.substring(0,2).toUpperCase();
             }
-            if(bal) document.getElementById('balance').innerText = parseFloat(bal).toFixed(2);
             render();
         };
 
-        window.onscroll = function() {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300) {
-                if (!isLoading) fetchMoreMarkets();
-            }
-        };
+        function startPayment() {
+            const amt = document.getElementById('customAmount').value;
+            if(amt < 10) return alert("Min Ksh 10");
+            
+            // HIDE HEADER logic
+            document.body.classList.add('hide-header');
+            closeModal('deposit-overlay');
 
-        async function fetchMoreMarkets() {
-            isLoading = true;
-            document.getElementById('skeleton-container').classList.remove('hidden');
+            const intasend = new window.IntaSend({ 
+                publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad", 
+                live: false 
+            });
 
-            const categoryFocus = selectedCategory === 'All' ? 'Kenya politics and global trends' : selectedCategory;
-            const avoidList = seenQuestions.slice(-15).join(", "); // Send the last 15 questions to Gemini
+            intasend.run({ amount: Number(amt), currency: "KES" })
+            .on("COMPLETE", () => {
+                let bal = parseFloat(localStorage.getItem('nx_balance') || 0);
+                localStorage.setItem('nx_balance', bal + Number(amt));
+                location.reload();
+            })
+            .on("FAILED", () => {
+                document.body.classList.remove('hide-header');
+            })
+            .on("CLOSE", () => {
+                document.body.classList.remove('hide-header');
+            });
+        }
 
-            const prompt = `Act as a prediction market analyst. Generate 3 unique "Yes/No" prediction questions for May 2026 regarding ${categoryFocus}. 
-            Do NOT repeat or generate anything similar to these previous questions: [${avoidList}].
-            Format: Strict JSON array of objects with keys "cat", "q", and "p".`;
-
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                });
-
-                const data = await response.json();
-                const text = data.candidates[0].content.parts[0].text;
-                const cleanedJson = text.replace(/```json|```/g, "").trim();
-                const newItems = JSON.parse(cleanedJson);
-
-                // Final client-side check to prevent duplicates
-                newItems.forEach(item => {
-                    if (!seenQuestions.includes(item.q)) {
-                        markets.push(item);
-                        seenQuestions.push(item.q);
-                    }
-                });
-
-                render();
-            } catch (e) {
-                console.error("Gemini Error", e);
-            } finally {
-                isLoading = false;
-                document.getElementById('skeleton-container').classList.add('hidden');
+        function switchAuth(mode) {
+            const tIn = document.getElementById('tab-in'), tUp = document.getElementById('tab-up');
+            const sUp = document.getElementById('signupOnly'), title = document.getElementById('authTitle');
+            if(mode === 'up') {
+                tUp.classList.add('active'); tIn.classList.remove('active'); 
+                sUp.classList.remove('hidden'); title.innerText = "Create Account";
+            } else {
+                tIn.classList.add('active'); tUp.classList.remove('active'); 
+                sUp.classList.add('hidden'); title.innerText = "Welcome Back";
             }
         }
 
         function render() {
             const feed = document.getElementById('dynamic-feed');
-            const search = document.getElementById('mSearch').value.toLowerCase();
             feed.innerHTML = '';
-            
-            markets.filter(m => (selectedCategory === 'All' || m.cat === selectedCategory) && m.q.toLowerCase().includes(search)).forEach(m => {
+            markets.filter(m => selectedCategory === 'All' || m.cat === selectedCategory).forEach(m => {
                 const card = document.createElement('div');
                 card.className = 'market-card';
                 card.innerHTML = `
                     <div class="card-header">
-                        <div class="letter-icon">${m.q.charAt(0)}</div>
                         <div class="m-title">${m.q}</div>
                         <div class="m-chance">${m.p}%<span>chance</span></div>
                     </div>
                     <div class="order-btn-group">
                         <button class="order-btn" style="background:var(--yes); color:var(--yes-text)">Yes</button>
                         <button class="order-btn" style="background:var(--no); color:var(--no-text)">No</button>
-                    </div>
-                `;
+                    </div>`;
                 feed.appendChild(card);
             });
         }
@@ -231,33 +223,15 @@
             document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
             render();
-            // Automatically fetch more if the category is empty
-            if(markets.filter(m => m.cat === cat).length < 2) fetchMoreMarkets();
-        }
-
-        function switchAuth(mode) {
-            const tIn = document.getElementById('tab-in'), tUp = document.getElementById('tab-up'), sUp = document.getElementById('signupOnly');
-            if(mode === 'up') {
-                tUp.classList.add('active'); tIn.classList.remove('active'); sUp.classList.remove('hidden');
-            } else {
-                tIn.classList.add('active'); tUp.classList.remove('active'); sUp.classList.add('hidden');
-            }
-        }
-
-        function startPayment() {
-            const amt = document.getElementById('customAmount').value;
-            if(amt < 10) return alert("Min Ksh 10");
-            const intasend = new window.IntaSend({ publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad", live: false });
-            intasend.run({ amount: Number(amt), currency: "KES" }).on("COMPLETE", () => {
-                const cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-                localStorage.setItem('nx_balance', cur + Number(amt));
-                location.reload();
-            });
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function handleAuth() { localStorage.setItem('nx_user', 'USR'); location.reload(); }
+        function handleAuth() { 
+            const email = document.getElementById('authEmail').value;
+            localStorage.setItem('nx_user', email || 'USR'); 
+            location.reload(); 
+        }
         function logout() { localStorage.clear(); location.reload(); }
     </script>
 </body>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NexGen | Professional Terminal</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
     <style>
         :root { 
             --primary: #2ebd85; --border: #f1f5f9; --text-main: #0f172a;
@@ -22,6 +22,8 @@
         .btn-auth { font-size: 12px; font-weight: 700; border: none; background: transparent; padding: 6px 12px; border-radius: 6px; color: #475569; cursor: pointer; }
         .btn-auth.active { background: #fff; color: #000; }
         .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 2px 2px 2px 10px; border-radius: 10px; gap: 8px; font-size: 13px; font-weight: 700; }
+        
+        /* The IntaSend Button Style */
         .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 800; cursor: pointer; }
         
         .cat-bar { display: flex; overflow-x: auto; padding: 12px 16px; gap: 20px; background: #fff; border-top: 1px solid var(--border); }
@@ -58,7 +60,10 @@
                 </div>
                 <div class="wallet-pill">
                     Ksh <span id="balance">0</span>
-                    <button class="btn-deposit" onclick="triggerDeposit()">Deposit</button>
+                    <button class="btn-deposit intaSendPayButton" 
+                            data-amount="10" 
+                            data-currency="KES" 
+                            data-email="user@nexgen.com">Deposit</button>
                 </div>
             </div>
         </div>
@@ -74,7 +79,6 @@
     <div id="dashboard">
         <div class="card"><div class="m-title">Will Arsenal win the Premier League?</div><div class="stat-row"><div><span class="p-val">45%</span> <span style="font-size:12px; color:#64748b;">WINNER</span></div><div style="font-size:11px; font-weight:700; color:#94a3b8;">VOL: $1.2M</div></div><div class="btn-row"><button class="m-btn btn-yes" onclick="trade()">YES</button><button class="m-btn btn-no" onclick="trade()">NO</button></div></div>
         <div class="card"><div class="m-title">Solana to flip Ethereum in Market Cap?</div><div class="stat-row"><div><span class="p-val">12%</span> <span style="font-size:12px; color:#64748b;">CHANCE</span></div><div style="font-size:11px; font-weight:700; color:#94a3b8;">VOL: $300K</div></div><div class="btn-row"><button class="m-btn btn-yes" onclick="trade()">YES</button><button class="m-btn btn-no" onclick="trade()">NO</button></div></div>
-        <div class="card"><div class="m-title">Will Jesus come back in June 2026?</div><div class="stat-row"><div><span class="p-val">11%</span> <span style="font-size:12px; color:#64748b;">CHANCE</span></div><div style="font-size:11px; font-weight:700; color:#94a3b8;">VOL: $4.2M</div></div><div class="btn-row"><button class="m-btn btn-yes" onclick="trade()">YES x9</button><button class="m-btn btn-no" onclick="trade()">NO x3</button></div></div>
         
         <div id="extra-feed"></div>
     </div>
@@ -90,46 +94,36 @@
     </div>
 
     <script>
-        // --- THE DEPOSIT SYSTEM ---
-        function triggerDeposit() {
-            const instance = new window.IntaSend({
-                public_key: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
-                live: false
-            });
-            
-            // Force the payment window to open
-            instance.run({
-                amount: 10,
-                currency: "KES"
-            })
-            .on("COMPLETE", (results) => {
-                document.getElementById('balance').innerText = results.amount;
-            })
-            .on("FAILED", (results) => {
-                alert("Payment Failed");
-            });
-        }
+        // --- LIVE DEPOSIT SYSTEM ---
+        window.onload = function() {
+            if (window.IntaSend) {
+                new window.IntaSend({
+                    publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
+                    live: false
+                })
+                .on("COMPLETE", (results) => { 
+                    document.getElementById('balance').innerText = results.amount;
+                })
+                .on("FAILED", () => { alert("Payment failed"); });
+            }
+        };
 
-        // 1. Modal Logic
+        // Modal Logic
         function openAuth(type) {
             document.getElementById('modal-title').innerText = 'Sign ' + type;
             document.getElementById('auth-modal').style.display = 'flex';
         }
         function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
-        function confirmAuth() {
-            alert("Supabase Auth Connection Ready"); 
-            closeAuth();
-        }
+        function confirmAuth() { closeAuth(); }
 
-        // 2. Immediate Scripted Cards (1000 items)
+        // Cards Feed
         let cardsHtml = '';
-        for(let i=4; i<=1000; i++) {
+        for(let i=4; i<=100; i++) {
             cardsHtml += `
             <div class="card">
-                <div class="m-title">Polymarket Event #${i}: Global Prediction?</div>
+                <div class="m-title">Polymarket Event #${i}: Prediction?</div>
                 <div class="stat-row">
-                    <div><span class="p-val">${Math.floor(Math.random()*99)}%</span> <span style="font-size:12px; color:#64748b;">CHANCE</span></div>
-                    <div style="font-size:11px; font-weight:700; color:#94a3b8;">VOL: LIVE</div>
+                    <div><span class="p-val">${Math.floor(Math.random()*99)}%</span></div>
                 </div>
                 <div class="btn-row">
                     <button class="m-btn btn-yes" onclick="trade()">YES</button>

@@ -293,7 +293,7 @@
                 amtLabel.innerText = "Withdrawal Amount (Ksh)";
                 fSubmit.innerText = "Confirm Withdrawal";
                 fSubmit.style.background = "#000";
-                fChips.classList.remove('hidden');
+                fChips.classList.add('hidden');
                 fBadge.classList.add('hidden');
             } else {
                 tDep.classList.add('active'); tWith.classList.remove('active');
@@ -347,4 +347,6 @@
             localStorage.setItem('nx_balance', curBal - amt);
             syncState();
             alert("Withdrawal complete");
+        }
+
         

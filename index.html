@@ -13,7 +13,7 @@
             --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #cf304a;
         }
         
-        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 100px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
+        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 80px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
 
         /* --- THE PERMANENT RETURN BUTTON --- */
         #return-btn {
@@ -23,63 +23,50 @@
             cursor: pointer; font-size: 14px; letter-spacing: 0.5px;
         }
 
-        /* --- FIXED AUTH SWITCH --- */
+        /* --- SLEEK SIGN IN BAR --- */
+        .btn-auth-trigger {
+            background: transparent; border: 1.5px solid #e2e8f0; color: var(--text-main);
+            padding: 8px 18px; border-radius: 12px; font-weight: 700; font-size: 13px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-auth-trigger:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+        /* --- AUTH SWITCH (BRIGHT VS DULL) --- */
         .auth-switch { 
             display: flex; background: #f1f5f9; padding: 4px; border-radius: 100px; margin-bottom: 30px; width: 240px; margin-inline: auto; border: 1px solid #e2e8f0;
         }
-        .auth-tab { 
-            flex: 1; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; text-align: center; border-radius: 100px;
-        }
-        .auth-tab.active { color: #fff; background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .auth-tab { flex: 1; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; text-align: center; border-radius: 100px; }
+        .auth-tab.active { color: #fff; background: #000; }
         .auth-tab.inactive { color: #94a3b8; background: transparent; }
 
-        /* --- PROFESSIONAL AMOUNT INPUT --- */
-        .currency-terminal { 
-            background: #fff; padding: 25px; border-radius: 24px; border: 1.5px solid #e2e8f0; margin-bottom: 25px; 
-        }
-        .input-wrapper { display: flex; align-items: baseline; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 5px; }
-        .currency-prefix { font-size: 20px; font-weight: 800; color: #000; margin-right: 10px; }
-        .amount-field { 
-            border: none; outline: none; font-size: 36px; font-weight: 900; width: 100%; color: #000; background: transparent; 
-        }
-        
-        .chip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .chip { 
-            background: #f1f5f9; padding: 10px 5px; border-radius: 10px; font-size: 12px; font-weight: 700; 
-            cursor: pointer; text-align: center; transition: 0.2s; border: 1px solid transparent;
-        }
-        .chip.active { background: #000; color: #fff; }
-
-        .modal-overlay { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
-            backdrop-filter: blur(10px); z-index: 5000; align-items: center; justify-content: center; padding: 15px; 
-        }
+        /* --- MODALS --- */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); z-index: 5000; align-items: center; justify-content: center; padding: 15px; }
         .modal-card { background: #fff; width: 100%; max-width: 380px; padding: 35px; border-radius: 35px; text-align: center; }
 
-        .btn-main { width: 100%; padding: 18px; background: #000; color: #fff; border: none; border-radius: 18px; font-weight: 700; font-size: 16px; cursor: pointer; }
-        .btn-main.deposit { background: var(--primary); }
+        /* --- HEADER --- */
+        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
+        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; height: 64px; }
+        .logo { font-weight: 950; font-size: 24px; letter-spacing: -1.5px; }
+        .bar-right { display: flex; align-items: center; gap: 8px; }
+        
+        .user-profile { width: 38px; height: 38px; background: #0f172a; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; font-size: 12px; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
+        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; }
 
+        /* --- TERMINAL INPUT --- */
+        .currency-terminal { background: #fff; padding: 25px; border-radius: 24px; border: 1.5px solid #e2e8f0; margin-bottom: 25px; }
+        .input-wrapper { display: flex; align-items: baseline; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 5px; }
+        .amount-field { border: none; outline: none; font-size: 36px; font-weight: 900; width: 100%; color: #000; background: transparent; }
+
+        /* --- UI STATES --- */
         body.hide-header .header { display: none !important; }
         body.hide-header { padding-top: 0 !important; }
         body.hide-header #return-btn { display: block !important; }
         .hidden { display: none !important; }
 
-        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; height: 64px; }
-        .logo { font-weight: 950; font-size: 24px; letter-spacing: -1.5px; }
-        .bar-right { display: flex; align-items: center; gap: 10px; }
-        .user-profile { width: 38px; height: 38px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; font-size: 12px; }
-        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
-        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; }
-
         #dashboard { max-width: 500px; margin: auto; padding: 12px; }
         .card { background: #fff; border-radius: 24px; border: 1px solid var(--border); padding: 22px; margin-bottom: 16px; }
-        .m-title { font-size: 17px; font-weight: 700; line-height: 1.4; margin-bottom: 18px; }
         .p-val { font-size: 30px; font-weight: 900; display: block; margin-bottom: 15px; }
-        .btn-row { display: flex; gap: 10px; }
-        .m-btn { flex: 1; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; font-size: 14px; }
-        .btn-yes { background: var(--yes); color: var(--yes-text); }
-        .btn-no { background: var(--no); color: var(--no-text); }
     </style>
 </head>
 <body>
@@ -92,37 +79,33 @@
                 <div id="tab-in" class="auth-tab active" onclick="switchAuth('in')">Sign In</div>
                 <div id="tab-up" class="auth-tab inactive" onclick="switchAuth('up')">Sign Up</div>
             </div>
-
-            <h2 id="authTitle" style="margin:0 0 20px 0; letter-spacing: -1px;">Login</h2>
-            
+            <h2 id="authTitle" style="margin-bottom:20px; letter-spacing:-1px">Access Terminal</h2>
             <div id="signupOnly" class="hidden">
                 <input type="text" id="authName" oninput="saveDraft()" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:12px;" placeholder="Full Name">
             </div>
             <input type="email" id="authEmail" oninput="saveDraft()" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:12px;" placeholder="Email Address">
             <input type="password" id="authPass" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:20px;" placeholder="Password">
-
-            <button class="btn-main" onclick="handleAuth()">Access Terminal</button>
-            <p onclick="closeModal('auth-overlay')" style="margin-top:20px; font-size:13px; color:#999; cursor:pointer; font-weight:700;">Dismiss</p>
+            <button class="btn-main" onclick="handleAuth()" style="width:100%; padding:18px; background:#000; color:#fff; border-radius:18px; border:none; font-weight:700">Enter NexGen</button>
+            <p onclick="closeModal('auth-overlay')" style="margin-top:20px; font-size:13px; color:#999; cursor:pointer;">Dismiss</p>
         </div>
     </div>
 
     <div id="deposit-overlay" class="modal-overlay">
         <div class="modal-card">
-            <h2 style="margin:0 0 25px 0; letter-spacing: -1px;">Deposit KES</h2>
+            <h2 style="margin-bottom:25px; letter-spacing:-1px">Deposit KES</h2>
             <div class="currency-terminal">
                 <div class="input-wrapper">
-                    <span class="currency-prefix">Ksh</span>
-                    <input type="number" id="customAmount" class="amount-field" placeholder="0" min="200">
+                    <span style="font-size:20px; font-weight:800; margin-right:10px">Ksh</span>
+                    <input type="number" id="customAmount" class="amount-field" placeholder="0">
                 </div>
-                <div class="chip-grid">
-                    <div class="chip" onclick="setAmt(250, this)">250</div>
-                    <div class="chip" onclick="setAmt(500, this)">500</div>
-                    <div class="chip" onclick="setAmt(1000, this)">1k</div>
-                    <div class="chip" onclick="setAmt(2000, this)">2k</div>
+                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px">
+                    <div style="background:#f1f5f9; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer" onclick="document.getElementById('customAmount').value=250">250</div>
+                    <div style="background:#f1f5f9; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer" onclick="document.getElementById('customAmount').value=500">500</div>
+                    <div style="background:#f1f5f9; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer" onclick="document.getElementById('customAmount').value=1000">1k</div>
+                    <div style="background:#f1f5f9; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer" onclick="document.getElementById('customAmount').value=2000">2k</div>
                 </div>
             </div>
-            <button class="btn-main deposit" onclick="startPayment()">Authorize Deposit</button>
-            <p onclick="closeModal('deposit-overlay')" style="margin-top:20px; font-size:13px; color:#999; cursor:pointer;">Close</p>
+            <button class="btn-deposit" style="width:100%; padding:18px; border-radius:18px" onclick="startPayment()">Authorize Deposit</button>
         </div>
     </div>
 
@@ -130,7 +113,7 @@
         <div class="top-nav">
             <div class="logo">NEXGEN</div>
             <div class="bar-right">
-                <button id="loginBtn" class="btn-login-trigger" onclick="openModal('auth-overlay')">Sign In</button>
+                <button id="loginBtn" class="btn-auth-trigger" onclick="openModal('auth-overlay')">Sign In</button>
                 <div id="userIcon" class="user-profile hidden" onclick="logout()">??</div>
                 <div class="wallet-pill">
                     Ksh <span id="balance">0.00</span>
@@ -145,28 +128,25 @@
     </div>
 
     <script>
-        // --- PERSISTENCE & DRAFT SAVING ---
+        // --- DATA PERSISTENCE ---
         window.onload = () => {
-            const savedUser = localStorage.getItem('nx_user');
-            const savedBal = localStorage.getItem('nx_balance');
+            const user = localStorage.getItem('nx_user');
+            const bal = localStorage.getItem('nx_balance');
             const draftEmail = localStorage.getItem('nx_draft_email');
-            const draftName = localStorage.getItem('nx_draft_name');
             
-            if(savedUser) {
+            if(user) {
                 document.getElementById('loginBtn').classList.add('hidden');
                 document.getElementById('userIcon').classList.remove('hidden');
-                document.getElementById('userIcon').innerText = savedUser;
+                document.getElementById('userIcon').innerText = user;
             }
-            if(savedBal) document.getElementById('balance').innerText = parseFloat(savedBal).toFixed(2);
+            if(bal) document.getElementById('balance').innerText = parseFloat(bal).toFixed(2);
             if(draftEmail) document.getElementById('authEmail').value = draftEmail;
-            if(draftName) document.getElementById('authName').value = draftName;
 
             render();
         };
 
         function saveDraft() {
             localStorage.setItem('nx_draft_email', document.getElementById('authEmail').value);
-            localStorage.setItem('nx_draft_name', document.getElementById('authName').value);
         }
 
         // --- BACK BUTTON INTERCEPTION ---
@@ -183,37 +163,27 @@
         function switchAuth(mode) {
             const tIn = document.getElementById('tab-in');
             const tUp = document.getElementById('tab-up');
-            const signup = document.getElementById('signupOnly');
-            const title = document.getElementById('authTitle');
-
             if(mode === 'up') {
-                tUp.className = "auth-tab active"; tIn.className = "auth-tab inactive";
-                signup.classList.remove('hidden'); title.innerText = "Register";
+                tUp.className="auth-tab active"; tIn.className="auth-tab inactive";
+                document.getElementById('signupOnly').classList.remove('hidden');
             } else {
-                tIn.className = "auth-tab active"; tUp.className = "auth-tab inactive";
-                signup.classList.add('hidden'); title.innerText = "Login";
+                tIn.className="auth-tab active"; tUp.className="auth-tab inactive";
+                document.getElementById('signupOnly').classList.add('hidden');
             }
         }
 
         function handleAuth() {
             const email = document.getElementById('authEmail').value;
             if(!email.includes('@')) return alert("Invalid email");
-            const initial = email.substring(0,2).toUpperCase();
-            localStorage.setItem('nx_user', initial);
+            localStorage.setItem('nx_user', email.substring(0,2).toUpperCase());
             location.reload();
         }
 
-        function logout() { if(confirm("Logout?")) { localStorage.removeItem('nx_user'); location.reload(); } }
-
-        function setAmt(val, el) {
-            document.getElementById('customAmount').value = val;
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-        }
+        function logout() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } }
 
         function startPayment() {
             const amt = document.getElementById('customAmount').value;
-            if(amt < 200) return alert("Min deposit Ksh 200");
+            if(amt < 200) return alert("Min Ksh 200");
             closeModal('deposit-overlay');
             document.body.classList.add('hide-header');
             
@@ -227,10 +197,8 @@
 
             intasend.run({ amount: Number(amt), currency: "KES", redirect: false })
             .on("COMPLETE", (res) => {
-                const current = parseFloat(document.getElementById('balance').innerText);
-                const newBal = current + Number(amt);
+                const newBal = parseFloat(document.getElementById('balance').innerText) + Number(amt);
                 localStorage.setItem('nx_balance', newBal);
-                cleanupUI();
                 location.reload();
             })
             .on("FAILED", cleanupUI);
@@ -244,11 +212,11 @@
 
         function render() {
             const feed = document.getElementById('dynamic-feed');
-            const m = ["BTC to reach Ksh 15M?", "KES to drop vs USD?", "Arsenal Premier League?", "AI Solves Cancer?"];
-            for(let i=0; i<15; i++) {
+            const m = ["BTC to reach Ksh 15M?", "KES to drop vs USD?", "Arsenal Premier League?"];
+            for(let i=0; i<10; i++) {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.innerHTML = `<div class="m-title">${m[Math.floor(Math.random()*m.length)]}</div><span class="p-val">${Math.floor(Math.random()*80)+10}%</span><div class="btn-row"><button class="m-btn btn-yes">YES</button><button class="m-btn btn-no">NO</button></div>`;
+                card.innerHTML = `<div style="font-weight:700;margin-bottom:10px">${m[i%3]}</div><span class="p-val">${Math.floor(Math.random()*80)+10}%</span><div style="display:flex;gap:10px"><button style="flex:1;padding:15px;border-radius:15px;border:none;background:var(--yes);color:var(--yes-text);font-weight:800">YES</button><button style="flex:1;padding:15px;border-radius:15px;border:none;background:var(--no);color:var(--no-text);font-weight:800">NO</button></div>`;
                 feed.appendChild(card);
             }
         }

@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Polymarkets Africa | Terminal</title>
+    <title>Polymarkets Africa | Cloud Terminal</title>
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js" async></script>
 
     <style>
@@ -55,9 +56,6 @@
         .news-h { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #000; }
         .news-p { font-size: 13px; color: var(--text-sub); line-height: 1.5; margin: 0; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
         .modal { background: #fff; width: 100%; max-width: 360px; padding: 32px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         .auth-nav { display: flex; background: #f1f5f9; padding: 6px; border-radius: 14px; margin-bottom: 24px; }
@@ -79,7 +77,7 @@
                 <div class="logo-sub">Africa</div>
             </div>
             <div class="nav-right">
-                <button id="signBtn" class="btn-deposit" style="background:#f1f5f9; color:#000;" onclick="openModal('authModal')">Sign In</button>
+                <button id="signBtn" class="btn-deposit" onclick="openModal('authModal')">Sign In</button>
                 <div id="userIcon" class="user-id hidden" onclick="logout()">
                     <svg class="person-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 </div>
@@ -116,19 +114,14 @@
     <div id="depositModal" class="overlay">
         <div class="modal">
             <h2>Deposit</h2>
-            <p style="color: var(--text-sub); font-size: 13px;">Secure M-Pesa Funding (Min 200)</p>
-            <div style="background:#f8fafc; padding:20px; border-radius:18px; border: 1px solid var(--border);">
-                <input type="number" id="depAmt" class="input-tech" style="font-size: 32px; text-align: center; font-weight: 900; background: transparent; border: none;" placeholder="0">
-                <div class="chip-grid">
-                    <div class="amt-chip" onclick="setAmt(250)">250</div>
-                    <div class="amt-chip" onclick="setAmt(500)">500</div>
-                    <div class="amt-chip" onclick="setAmt(1000)">1k</div>
-                    <div class="amt-chip" onclick="setAmt(2000)">2k</div>
-                    <div class="amt-chip" onclick="setAmt(5000)">5k</div>
-                    <div class="amt-chip" onclick="setAmt(10000)">10k</div>
-                </div>
+            <p style="color: var(--text-sub); font-size: 13px;">Instant Top-up</p>
+            <input type="number" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800;" placeholder="Enter Amount">
+            <div class="chip-grid">
+                <div class="amt-chip" onclick="setAmt(250)">250</div>
+                <div class="amt-chip" onclick="setAmt(500)">500</div>
+                <div class="amt-chip" onclick="setAmt(1000)">1k</div>
             </div>
-            <button onclick="payNow()" class="btn-tech" style="background:var(--accent)">Confirm Deposit</button>
+            <button onclick="payNow()" class="btn-tech" style="background:var(--accent)">Confirm</button>
             <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
@@ -145,96 +138,72 @@
 
     <div id="createModal" class="overlay">
         <div class="modal">
-            <h2>New Prediction</h2>
-            <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 15px;">Create a real-world market for trading</p>
-            <input type="text" id="cQuestion" class="input-tech" placeholder="Market Query/Question">
-            <input type="number" id="cOdds" class="input-tech" placeholder="Initial Implied Odds % (e.g. 50)" min="1" max="99">
-            <button onclick="createNewMarket()" class="btn-tech" style="background: var(--accent)">Create Market</button>
+            <h2>New Market</h2>
+            <input type="text" id="cQuestion" class="input-tech" placeholder="Question">
+            <input type="number" id="cOdds" class="input-tech" placeholder="Implied Odds % (e.g. 50)" min="1" max="99">
+            <button onclick="createMarket()" class="btn-tech" style="background: var(--accent)">Create Market</button>
             <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('createModal')">Cancel</p>
         </div>
     </div>
 
     <script>
+        // --------------------------------------------------
+        // ACTIVE SUPABASE CREDENTIALS INJECTED
+        // --------------------------------------------------
+        const SUPABASE_URL = "https://hwxnfzuwaeseszgsjeny.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL";
+        // --------------------------------------------------
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         let currentCat = 'All';
         let currentUser = null;
-        let globalUsers = {}; // Shared mock database synced in real time via Cloud or Local Network simulator
+        let userData = null;
         let markets = [];
+        let userWagers = [];
 
-        const baseMarkets = [
-            { type: 'm', cat: "World", q: "Will XRP hit an all-time high by June?", p: 3, id: "poly-xrp-ath" },
-            { type: 'm', cat: "World", q: "Will Oklahoma City Thunder win the NBA Finals?", p: 38, id: "poly-nba-thunder" },
-            { type: 'm', cat: "World", q: "Will China initiate a blockade on Taiwan?", p: 21, id: "poly-china-taiwan" },
-            { type: 'n', cat: "News", h: "XRP Market Update", p: "Spot XRP ETFs crossed $1.3B in cumulative inflows, positioning it near a crucial breakout channel.", id: "news-xrp" }
-        ];
-
-        window.onload = () => {
-            loadDatabase();
-            const lastSession = localStorage.getItem('nx_current_user');
-            if (lastSession && globalUsers[lastSession]) {
-                currentUser = lastSession;
+        window.onload = async () => {
+            const savedEmail = localStorage.getItem('nx_email');
+            if (savedEmail) {
+                currentUser = savedEmail;
+                await fetchUserData();
             }
-            syncDataState();
+            await fetchMarkets();
             render('All');
         };
 
-        // Simulated cloud-wide network synchronizer
-        function loadDatabase() {
-            try {
-                const storedDb = localStorage.getItem('nx_cloud_db');
-                if (storedDb) {
-                    globalUsers = JSON.parse(storedDb);
-                }
-            } catch(e) { globalUsers = {}; }
-            
-            try {
-                const storedMarkets = localStorage.getItem('nx_cloud_markets');
-                if (storedMarkets) {
-                    markets = JSON.parse(storedMarkets);
-                } else {
-                    markets = [...baseMarkets];
-                    saveDatabase();
-                }
-            } catch(e) {
-                markets = [...baseMarkets];
-                saveDatabase();
+        async function fetchUserData() {
+            if (!currentUser) return;
+            const { data, error } = await supabase.from('profiles').select('*').eq('email', currentUser).single();
+            if (!error && data) {
+                userData = data;
+                const { data: wagers } = await supabase.from('wagers').select('*').eq('email', currentUser);
+                userWagers = wagers || [];
             }
+            syncHeader();
         }
 
-        function saveDatabase() {
-            localStorage.setItem('nx_cloud_db', JSON.stringify(globalUsers));
-            localStorage.setItem('nx_cloud_markets', JSON.stringify(markets));
-        }
-
-        function syncDataState() {
-            if (currentUser && globalUsers[currentUser]) {
-                document.getElementById('signBtn').classList.add('hidden');
-                document.getElementById('userIcon').classList.remove('hidden');
-                document.getElementById('balance').innerText = parseFloat(globalUsers[currentUser].balance).toLocaleString(undefined, {minimumFractionDigits: 2});
-            } else {
-                document.getElementById('signBtn').classList.remove('hidden');
-                document.getElementById('userIcon').classList.add('hidden');
-                document.getElementById('balance').innerText = "0.00";
+        async function fetchMarkets() {
+            const { data, error } = await supabase.from('markets').select('*');
+            if (!error && data) {
+                markets = data;
             }
         }
 
         function render(cat) {
             currentCat = cat;
             if (cat === 'Create') {
-                if (!currentUser) {
-                    openModal('authModal');
-                    return filterCat('All', document.querySelector('.cat-link'));
-                }
-                openModal('createModal');
-                return;
+                if (!currentUser) { openModal('authModal'); return filterCat('All', document.querySelector('.cat-link')); }
+                openModal('createModal'); return;
             }
 
-            const f = document.getElementById('feed'); 
+            const f = document.getElementById('feed');
             if (!f) return;
             f.innerHTML = '';
             
             let filtered = markets.filter(m => cat === 'All' ? true : (cat === 'News' ? m.type === 'n' : m.cat === cat));
             if (filtered.length === 0) {
-                f.innerHTML = `<p style="text-align: center; color: var(--text-sub); font-size: 14px; margin-top: 40px;">No active items in this category.</p>`;
+                f.innerHTML = `<p style="text-align: center; color: var(--text-sub); font-size: 14px; margin-top: 40px;">No active items available.</p>`;
                 return;
             }
             filtered.forEach(m => injectToTerminal(m));
@@ -254,12 +223,12 @@
             if(item.type === 'm') {
                 card.className = 'market-card';
                 const safeQ = item.q.replace(/'/g, "\\'");
-                const wager = getActiveWager(item.id);
-                const activeStakeStatus = wager ? `<br><span style="color:var(--accent); font-size:11px; font-weight:700;">Active wager: Ksh ${wager.amt} on '${wager.side}'</span>` : '';
+                const activeWager = userWagers.find(w => w.market_id === item.id);
+                const wagerHtml = activeWager ? `<br><span style="color:var(--accent); font-size:11px; font-weight:700;">Wagered: Ksh ${activeWager.amt} on '${activeWager.side}'</span>` : '';
 
                 card.innerHTML = `
                     <div class="m-header">
-                        <div class="m-title">${item.q}${activeStakeStatus}</div>
+                        <div class="m-title">${item.q}${wagerHtml}</div>
                         <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
@@ -269,21 +238,9 @@
                     <button class="resolve-btn" onclick="resolvePrediction('${item.id}')">Settle Prediction</button>`;
             } else {
                 card.className = 'news-card';
-                card.innerHTML = `
-                    <span class="news-tag">
-                        <div style="width:5px; height:5px; background:var(--accent); border-radius:50%; animation:pulse 1s infinite;"></div>
-                        Market Intel
-                    </span>
-                    <div class="news-h">${item.h}</div>
-                    <p class="news-p">${item.p}</p>`;
+                card.innerHTML = `<div class="news-h">${item.h}</div><p class="news-p">${item.p_desc}</p>`;
             }
-
             f.appendChild(card);
-        }
-
-        function getActiveWager(marketId) {
-            if (!currentUser || !globalUsers[currentUser]) return null;
-            return globalUsers[currentUser].wagers[marketId];
         }
 
         function openStakeModal(side, question, marketId) {
@@ -293,63 +250,104 @@
             document.getElementById('stakeAmt').value = '';
             openModal('stakeModal');
 
-            document.getElementById('stakeConfirmBtn').onclick = () => {
-                const amt = Number(document.getElementById('stakeAmt').value);
-                const uBal = globalUsers[currentUser].balance;
+            document.getElementById('stakeConfirmBtn').onclick = async () => {
+                const amt = parseFloat(document.getElementById('stakeAmt').value);
+                if (!amt || amt < 50) return alert("Minimum stake is Ksh 50");
+                if (amt > userData.balance) return alert("Insufficient balance.");
 
-                if(!amt || amt < 50) return alert("Minimum stake is Ksh 50");
-                if(amt > uBal) return alert("Insufficient balance to place stake.");
+                const newBal = userData.balance - amt;
+                await supabase.from('profiles').update({ balance: newBal }).eq('email', currentUser);
+                await supabase.from('wagers').insert([{ email: currentUser, market_id: marketId, side, amt }]);
 
-                globalUsers[currentUser].balance -= amt;
-                globalUsers[currentUser].wagers[marketId] = { side: side, amt: amt };
-                
-                saveDatabase();
-                syncDataState();
+                await fetchUserData();
                 closeModal('stakeModal');
                 render(currentCat);
-                alert(`Stake successfully locked! Your correct balance matches across devices.`);
+                alert("Wager placed successfully on the cloud!");
             };
         }
 
-        function resolvePrediction(marketId) {
-            const outcomes = ["YES", "NO"];
-            const resolvedOutcome = outcomes[Math.floor(Math.random() * outcomes.length)];
-            let alertMsg = `Resolved to '${resolvedOutcome}'.\n`;
+        async function resolvePrediction(marketId) {
+            const outcome = Math.random() > 0.5 ? "YES" : "NO";
+            const activeWager = userWagers.find(w => w.market_id === marketId);
+            let alertMsg = `Settled as: '${outcome}'.\n`;
 
-            if (currentUser && globalUsers[currentUser]) {
-                const wager = globalUsers[currentUser].wagers[marketId];
-                if (wager) {
-                    if (wager.side === resolvedOutcome) {
-                        const win = wager.amt * 2;
-                        globalUsers[currentUser].balance += win;
-                        alertMsg += `🎉 Correct! Ksh ${win.toLocaleString()} added to balance.`;
-                    } else {
-                        alertMsg += `❌ Incorrect. The stake of Ksh ${wager.amt} expired.`;
-                    }
-                    delete globalUsers[currentUser].wagers[marketId];
+            if (activeWager) {
+                if (activeWager.side === outcome) {
+                    const winnings = activeWager.amt * 2;
+                    const newBal = userData.balance + winnings;
+                    await supabase.from('profiles').update({ balance: newBal }).eq('email', currentUser);
+                    alertMsg += `🎉 Correct! Ksh ${winnings.toLocaleString()} added to your account!`;
                 } else {
-                    alertMsg += "You didn't stake on this market on this user profile.";
+                    alertMsg += `❌ Incorrect outcome.`;
                 }
-            } else {
-                alertMsg += "Login to resolve and collect direct payouts.";
+                await supabase.from('wagers').delete().eq('market_id', marketId).eq('email', currentUser);
             }
 
-            // Sync deleted from markets
-            markets = markets.filter(m => m.id !== marketId);
-            saveDatabase();
-            syncDataState();
+            await supabase.from('markets').delete().eq('id', marketId);
+            await fetchMarkets();
+            await fetchUserData();
             render(currentCat);
             alert(alertMsg);
         }
 
-        function createNewMarket() {
+        async function createMarket() {
             const q = document.getElementById('cQuestion').value;
             const p = parseInt(document.getElementById('cOdds').value);
-            if (!q || !p || p < 1 || p > 99) return alert("Ensure a valid question and a 1-99% odds probability.");
+            if(!q || !p || p < 1 || p > 99) return alert("All inputs required, odds must be 1-99.");
 
-            const customItem = {
-                type: 'm',
-                cat: "World",
-                q: q,
-                p: 
-        
+            const marketId = "poly-" + Date.now();
+            await supabase.from('markets').insert([{ id: marketId, type: 'm', cat: 'World', q, p }]);
+            
+            await fetchMarkets();
+            closeModal('createModal');
+            filterCat('All', document.querySelector('.cat-link'));
+            alert("Prediction market created on Supabase!");
+        }
+
+        async function doAuth() {
+            const email = document.getElementById('aEmail').value.trim().toLowerCase();
+            const pass = document.getElementById('aPass').value;
+            if(!email.includes('@') || pass.length < 4) return alert("Valid credentials required.");
+
+            const { data: existingUser } = await supabase.from('profiles').select('*').eq('email', email).single();
+
+            if (!existingUser) {
+                await supabase.from('profiles').insert([{ email, password: pass, balance: 1000 }]);
+                alert("Account created! Welcome to Polymarkets Africa.");
+            } else if (existingUser.password !== pass) {
+                return alert("Incorrect password.");
+            }
+
+            currentUser = email;
+            localStorage.setItem('nx_email', currentUser);
+            await fetchUserData();
+            closeModal('authModal');
+            render('All');
+        }
+
+        async function payNow() {
+            const amt = parseFloat(document.getElementById('depAmt').value);
+            if (!amt || amt < 200) return alert("Min required deposit is Ksh 200");
+            const newBal = userData.balance + amt;
+            await supabase.from('profiles').update({ balance: newBal }).eq('email', currentUser);
+            await fetchUserData();
+            closeModal('depositModal');
+            alert("Balance successfully topped up!");
+        }
+
+        function syncHeader() {
+            if(currentUser && userData) {
+                document.getElementById('signBtn').classList.add('hidden');
+                document.getElementById('userIcon').classList.remove('hidden');
+                document.getElementById('balance').innerText = parseFloat(userData.balance).toLocaleString(undefined, {minimumFractionDigits:2});
+            } else {
+                document.getElementById('signBtn').classList.remove('hidden');
+                document.getElementById('userIcon').classList.add('hidden');
+                document.getElementById('balance').innerText = "0.00";
+            }
+        }
+
+        function setAuth(mode) {
+            const tIn = document.getElementById('tabIn'), tUp = document.getElementById('tabUp'), title = document.getElementById('aTitle');
+            if (mode === 'up') { tUp.classList.add('active'); tIn.classList.remove('active'); title.innerText = "Register Identity"; }
+            else { tIn.classList.add('active'); tUp.classList.remove('active'); title.innerText = "Terminal Acce

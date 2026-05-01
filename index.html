@@ -22,23 +22,9 @@
         .auth-btn { background: #f1f5f9; border: none; padding: 8px 12px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; }
 
         .wallet { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 2px 2px 2px 10px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
+        
+        /* THE REDIRECT BUTTON */
         .deposit-btn { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 13px; }
-
-        /* --- THE FIX: FORCING MPESA/CARD TABS TO THE BOTTOM --- */
-        /* Targets the IntaSend wrapper to flip the layout order */
-        #intasend-inline-container .intasend-payment-nav {
-            order: 2 !important;
-            margin-top: 20px !important;
-            border-top: 1px solid #eee !important;
-            border-bottom: none !important;
-        }
-        #intasend-inline-container .intasend-payment-body {
-            order: 1 !important;
-        }
-        #intasend-inline-container .intasend-modal-content {
-            display: flex !important;
-            flex-direction: column !important;
-        }
 
         /* --- AUTH SWITCH MODAL --- */
         #auth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
@@ -72,7 +58,7 @@
             <button class="auth-btn" onclick="openAuth()">Sign In</button>
             <div class="wallet">
                 Ksh <span id="bal">0.00</span>
-                <button onclick="initiatePayment()" class="deposit-btn">Deposit</button>
+                <button onclick="payWithRedirect()" class="deposit-btn">Deposit</button>
             </div>
         </div>
     </header>
@@ -104,23 +90,23 @@
     </div>
 
     <script>
-        function initiatePayment() {
+        // --- REDIRECT PAYMENT LOGIC ---
+        function payWithRedirect() {
             const intasend = new window.IntaSend({
                 publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
                 live: false 
             });
 
+            // Redirect: true ensures a full-page experience where M-Pesa tabs are visible
             intasend.run({
                 amount: 50,
                 currency: "KES",
                 email: "user@nexgen.com",
-                button_text: "Pay Now",
-                redirect: false 
-            }).on("COMPLETE", (res) => {
-                document.getElementById('bal').innerText = res.amount;
+                redirect: true 
             });
         }
 
+        // --- AUTH TOGGLE ---
         function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
         function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
         
@@ -133,7 +119,8 @@
             document.getElementById('tUp').classList.toggle('active');
         }
 
-        const marketItems = ["Bitcoin to $100k?", "Ksh to 120?", "Arsenal Win?", "AI Solves Fusion?", "Solana Flip ETH?"];
+        // --- PREDICTIONS FEED ---
+        const marketItems = ["Bitcoin to $100k?", "Ksh to 120?", "Arsenal Win?", "AI Solves Fusion?"];
         let total = 0;
         function render(num) {
             const container = document.getElementById('dynamic');

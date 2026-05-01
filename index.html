@@ -36,6 +36,11 @@
 
         #dashboard { max-width: 600px; margin: auto; padding: 12px; box-sizing: border-box; }
         
+        /* Breaking News Ticker styling */
+        .news-ticker-container { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.01); }
+        .news-label { background: #000; color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; letter-spacing: 1px; flex-shrink: 0; }
+        .news-headline { font-size: 13px; font-weight: 600; color: var(--text-main); margin: 0; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-grow: 1; }
+
         /* Lively Market Cards */
         .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
         .market-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
@@ -99,6 +104,11 @@
     </div>
 
     <div id="dashboard">
+        <div class="news-ticker-container">
+            <span class="news-label">News</span>
+            <div id="news-headline" class="news-headline">Market volatility shifts following local central bank indicators...</div>
+        </div>
+
         <div id="feed"></div>
     </div>
 
@@ -246,6 +256,15 @@
         // Synchronize and validate across LocalStorage fallback 
         let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
 
+        // Preset Headlines Rotation
+        const headlines = [
+            "Market volatility shifts following local central bank indicators...",
+            "African tech corridors report record funding cycles this quarter...",
+            "Global commodities hold key support as currency markets open...",
+            "Commodities indices report dynamic activity as gold stabilizes...",
+            "New trading volumes established over global weekend indices..."
+        ];
+
         // Global Prediction Dataset
         const categories = ["Finance", "Sports", "Politics", "Tech", "Entertainment"];
         const feedThemes = {
@@ -292,19 +311,16 @@
             syncState(); 
             renderFeed();
             
-            // Intercept hardware/browser back buttons to safely close overlay/payment mode instead of navigating away
-            window.addEventListener('popstate', (e) => {
-                if (document.body.classList.contains('hide-header')) {
-                    document.body.classList.remove('hide-header');
-                    document.getElementById('depositModal').style.display = 'none';
-                    document.getElementById('authModal').style.display = 'none';
-                    history.pushState(null, null, window.location.pathname);
-                }
-            });
+            // Periodically cycle headlines in news bar
+            let newsIndex = 0;
+            setInterval(() => {
+                newsIndex = (newsIndex + 1) % headlines.length;
+                document.getElementById('news-headline').innerText = headlines[newsIndex];
+            }, 6500);
         };
 
         function initializeMarkets() {
-            // Generates dynamic markets and injects Jesus Market as Prediction #8
+            // Build out markets and place Jesus Market at Prediction #8
             for (let i = 1; i <= 3000; i++) {
                 if (i === 8) {
                     markets.push({
@@ -519,7 +535,6 @@
 
             closeModal('depositModal');
             document.body.classList.add('hide-header');
-            history.pushState(null, null, window.location.pathname);
 
             let intasend = new window.IntaSend({
                 publicAPIKey: INTASEND_PUBLIC_KEY,
@@ -558,8 +573,7 @@
 
         function openModal(id) { 
             document.body.classList.add('hide-header');
-            document.getElementById(id).style.display = 'flex';
-            history.pushState(null, null, window.location.pathname);
+            document.getElementById(id).style.display = 'flex'; 
         }
 
         function closeModal(id) { 

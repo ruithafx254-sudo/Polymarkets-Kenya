@@ -55,6 +55,8 @@
         .news-h { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #000; }
         .news-p { font-size: 13px; color: var(--text-sub); line-height: 1.5; margin: 0; }
 
+        .add-market-card { background: #fafafa; border: 2px dashed var(--border); border-radius: 14px; padding: 20px; margin-bottom: 12px; text-align: center; }
+
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
@@ -63,7 +65,7 @@
         .auth-nav { display: flex; background: #f1f5f9; padding: 6px; border-radius: 14px; margin-bottom: 24px; }
         .auth-tab { flex: 1; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 10px; color: var(--text-sub); transition: 0.3s; }
         .auth-tab.active { background: #000; color: #fff; }
-        .input-tech { width: 100%; padding: 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
+        .input-tech { width: 100%; padding: 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
         .btn-tech { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 15px; }
         .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
         .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; }
@@ -96,6 +98,7 @@
             <div class="cat-link" onclick="filterCat('Entertainment', this)">Entertainment</div>
             <div class="cat-link" onclick="filterCat('Sports', this)">Sports</div>
             <div class="cat-link" onclick="filterCat('Tech', this)">Tech</div>
+            <div class="cat-link" style="color: var(--accent); font-weight: bold;" onclick="openModal('createMarketModal')">+ Add Market</div>
         </div>
     </div>
 
@@ -146,10 +149,28 @@
         </div>
     </div>
 
+    <div id="createMarketModal" class="overlay">
+        <div class="modal">
+            <h2>New Prediction</h2>
+            <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Deploy directly to feed</p>
+            <select id="cmCat" class="input-tech">
+                <option value="World">World News</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Sports">Sports</option>
+                <option value="Tech">Tech</option>
+            </select>
+            <input type="text" id="cmTitle" class="input-tech" placeholder="Question Title (e.g., Will it rain?)">
+            <input type="number" id="cmProb" class="input-tech" placeholder="Starting Odds / Probability %" min="1" max="99">
+            <button onclick="deployMarket()" class="btn-tech" style="background: var(--accent)">Deploy to Live Feed</button>
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 16px; cursor: pointer;" onclick="closeModal('createMarketModal')">Cancel</p>
+        </div>
+    </div>
+
     <script>
         let currentCat = 'All';
         let markets = [];
 
+        // Standalone Local Base Markets
         const baseMarkets = [
             { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" },
             { type: 'm', cat: "Entertainment", q: "Will Marvel announce Black Panther 3 this year?", p: 55, id: "ent-bp3" },
@@ -160,8 +181,6 @@
         ];
 
         window.onload = () => { 
-            // Wipes existing cache completely so fresh default markets load in safely
-            localStorage.removeItem('nx_markets');
             loadPersistedMarkets();
             syncState(); 
             render('All');
@@ -190,7 +209,7 @@
             const f = document.getElementById('feed'); 
             f.innerHTML = '';
             
-            // Fixed, foolproof filtering logic
+            // Solid, filter system for the complete standalone layout
             let filtered = markets.filter(m => {
                 if (cat === 'All') return true;
                 if (cat === 'News') return m.type === 'n';
@@ -202,7 +221,7 @@
 
         function filterCat(cat, el) {
             document.querySelectorAll('.cat-link').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
+            if(el) el.classList.add('active');
             render(cat);
         }
 
@@ -242,6 +261,32 @@
             }
 
             f.appendChild(card);
+        }
+
+        function deployMarket() {
+            const cat = document.getElementById('cmCat').value;
+            const q = document.getElementById('cmTitle').value;
+            const p = parseInt(document.getElementById('cmProb').value);
+
+            if (!q || !p || p < 1 || p > 99) {
+                return alert("Please check title and enter valid odds between 1% and 99%");
+            }
+
+            const newMarket = {
+                type: 'm',
+                cat: cat,
+                q: q,
+                p: p,
+                id: 'custom-' + Date.now()
+            };
+
+            markets.unshift(newMarket);
+            saveMarkets();
+            closeModal('createMarketModal');
+            document.getElementById('cmTitle').value = '';
+            document.getElementById('cmProb').value = '';
+            render(currentCat);
+            alert("Prediction deployed successfully!");
         }
 
         function getActiveWager(marketId) {
@@ -304,53 +349,4 @@
             saveMarkets();
             
             syncState();
-            render(currentCat);
-            alert(alertMsg);
-        }
-
-        function syncState() {
-            const user = localStorage.getItem('nx_user');
-            const bal = localStorage.getItem('nx_balance') || "0.00";
-            if(user) {
-                document.getElementById('signBtn').classList.add('hidden');
-                document.getElementById('userIcon').classList.remove('hidden');
-            }
-            document.getElementById('balance').innerText = parseFloat(bal).toLocaleString(undefined, {minimumFractionDigits: 2});
-        }
-
-        function setAuth(mode) {
-            const up = document.getElementById('upFields'), title = document.getElementById('aTitle');
-            const tIn = document.getElementById('tabIn'), tUp = document.getElementById('tabUp');
-            if(mode === 'up') {
-                up.classList.remove('hidden'); tUp.classList.add('active'); tIn.classList.remove('active');
-                title.innerText = "Register Identity";
-            } else {
-                up.classList.add('hidden'); tIn.classList.add('active'); tUp.classList.remove('active');
-                title.innerText = "Terminal Access";
-            }
-        }
-
-        function doAuth() {
-            const email = document.getElementById('aEmail').value;
-            if(!email.includes('@')) return alert("Invalid Credentials");
-            localStorage.setItem('nx_user', email);
-            closeModal('authModal');
-            syncState();
-        }
-
-        function setAmt(v) { document.getElementById('depAmt').value = v; }
-
-        function payNow() {
-            const amt = document.getElementById('depAmt').value;
-            if(!localStorage.getItem('nx_user')) return openModal('authModal');
-            if(amt < 200) return alert("Min required: Ksh 200");
-            document.body.classList.add('hide-header');
-            closeModal('depositModal');
-            
-            let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-            localStorage.setItem('nx_balance', cur + Number(amt));
-            document.body.classList.remove('hide-header');
-            syncState();
-        }
-
-        function openModal(id) { document.getElementById(id).style.display = 'flex'
+            ren

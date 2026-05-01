@@ -41,28 +41,26 @@
 
         #dashboard { max-width: 620px; margin: auto; padding: 12px; box-sizing: border-box; }
         
-        /* 1:1 Accurate Polymarket Card UI */
-        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 12px; transition: box-shadow 0.2s; }
-        .market-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.03); }
-        .m-category { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-sub); display: inline-block; margin-bottom: 8px; letter-spacing: 0.3px; }
-        .m-header { margin-bottom: 16px; }
-        .m-title { font-size: 16px; font-weight: 600; line-height: 1.4; color: #0f172a; }
+        /* High-Variety Multiplier Cards */
+        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
+        .market-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+        .m-category { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-sub); display: inline-block; margin-bottom: 12px; letter-spacing: 0.5px; }
+        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+        .m-title { font-size: 16px; font-weight: 600; line-height: 1.45; color: #0f172a; padding-right: 12px; }
+        .odds-val { font-size: 18px; font-weight: 800; color: #000; }
+        .odds-lbl { font-size: 10px; color: var(--text-sub); text-transform: uppercase; display: block; text-align: right; }
 
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .trade-btn { width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid transparent; font-weight: 700; font-size: 15px; cursor: pointer; transition: background 0.15s; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
-        .trade-btn:active { opacity: 0.75; }
+        .btn-group { display: flex; gap: 10px; }
+        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid transparent; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .trade-btn:active { opacity: 0.7; }
         
         .trade-btn.yes { background: var(--yes-bg); color: var(--yes-blue); border-color: #dbeafe; }
-        .trade-btn.yes:hover { background: #dbeafe; }
         .trade-btn.no { background: var(--no-bg); color: var(--no-red); border-color: #ffe4e6; }
-        .trade-btn.no:hover { background: #ffe4e6; }
-        
-        .btn-label { font-size: 14px; font-weight: 700; }
-        .btn-price { font-size: 15px; font-weight: 800; letter-spacing: -0.2px; }
+        .multiplier { font-size: 11px; font-weight: 700; opacity: 0.8; }
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
         
-        /* Modal Window Design */
+        /* Modal Content */
         .modal { background: #fff; width: 100%; max-width: 380px; padding: 32px 28px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); box-sizing: border-box; border: 1px solid rgba(255,255,255,0.2); max-height: 90vh; overflow-y: auto; }
         .auth-nav { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 24px; }
         .auth-tab { flex: 1; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); transition: 0.2s; text-align: center; }
@@ -199,7 +197,7 @@
         let activeTab = 'in';
         let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
 
-        const categories = ["Politics", "Crypto", "Sports", "Pop Culture", "Global Affairs", "Business"];
+        const categories = ["Finance", "Crypto", "Sports", "Pop Culture", "Global Affairs", "Business"];
         let markets = [];
         let currentFundsMode = 'deposit';
 
@@ -214,14 +212,15 @@
             let totalMarketsCount = 1005; 
             
             for (let i = 0; i < totalMarketsCount; i++) {
-                // Placed exactly between 8 and 9 (index 8 is 9th on display)
+                // Placed exactly between index 8 and 9
                 if (i === 8) {
                     markets.push({
                         id: `m-jesus`,
                         q: "Will Jesus be back before June 5th?",
                         category: "Culture",
-                        yesPrice: "25",
-                        noPrice: "75"
+                        p: 25,
+                        yesMult: "4.00",
+                        noMult: "1.33"
                     });
                     continue;
                 }
@@ -229,10 +228,10 @@
                 const cat = categories[i % categories.length];
                 let question = "";
 
-                // Generate 1000+ unique questions without sequential repetition
+                // Restored full question list generation to prevent repetition
                 switch (cat) {
-                    case "Politics":
-                        question = `Will candidate #${100 + i} claim more than ${(45 + (i * 0.04)).toFixed(1)}% in regional election polls?`;
+                    case "Finance":
+                        question = `Will the NSE index close with a net positive margin exceeding ${(3.5 + (i * 0.05)).toFixed(2)}% in Quarter ${1 + (i % 4)}?`;
                         break;
                     case "Crypto":
                         question = `Will Bitcoin complete the third quarter trading with a price floor above $${(90000 + (i * 12)).toLocaleString()}?`;
@@ -251,15 +250,17 @@
                         break;
                 }
 
-                const probabilityYes = Math.floor(10 + ((i * 3) % 78));
-                const probabilityNo = 100 - probabilityYes;
+                const chanceValue = Math.floor(15 + ((i * 4) % 68));
+                const yesMultiplier = (100 / chanceValue).toFixed(2);
+                const noMultiplier = (100 / (100 - chanceValue)).toFixed(2);
 
                 markets.push({
                     id: `m-ext-${i}`,
                     q: question,
                     category: cat,
-                    yesPrice: probabilityYes.toString(),
-                    noPrice: probabilityNo.toString()
+                    p: chanceValue,
+                    yesMult: yesMultiplier,
+                    noMult: noMultiplier
                 });
             }
         }
@@ -276,15 +277,16 @@
                     <div class="m-category">${item.category}</div>
                     <div class="m-header">
                         <div class="m-title">${item.q}</div>
+                        <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
                         <button class="trade-btn yes" onclick="handleWagerClick('${item.q}')">
-                            <span class="btn-label">Yes</span>
-                            <span class="btn-price">${item.yesPrice}¢</span>
+                            <span>Yes</span>
+                            <span class="multiplier">${item.yesMult}x</span>
                         </button>
                         <button class="trade-btn no" onclick="handleWagerClick('${item.q}')">
-                            <span class="btn-label">No</span>
-                            <span class="btn-price">${item.noPrice}¢</span>
+                            <span>No</span>
+                            <span class="multiplier">${item.noMult}x</span>
                         </button>
                     </div>`;
                 f.appendChild(card);

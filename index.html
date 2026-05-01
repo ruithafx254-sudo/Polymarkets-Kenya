@@ -230,11 +230,11 @@
                 { q: "Will 2026 be the hottest year on record according to NASA?", category: "Global Affairs", p: 9 }
             ];
 
-            const realTech = ["OpenAI", "Microsoft", "Google", "Apple", "Tesla", "Meta", "Nvidia", "X (Twitter)", "Anthropic", "Oracle", "Amazon AWS"];
-            const realCoins = ["Solana", "Ethereum", "Cardano", "XRP", "DOGE", "Binance Coin", "Avalanche", "Polkadot", "Chainlink", "Near Protocol", "Sui"];
-            const realNations = ["US", "United Kingdom", "France", "Germany", "China", "India", "Japan", "Brazil", "Kenya", "South Africa", "Nigeria"];
-            const realCompanies = ["Saudi Aramco", "ExxonMobil", "Amazon", "Walmart", "TSMC", "LVMH", "Berkshire Hathaway", "Safaricom", "KCB Bank"];
-            const realTournaments = ["Premier League", "NBA Finals", "Formula 1 Championship", "UEFA Champions League", "CAF Champions League"];
+            const realTech = ["OpenAI", "Microsoft", "Google", "Apple", "Tesla", "Meta", "Nvidia", "X (Twitter)", "Anthropic", "Oracle", "Amazon AWS", "SpaceX", "DeepMind", "IBM"];
+            const realCoins = ["Solana", "Ethereum", "Cardano", "XRP", "DOGE", "Binance Coin", "Avalanche", "Polkadot", "Chainlink", "Near Protocol", "Sui", "Aptos", "Arbitrum", "Optimism"];
+            const realNations = ["US", "United Kingdom", "France", "Germany", "China", "India", "Japan", "Brazil", "Kenya", "South Africa", "Nigeria", "South Korea", "Australia", "Canada"];
+            const realCompanies = ["Saudi Aramco", "ExxonMobil", "Amazon", "Walmart", "TSMC", "LVMH", "Berkshire Hathaway", "Safaricom", "KCB Bank", "Sony", "Samsung Electronics", "Toyota"];
+            const realTournaments = ["Premier League", "NBA Finals", "Formula 1 Championship", "UEFA Champions League", "CAF Champions League", "Wimbledon", "ICC Cricket World Cup"];
 
             baseMarkets.forEach((bm, i) => {
                 const yesMult = (100 / bm.p).toFixed(2);
@@ -249,21 +249,21 @@
                 });
             });
 
-            // Keep Jesus prediction fixed exactly at index 8
+            // Index 8 explicitly locked to your Jesus prediction with 9.00x Yes and 3.00x No
             markets.splice(8, 0, {
                 id: "m-jesus",
                 q: "Will Jesus be back before June 5th?",
                 category: "Culture",
-                p: 25,
-                yesMult: "4.00",
-                noMult: "1.33"
+                p: 11,
+                yesMult: "9.00",
+                noMult: "3.00"
             });
 
-            // Added an additional 500+ items to reach 1,500+ highly varied, realistic predictions
-            for (let i = 1; i <= 1502; i++) {
+            // Generates up to over 2,000 highly unique news/current-affairs prediction markets
+            for (let i = 1; i <= 2005; i++) {
                 let cat = "Global Affairs";
                 let q = "";
-                let p = Math.floor(12 + ((i * 11) % 76));
+                let p = Math.floor(11 + ((i * 13) % 78));
 
                 const techCompany = realTech[i % realTech.length];
                 const coin = realCoins[i % realCoins.length];
@@ -271,43 +271,49 @@
                 const firm = realCompanies[i % realCompanies.length];
                 const cup = realTournaments[i % realTournaments.length];
 
-                const mod = i % 12;
+                const mod = i % 14;
                 if (mod === 0) {
                     cat = "Crypto";
-                    q = `Will ${coin} decouple or outperform Bitcoin's localized trajectory over the upcoming fiscal quarter?`;
+                    q = `Will ${coin} decouple or establish a distinct localized market trajectory from Bitcoin this coming quarter?`;
                 } else if (mod === 1) {
                     cat = "Politics";
-                    q = `Will the ${country} trade commission endorse and enforce the upcoming regional digital assets roadmap?`;
+                    q = `Will the ${country} trade commission officially implement the dynamic digital assets roadmap before Q4?`;
                 } else if (mod === 2) {
                     cat = "Sports";
-                    q = `Will the leading scorer or title winner in the ${cup} attain a record score margin this season?`;
+                    q = `Will the top performing club or title contender in the ${cup} match the previous margin record this season?`;
                 } else if (mod === 3) {
                     cat = "Pop Culture";
-                    q = `Will the next production or streaming exclusive release by ${techCompany} exceed $${(180 + (i % 380))} million in global licensing?`;
+                    q = `Will the major cinematic or distribution exclusive backed by ${techCompany} exceed $${(150 + (i % 420))} million globally?`;
                 } else if (mod === 4) {
                     cat = "Business";
-                    q = `Will ${firm} announce a major cross-border acquisition or buyback initiative during their next earnings call?`;
+                    q = `Will ${firm} announce a major cross-border expansion or infrastructure investment next fiscal period?`;
                 } else if (mod === 5) {
                     cat = "Finance";
-                    q = `Will the local inflation benchmark across ${country} adjust below ${(2.2 + (i * 0.015)).toFixed(2)}% following the next consensus report?`;
+                    q = `Will the headline inflation benchmark in ${country} print lower than ${(2.0 + (i * 0.012)).toFixed(2)}% in the next release?`;
                 } else if (mod === 6) {
                     cat = "Global Affairs";
-                    q = `Will ${country} and its immediate trade allies ratify the newly proposed green logistics accord before Q4?`;
+                    q = `Will ${country} and its regional trade partners fully validate the green manufacturing accords by November?`;
                 } else if (mod === 7) {
                     cat = "Crypto";
-                    q = `Will the active volume within the ${coin} DeFi ecosystem expand past $${(2.8 + (i % 14))} Billion this fiscal year?`;
+                    q = `Will the aggregate total value locked (TVL) in the ${coin} network ecosystem hit $${(3.2 + (i % 16)).toFixed(1)} Billion this year?`;
                 } else if (mod === 8) {
                     cat = "Business";
-                    q = `Will ${techCompany} successfully clear antitrust or data privacy reviews for their new machine learning architecture?`;
+                    q = `Will ${techCompany} secure broad regulatory clearance for their latest proprietary cloud AI network?`;
                 } else if (mod === 9) {
                     cat = "Pop Culture";
-                    q = `Will the highest performing international album this season come from a native artist hailing from ${country}?`;
+                    q = `Will the most streamed music production this season be from an independent artist hailing from ${country}?`;
                 } else if (mod === 10) {
                     cat = "Finance";
-                    q = `Will the core equity indices across ${country} register a total upward momentum above ${(4.1 + (i * 0.01)).toFixed(2)}%?`;
+                    q = `Will the core equity indices across ${country} register a total recovery momentum of more than ${(3.8 + (i * 0.01)).toFixed(2)}%?`;
+                } else if (mod === 11) {
+                    cat = "Politics";
+                    q = `Will the governing bodies in ${country} clear the new climate-resilient framework before the summit?`;
+                } else if (mod === 12) {
+                    cat = "Sports";
+                    q = `Will the finals of the ${cup} draw more than ${(15 + (i % 25))} million concurrent global streaming viewers?`;
                 } else {
                     cat = "Global Affairs";
-                    q = `Will ${firm} lead the joint renewable expansion initiatives with the government of ${country} this fall?`;
+                    q = `Will ${firm} lead the localized carbon capture initiatives with the government of ${country} this year?`;
                 }
 
                 const yesMult = (100 / p).toFixed(2);

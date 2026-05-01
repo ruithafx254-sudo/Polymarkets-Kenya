@@ -292,7 +292,7 @@
     <script>
         let currentCat = 'All';
         
-        // --- BASE SEED DATA ---
+        // Base seed markets
         let markets = [
             { id: 'jesus-return-permanent-99', type: 'm', cat: "Spirituality", q: "Will Jesus come back before June?", p: 69, isPermanent: true, xYes: 9, xNo: 4 },
             { id: 'ruto-reshuffle-june', type: 'm', cat: "Kenya", q: "Will William Ruto reshuffle the cabinet by June?", p: 62 },
@@ -333,7 +333,6 @@
             currentCat = cat;
             const f = document.getElementById('feed'); f.innerHTML = '';
             
-            // Permanent items always show in 'All' and their exact category
             let filtered = markets.filter(m => {
                 if(cat === 'All') return m.type === 'm';
                 if(cat === 'News') return m.type === 'n';
@@ -418,4 +417,6 @@
                             ${item.q}
                         </div>
                         <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
-           
+                    </div>
+                    <div class="btn-group">
+                      

@@ -150,7 +150,7 @@
         let currentCat = 'All';
         let markets = [];
 
-        // Seed markets updated with diverse, lightweight prediction categories
+        // Complete set of diverse, default markets for quick testing
         const baseMarkets = [
             { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" },
             { type: 'm', cat: "Entertainment", q: "Will Marvel announce Black Panther 3 this year?", p: 55, id: "ent-bp3" },
@@ -161,8 +161,9 @@
         ];
 
         window.onload = () => { 
-            // Note: If you ever update baseMarkets and don't see them, uncomment the next line once:
-            // localStorage.clear();
+            // Wipes the cached, blank markets from browser memory once on startup
+            localStorage.clear();
+            
             loadPersistedMarkets();
             syncState(); 
             render('All');
@@ -349,4 +350,4 @@
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-       
+        function logout() 

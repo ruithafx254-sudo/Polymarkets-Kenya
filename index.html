@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NexGen Terminal</title>
 
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
+
     <style>
         :root { 
             --primary: #2ebd85; --border: #f1f5f9; --text: #0f172a;
@@ -12,7 +14,7 @@
         }
         body { background: #f8fafc; color: var(--text); margin: 0; padding-top: 80px; font-family: system-ui, -apple-system, sans-serif; }
 
-        /* --- FIXED HEADER --- */
+        /* --- HEADER --- */
         .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; height: 60px; }
         .logo { font-weight: 900; font-size: 22px; letter-spacing: -1.2px; }
         
@@ -20,9 +22,7 @@
         .auth-btn { background: #f1f5f9; border: none; padding: 8px 12px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; }
 
         .wallet { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 2px 2px 2px 10px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
-        
-        /* THE REDIRECT BUTTON */
-        .deposit-link { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; text-decoration: none; font-size: 13px; }
+        .deposit-btn { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 13px; }
 
         /* --- AUTH SWITCH MODAL --- */
         #auth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
@@ -31,7 +31,7 @@
         .toggle-switch { display: flex; background: #f1f5f9; padding: 4px; border-radius: 14px; margin-bottom: 20px; position: relative; cursor: pointer; border: 1px solid #e2e8f0; }
         .t-btn { flex: 1; padding: 12px; font-size: 14px; font-weight: 700; color: #64748b; z-index: 1; }
         .t-btn.active { color: #000; }
-        .slider { position: absolute; width: calc(50% - 4px); height: calc(100% - 8px); background: #fff; border-radius: 11px; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .slider { position: absolute; width: calc(50% - 4px); height: calc(100% - 8px); background: #fff; border-radius: 11px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .signup-active .slider { transform: translateX(100%); }
 
         .m-input { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 16px; box-sizing: border-box; outline: none; }
@@ -56,7 +56,7 @@
             <button class="auth-btn" onclick="openAuth()">Sign In</button>
             <div class="wallet">
                 Ksh <span id="bal">0.00</span>
-                <a href="https://payment.intasend.com/pay/254-sudo/" class="deposit-link">Deposit</a>
+                <button onclick="initiatePayment()" class="deposit-btn">Deposit</button>
             </div>
         </div>
     </header>
@@ -88,6 +88,25 @@
     </div>
 
     <script>
+        // --- SECURE PAYMENT REDIRECT ---
+        function initiatePayment() {
+            const intasend = new window.IntaSend({
+                publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
+                live: false 
+            });
+
+            // Using .run with redirect: true is the safest way to show M-Pesa tabs on mobile
+            intasend.run({
+                amount: 50,
+                currency: "KES",
+                email: "user@nexgen.com",
+                button_text: "Pay Now",
+                redirect: true 
+            }).on("COMPLETE", (res) => {
+                document.getElementById('bal').innerText = res.amount;
+            });
+        }
+
         // --- AUTH TOGGLE ---
         function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
         function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
@@ -95,25 +114,13 @@
         let isSignup = false;
         function toggleAuthMode() {
             isSignup = !isSignup;
-            const container = document.getElementById('authSwitch');
-            const head = document.getElementById('auth-head');
-            const tin = document.getElementById('tIn');
-            const tup = document.getElementById('tUp');
-
-            if(isSignup) {
-                container.classList.add('signup-active');
-                head.innerText = "Create Account";
-                tup.classList.add('active');
-                tin.classList.remove('active');
-            } else {
-                container.classList.remove('signup-active');
-                head.innerText = "Welcome Back";
-                tin.classList.add('active');
-                tup.classList.remove('active');
-            }
+            document.getElementById('authSwitch').classList.toggle('signup-active');
+            document.getElementById('auth-head').innerText = isSignup ? "Create Account" : "Welcome Back";
+            document.getElementById('tIn').classList.toggle('active');
+            document.getElementById('tUp').classList.toggle('active');
         }
 
-        // --- PREDICTIONS FEED (30 INITIAL) ---
+        // --- PREDICTIONS FEED ---
         const marketItems = ["Bitcoin to $100k?", "Ksh to 120?", "Arsenal Win?", "AI Solves Fusion?", "Solana Flip ETH?"];
         let total = 0;
         function render(num) {

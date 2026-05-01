@@ -9,140 +9,145 @@
 
     <style>
         :root { 
-            --primary: #2ebd85; --border: #f1f5f9; --text-main: #0f172a; --text-sub: #94a3b8;
-            --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #cf304a;
+            --primary: #2ebd85; --border: #e2e8f0; --text-main: #0f172a; --text-sub: #64748b;
+            --surface: #ffffff; --bg: #f8fafc;
         }
         
-        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 175px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text-main); margin: 0; padding-top: 160px; font-family: "Inter", -apple-system, sans-serif; letter-spacing: -0.01em; }
 
-        /* --- HEADER CONTROL --- */
-        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* --- OFFICIAL TOP NAV --- */
+        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: var(--surface); z-index: 2000; border-bottom: 1px solid var(--border); transition: transform 0.4s ease; }
         body.hide-header .header-stack { transform: translateY(-100%); }
-        body.hide-header { padding-top: 0 !important; }
 
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; height: 64px; }
-        .logo { font-weight: 950; font-size: 24px; letter-spacing: -1.5px; display: flex; align-items: center; gap: 8px; }
-        .live-dot { width: 8px; height: 8px; background: #ff4757; border-radius: 50%; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        .bar-right { display: flex; align-items: center; gap: 8px; }
-        .user-profile { width: 38px; height: 38px; background: #0f172a; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; font-size: 12px; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
-        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; }
-
-        /* --- SEARCH & CATEGORY --- */
-        .search-container { padding: 8px 16px; background: #fff; }
-        .search-bar { background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; padding: 10px 15px; gap: 10px; }
-        .search-input { border: none; background: transparent; outline: none; width: 100%; font-size: 14px; font-weight: 500; }
-        .category-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 10px 16px; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-        .cat-chip { padding: 8px 16px; background: #fff; border: 1px solid var(--border); border-radius: 100px; font-size: 13px; font-weight: 700; color: var(--text-sub); flex-shrink: 0; cursor: pointer; }
-        .cat-chip.active { background: #000; color: #fff; border-color: #000; }
-
-        /* --- MARKET CARDS --- */
-        #dashboard { max-width: 500px; margin: auto; padding-bottom: 80px; }
-        .market-card { background: #fff; border-radius: 20px; border: 1.5px solid var(--border); padding: 18px; margin: 12px; }
-        .card-header { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
-        .m-title { font-size: 16px; font-weight: 700; line-height: 1.35; flex: 1; text-align: left; }
-        .m-chance { font-size: 18px; font-weight: 800; text-align: right; min-width: 65px; }
-        .m-chance span { font-size: 10px; display: block; color: var(--text-sub); text-transform: uppercase; }
-        .order-btn-group { display: flex; gap: 10px; }
-        .order-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; }
-
-        /* --- PREMIUM MODALS --- */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); z-index: 5000; align-items: center; justify-content: center; padding: 15px; }
-        .modal-card { background: #fff; width: 100%; max-width: 400px; padding: 32px; border-radius: 32px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 60px; }
+        .logo { font-weight: 800; font-size: 20px; letter-spacing: -1px; text-transform: uppercase; color: #000; }
         
-        .auth-switch { display: flex; background: #f1f5f9; padding: 6px; border-radius: 100px; margin-bottom: 24px; }
-        .auth-tab { flex: 1; padding: 12px; font-size: 14px; font-weight: 800; cursor: pointer; border-radius: 100px; transition: 0.3s; color: #94a3b8; }
-        .auth-tab.active { background: #000; color: #fff; }
+        .nav-actions { display: flex; align-items: center; gap: 12px; }
+        .user-badge { background: #000; color: #fff; width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; cursor: pointer; }
+        
+        .wallet-display { display: flex; align-items: center; border: 1px solid var(--border); border-radius: 6px; padding: 2px 2px 2px 10px; gap: 10px; font-size: 13px; font-weight: 600; }
+        .btn-deposit-main { background: var(--primary); color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 700; font-size: 12px; cursor: pointer; }
 
-        .modal-input { width: 100%; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; margin-bottom: 12px; font-size: 15px; outline: none; box-sizing: border-box; }
-        .modal-input:focus { border-color: #000; }
+        /* --- SEARCH & FILTERS (DRY) --- */
+        .sub-nav { padding: 10px 20px; border-bottom: 1px solid var(--border); background: #fff; }
+        .search-bar { background: #f1f5f9; border-radius: 4px; display: flex; align-items: center; padding: 8px 12px; }
+        .search-input { border: none; background: transparent; outline: none; width: 100%; font-size: 13px; font-weight: 500; }
 
-        .btn-action { width: 100%; padding: 18px; background: #000; color: #fff; border: none; border-radius: 18px; font-weight: 700; font-size: 16px; cursor: pointer; }
-        .modal-dismiss { margin-top: 20px; font-size: 14px; color: #94a3b8; cursor: pointer; font-weight: 600; }
+        .filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 12px 20px; background: #fff; border-bottom: 1px solid var(--border); }
+        .filter-chip { padding: 6px 16px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; font-weight: 600; color: var(--text-sub); cursor: pointer; white-space: nowrap; transition: 0.2s; }
+        .filter-chip.active { background: #000; color: #fff; border-color: #000; }
 
-        /* --- QUICK AMOUNT CHIPS --- */
-        .chip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
-        .amt-chip { background: #fff; border: 1px solid #e2e8f0; padding: 12px 5px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .amt-chip:active { background: #f1f5f9; transform: scale(0.95); }
+        /* --- MARKET GRID --- */
+        #dashboard { max-width: 600px; margin: auto; padding: 10px; }
+        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 12px; transition: box-shadow 0.2s; }
+        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .m-title { font-size: 15px; font-weight: 700; line-height: 1.4; color: #1e293b; max-width: 80%; }
+        .m-odds { text-align: right; }
+        .odds-val { font-size: 18px; font-weight: 800; display: block; }
+        .odds-lbl { font-size: 10px; color: var(--text-sub); text-transform: uppercase; font-weight: 700; }
+
+        .btn-group { display: flex; gap: 8px; }
+        .trade-btn { flex: 1; padding: 12px; border-radius: 4px; border: 1px solid var(--border); font-weight: 700; font-size: 13px; cursor: pointer; background: #fff; }
+        .trade-btn.yes { color: #166534; background: #f0fdf4; border-color: #dcfce7; }
+        .trade-btn.no { color: #991b1b; background: #fef2f2; border-color: #fee2e2; }
+
+        /* --- MODALS (OFFICIAL/DRY) --- */
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 5000; align-items: center; justify-content: center; }
+        .modal { background: #fff; width: 90%; max-width: 360px; padding: 30px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        
+        .modal-h { font-size: 18px; font-weight: 800; margin: 0 0 8px 0; }
+        .modal-p { font-size: 13px; color: var(--text-sub); margin: 0 0 20px 0; }
+
+        .auth-toggle { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+        .auth-tab { flex: 1; padding: 10px; font-size: 13px; font-weight: 700; text-align: center; cursor: pointer; color: var(--text-sub); }
+        .auth-tab.active { color: #000; border-bottom: 2px solid #000; margin-bottom: -2px; }
+
+        .input-field { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; box-sizing: border-box; margin-bottom: 12px; outline: none; background: #f8fafc; }
+        .input-field:focus { border-color: #000; background: #fff; }
+
+        .btn-submit { width: 100%; padding: 14px; background: #000; color: #fff; border: none; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 14px; margin-top: 10px; }
+        
+        /* --- DEPOSIT CHIPS --- */
+        .chip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+        .amt-chip { border: 1px solid var(--border); padding: 8px; border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; }
+        .amt-chip:hover { background: #f1f5f9; }
 
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="header-stack" id="mainHeader">
+    <div class="header-stack">
         <div class="top-nav">
-            <div class="logo">NEXGEN <div class="live-dot"></div></div>
-            <div class="bar-right">
-                <button id="loginBtn" class="user-profile" style="background:#f1f5f9; color:#000; border:none; width:auto; padding:0 15px; border-radius:12px" onclick="openModal('auth-overlay')">Sign In</button>
-                <div id="userIcon" class="user-profile hidden" onclick="confirmLogout()">??</div>
-                <div class="wallet-pill">
+            <div class="logo">NexGen</div>
+            <div class="nav-actions">
+                <button id="signInBtn" class="filter-chip active" onclick="openModal('authModal')">Sign In</button>
+                <div id="userProfile" class="user-badge hidden" onclick="logout()">??</div>
+                <div class="wallet-display">
                     Ksh <span id="balance">0.00</span>
-                    <button onclick="openModal('deposit-overlay')" class="btn-deposit">Deposit</button>
+                    <button onclick="openModal('depositModal')" class="btn-deposit-main">Deposit</button>
                 </div>
             </div>
         </div>
-        <div class="search-container">
-            <div class="search-bar"><span>🔍</span><input type="text" id="mSearch" class="search-input" placeholder="Search markets..." oninput="render()"></div>
+        <div class="sub-nav">
+            <div class="search-bar">🔍 <input type="text" id="mSearch" class="search-input" placeholder="Search markets..." oninput="render()"></div>
         </div>
-        <div class="category-scroller">
-            <div class="cat-chip active" onclick="filterCat('All', this)">All</div>
-            <div class="cat-chip" onclick="filterCat('Kenya', this)">Kenya</div>
-            <div class="cat-chip" onclick="filterCat('Politics', this)">Politics</div>
-            <div class="cat-chip" onclick="filterCat('Crypto', this)">Crypto</div>
+        <div class="filter-row">
+            <div class="filter-chip active" onclick="filterCat('All', this)">All</div>
+            <div class="filter-chip" onclick="filterCat('Kenya', this)">Kenya</div>
+            <div class="filter-chip" onclick="filterCat('Politics', this)">Politics</div>
+            <div class="filter-chip" onclick="filterCat('Crypto', this)">Crypto</div>
         </div>
     </div>
 
     <div id="dashboard">
-        <div id="dynamic-feed"></div>
+        <div id="feed"></div>
     </div>
 
-    <div id="auth-overlay" class="modal-overlay">
-        <div class="modal-card">
-            <div class="auth-switch">
-                <div id="tab-in" class="auth-tab active" onclick="switchAuth('in')">Sign In</div>
-                <div id="tab-up" class="auth-tab" onclick="switchAuth('up')">Sign Up</div>
+    <div id="authModal" class="overlay">
+        <div class="modal">
+            <div class="auth-toggle">
+                <div id="tabIn" class="auth-tab active" onclick="setAuth('in')">Login</div>
+                <div id="tabUp" class="auth-tab" onclick="setAuth('up')">Register</div>
             </div>
-            <h2 id="authTitle" style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Welcome Back</h2>
-            <p style="color: #64748b; font-size: 14px; margin-bottom: 24px;">Initialize secure terminal session</p>
+            <h2 class="modal-h" id="aTitle">Secure Login</h2>
+            <p class="modal-p">Connect to the prediction terminal.</p>
             
-            <div id="signupOnly" class="hidden">
-                <input type="text" id="authName" class="modal-input" placeholder="Full Name">
+            <div id="regFields" class="hidden">
+                <input type="text" id="aName" class="input-field" placeholder="Full Name">
             </div>
-            <input type="email" id="authEmail" class="modal-input" placeholder="Email Address">
-            <input type="password" id="authPass" class="modal-input" placeholder="Password">
+            <input type="email" id="aEmail" class="input-field" placeholder="Email Address">
+            <input type="password" id="aPass" class="input-field" placeholder="Password">
             
-            <button onclick="handleAuth()" class="btn-action">Initialize Session</button>
-            <div class="modal-dismiss" onclick="closeModal('auth-overlay')">Dismiss</div>
+            <button onclick="doAuth()" class="btn-submit">Authenticate</button>
+            <div style="text-align:center; margin-top:15px; font-size:12px; color:var(--text-sub); cursor:pointer" onclick="closeModal('authModal')">Close</div>
         </div>
     </div>
 
-    <div id="deposit-overlay" class="modal-overlay">
-        <div class="modal-card">
-            <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Add Liquidity</h2>
-            <p style="color: #64748b; font-size: 14px; margin-bottom: 24px;">Secure M-Pesa & Card Funding</p>
+    <div id="depositModal" class="overlay">
+        <div class="modal">
+            <h2 class="modal-h">Deposit Liquidity</h2>
+            <p class="modal-p">Funds available instantly via M-Pesa.</p>
             
-            <div style="background:#f8fafc; padding:24px; border-radius:24px; border: 1px solid #e2e8f0; margin-bottom: 20px">
-                <div style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Amount (Ksh)</div>
-                <input type="number" id="customAmount" style="width:100%; border:none; background:transparent; font-size:38px; font-weight:900; text-align:center; outline:none" placeholder="0">
+            <div style="background:#f8fafc; padding:15px; border:1px solid var(--border); border-radius:4px;">
+                <label style="font-size:10px; font-weight:800; color:var(--text-sub); text-transform:uppercase">Amount (Ksh)</label>
+                <input type="number" id="depAmt" class="input-field" style="margin-bottom:0; font-size:24px; font-weight:800; background:transparent; border:none; padding:10px 0" placeholder="0">
                 
                 <div class="chip-grid">
-                    <div class="amt-chip" onclick="document.getElementById('customAmount').value=250">250</div>
-                    <div class="amt-chip" onclick="document.getElementById('customAmount').value=500">500</div>
-                    <div class="amt-chip" onclick="document.getElementById('customAmount').value=1000">1k</div>
-                    <div class="amt-chip" onclick="document.getElementById('customAmount').value=2000">2k</div>
+                    <div class="amt-chip" onclick="document.getElementById('depAmt').value=250">250</div>
+                    <div class="amt-chip" onclick="document.getElementById('depAmt').value=500">500</div>
+                    <div class="amt-chip" onclick="document.getElementById('depAmt').value=1000">1000</div>
+                    <div class="amt-chip" onclick="document.getElementById('depAmt').value=2000">2000</div>
                 </div>
             </div>
             
-            <button class="btn-action" style="background:var(--primary)" onclick="startPayment()">Authorize Deposit</button>
-            <div class="modal-dismiss" onclick="closeModal('deposit-overlay')">Cancel</div>
+            <button onclick="payNow()" class="btn-submit" style="background:var(--primary)">Confirm Deposit</button>
+            <div style="text-align:center; margin-top:15px; font-size:12px; color:var(--text-sub); cursor:pointer" onclick="closeModal('depositModal')">Cancel</div>
         </div>
     </div>
 
     <script>
-        let selectedCategory = 'All';
+        let currentCat = 'All';
         let markets = [
             { cat: "Kenya", q: "Will William Ruto reshuffle the cabinet by June?", p: 62 },
             { cat: "Crypto", q: "Will Bitcoin stay above $100k until June?", p: 72 },
@@ -150,107 +155,98 @@
         ];
 
         window.onload = () => {
-            syncUI();
+            updateUI();
             render();
         };
 
-        function syncUI() {
+        function updateUI() {
             const user = localStorage.getItem('nx_user');
-            const bal = localStorage.getItem('nx_balance');
+            const bal = localStorage.getItem('nx_balance') || "0.00"; // Defaults to 0.00
             
             if(user) {
-                document.getElementById('loginBtn').classList.add('hidden');
-                document.getElementById('userIcon').classList.remove('hidden');
-                document.getElementById('userIcon').innerText = user.substring(0,2).toUpperCase();
+                document.getElementById('signInBtn').classList.add('hidden');
+                document.getElementById('userProfile').classList.remove('hidden');
+                document.getElementById('userProfile').innerText = user.substring(0,2).toUpperCase();
             } else {
-                document.getElementById('loginBtn').classList.remove('hidden');
-                document.getElementById('userIcon').classList.add('hidden');
+                document.getElementById('signInBtn').classList.remove('hidden');
+                document.getElementById('userProfile').classList.add('hidden');
             }
-            document.getElementById('balance').innerText = bal ? parseFloat(bal).toLocaleString() : "0.00";
+            document.getElementById('balance').innerText = parseFloat(bal).toFixed(2);
         }
 
-        function switchAuth(mode) {
-            const tIn = document.getElementById('tab-in'), tUp = document.getElementById('tab-up');
-            const sUp = document.getElementById('signupOnly'), title = document.getElementById('authTitle');
+        function setAuth(mode) {
+            const tabIn = document.getElementById('tabIn'), tabUp = document.getElementById('tabUp');
+            const reg = document.getElementById('regFields'), title = document.getElementById('aTitle');
             if(mode === 'up') {
-                tUp.classList.add('active'); tIn.classList.remove('active'); 
-                sUp.classList.remove('hidden'); title.innerText = "Create Account";
+                tabUp.classList.add('active'); tabIn.classList.remove('active'); 
+                reg.classList.remove('hidden'); title.innerText = "New Account";
             } else {
-                tIn.classList.add('active'); tUp.classList.remove('active'); 
-                sUp.classList.add('hidden'); title.innerText = "Welcome Back";
+                tabIn.classList.add('active'); tabUp.classList.remove('active'); 
+                reg.classList.add('hidden'); title.innerText = "Secure Login";
             }
         }
 
-        function handleAuth() {
-            const email = document.getElementById('authEmail').value;
+        function doAuth() {
+            const email = document.getElementById('aEmail').value;
             if(!email.includes('@')) return alert("Enter valid email");
-            
             localStorage.setItem('nx_user', email);
             if(!localStorage.getItem('nx_balance')) localStorage.setItem('nx_balance', '0');
-            
-            closeModal('auth-overlay');
-            syncUI();
+            closeModal('authModal');
+            updateUI();
         }
 
-        function confirmLogout() {
-            if(confirm("Securely sign out of terminal?")) {
-                localStorage.removeItem('nx_user');
-                location.reload();
-            }
-        }
-
-        function startPayment() {
-            const amt = document.getElementById('customAmount').value;
-            if(!localStorage.getItem('nx_user')) return openModal('auth-overlay');
-            if(amt < 10) return alert("Min deposit is Ksh 10");
+        function payNow() {
+            const amt = document.getElementById('depAmt').value;
+            if(!localStorage.getItem('nx_user')) return openModal('authModal');
+            if(amt < 10) return alert("Min deposit Ksh 10");
 
             document.body.classList.add('hide-header');
-            closeModal('deposit-overlay');
+            closeModal('depositModal');
 
-            const intasend = new window.IntaSend({ 
-                publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad", 
-                live: false 
-            });
-
+            const intasend = new window.IntaSend({ publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad", live: false });
             intasend.run({ amount: Number(amt), currency: "KES" })
             .on("COMPLETE", () => {
-                let current = parseFloat(localStorage.getItem('nx_balance') || 0);
-                localStorage.setItem('nx_balance', current + Number(amt));
+                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
+                localStorage.setItem('nx_balance', cur + Number(amt));
                 document.body.classList.remove('hide-header');
-                syncUI();
+                updateUI();
             })
             .on("FAILED", () => document.body.classList.remove('hide-header'))
             .on("CLOSE", () => document.body.classList.remove('hide-header'));
         }
 
         function render() {
-            const feed = document.getElementById('dynamic-feed');
+            const feed = document.getElementById('feed');
             feed.innerHTML = '';
-            markets.filter(m => selectedCategory === 'All' || m.cat === selectedCategory).forEach(m => {
+            markets.filter(m => currentCat === 'All' || m.cat === currentCat).forEach(m => {
                 const card = document.createElement('div');
                 card.className = 'market-card';
                 card.innerHTML = `
-                    <div class="card-header">
+                    <div class="m-header">
                         <div class="m-title">${m.q}</div>
-                        <div class="m-chance">${m.p}%<span>chance</span></div>
+                        <div class="m-odds">
+                            <span class="odds-val">${m.p}%</span>
+                            <span class="odds-lbl">Chance</span>
+                        </div>
                     </div>
-                    <div class="order-btn-group">
-                        <button class="order-btn" style="background:var(--yes); color:var(--yes-text)">Yes</button>
-                        <button class="order-btn" style="background:var(--no); color:var(--no-text)">No</button>
+                    <div class="btn-group">
+                        <button class="trade-btn yes">Yes</button>
+                        <button class="trade-btn no">No</button>
                     </div>`;
                 feed.appendChild(card);
             });
         }
 
         function filterCat(cat, el) {
-            selectedCategory = cat;
-            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+            currentCat = cat;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
             render();
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function logout() { if(confirm("Logout?")) { localStorage.removeItem('nx_user'); location.reload(); } }
     </script>
 </body>
 </html>

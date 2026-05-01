@@ -11,7 +11,7 @@
         :root { 
             --accent: #2ebd85; --border: #eceef2; --text-main: #0f172a; --text-sub: #64748b;
             --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #991b1b;
-            --tech-bg: #0f172a; --gemini: #6366f1;
+            --tech-bg: #0f172a;
         }
         
         body { background: #ffffff; color: var(--text-main); margin: 0; padding-top: 130px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
@@ -92,8 +92,7 @@
         <div class="sub-nav">
             <div class="cat-link active" onclick="filterCat('All', this)">Markets</div>
             <div class="cat-link" onclick="filterCat('News', this)">News/Updates</div>
-            <div class="cat-link" onclick="filterCat('Kenya', this)">Kenya</div>
-            <div class="cat-link" onclick="filterCat('Crypto', this)">Crypto</div>
+            <div class="cat-link" onclick="filterCat('World', this)">World News</div>
         </div>
     </div>
 
@@ -148,19 +147,17 @@
         let currentCat = 'All';
         let markets = [];
 
+        // Dedicated markets and worldwide news only (No AI generated predictions)
         const baseMarkets = [
-            { type: 'm', cat: "Kenya", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" }
+            { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" },
+            { type: 'n', cat: "News", h: "Global Markets Update", p: "Indices fluctuate as inflation metrics point to sustained interest rates from global central banks.", id: "news-global-1" },
+            { type: 'n', cat: "News", h: "Digital Finance Surge", p: "Decentralized prediction tools experience a worldwide 15% increase in user volume.", id: "news-global-2" }
         ];
-
-        const intelligenceSignals = {
-            Kenya: ["I&M Bank launches KSh 10 billion fixed-rate note offer.", "NSE derivatives turnover hits record high."]
-        };
 
         window.onload = () => { 
             loadPersistedMarkets();
             syncState(); 
             render('All');
-            setInterval(generateGeminiPulse, 12000); // 12 seconds
         };
 
         function loadPersistedMarkets() {
@@ -184,8 +181,8 @@
         function render(cat) {
             currentCat = cat;
             const f = document.getElementById('feed'); f.innerHTML = '';
-            let filtered = markets.filter(m => cat === 'All' ? m.type === 'm' : (cat === 'News' ? m.type === 'n' : m.cat === cat));
-            filtered.forEach(m => injectToTerminal(m, false));
+            let filtered = markets.filter(m => cat === 'All' ? true : (cat === 'News' ? m.type === 'n' : m.cat === cat));
+            filtered.forEach(m => injectToTerminal(m));
         }
 
         function filterCat(cat, el) {
@@ -194,59 +191,21 @@
             render(cat);
         }
 
-        function generateGeminiPulse() {
-            const cats = Object.keys(intelligenceSignals);
-            const rCat = cats[Math.floor(Math.random() * cats.length)];
-            const signal = intelligenceSignals[rCat][Math.floor(Math.random() * intelligenceSignals[rCat].length)];
-            
-            const newItem = {
-                type: 'm',
-                cat: rCat,
-                q: `Will trends follow "${signal.substring(0, 15)}..." this week?`,
-                p: Math.floor(Math.random() * 70 + 15),
-                id: 'ai-' + Date.now(),
-                isAI: true
-            };
-
-            const newNews = {
-                type: 'n',
-                cat: 'News',
-                h: `Live Signal: ${rCat}`,
-                p: signal,
-                id: 'news-' + Date.now()
-            };
-
-            markets.push(newItem);
-            markets.push(newNews);
-            saveMarkets();
-            
-            injectToTerminal(newItem, true);
-            setTimeout(() => injectToTerminal(newNews, true), 2500);
-        }
-
-        function injectToTerminal(item, isNew) {
+        function injectToTerminal(item) {
             const f = document.getElementById('feed');
-            
-            if (!isNew && currentCat !== 'All' && currentCat !== 'News' && currentCat !== item.cat) return;
-            if (isNew && currentCat !== 'All' && currentCat !== 'News' && currentCat !== item.cat) return;
 
             const card = document.createElement('div');
             card.id = 'market-el-' + item.id;
             
             if(item.type === 'm') {
                 card.className = 'market-card';
-                if(item.isAI) card.style.borderTop = "2px solid var(--gemini)";
-                
                 const safeQ = item.q.replace(/'/g, "\\'");
-                
-                // Fetch existing wager status
                 const wager = getActiveWager(item.id);
                 const activeStakeStatus = wager ? `<br><span style="color:var(--accent); font-size:11px; font-weight:700;">Wager placed: Ksh ${wager.amt} on '${wager.side}'</span>` : '';
 
                 card.innerHTML = `
                     <div class="m-header">
                         <div class="m-title">
-                            ${item.isAI ? '<span style="color:var(--gemini); font-size:9px; font-weight:900;">AI PREDICTION</span><br>' : ''}
                             ${item.q}
                             ${activeStakeStatus}
                         </div>
@@ -269,10 +228,8 @@
             }
 
             f.appendChild(card);
-            if(f.children.length > 30) f.removeChild(f.firstChild); 
         }
 
-        // --- STAKING & OUTCOME ENGINE ---
         function getActiveWager(marketId) {
             const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
             return wagers[marketId];
@@ -292,11 +249,8 @@
                 if(!amt || amt < 50) return alert("Minimum stake is Ksh 50");
                 if(amt > currentBalance) return alert("Insufficient balance to place stake.");
 
-                // Subtract balance
-                const newBalance = currentBalance - amt;
-                localStorage.setItem('nx_balance', newBalance);
+                localStorage.setItem('nx_balance', currentBalance - amt);
                 
-                // Save specific wager
                 const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
                 wagers[marketId] = { side: side, amt: amt };
                 localStorage.setItem('nx_wagers', JSON.stringify(wagers));
@@ -304,7 +258,6 @@
                 syncState();
                 closeModal('stakeModal');
                 
-                // Instantly re-render to reflect the stake
                 render(currentCat);
                 alert(`Stake successfully placed on '${side}'!`);
             };
@@ -315,7 +268,7 @@
             const resolvedOutcome = outcomes[Math.floor(Math.random() * outcomes.length)];
             const wager = getActiveWager(marketId);
 
-            let alertMsg = `The prediction is settled as '${resolvedOutcome}'.\n`;
+            let alertMsg = `The prediction settled as '${resolvedOutcome}'.\n`;
 
             if (wager) {
                 if (wager.side === resolvedOutcome) {
@@ -326,7 +279,6 @@
                 } else {
                     alertMsg += `❌ Incorrect. You lost your Ksh ${wager.amt} stake.`;
                 }
-                // Clear the used wager
                 const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
                 delete wagers[marketId];
                 localStorage.setItem('nx_wagers', JSON.stringify(wagers));
@@ -334,7 +286,6 @@
                 alertMsg += `You didn't have an active stake on this market.`;
             }
 
-            // Remove market from local storage
             markets = markets.filter(m => m.id !== marketId);
             saveMarkets();
             
@@ -343,7 +294,6 @@
             alert(alertMsg);
         }
 
-        // --- ACCOUNT & WALLET ---
         function syncState() {
             const user = localStorage.getItem('nx_user');
             const bal = localStorage.getItem('nx_balance') || "0.00";
@@ -363,4 +313,35 @@
             } else {
                 up.classList.add('hidden'); tIn.classList.add('active'); tUp.classList.remove('active');
                 title.innerText = "Terminal Access";
-       
+            }
+        }
+
+        function doAuth() {
+            const email = document.getElementById('aEmail').value;
+            if(!email.includes('@')) return alert("Invalid Credentials");
+            localStorage.setItem('nx_user', email);
+            closeModal('authModal');
+            syncState();
+        }
+
+        function setAmt(v) { document.getElementById('depAmt').value = v; }
+
+        function payNow() {
+            const amt = document.getElementById('depAmt').value;
+            if(!localStorage.getItem('nx_user')) return openModal('authModal');
+            if(amt < 200) return alert("Min required: Ksh 200");
+            document.body.classList.add('hide-header');
+            closeModal('depositModal');
+            
+            let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
+            localStorage.setItem('nx_balance', cur + Number(amt));
+            document.body.classList.remove('hide-header');
+            syncState();
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function logout() { if(confirm("Sign out?")) { localStorage.clear(); location.reload(); } }
+    </script>
+</body>
+</html>

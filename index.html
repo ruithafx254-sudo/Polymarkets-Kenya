@@ -14,10 +14,20 @@
         }
         body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 100px; font-family: -apple-system, sans-serif; overflow-x: hidden; }
 
-        /* --- THE FIX: PUSH BARS DOWN INTO VIEW --- */
-        #intasend-inline-iframe, #intasend-iframe { 
-            margin-top: 100px !important; 
-            border-radius: 20px !important;
+        /* --- THE FIX: MOVE MPESA/CARD BARS TO THE BOTTOM --- */
+        /* This targets the IntaSend modal and flips the internal order */
+        #intasend-inline-container .intasend-modal-content {
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #intasend-inline-container .intasend-payment-nav {
+            order: 2 !important; /* Moves navigation bars to the bottom */
+            margin-top: 20px !important;
+            border-top: 1px solid #eee !important;
+            border-bottom: none !important;
+        }
+        #intasend-inline-container .intasend-payment-body {
+            order: 1 !important; /* Keeps payment fields at the top */
         }
 
         /* --- HEADER --- */
@@ -29,23 +39,9 @@
         .auth-trigger-btn { background: #f1f5f9; color: #475569; border: none; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
 
         .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 14px; font-weight: 700; }
-        
-        /* DEPOSIT BUTTON */
         .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; }
 
-        /* --- AUTH SWITCH --- */
-        #auth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
-        .modal-content { background: #fff; width: 100%; max-width: 340px; padding: 25px; border-radius: 30px; text-align: center; }
-        .switch-container { display: flex; background: #f1f5f9; padding: 4px; border-radius: 14px; margin-bottom: 20px; position: relative; cursor: pointer; border: 1px solid #e2e8f0; }
-        .switch-tab { flex: 1; padding: 12px; font-size: 14px; font-weight: 700; color: #64748b; z-index: 1; }
-        .switch-tab.active { color: #000; }
-        .slider { position: absolute; width: calc(50% - 4px); height: calc(100% - 8px); background: #fff; border-radius: 11px; transition: 0.3s transform; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .signup-mode .slider { transform: translateX(100%); }
-
-        .m-input { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 16px; box-sizing: border-box; outline: none; }
-        .m-btn-main { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; }
-
-        /* --- CARDS --- */
+        /* --- DASHBOARD --- */
         #dashboard { max-width: 500px; margin: auto; padding: 12px; }
         .card { background: #fff; border-radius: 24px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; }
         .m-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 18px; color: #1e293b; }
@@ -63,7 +59,7 @@
         <div class="top-nav">
             <div class="logo">NEXGEN</div>
             <div class="bar-right">
-                <button class="auth-trigger-btn" onclick="openAuth()">Sign In</button>
+                <button class="auth-trigger-btn">Sign In</button>
                 <div class="wallet-pill">
                     Ksh <span id="balance">0.00</span>
                     <button onclick="handleDeposit()" class="btn-deposit">Deposit</button>
@@ -87,20 +83,6 @@
         <div id="dynamic-feed"></div>
     </div>
 
-    <div id="auth-modal">
-        <div class="modal-content">
-            <div class="switch-container" onclick="toggleAuthMode()">
-                <div class="slider" id="authSlider"></div>
-                <div class="switch-tab active" id="tabIn">Sign In</div>
-                <div class="switch-tab" id="tabUp">Sign Up</div>
-            </div>
-            <h2 id="auth-title">Welcome Back</h2>
-            <input type="email" class="m-input" placeholder="Email Address">
-            <input type="password" class="m-input" placeholder="Password">
-            <button class="m-btn-main" onclick="closeAuth()">Continue</button>
-        </div>
-    </div>
-
     <script>
         function handleDeposit() {
             const intasend = new window.IntaSend({
@@ -112,28 +94,9 @@
                 amount: 50,
                 currency: "KES",
                 redirect: false 
+            }).on("COMPLETE", (res) => {
+                document.getElementById('balance').innerText = res.amount;
             });
-        }
-
-        let isSignUp = false;
-        function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
-        function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
-        function toggleAuthMode() {
-            isSignUp = !isSignUp;
-            const title = document.getElementById('auth-title');
-            const container = document.querySelector('.switch-container');
-            const tabIn = document.getElementById('tabIn');
-            const tabUp = document.getElementById('tabUp');
-            
-            if(isSignUp) {
-                container.classList.add('signup-mode');
-                tabUp.classList.add('active'); tabIn.classList.remove('active');
-                title.innerText = "Create Account";
-            } else {
-                container.classList.remove('signup-mode');
-                tabIn.classList.add('active'); tabUp.classList.remove('active');
-                title.innerText = "Welcome Back";
-            }
         }
 
         const marketPool = ["Bitcoin to $100k?", "Ksh to 120?", "Arsenal Win?", "AI Solves Cancer?", "Solana Flip ETH?"];
@@ -153,13 +116,7 @@
                 feed.appendChild(card);
             }
         }
-
         window.onload = () => renderMarkets(30);
-        window.onscroll = () => {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 800) {
-                renderMarkets(10);
-            }
-        };
     </script>
 </body>
 </html>

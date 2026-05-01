@@ -3,385 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Polymarkets Africa | Premium Terminal</title>
+    <title>Polymarkets Africa | Terminal</title>
     
     <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
     <style>
         :root { 
-            --bg-base: #060813;
-            --bg-surface: #0f1329;
-            --bg-surface-hover: #181d3d;
-            --accent-neon: #00ff87;
-            --accent-neon-glow: rgba(0, 255, 135, 0.35);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --text-main: #ffffff;
-            --text-sub: #8b9bb4;
-            --yes-green: #10b981;
-            --yes-bg: rgba(16, 185, 129, 0.12);
-            --no-red: #ef4444;
-            --no-bg: rgba(239, 68, 68, 0.12);
-            --font-display: 'Cabinet Grotesk', -apple-system, sans-serif;
-            --font-body: 'Inter', -apple-system, sans-serif;
+            --accent: #2ebd85; --border: #eceef2; --text-main: #0f172a; --text-sub: #64748b;
+            --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #991b1b;
+            --tech-bg: #0f172a;
+            --news-accent: #ef4444;
         }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: #fafafa; color: var(--text-main); margin: 0; padding-top: 80px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
 
-        body { 
-            background: var(--bg-base); 
-            color: var(--text-main); 
-            margin: 0; 
-            padding-top: 76px; 
-            font-family: var(--font-body);
-            -webkit-font-smoothing: antialiased; 
-            background-image: radial-gradient(circle at 50% -20%, #151c4a 0%, var(--bg-base) 65%);
-            background-attachment: fixed;
-            min-height: 100vh;
-        }
-
-        /* Top Nav - Elite Premium Styling */
-        .header-stack { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            background: rgba(6, 8, 19, 0.85); 
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px); 
-            z-index: 2000; 
-            border-bottom: 1px solid var(--border-color); 
-            transition: transform 0.3s ease-in-out;
-        }
-        .top-nav { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 0 16px; 
-            height: 68px; 
-            max-width: 600px; 
-            margin: 0 auto; 
-        }
-        .logo-wrap { display: flex; flex-direction: column; line-height: 1; cursor: pointer; }
-        .logo-main { 
-            font-family: var(--font-display); 
-            font-weight: 900; 
-            font-size: 21px; 
-            letter-spacing: -0.5px; 
-            color: #fff; 
-            text-transform: uppercase;
-            background: linear-gradient(to right, #fff 40%, var(--accent-neon));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .logo-sub { 
-            font-family: var(--font-body); 
-            font-size: 10px; 
-            font-weight: 800; 
-            color: var(--accent-neon); 
-            letter-spacing: 2.5px; 
-            text-transform: uppercase; 
-            margin-top: 1px; 
-        }
+        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); transition: transform 0.3s ease-in-out; }
+        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 68px; }
+        .logo-wrap { display: flex; flex-direction: column; line-height: 1; }
+        .logo-main { font-weight: 900; font-size: 19px; letter-spacing: -0.5px; color: #000; text-transform: uppercase; }
+        .logo-sub { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
         
-        .nav-right { display: flex; align-items: center; gap: 8px; }
-        .wallet-pill { 
-            display: flex; 
-            align-items: center; 
-            background: rgba(255, 255, 255, 0.04); 
-            border: 1px solid var(--border-color); 
-            padding: 4px 4px 4px 12px; 
-            border-radius: 30px; 
-            gap: 8px; 
-            font-size: 13px; 
-            font-weight: 700; 
-            color: #fff;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        }
-        .bal-val { font-family: var(--font-body); color: var(--accent-neon); font-weight: 800; }
-        .btn-deposit { 
-            background: var(--accent-neon); 
-            color: #000; 
-            border: none; 
-            padding: 6px 14px; 
-            border-radius: 20px; 
-            font-weight: 800; 
-            font-size: 11.5px; 
-            cursor: pointer; 
-            transition: all 0.2s ease; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 0 12px var(--accent-neon-glow);
-        }
-        .btn-deposit:active { transform: scale(0.96); opacity: 0.9; }
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+        .wallet-pill { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); padding: 4px 4px 4px 12px; border-radius: 10px; gap: 8px; font-size: 13px; font-weight: 700; }
+        .btn-deposit { background: #000; color: #fff; border: none; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .btn-deposit:active { opacity: 0.8; }
         
-        .user-id { 
-            width: 34px; 
-            height: 34px; 
-            background: var(--bg-surface); 
-            color: var(--accent-neon); 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: pointer; 
-            border: 1px solid var(--border-color); 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3); 
-            transition: all 0.2s ease;
-        }
-        .user-id:active { transform: scale(0.92); }
-        .person-icon { width: 16px; height: 16px; fill: currentColor; }
+        .user-id { width: 36px; height: 36px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .person-icon { width: 18px; height: 18px; fill: currentColor; }
 
         body.hide-header .header-stack { transform: translateY(-100%); }
-        body.hide-header { padding-top: 16px; }
+        body.hide-header { padding-top: 20px; }
 
         #dashboard { max-width: 600px; margin: auto; padding: 12px; box-sizing: border-box; }
         
-        /* High-End Lively Moving News Banner (Sportsbook style) */
+        /* Continuous Smooth Professional Ticker */
         .news-ticker-container { 
-            background: var(--bg-surface); 
-            border: 1px solid var(--border-color); 
-            border-left: 3px solid var(--accent-neon);
-            border-radius: 12px; 
-            padding: 12px 14px; 
-            margin-bottom: 16px; 
+            background: #fff; 
+            border: 1px solid var(--border); 
+            border-left: 4px solid var(--news-accent);
+            border-radius: 14px; 
+            padding: 14px 0; 
+            margin-bottom: 20px; 
             display: flex; 
             align-items: center; 
-            gap: 12px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.04); 
             overflow: hidden;
             position: relative;
         }
         .news-badge { 
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #ff4d4d; 
+            background: var(--news-accent); 
+            color: #fff; 
             font-size: 10px; 
             font-weight: 900; 
             text-transform: uppercase; 
-            padding: 3px 8px; 
+            padding: 5px 10px; 
             border-radius: 6px; 
             letter-spacing: 1px; 
             flex-shrink: 0; 
             display: flex;
             align-items: center;
-            gap: 5px;
-            animation: pulse-glow 2s infinite;
+            gap: 6px;
+            margin-left: 18px;
+            margin-right: 14px;
+            z-index: 2;
+            box-shadow: 2px 0 8px rgba(255, 255, 255, 0.9);
         }
         .news-badge::before {
             content: "";
-            width: 5px;
-            height: 5px;
-            background: #ff4d4d;
+            width: 6px;
+            height: 6px;
+            background: #fff;
             border-radius: 50%;
             display: inline-block;
         }
+
+        /* Seamless Continuous Scroll Area */
         .news-headline-wrapper {
             flex-grow: 1;
             overflow: hidden;
+            white-space: nowrap;
             position: relative;
-            height: 18px;
+            display: flex;
         }
-        .news-headline { 
-            font-size: 12.5px; 
-            font-weight: 700; 
-            color: #cbd5e1; 
-            margin: 0; 
-            line-height: 18px; 
-            white-space: nowrap; 
-            position: absolute;
-            width: 100%;
-            transform: translateY(0);
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+        .news-scroller {
+            display: flex;
+            gap: 50px;
+            animation: tickerScroll 35s linear infinite;
+            padding-right: 50px;
         }
-        .news-headline.exit { transform: translateY(-22px); opacity: 0; }
-        .news-headline.enter { transform: translateY(22px); opacity: 0; }
-
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); }
-            70% { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        .news-scroller:hover {
+            animation-play-state: paused;
         }
-
-        /* Multimillion Aesthetic Sportsbook Market Cards */
-        .market-card { 
-            background: var(--bg-surface); 
-            border: 1px solid var(--border-color); 
-            border-radius: 16px; 
-            padding: 16px; 
-            margin-bottom: 14px; 
-            box-shadow: 0 6px 18px rgba(0,0,0,0.15); 
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        .market-card:hover { 
-            border-color: rgba(255,255,255,0.15); 
-            background: var(--bg-surface-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(0,0,0,0.25);
-        }
-        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
-        .m-title { 
-            font-size: 14.5px; 
-            font-weight: 700; 
-            line-height: 1.45; 
-            color: #fff; 
-            padding-right: 8px; 
-            letter-spacing: -0.2px;
-        }
-        .odds-val { font-family: var(--font-body); font-size: 17px; font-weight: 800; color: var(--accent-neon); }
-        .odds-lbl { font-size: 9.5px; color: var(--text-sub); text-transform: uppercase; display: block; text-align: right; font-weight: 600; }
-        
-        .m-category { 
-            font-size: 9.5px; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            color: #fff; 
-            background: rgba(255,255,255,0.06); 
-            border: 1px solid var(--border-color);
-            padding: 4px 10px; 
-            border-radius: 6px; 
-            display: inline-block; 
-            margin-bottom: 12px; 
-            letter-spacing: 0.8px; 
-        }
-
-        .btn-group { display: flex; gap: 8px; }
-        .trade-btn { 
-            flex: 1; 
-            padding: 12px 8px; 
-            border-radius: 12px; 
-            border: 1px solid transparent;
-            font-weight: 800; 
-            font-size: 14px; 
-            cursor: pointer; 
-            transition: all 0.2s ease; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 1px; 
-            font-family: var(--font-body);
-        }
-        .trade-btn:active { transform: scale(0.96); }
-        
-        .trade-btn.yes { 
-            background: var(--yes-bg); 
-            color: var(--yes-green); 
-            border-color: rgba(16, 185, 129, 0.2);
-        }
-        .trade-btn.yes:hover {
-            background: rgba(16, 185, 129, 0.2);
-            border-color: var(--yes-green);
-        }
-        .trade-btn.no { 
-            background: var(--no-bg); 
-            color: var(--no-red); 
-            border-color: rgba(239, 68, 68, 0.2);
-        }
-        .trade-btn.no:hover {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: var(--no-red);
-        }
-        .multiplier { font-size: 11.5px; font-weight: 700; opacity: 0.9; }
-
-        /* Fancy Premium Overlays */
-        .overlay { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(4, 5, 12, 0.82); 
-            backdrop-filter: blur(14px); 
-            -webkit-backdrop-filter: blur(14px); 
-            z-index: 5000; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 16px; 
-        }
-        
-        /* Premium Modal Body */
-        .modal { 
-            background: var(--bg-surface); 
-            width: 100%; 
-            max-width: 380px; 
-            padding: 28px 24px; 
-            border-radius: 24px; 
-            text-align: center; 
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05); 
-            box-sizing: border-box; 
-            border: 1px solid var(--border-color); 
-            max-height: 90vh; 
-            overflow-y: auto; 
-            animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.94) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .auth-nav { display: flex; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); padding: 4px; border-radius: 12px; margin-bottom: 24px; }
-        .auth-tab { flex: 1; padding: 11px; font-size: 12px; font-weight: 800; cursor: pointer; border-radius: 9px; color: var(--text-sub); transition: all 0.2s ease; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
-        .auth-tab.active { background: var(--border-color); color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-        
-        .input-group { position: relative; margin-bottom: 16px; text-align: left; }
-        .input-group label { display: block; font-size: 10.5px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
-        .input-tech { 
-            width: 100%; 
-            padding: 13px 16px; 
-            background: rgba(0, 0, 0, 0.25); 
-            border: 1px solid var(--border-color); 
-            border-radius: 12px; 
-            font-size: 14px; 
-            box-sizing: border-box; 
-            outline: none; 
-            transition: all 0.2s ease; 
-            color: #fff; 
-            font-family: inherit; 
-        }
-        .input-tech:focus { border-color: rgba(255, 255, 255, 0.2); background: rgba(0, 0, 0, 0.4); }
-        
-        .btn-tech { 
-            width: 100%; 
-            padding: 15px; 
-            background: var(--accent-neon); 
-            color: #000; 
-            border: none; 
-            border-radius: 14px; 
-            font-weight: 800; 
-            cursor: pointer; 
+        .news-item {
             font-size: 13.5px; 
-            transition: all 0.2s ease; 
-            letter-spacing: 0.5px; 
-            text-transform: uppercase; 
-            margin-top: 8px; 
-            box-shadow: 0 0 16px var(--accent-neon-glow);
+            font-weight: 700; 
+            color: var(--text-main); 
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        .btn-tech:active { transform: scale(0.97); }
+        .news-divider {
+            color: var(--news-accent);
+            font-weight: 900;
+        }
+
+        @keyframes tickerScroll {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+
+        /* Lively Market Cards */
+        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
+        .market-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+        .m-title { font-size: 15px; font-weight: 600; line-height: 1.45; color: #0f172a; padding-right: 12px; }
+        .odds-val { font-size: 18px; font-weight: 800; color: #000; }
+        .odds-lbl { font-size: 10px; color: var(--text-sub); text-transform: uppercase; display: block; text-align: right; }
         
-        .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; }
-        .amt-chip { 
-            border: 1px solid var(--border-color); 
-            padding: 12px; 
-            border-radius: 12px; 
-            font-size: 12.5px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            background: rgba(255,255,255,0.02); 
-            text-align: center; 
-            color: #fff;
-            transition: all 0.2s ease;
-        }
-        .amt-chip:hover, .amt-chip:active { 
-            background: rgba(255,255,255,0.06); 
-            border-color: var(--accent-neon);
-            color: var(--accent-neon);
-        }
+        .m-category { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent); background: #f0fdf4; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 12px; letter-spacing: 0.5px; }
+
+        .btn-group { display: flex; gap: 10px; }
+        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .trade-btn:active { opacity: 0.7; }
+        .trade-btn.yes { background: var(--yes); color: var(--yes-text); }
+        .trade-btn.no { background: var(--no); color: var(--no-text); }
+        .multiplier { font-size: 11px; font-weight: 700; opacity: 0.8; }
+
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
         
-        .badge-wrap { margin-top: 18px; border-top: 1px solid var(--border-color); padding-top: 16px; }
+        /* Premium Modal Styling */
+        .modal { background: #fff; width: 100%; max-width: 380px; padding: 32px 28px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); box-sizing: border-box; border: 1px solid rgba(255,255,255,0.2); max-height: 90vh; overflow-y: auto; }
+        .auth-nav { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 24px; }
+        .auth-tab { flex: 1; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); transition: 0.2s; text-align: center; }
+        .auth-tab.active { background: #fff; color: #000; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+        
+        .input-group { position: relative; margin-bottom: 14px; text-align: left; }
+        .input-group label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .input-tech { width: 100%; padding: 14px 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; box-sizing: border-box; outline: none; transition: 0.2s; color: #0f172a; font-family: inherit; }
+        .input-tech:focus { border-color: #cbd5e1; background: #fff; }
+        
+        .btn-tech { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 14px; transition: 0.2s; letter-spacing: 0.5px; text-transform: uppercase; margin-top: 8px; }
+        .btn-tech:active { opacity: 0.8; }
+        
+        .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
+        .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; text-align: center; }
+        .amt-chip:active { background: #f1f5f9; }
+        
+        .badge-wrap { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -394,13 +162,13 @@
                 <div class="logo-sub">Africa</div>
             </div>
             <div class="nav-right">
-                <button id="signBtn" class="btn-deposit" style="background:rgba(255,255,255,0.08); color:#fff; box-shadow:none; border: 1px solid var(--border-color);" onclick="openModal('authModal')">Sign In</button>
+                <button id="signBtn" class="btn-deposit" style="background:#f1f5f9; color:#000;" onclick="openModal('authModal')">Sign In</button>
                 <div id="userIcon" class="user-id hidden" onclick="logout()">
                     <svg class="person-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 </div>
                 <div class="wallet-pill">
-                    Ksh <span id="balance" class="bal-val">0.00</span>
-                    <button onclick="openModal('depositModal')" class="btn-deposit">Deposit</button>
+                    Ksh <span id="balance">0.00</span>
+                    <button onclick="openModal('depositModal')" class="btn-deposit">Funds</button>
                 </div>
             </div>
         </div>
@@ -410,7 +178,8 @@
         <div class="news-ticker-container">
             <div class="news-badge">Live</div>
             <div class="news-headline-wrapper">
-                <div id="news-headline" class="news-headline">Direct M-Pesa settlements processing with normal parameters...</div>
+                <div id="news-scroller" class="news-scroller">
+                    </div>
             </div>
         </div>
 
@@ -423,8 +192,8 @@
                 <div id="tabIn" class="auth-tab active" onclick="setAuth('in')">Sign In</div>
                 <div id="tabUp" class="auth-tab" onclick="setAuth('up')">Sign Up</div>
             </div>
-            <h2 id="aTitle" style="margin:0 0 6px 0; font-family:var(--font-display); font-weight:900; font-size:22px; letter-spacing:-0.5px; text-transform:uppercase;">Terminal Access</h2>
-            <p id="aDesc" style="color: var(--text-sub); font-size: 12.5px; margin: 0 0 24px 0; font-weight:500;">Authorize secure account terminal access</p>
+            <h2 id="aTitle" style="margin:0 0 8px 0; font-weight:800; font-size:20px; letter-spacing:-0.5px;">Terminal Access</h2>
+            <p id="aDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Enter credentials to connect to terminal</p>
             
             <div id="upFields" class="hidden">
                 <div class="input-group">
@@ -435,59 +204,10 @@
                     <label>Country</label>
                     <select id="aCountry" class="input-tech">
                         <option value="Algeria">Algeria</option>
-                        <option value="Angola">Angola</option>
-                        <option value="Benin">Benin</option>
-                        <option value="Botswana">Botswana</option>
-                        <option value="Burkina Faso">Burkina Faso</option>
-                        <option value="Burundi">Burundi</option>
-                        <option value="Cabo Verde">Cabo Verde</option>
-                        <option value="Cameroon">Cameroon</option>
-                        <option value="Central African Republic">Central African Republic</option>
-                        <option value="Chad">Chad</option>
-                        <option value="Comoros">Comoros</option>
-                        <option value="Congo">Congo</option>
-                        <option value="Democratic Republic of the Congo">DR Congo</option>
-                        <option value="Djibouti">Djibouti</option>
-                        <option value="Egypt">Egypt</option>
-                        <option value="Equatorial Guinea">Equatorial Guinea</option>
-                        <option value="Eritrea">Eritrea</option>
-                        <option value="Eswatini">Eswatini</option>
-                        <option value="Ethiopia">Ethiopia</option>
-                        <option value="Gabon">Gabon</option>
-                        <option value="Gambia">Gambia</option>
-                        <option value="Ghana">Ghana</option>
-                        <option value="Guinea">Guinea</option>
-                        <option value="Guinea-Bissau">Guinea-Bissau</option>
-                        <option value="Ivory Coast">Ivory Coast</option>
                         <option value="Kenya" selected>Kenya</option>
-                        <option value="Lesotho">Lesotho</option>
-                        <option value="Liberia">Liberia</option>
-                        <option value="Libya">Libya</option>
-                        <option value="Madagascar">Madagascar</option>
-                        <option value="Malawi">Malawi</option>
-                        <option value="Mali">Mali</option>
-                        <option value="Mauritania">Mauritania</option>
-                        <option value="Mauritius">Mauritius</option>
-                        <option value="Morocco">Morocco</option>
-                        <option value="Mozambique">Mozambique</option>
-                        <option value="Namibia">Namibia</option>
-                        <option value="Niger">Niger</option>
                         <option value="Nigeria">Nigeria</option>
-                        <option value="Rwanda">Rwanda</option>
-                        <option value="Sao Tome and Principe">Sao Tome and Principe</option>
-                        <option value="Senegal">Senegal</option>
-                        <option value="Seychelles">Seychelles</option>
-                        <option value="Sierra Leone">Sierra Leone</option>
-                        <option value="Somalia">Somalia</option>
                         <option value="South Africa">South Africa</option>
-                        <option value="South Sudan">South Sudan</option>
-                        <option value="Sudan">Sudan</option>
-                        <option value="Tanzania">Tanzania</option>
-                        <option value="Togo">Togo</option>
-                        <option value="Tunisia">Tunisia</option>
                         <option value="Uganda">Uganda</option>
-                        <option value="Zambia">Zambia</option>
-                        <option value="Zimbabwe">Zimbabwe</option>
                     </select>
                 </div>
             </div>
@@ -507,8 +227,8 @@
                 <input type="password" id="aConfirmPass" class="input-tech" placeholder="••••••••">
             </div>
             
-            <button onclick="doAuth()" class="btn-tech">Access Terminal</button>
-            <p style="font-size: 12.5px; color: var(--text-sub); margin-top: 22px; cursor: pointer; font-weight:700; text-transform: uppercase; letter-spacing:0.5px;" onclick="closeModal('authModal')">Dismiss</p>
+            <button onclick="doAuth()" class="btn-tech">Initialize Session</button>
+            <p style="font-size: 13px; color: var(--text-sub); margin-top: 22px; cursor: pointer; font-weight:700;" onclick="closeModal('authModal')">Dismiss</p>
         </div>
     </div>
 
@@ -519,13 +239,13 @@
                 <div id="tabWithdraw" class="auth-tab" onclick="setFundsMode('withdraw')">Withdraw</div>
             </div>
             
-            <h2 id="fundsTitle" style="margin: 0 0 4px 0; font-family:var(--font-display); font-weight:900; font-size:22px; letter-spacing:-0.5px; text-transform:uppercase;">Fund Balance</h2>
-            <p id="fundsDesc" style="color: var(--text-sub); font-size: 12.5px; margin: 0 0 24px 0; font-weight:500;">Direct M-Pesa Integration via IntaSend</p>
+            <h2 id="fundsTitle" style="margin: 0 0 6px 0; font-weight:800; font-size:20px; letter-spacing:-0.5px;">Fund Balance</h2>
+            <p id="fundsDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Direct M-Pesa Integration via IntaSend</p>
             
-            <div style="background:rgba(0,0,0,0.25); padding:16px; border-radius:18px; border: 1px solid var(--border-color); margin-bottom:16px;">
+            <div style="background:#f8fafc; padding:18px; border-radius:18px; border: 1px solid var(--border); margin-bottom:16px;">
                 <div class="input-group">
                     <label id="amtLabel">Deposit Amount (Ksh)</label>
-                    <input type="text" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800; color: #fff; background: transparent; border:none; border-bottom: 1px solid var(--border-color); border-radius:0; padding:4px;" value="0.00" onfocus="if(this.value==='0.00')this.value='';" onblur="if(this.value==='')this.value='0.00';">
+                    <input type="text" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800; color: #000;" value="0.00" onfocus="if(this.value==='0.00')this.value='';" onblur="if(this.value==='')this.value='0.00';">
                 </div>
                 <div id="fundsChips" class="chip-grid">
                     <div class="amt-chip" onclick="setAmt(250)">250</div>
@@ -537,71 +257,42 @@
                 </div>
             </div>
             
-            <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech">Confirm Deposit</button>
+            <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--accent);">Confirm Deposit</button>
             
             <div id="sharedBadge" class="badge-wrap">
                 <span style="display:block; text-align: center">
                     <a href="https://intasend.com/security" target="_blank">
-                        <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-dark.png" width="375px" style="max-width:100%; height:auto;" alt="IntaSend Secure Payments">
+                        <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" width="375px" style="max-width:100%; height:auto;" alt="IntaSend Secure Payments">
                     </a>
                 </span>
             </div>
 
-            <p style="font-size: 12.5px; color: var(--text-sub); margin-top: 16px; cursor: pointer; font-weight:700; text-transform: uppercase; letter-spacing:0.5px;" onclick="closeModal('depositModal')">Cancel</p>
+            <p style="font-size: 13px; color: var(--text-sub); margin-top: 14px; cursor: pointer; font-weight:700;" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
 
     <script>
         const INTASEND_PUBLIC_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad";
         let activeTab = 'in';
-
         let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
 
-        // Preset Premium Headlines
+        // Preset Professional Terminal News Items
         const headlines = [
-            "Direct M-Pesa settlements processing with normal parameters...",
-            "African derivatives indices break previous liquidity ceiling.",
-            "Gold spot markets maintain solid traction at current valuations.",
-            "Technology sector indices surge on continental development updates.",
-            "Corporate capital structures report stable growth this quarter."
+            "Market volatility shifts following regional central bank updates",
+            "Gold markets sustain positive traction ahead of US CPI metrics",
+            "African tech networks report surging investment cycles this season",
+            "Local derivatives post record liquidity as volumes continue to climb",
+            "Crude oil stabilizes as international supply frameworks adjust"
         ];
 
         // Global Prediction Dataset
         const categories = ["Finance", "Sports", "Politics", "Tech", "Entertainment"];
         const feedThemes = {
-            "Finance": [
-                "Will Kenya's GDP growth surpass the 5.5% marker next quarter?",
-                "Will the Central Bank of Kenya reduce interest rates at the next policy review?",
-                "Will Bitcoin secure a stable position above the $100k line next month?",
-                "Will major indices finish the quarter with gains?",
-                "Will crude oil benchmarks remain stable at $80 per barrel?",
-                "Will gold prices break past the $2,500/oz ceiling this month?",
-                "Will the US Federal Reserve lower the benchmark rate by September?",
-                "Will the Nairobi Securities Exchange post a record year for transaction volume?"
-            ],
-            "Sports": [
-                "Will Arsenal claim the English Premier League crown this season?",
-                "Will Real Madrid successfully claim the Champions League trophy?",
-                "Will Kenya win at least 3 gold medals in the upcoming Athletics Championships?",
-                "Will the next World Cup host unveil new regional stadium upgrades this month?",
-                "Will a new lap record be set at the next Formula 1 Grand Prix?"
-            ],
-            "Politics": [
-                "Will the African Union establish a unified startup regulatory framework?",
-                "Will the regional trade pact see 5 new member additions before December?",
-                "Will a major environmental treaty be ratified by global leaders next quarter?"
-            ],
-            "Tech": [
-                "Will EV sales establish a new high within the regional automotive market?",
-                "Will a major tech titan announce a new digital device this year?",
-                "Will AI-generated software engineering tools outpace traditional platforms?",
-                "Will European energy storage networks double total capacity before next winter?"
-            ],
-            "Entertainment": [
-                "Will the next James Bond actor be officially announced before August?",
-                "Will a new movie release surpass the current box office records?",
-                "Will a major streaming platform restrict password sharing worldwide next month?"
-            ]
+            "Finance": ["Will Kenya's GDP growth surpass the 5.5% marker next quarter?", "Will the CBK reduce interest rates?"],
+            "Sports": ["Will Arsenal claim the English Premier League crown this season?", "Will Kenya win 3+ gold medals?"],
+            "Politics": ["Will the African Union establish a unified startup regulatory framework?"],
+            "Tech": ["Will EV sales establish a new high within the regional market?"],
+            "Entertainment": ["Will the next James Bond actor be officially announced before August?"]
         };
 
         let markets = [];
@@ -611,56 +302,49 @@
             initializeMarkets();
             syncState(); 
             renderFeed();
-            
-            // Premium Headline Rotation Slider Animation
-            let newsIndex = 0;
-            const hElem = document.getElementById('news-headline');
-            
-            setInterval(() => {
-                hElem.classList.add('exit');
-                setTimeout(() => {
-                    newsIndex = (newsIndex + 1) % headlines.length;
-                    hElem.innerText = headlines[newsIndex];
-                    hElem.classList.remove('exit');
-                    hElem.classList.add('enter');
-                    setTimeout(() => {
-                        hElem.classList.remove('enter');
-                    }, 50);
-                }, 450);
-            }, 6000);
+            setupNewsTicker();
         };
 
+        function setupNewsTicker() {
+            const scroller = document.getElementById('news-scroller');
+            scroller.innerHTML = '';
+
+            // Generate content once
+            const content = headlines.map(h => `<div class="news-item"><span>${h}</span><span class="news-divider">•</span></div>`).join('');
+            
+            // Duplicate the contents exactly to create an uninterrupted continuous marquee loop
+            scroller.innerHTML = content + content;
+        }
+
         function initializeMarkets() {
-            // Build out exactly 3000 markets. Jesus Market goes at Position #8 and #10
             for (let i = 1; i <= 3000; i++) {
-                if (i === 8 || i === 10) {
+                if (i === 8) {
                     markets.push({
-                        id: `m-ext-custom-${i}`,
+                        id: `m-ext-0`,
                         q: "Will Jesus be back before June 5th?",
                         category: "Culture",
                         p: 25,
                         yesMult: "9.00",
                         noMult: "3.00"
                     });
-                } else {
-                    const cat = categories[i % categories.length];
-                    const prompts = feedThemes[cat];
-                    const basePrompt = prompts[i % prompts.length];
-                    const question = `${basePrompt} (Market Variant #${1000 + i})`;
-                    
-                    const chanceValue = Math.floor(10 + (i * 3.7) % 80);
-                    const yesMultiplier = (100 / chanceValue).toFixed(2);
-                    const noMultiplier = (100 / (100 - chanceValue)).toFixed(2);
-
-                    markets.push({
-                        id: `m-ext-${i}`,
-                        q: question,
-                        category: cat,
-                        p: chanceValue,
-                        yesMult: yesMultiplier,
-                        noMult: noMultiplier
-                    });
                 }
+                const cat = categories[i % categories.length];
+                const prompts = feedThemes[cat] || ["General market predictions to monitor this month."];
+                const basePrompt = prompts[i % prompts.length];
+                const question = `${basePrompt} (Market Variant #${1000 + i})`;
+                
+                const chanceValue = Math.floor(10 + (i * 3.7) % 80);
+                const yesMultiplier = (100 / chanceValue).toFixed(2);
+                const noMultiplier = (100 / (100 - chanceValue)).toFixed(2);
+
+                markets.push({
+                    id: `m-ext-${i}`,
+                    q: question,
+                    category: cat,
+                    p: chanceValue,
+                    yesMult: yesMultiplier,
+                    noMult: noMultiplier
+                });
             }
         }
 
@@ -693,10 +377,8 @@
         }
 
         function handleWagerClick(marketQuestion) {
-            if (!localStorage.getItem('nx_user')) {
-                return openModal('authModal');
-            }
-            alert("Insufficient funds. Open deposit to top up balance.");
+            if (!localStorage.getItem('nx_user')) return openModal('authModal');
+            alert("Insufficient funds. Please fund your balance to open wagers.");
         }
 
         function syncState() {
@@ -716,12 +398,10 @@
             const confirmPass = document.getElementById('confirmPassWrapper');
             if(mode === 'up') {
                 up.classList.remove('hidden'); confirmPass.classList.remove('hidden'); tUp.classList.add('active'); tIn.classList.remove('active');
-                title.innerText = "Secure Signup";
-                desc.innerText = "Register your identity to access the terminal";
+                title.innerText = "Register Identity"; desc.innerText = "Create an account to begin using the terminal";
             } else {
                 up.classList.add('hidden'); confirmPass.classList.add('hidden'); tIn.classList.add('active'); tUp.classList.remove('active');
-                title.innerText = "Terminal Access";
-                desc.innerText = "Enter credentials to connect to terminal";
+                title.innerText = "Terminal Access"; desc.innerText = "Enter credentials to connect to the terminal";
             }
         }
 
@@ -733,22 +413,14 @@
 
             if(mode === 'withdraw') {
                 tWith.classList.add('active'); tDep.classList.remove('active');
-                fTitle.innerText = "Terminal Withdrawal";
-                fDesc.innerText = "Direct settlement to your M-Pesa account";
-                amtLabel.innerText = "Withdrawal Amount (Ksh)";
-                fSubmit.innerText = "Confirm Withdrawal";
-                fSubmit.style.background = "#fff";
-                fSubmit.style.color = "#000";
-                fSubmit.style.boxShadow = "none";
+                fTitle.innerText = "Withdraw Balance"; fDesc.innerText = "Direct settlement to your M-Pesa account";
+                amtLabel.innerText = "Withdrawal Amount (Ksh)"; fSubmit.innerText = "Confirm Withdrawal";
+                fSubmit.style.background = "#000";
             } else {
                 tDep.classList.add('active'); tWith.classList.remove('active');
-                fTitle.innerText = "Fund Balance";
-                fDesc.innerText = "Direct M-Pesa Integration via IntaSend";
-                amtLabel.innerText = "Deposit Amount (Ksh)";
-                fSubmit.innerText = "Confirm Deposit";
-                fSubmit.style.background = "var(--accent-neon)";
-                fSubmit.style.color = "#000";
-                fSubmit.style.boxShadow = "0 0 16px var(--accent-neon-glow)";
+                fTitle.innerText = "Fund Balance"; fDesc.innerText = "Direct M-Pesa Integration via IntaSend";
+                amtLabel.innerText = "Deposit Amount (Ksh)"; fSubmit.innerText = "Confirm Deposit";
+                fSubmit.style.background = "var(--accent)";
             }
         }
 
@@ -769,10 +441,10 @@
 
                 userDB[email] = { name, email, pass, country, balance: "0.00" };
                 localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
-
                 localStorage.setItem('nx_user', email);
                 localStorage.setItem('nx_balance', "0.00");
-                alert(`Welcome, ${name}. Terminal initialized!`);
+                
+                alert(`Account created successfully!`);
                 closeModal('authModal');
                 syncState();
             } else {
@@ -780,10 +452,9 @@
                 if (!userRecord || userRecord.pass !== pass) {
                     return alert("Access denied. Incorrect email address or password.");
                 }
-
                 localStorage.setItem('nx_user', userRecord.email);
                 localStorage.setItem('nx_balance', userRecord.balance || "0.00");
-                alert(`Session resumed successfully.`);
+                alert(`Session initialized for ${userRecord.name || userRecord.email}`);
                 closeModal('authModal');
                 syncState();
             }
@@ -792,11 +463,7 @@
         function setAmt(v) { document.getElementById('depAmt').value = parseFloat(v).toFixed(2); }
 
         function handleFundsAction() {
-            if (currentFundsMode === 'withdraw') {
-                withdrawNow();
-            } else {
-                payNow();
-            }
+            if (currentFundsMode === 'withdraw') { withdrawNow(); } else { payNow(); }
         }
 
         function withdrawNow() {
@@ -804,21 +471,11 @@
             const userEmail = localStorage.getItem('nx_user');
             let curBal = parseFloat(localStorage.getItem('nx_balance') || 0);
 
-            if(!userEmail) {
-                closeModal('depositModal');
-                return openModal('authModal');
-            }
-
-            if(!amt || amt < 100) {
-                return alert("Minimum withdrawal amount required is Ksh 100");
-            }
-
-            if(amt > curBal) {
-                return alert("Insufficient funds");
-            }
+            if(!userEmail) { closeModal('depositModal'); return openModal('authModal'); }
+            if(!amt || amt < 100) return alert("Minimum withdrawal amount required is Ksh 100");
+            if(amt > curBal) return alert("Insufficient funds");
 
             closeModal('depositModal');
-            
             const newBal = (curBal - amt).toFixed(2);
             localStorage.setItem('nx_balance', newBal);
             
@@ -826,23 +483,16 @@
                 userDB[userEmail].balance = newBal;
                 localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
             }
-
             syncState();
-            alert("Withdrawal processing successfully!");
+            alert("Withdrawal complete");
         }
 
         function payNow() {
             const amt = Number(document.getElementById('depAmt').value);
             const userEmail = localStorage.getItem('nx_user');
 
-            if(!userEmail) {
-                closeModal('depositModal');
-                return openModal('authModal');
-            }
-
-            if(!amt || amt < 100) {
-                return alert("Minimum deposit amount required is Ksh 100");
-            }
+            if(!userEmail) { closeModal('depositModal'); return openModal('authModal'); }
+            if(!amt || amt < 100) return alert("Minimum deposit amount required is Ksh 100");
 
             closeModal('depositModal');
             document.body.classList.add('hide-header');
@@ -856,18 +506,16 @@
                 document.body.classList.remove('hide-header');
                 let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
                 const newBal = (cur + Number(amt)).toFixed(2);
-                
                 localStorage.setItem('nx_balance', newBal);
 
                 if (userDB[userEmail]) {
                     userDB[userEmail].balance = newBal;
                     localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
                 }
-
                 syncState();
-                alert(`Success! Ksh ${amt.toLocaleString()} has been added to your account.`);
+                alert(`Success! Ksh ${amt.toLocaleString()} added to balance.`);
             })
-            .on("FAILED", (results) => {
+            .on("FAILED", () => {
                 document.body.classList.remove('hide-header');
                 alert("The transaction was not completed.");
             })
@@ -875,11 +523,7 @@
                 document.body.classList.add('hide-header');
             });
 
-            intasend.run({
-                amount: amt,
-                currency: "KES",
-                email: userEmail
-            });
+            intasend.run({ amount: amt, currency: "KES", email: userEmail });
         }
 
         function openModal(id) { 
@@ -890,13 +534,11 @@
         function closeModal(id) { 
             document.body.classList.remove('hide-header');
             document.getElementById(id).style.display = 'none'; 
-            if(id === 'depositModal') {
-                document.getElementById('depAmt').value = '0.00';
-            }
+            if(id === 'depositModal') document.getElementById('depAmt').value = '0.00';
         }
 
         function logout() { 
-            if(confirm("Terminate terminal session?")) { 
+            if(confirm("Terminate session?")) { 
                 localStorage.removeItem('nx_user');
                 localStorage.removeItem('nx_balance');
                 location.reload(); 

@@ -3,172 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexGen | Professional Prediction Terminal</title>
+    <title>NexGen Terminal</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@3.0.4/build/intasend-inline.js"></script>
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
 
     <style>
-        :root { 
-            --primary: #2ebd85; 
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --yes: #f0fdf4; 
-            --yes-text: #166534; 
-            --no: #fef2f2; 
-            --no-text: #cf304a;
+        :root { --primary: #2ebd85; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; padding-top: 80px; }
+
+        /* HEADER */
+        .header { position: fixed; top: 0; width: 100%; background: #0f172a; border-bottom: 1px solid #334155; z-index: 1000; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
+        .logo { font-weight: 900; font-size: 22px; letter-spacing: -1px; color: var(--primary); }
+        
+        .wallet { display: flex; align-items: center; background: #1e293b; padding: 6px 12px; border-radius: 12px; gap: 10px; border: 1px solid #334155; }
+        .balance { font-weight: 800; font-size: 14px; }
+        
+        /* THE DEPOSIT BUTTON */
+        .intaSendPayButton { 
+            background: var(--primary); color: #fff; border: none; padding: 8px 16px; 
+            border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 13px;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text-main); margin: 0; padding-top: 135px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; overflow-x: hidden; }
-
-        /* --- PROFESSIONAL HEADER --- */
-        .header { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid #e2e8f0; }
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
-        .logo { font-weight: 900; font-size: 24px; color: #000; letter-spacing: -1.5px; }
+        /* FEED */
+        #feed { padding: 16px; max-width: 500px; margin: 0 auto; }
+        .card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 16px; border: 1px solid #334155; }
+        .m-title { font-size: 17px; font-weight: 600; margin-bottom: 15px; line-height: 1.4; }
         
-        .wallet-ui { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 4px 4px 4px 12px; border-radius: 12px; gap: 8px; font-size: 14px; font-weight: 700; }
-        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; cursor: pointer; transition: transform 0.1s; }
-        .btn-deposit:active { transform: scale(0.95); }
-
-        .cat-bar { display: flex; overflow-x: auto; padding: 12px 16px; gap: 20px; background: #fff; scrollbar-width: none; }
-        .cat-bar::-webkit-scrollbar { display: none; }
-        .cat-item { font-size: 14px; font-weight: 600; color: var(--text-muted); white-space: nowrap; cursor: pointer; padding-bottom: 4px; }
-        .cat-item.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
-
-        /* --- FEED LAYOUT --- */
-        #dashboard { max-width: 550px; margin: auto; padding: 10px; }
-        .card { background: var(--card-bg); border-radius: 24px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .m-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin: 0 0 15px 0; }
+        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .price { font-size: 28px; font-weight: 900; }
         
-        .stat-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
-        .p-val { font-size: 32px; font-weight: 900; color: #000; letter-spacing: -1px; }
-        .vol-tag { font-size: 11px; font-weight: 700; color: var(--text-muted); background: #f1f5f9; padding: 4px 8px; border-radius: 6px; }
-        
-        .btn-row { display: flex; gap: 10px; }
-        .m-btn { flex: 1; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; font-size: 15px; transition: 0.1s; }
-        .btn-yes { background: var(--yes); color: var(--yes-text); }
-        .btn-no { background: var(--no); color: var(--no-text); }
-        .m-btn:active { transform: scale(0.97); opacity: 0.8; }
+        .btn-group { display: flex; gap: 10px; }
+        .bet-btn { flex: 1; padding: 14px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; }
+        .yes { background: #064e3b; color: #4ade80; }
+        .no { background: #450a0a; color: #f87171; }
 
-        /* --- AUTH MODAL --- */
-        #auth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
-        .modal-content { background: #fff; width: 100%; max-width: 350px; padding: 30px; border-radius: 28px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-        .m-input { width: 100%; padding: 16px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 16px; outline: none; }
-        .m-btn-main { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; }
-
-        #load-more { width: 100%; padding: 15px; background: transparent; border: 2px dashed #cbd5e1; border-radius: 15px; color: var(--text-muted); font-weight: 700; margin-bottom: 50px; }
+        .loader { text-align: center; color: #64748b; font-size: 14px; padding: 20px; }
     </style>
 </head>
 <body>
 
     <header class="header">
-        <div class="top-nav">
-            <div class="logo">NEXGEN</div>
-            <div class="bar-right" style="display: flex; gap: 10px;">
-                <button onclick="openAuth()" style="background: none; border: none; font-weight: 700; font-size: 13px;">Login</button>
-                <div class="wallet-ui">
-                    Ksh <span id="balance">0.00</span>
-                    <button class="btn-deposit" onclick="triggerDeposit()">Deposit</button>
-                </div>
-            </div>
+        <div class="logo">NEXGEN</div>
+        <div class="wallet">
+            <span class="balance">Ksh <span id="bal-amt">0.00</span></span>
+            <button 
+                id="deposit-btn"
+                class="intaSendPayButton" 
+                data-amount="50" 
+                data-currency="KES" 
+                data-email="user@nexgen.com"
+                data-phone_number="254700000000">
+                Deposit
+            </button>
         </div>
-        <nav class="cat-bar">
-            <div class="cat-item active">Featured</div>
-            <div class="cat-item">Politics</div>
-            <div class="cat-item">Sports</div>
-            <div class="cat-item">Crypto</div>
-            <div class="cat-item">Kenya</div>
-        </nav>
     </header>
 
-    <main id="dashboard">
-        <div id="market-feed"></div>
-        <button id="load-more" onclick="renderMarkets(10)">Load More Markets</button>
-    </main>
-
-    <div id="auth-modal">
-        <div class="modal-content">
-            <h2 style="margin-top:0; font-weight: 900;">Sign In</h2>
-            <input type="email" class="m-input" placeholder="Email Address">
-            <input type="password" class="m-input" placeholder="Password">
-            <button class="m-btn-main" onclick="closeAuth()">Continue</button>
-            <p onclick="closeAuth()" style="margin-top:20px; font-size:13px; color:var(--text-muted); cursor:pointer;">Dismiss</p>
+    <div id="feed">
         </div>
-    </div>
+    <div class="loader" id="load-trigger">Scanning Global Markets...</div>
 
     <script>
-        // 1. SECURE DEPOSIT REDIRECT
-        function triggerDeposit() {
-            const intasend = new window.IntaSend({
-                public_key: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
-                live: false
-            });
-            
-            intasend.run({
-                amount: 50,
-                currency: "KES",
-                redirect: true // SMOOTH REDIRECT: Avoids popup blockers on Android
-            })
-            .on("COMPLETE", (results) => {
-                document.getElementById('balance').innerText = results.amount.toFixed(2);
-            });
+        // 1. INITIALIZE INTASEND (The "Fix")
+        // We wrap it in a check to ensure the library is loaded
+        function initPayment() {
+            if (window.IntaSend) {
+                const intasend = new window.IntaSend({
+                    publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad",
+                    live: false 
+                });
+
+                // Attach to the button
+                intasend.buttons("#deposit-btn").on("COMPLETE", (response) => {
+                    document.getElementById('bal-amt').innerText = response.amount;
+                    alert("Deposit Successful!");
+                }).on("FAILED", () => {
+                    alert("M-Pesa session timed out or failed.");
+                });
+            }
         }
 
-        // 2. MARKET GENERATOR (Android Optimized)
-        const marketTitles = [
-            "Will Bitcoin hit $100,000 by June?",
-            "Will Arsenal win the Premier League title?",
-            "Will the Kenyan Shilling reach 120 per USD?",
-            "Will AI replace 20% of dev jobs by 2027?",
-            "Will Solana flip Ethereum in Volume?",
-            "Will the Finance Bill 2026 be amended?",
-            "Will Eliud Kipchoge win his next Marathon?"
+        // 2. PROFESSIONAL MARKET GENERATOR
+        const markets = [
+            "Will Bitcoin break $100k before Sunday?",
+            "Will the Kenya Shilling stabilize against USD?",
+            "Will Arsenal drop points in their next match?",
+            "Will AI regulation be passed in the EU?",
+            "Will SpaceX launch Starship this month?",
+            "Will Crude Oil prices drop below $70?",
+            "Will Solana outperform Ethereum today?"
         ];
 
-        function renderMarkets(count) {
-            const container = document.getElementById('market-feed');
-            for(let i=0; i<count; i++) {
-                const card = document.createElement('div');
-                card.className = 'card';
-                const randomProb = Math.floor(Math.random() * 90) + 5;
-                const randomVol = (Math.random() * 10).toFixed(1);
-                
-                card.innerHTML = `
-                    <h2 class="m-title">${marketTitles[Math.floor(Math.random()*marketTitles.length)]}</h2>
-                    <div class="stat-row">
-                        <div><span class="p-val" id="prob-${i}">${randomProb}%</span></div>
-                        <div class="vol-tag">VOL: $${randomVol}M</div>
-                    </div>
-                    <div class="btn-row">
-                        <button class="m-btn btn-yes" onclick="bet()">YES</button>
-                        <button class="m-btn btn-no" onclick="bet()">NO</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            }
+        function createCard() {
+            const container = document.getElementById('feed');
+            const title = markets[Math.floor(Math.random() * markets.length)];
+            const prob = Math.floor(Math.random() * 85) + 5;
+            
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="m-title">${title}</div>
+                <div class="row">
+                    <span class="price">${prob}%</span>
+                    <span style="color:#64748b; font-size:12px; font-weight:700;">VOL: $${(Math.random()*5).toFixed(1)}M</span>
+                </div>
+                <div class="btn-group">
+                    <button class="bet-btn yes" onclick="trade()">YES</button>
+                    <button class="bet-btn no" onclick="trade()">NO</button>
+                </div>
+            `;
+            container.appendChild(card);
         }
 
-        // 3. UI HELPERS
-        function bet() { alert("Transaction Sent to Blockchain..."); }
-        function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
-        function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
+        // Initial Cards
+        for(let i=0; i<15; i++) createCard();
 
-        // Initial Load
-        renderMarkets(15);
-
-        // Professional Touch: Live Probability Fluctuations
-        setInterval(() => {
-            const vals = document.querySelectorAll('.p-val');
-            const target = vals[Math.floor(Math.random() * vals.length)];
-            if(target) {
-                let current = parseInt(target.innerText);
-                let change = Math.random() > 0.5 ? 1 : -1;
-                target.innerText = (current + change) + "%";
+        // Android Infinite Scroll Logic
+        window.onscroll = function() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                createCard();
             }
-        }, 2000);
+        };
+
+        function trade() { alert("Processing on-chain transaction..."); }
+
+        // Run payment init on load
+        window.onload = initPayment;
     </script>
 </body>
 </html>

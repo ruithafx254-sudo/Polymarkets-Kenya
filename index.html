@@ -12,6 +12,7 @@
             --accent: #2ebd85; --border: #eceef2; --text-main: #0f172a; --text-sub: #64748b;
             --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #991b1b;
             --tech-bg: #0f172a;
+            --news-accent: #ef4444;
         }
         
         body { background: #fafafa; color: var(--text-main); margin: 0; padding-top: 80px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
@@ -36,10 +37,76 @@
 
         #dashboard { max-width: 600px; margin: auto; padding: 12px; box-sizing: border-box; }
         
-        /* Breaking News Ticker styling */
-        .news-ticker-container { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.01); }
-        .news-label { background: #000; color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; letter-spacing: 1px; flex-shrink: 0; }
-        .news-headline { font-size: 13px; font-weight: 600; color: var(--text-main); margin: 0; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-grow: 1; }
+        /* Lively Breaking News Ticker styling with animation */
+        .news-ticker-container { 
+            background: #fff; 
+            border: 1px solid var(--border); 
+            border-left: 4px solid var(--news-accent);
+            border-radius: 14px; 
+            padding: 14px 18px; 
+            margin-bottom: 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 14px; 
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.04); 
+            overflow: hidden;
+            position: relative;
+        }
+        .news-badge { 
+            background: var(--news-accent); 
+            color: #fff; 
+            font-size: 10px; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            padding: 5px 10px; 
+            border-radius: 6px; 
+            letter-spacing: 1px; 
+            flex-shrink: 0; 
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: pulse 1.8s infinite;
+        }
+        .news-badge::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .news-headline-wrapper {
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+            height: 20px;
+        }
+        .news-headline { 
+            font-size: 13.5px; 
+            font-weight: 700; 
+            color: var(--text-main); 
+            margin: 0; 
+            line-height: 20px; 
+            white-space: nowrap; 
+            position: absolute;
+            width: 100%;
+            transform: translateY(0);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+        }
+        .news-headline.exit {
+            transform: translateY(-25px);
+            opacity: 0;
+        }
+        .news-headline.enter {
+            transform: translateY(25px);
+            opacity: 0;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
 
         /* Lively Market Cards */
         .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
@@ -105,8 +172,10 @@
 
     <div id="dashboard">
         <div class="news-ticker-container">
-            <span class="news-label">News</span>
-            <div id="news-headline" class="news-headline">Market volatility shifts following local central bank indicators...</div>
+            <div class="news-badge">Live</div>
+            <div class="news-headline-wrapper">
+                <div id="news-headline" class="news-headline">Market volatility shifts following regional indicators...</div>
+            </div>
         </div>
 
         <div id="feed"></div>
@@ -258,11 +327,11 @@
 
         // Preset Headlines Rotation
         const headlines = [
-            "Market volatility shifts following local central bank indicators...",
-            "African tech corridors report record funding cycles this quarter...",
-            "Global commodities hold key support as currency markets open...",
-            "Commodities indices report dynamic activity as gold stabilizes...",
-            "New trading volumes established over global weekend indices..."
+            "Market volatility shifts following regional central bank updates.",
+            "Gold markets sustain positive traction ahead of US CPI metrics.",
+            "African tech networks report surging investment cycles this season.",
+            "Local derivatives post record liquidity as trading volumes rise.",
+            "Crude oil stabilizes as international supply frameworks adjust."
         ];
 
         // Global Prediction Dataset
@@ -311,12 +380,22 @@
             syncState(); 
             renderFeed();
             
-            // Periodically cycle headlines in news bar
+            // Lively News Headline Rotation with Slide Animation
             let newsIndex = 0;
+            const hElem = document.getElementById('news-headline');
+            
             setInterval(() => {
-                newsIndex = (newsIndex + 1) % headlines.length;
-                document.getElementById('news-headline').innerText = headlines[newsIndex];
-            }, 6500);
+                hElem.classList.add('exit');
+                setTimeout(() => {
+                    newsIndex = (newsIndex + 1) % headlines.length;
+                    hElem.innerText = headlines[newsIndex];
+                    hElem.classList.remove('exit');
+                    hElem.classList.add('enter');
+                    setTimeout(() => {
+                        hElem.classList.remove('enter');
+                    }, 50);
+                }, 450);
+            }, 6000);
         };
 
         function initializeMarkets() {

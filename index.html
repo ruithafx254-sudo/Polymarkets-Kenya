@@ -41,6 +41,10 @@
 
         #dashboard { max-width: 620px; margin: auto; padding: 12px; box-sizing: border-box; }
         
+        .section-nav { display: flex; gap: 8px; margin-bottom: 16px; background: #f1f5f9; padding: 4px; border-radius: 12px; }
+        .section-tab { flex: 1; text-align: center; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); transition: 0.2s; }
+        .section-tab.active { background: #fff; color: #000; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+
         .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
         .market-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
         .m-category { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-sub); display: inline-block; margin-bottom: 12px; letter-spacing: 0.5px; }
@@ -56,6 +60,12 @@
         .trade-btn.yes { background: var(--yes-bg); color: var(--yes-blue); border-color: #dbeafe; }
         .trade-btn.no { background: var(--no-bg); color: var(--no-red); border-color: #ffe4e6; }
         .multiplier { font-size: 11px; font-weight: 700; opacity: 0.8; }
+
+        .history-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .hist-meta { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.4px; }
+        .hist-title { font-size: 14px; font-weight: 600; color: #0f172a; line-height: 1.4; }
+        .hist-stats { display: flex; justify-content: space-between; border-top: 1px dashed var(--border); padding-top: 8px; font-size: 13px; font-weight: 700; }
+        .status-badge { background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
         
@@ -102,7 +112,45 @@
     </div>
 
     <div id="dashboard">
-        <div id="feed"></div>
+        <div class="section-nav">
+            <div id="tabFeed" class="section-tab active" onclick="switchMainTab('feed')">Active Markets</div>
+            <div id="tabHist" class="section-tab" onclick="switchMainTab('history')">My Bets</div>
+        </div>
+
+        <div id="mainFeedView">
+            <div id="feed"></div>
+        </div>
+
+        <div id="mainHistoryView" class="hidden">
+            <div id="histFeed" style="margin-top:4px;">
+                <p style="text-align:center; color:var(--text-sub); font-size:13px; font-weight:600; padding:20px 0;">No predictions submitted yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="betSlipModal" class="overlay">
+        <div class="modal">
+            <h2 id="slipMarketTitle" style="margin:0 0 6px 0; font-weight:800; font-size:18px; line-height:1.35; letter-spacing:-0.5px; text-align: left;">Open Wager</h2>
+            <p id="slipPickMeta" style="color:var(--text-sub); font-size: 13px; margin: 0 0 20px 0; font-weight:700; text-align: left; text-transform: uppercase; letter-spacing:0.5px;">Pick: <span id="slipPickText" style="color:#000;">YES</span> &nbsp;|&nbsp; Multiplier: <span id="slipMultText" style="color:#000;">2.10x</span></p>
+
+            <div style="background:#f8fafc; padding:18px; border-radius:18px; border: 1px solid var(--border); margin-bottom:16px;">
+                <div class="input-group" style="margin-bottom:0;">
+                    <label>Your Wager Amount (Min. Ksh 20)</label>
+                    <input type="text" id="betAmt" class="input-tech" style="font-size: 26px; text-align: center; font-weight: 800; color: #000;" value="20.00" onfocus="if(this.value==='20.00')this.value='';" onblur="if(this.value==='')this.value='20.00';">
+                </div>
+                <div class="chip-grid" style="margin-bottom: 0;">
+                    <div class="amt-chip" onclick="setWagerAmt(20)">20</div>
+                    <div class="amt-chip" onclick="setWagerAmt(50)">50</div>
+                    <div class="amt-chip" onclick="setWagerAmt(100)">100</div>
+                    <div class="amt-chip" onclick="setWagerAmt(250)">250</div>
+                    <div class="amt-chip" onclick="setWagerAmt(500)">500</div>
+                    <div class="amt-chip" onclick="setWagerAmt(1000)">1k</div>
+                </div>
+            </div>
+
+            <button onclick="confirmWager()" class="btn-tech" style="background:var(--yes-blue);">Place Bet</button>
+            <p style="font-size: 13px; color: var(--text-sub); margin-top: 14px; cursor: pointer; font-weight:700;" onclick="closeModal('betSlipModal')">Cancel</p>
+        </div>
     </div>
 
     <div id="authModal" class="overlay">
@@ -176,16 +224,16 @@
 
                 <div class="input-group">
                     <label id="amtLabel">Deposit Amount (Ksh)</label>
-                    <input type="text" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800; color: #000;" value="0.00" onfocus="if(this.value==='0.00')this.value='';" onblur="if(this.value==='')this.value='0.00';">
+                    <input type="text" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800; color: #000;" value="100.00" onfocus="if(this.value==='100.00')this.value='';" onblur="if(this.value==='')this.value='100.00';">
                 </div>
                 
                 <div id="fundsChips" class="chip-grid">
+                    <div class="amt-chip" onclick="setAmt(100)">100</div>
                     <div class="amt-chip" onclick="setAmt(250)">250</div>
                     <div class="amt-chip" onclick="setAmt(500)">500</div>
                     <div class="amt-chip" onclick="setAmt(1000)">1k</div>
                     <div class="amt-chip" onclick="setAmt(2000)">2k</div>
                     <div class="amt-chip" onclick="setAmt(5000)">5k</div>
-                    <div class="amt-chip" onclick="setAmt(10000)">10k</div>
                 </div>
             </div>
             
@@ -209,16 +257,17 @@
         let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
         let markets = [];
         let currentFundsMode = 'deposit';
+        let activeSelection = null; 
 
         window.onload = () => {
             initializeMarkets();
             syncState(); 
             renderFeed();
+            renderHistory();
         };
 
         function initializeMarkets() {
             markets = [];
-            
             const baseMarkets = [
                 { q: "Will Spain win the FIFA World Cup?", category: "Sports", p: 16 },
                 { q: "Will Super Bowl LX be won by the Los Angeles Rams?", category: "Sports", p: 14 },
@@ -240,16 +289,10 @@
                 const yesMult = (100 / bm.p).toFixed(2);
                 const noMult = (100 / (100 - bm.p)).toFixed(2);
                 markets.push({
-                    id: `m-base-${i}`,
-                    q: bm.q,
-                    category: bm.category,
-                    p: bm.p,
-                    yesMult: yesMult,
-                    noMult: noMult
+                    id: `m-base-${i}`, q: bm.q, category: bm.category, p: bm.p, yesMult: yesMult, noMult: noMult
                 });
             });
 
-            // Index 8 explicitly locked to your Jesus prediction with 9.00x Yes and 3.00x No
             markets.splice(8, 0, {
                 id: "m-jesus",
                 q: "Will Jesus be back before June 5th?",
@@ -259,7 +302,6 @@
                 noMult: "3.00"
             });
 
-            // Generates up to over 2,000 highly unique news/current-affairs prediction markets
             for (let i = 1; i <= 2005; i++) {
                 let cat = "Global Affairs";
                 let q = "";
@@ -320,12 +362,7 @@
                 const noMult = (100 / (100 - p)).toFixed(2);
 
                 markets.push({
-                    id: `m-ext-${i}`,
-                    q: q,
-                    category: cat,
-                    p: p,
-                    yesMult: yesMult,
-                    noMult: noMult
+                    id: `m-ext-${i}`, q: q, category: cat, p: p, yesMult: yesMult, noMult: noMult
                 });
             }
         }
@@ -345,11 +382,11 @@
                         <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
-                        <button class="trade-btn yes" onclick="handleWagerClick('${item.q}')">
+                        <button class="trade-btn yes" onclick="openSlip('${item.id}', 'YES', '${item.yesMult}')">
                             <span>Yes</span>
                             <span class="multiplier">${item.yesMult}x</span>
                         </button>
-                        <button class="trade-btn no" onclick="handleWagerClick('${item.q}')">
+                        <button class="trade-btn no" onclick="openSlip('${item.id}', 'NO', '${item.noMult}')">
                             <span>No</span>
                             <span class="multiplier">${item.noMult}x</span>
                         </button>
@@ -358,9 +395,103 @@
             });
         }
 
-        function handleWagerClick(marketQuestion) {
-            if (!localStorage.getItem('nx_user')) return openModal('authModal');
-            alert("Insufficient funds. Please fund your balance to open wagers.");
+        function switchMainTab(view) {
+            if(view === 'feed') {
+                document.getElementById('tabFeed').classList.add('active');
+                document.getElementById('tabHist').classList.remove('active');
+                document.getElementById('mainFeedView').classList.remove('hidden');
+                document.getElementById('mainHistoryView').classList.add('hidden');
+            } else {
+                document.getElementById('tabHist').classList.add('active');
+                document.getElementById('tabFeed').classList.remove('active');
+                document.getElementById('mainHistoryView').classList.remove('hidden');
+                document.getElementById('mainFeedView').classList.add('hidden');
+                renderHistory();
+            }
+        }
+
+        function openSlip(id, side, mult) {
+            const user = localStorage.getItem('nx_user');
+            if(!user) return openModal('authModal');
+            
+            const target = markets.find(m => m.id === id);
+            if(!target) return;
+
+            activeSelection = { marketId: id, q: target.q, side: side, mult: mult };
+            document.getElementById('slipMarketTitle').innerText = target.q;
+            document.getElementById('slipPickText').innerText = side;
+            document.getElementById('slipPickText').style.color = side === 'YES' ? 'var(--yes-blue)' : 'var(--no-red)';
+            document.getElementById('slipMultText').innerText = mult + 'x';
+            document.getElementById('betAmt').value = "20.00";
+            
+            openModal('betSlipModal');
+        }
+
+        function setWagerAmt(v) { document.getElementById('betAmt').value = parseFloat(v).toFixed(2); }
+
+        function confirmWager() {
+            const amt = Number(document.getElementById('betAmt').value);
+            const userEmail = localStorage.getItem('nx_user');
+            let curBal = parseFloat(localStorage.getItem('nx_balance') || 0);
+
+            if(!userEmail) return openModal('authModal');
+            if(isNaN(amt) || amt < 20) return alert("The minimum wager is Ksh 20.00.");
+            if(amt > curBal) return alert("Insufficient funds in your account. Top up to place bets.");
+
+            // Deduct from client-side balance
+            const newBal = (curBal - amt).toFixed(2);
+            localStorage.setItem('nx_balance', newBal);
+
+            // Update registered DB
+            if(userDB[userEmail]) {
+                userDB[userEmail].balance = newBal;
+                if(!userDB[userEmail].bets) userDB[userEmail].bets = [];
+                userDB[userEmail].bets.unshift({
+                    id: 'bet-' + Date.now(),
+                    q: activeSelection.q,
+                    side: activeSelection.side,
+                    mult: activeSelection.mult,
+                    stake: amt.toFixed(2),
+                    status: 'Active',
+                    date: new Date().toLocaleDateString()
+                });
+                localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
+            }
+
+            syncState();
+            closeModal('betSlipModal');
+            alert(`Your wager on ${activeSelection.side} has been placed successfully! View it in "My Bets".`);
+            switchMainTab('history');
+        }
+
+        function renderHistory() {
+            const user = localStorage.getItem('nx_user');
+            const hFeed = document.getElementById('histFeed');
+            hFeed.innerHTML = '';
+
+            if(!user || !userDB[user] || !userDB[user].bets || userDB[user].bets.length === 0) {
+                hFeed.innerHTML = `<p style="text-align:center; color:var(--text-sub); font-size:13px; font-weight:600; padding:20px 0;">No predictions submitted yet.</p>`;
+                return;
+            }
+
+            userDB[user].bets.forEach(b => {
+                const hCard = document.createElement('div');
+                hCard.className = 'history-card';
+                const pPayout = (parseFloat(b.stake) * parseFloat(b.mult)).toFixed(2);
+                hCard.innerHTML = `
+                    <div class="hist-meta">
+                        <div><span>Date:</span> ${b.date}</div>
+                        <div class="status-badge">${b.status}</div>
+                    </div>
+                    <div class="hist-title">${b.q}</div>
+                    <div class="hist-stats">
+                        <div style="color:var(--text-sub);">Stake <span style="color:#000; display:block;">Ksh ${parseFloat(b.stake).toLocaleString()}</span></div>
+                        <div style="color:var(--text-sub); text-align:center;">Side <span style="color:${b.side==='YES'?'var(--yes-blue)':'var(--no-red)'}; display:block;">${b.side}</span></div>
+                        <div style="color:var(--text-sub); text-align:right;">Est. Return <span style="color:var(--accent); display:block; font-weight:800;">Ksh ${parseFloat(pPayout).toLocaleString()}</span></div>
+                    </div>
+                `;
+                hFeed.appendChild(hCard);
+            });
         }
 
         function syncState() {
@@ -427,7 +558,7 @@
                 if (!name) return alert("Full Name is required.");
                 if (pass !== confirmPass) return alert("Passwords do not match.");
 
-                userDB[email] = { name, email, pass, country, balance: "0.00" };
+                userDB[email] = { name, email, pass, country, balance: "0.00", bets: [] };
                 localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
                 
                 localStorage.setItem('nx_user', email);
@@ -528,7 +659,8 @@
         function closeModal(id) { 
             document.body.classList.remove('hide-header');
             document.getElementById(id).style.display = 'none'; 
-            if(id === 'depositModal') document.getElementById('depAmt').value = '0.00';
+            if(id === 'depositModal') document.getElementById('depAmt').value = '100.00';
+            if(id === 'betSlipModal') document.getElementById('betAmt').value = '20.00';
         }
 
         function logout() { 

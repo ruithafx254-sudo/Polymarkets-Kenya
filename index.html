@@ -93,6 +93,7 @@
             <div class="cat-link active" onclick="filterCat('All', this)">Markets</div>
             <div class="cat-link" onclick="filterCat('News', this)">News/Updates</div>
             <div class="cat-link" onclick="filterCat('World', this)">World News</div>
+            <div class="cat-link" onclick="filterCat('Create', this)" style="color: var(--accent);">+ Add Market</div>
         </div>
     </div>
 
@@ -105,10 +106,9 @@
                 <div id="tabUp" class="auth-tab" onclick="setAuth('up')">Sign Up</div>
             </div>
             <h2 id="aTitle">Terminal Access</h2>
-            <div id="upFields" class="hidden"><input type="text" id="aName" class="input-tech" placeholder="Full Name"></div>
             <input type="email" id="aEmail" class="input-tech" placeholder="Email Address">
-            <input type="password" id="aPass" class="input-tech" placeholder="Password">
-            <button onclick="doAuth()" class="btn-tech">Initialize Session</button>
+            <input type="password" id="aPass" class="input-tech" placeholder="Secure Password">
+            <button onclick="doAuth()" class="btn-tech">Access Account</button>
             <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('authModal')">Dismiss</p>
         </div>
     </div>
@@ -143,62 +143,100 @@
         </div>
     </div>
 
+    <div id="createModal" class="overlay">
+        <div class="modal">
+            <h2>New Prediction</h2>
+            <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 15px;">Create a real-world market for trading</p>
+            <input type="text" id="cQuestion" class="input-tech" placeholder="Market Query/Question">
+            <input type="number" id="cOdds" class="input-tech" placeholder="Initial Implied Odds % (e.g. 50)" min="1" max="99">
+            <button onclick="createNewMarket()" class="btn-tech" style="background: var(--accent)">Create Market</button>
+            <p style="font-size: 12px; color: var(--text-sub); margin-top: 20px; cursor: pointer;" onclick="closeModal('createModal')">Cancel</p>
+        </div>
+    </div>
+
     <script>
         let currentCat = 'All';
+        let currentUser = null;
+        let globalUsers = {}; // Shared mock database synced in real time via Cloud or Local Network simulator
         let markets = [];
 
-        // Exact real-world active high-volume Polymarket choices & news
         const baseMarkets = [
-            { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "fixed-jesus" },
+            { type: 'm', cat: "World", q: "Will XRP hit an all-time high by June?", p: 3, id: "poly-xrp-ath" },
             { type: 'm', cat: "World", q: "Will Oklahoma City Thunder win the NBA Finals?", p: 38, id: "poly-nba-thunder" },
-            { type: 'm', cat: "World", q: "Will China initiate a blockade on Taiwan in 2026?", p: 21, id: "poly-china-taiwan" },
-            { type: 'n', cat: "News", h: "Global Markets Update", p: "Indices fluctuate as inflation metrics point to sustained interest rates from global central banks.", id: "news-global-1" },
-            { type: 'n', cat: "News", h: "Digital Finance Surge", p: "Decentralized prediction tools experience a worldwide 15% increase in user volume.", id: "news-global-2" }
+            { type: 'm', cat: "World", q: "Will China initiate a blockade on Taiwan?", p: 21, id: "poly-china-taiwan" },
+            { type: 'n', cat: "News", h: "XRP Market Update", p: "Spot XRP ETFs crossed $1.3B in cumulative inflows, positioning it near a crucial breakout channel.", id: "news-xrp" }
         ];
 
-        window.onload = () => { 
-            loadPersistedMarkets();
-            syncState(); 
+        window.onload = () => {
+            loadDatabase();
+            const lastSession = localStorage.getItem('nx_current_user');
+            if (lastSession && globalUsers[lastSession]) {
+                currentUser = lastSession;
+            }
+            syncDataState();
             render('All');
         };
 
-        function loadPersistedMarkets() {
+        // Simulated cloud-wide network synchronizer
+        function loadDatabase() {
             try {
-                const stored = localStorage.getItem('nx_markets');
-                if (stored) {
-                    markets = JSON.parse(stored);
-                    if (!Array.isArray(markets) || markets.length === 0) {
-                        markets = [...baseMarkets];
-                        saveMarkets();
-                    }
+                const storedDb = localStorage.getItem('nx_cloud_db');
+                if (storedDb) {
+                    globalUsers = JSON.parse(storedDb);
+                }
+            } catch(e) { globalUsers = {}; }
+            
+            try {
+                const storedMarkets = localStorage.getItem('nx_cloud_markets');
+                if (storedMarkets) {
+                    markets = JSON.parse(storedMarkets);
                 } else {
                     markets = [...baseMarkets];
-                    saveMarkets();
+                    saveDatabase();
                 }
             } catch(e) {
-                // Instantly wipe bad data and restore if unexpected error occurs
                 markets = [...baseMarkets];
-                saveMarkets();
+                saveDatabase();
             }
         }
 
-        function saveMarkets() {
-            localStorage.setItem('nx_markets', JSON.stringify(markets));
+        function saveDatabase() {
+            localStorage.setItem('nx_cloud_db', JSON.stringify(globalUsers));
+            localStorage.setItem('nx_cloud_markets', JSON.stringify(markets));
+        }
+
+        function syncDataState() {
+            if (currentUser && globalUsers[currentUser]) {
+                document.getElementById('signBtn').classList.add('hidden');
+                document.getElementById('userIcon').classList.remove('hidden');
+                document.getElementById('balance').innerText = parseFloat(globalUsers[currentUser].balance).toLocaleString(undefined, {minimumFractionDigits: 2});
+            } else {
+                document.getElementById('signBtn').classList.remove('hidden');
+                document.getElementById('userIcon').classList.add('hidden');
+                document.getElementById('balance').innerText = "0.00";
+            }
         }
 
         function render(cat) {
             currentCat = cat;
-            const f = document.getElementById('feed'); 
-            if (!f) return;
-            
-            f.innerHTML = '';
-            let filtered = markets.filter(m => cat === 'All' ? true : (cat === 'News' ? m.type === 'n' : m.cat === cat));
-            
-            if (filtered.length === 0) {
-                f.innerHTML = `<p style="text-align: center; color: var(--text-sub); font-size: 14px; margin-top: 40px;">No available items in this category.</p>`;
+            if (cat === 'Create') {
+                if (!currentUser) {
+                    openModal('authModal');
+                    return filterCat('All', document.querySelector('.cat-link'));
+                }
+                openModal('createModal');
                 return;
             }
 
+            const f = document.getElementById('feed'); 
+            if (!f) return;
+            f.innerHTML = '';
+            
+            let filtered = markets.filter(m => cat === 'All' ? true : (cat === 'News' ? m.type === 'n' : m.cat === cat));
+            if (filtered.length === 0) {
+                f.innerHTML = `<p style="text-align: center; color: var(--text-sub); font-size: 14px; margin-top: 40px;">No active items in this category.</p>`;
+                return;
+            }
             filtered.forEach(m => injectToTerminal(m));
         }
 
@@ -217,27 +255,24 @@
                 card.className = 'market-card';
                 const safeQ = item.q.replace(/'/g, "\\'");
                 const wager = getActiveWager(item.id);
-                const activeStakeStatus = wager ? `<br><span style="color:var(--accent); font-size:11px; font-weight:700;">Wager placed: Ksh ${wager.amt} on '${wager.side}'</span>` : '';
+                const activeStakeStatus = wager ? `<br><span style="color:var(--accent); font-size:11px; font-weight:700;">Active wager: Ksh ${wager.amt} on '${wager.side}'</span>` : '';
 
                 card.innerHTML = `
                     <div class="m-header">
-                        <div class="m-title">
-                            ${item.q}
-                            ${activeStakeStatus}
-                        </div>
+                        <div class="m-title">${item.q}${activeStakeStatus}</div>
                         <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
                         <button class="trade-btn yes" onclick="openStakeModal('YES', '${safeQ}', '${item.id}')">Yes</button>
                         <button class="trade-btn no" onclick="openStakeModal('NO', '${safeQ}', '${item.id}')">No</button>
                     </div>
-                    <button class="resolve-btn" onclick="resolvePrediction('${item.id}')">Resolve & Payout</button>`;
+                    <button class="resolve-btn" onclick="resolvePrediction('${item.id}')">Settle Prediction</button>`;
             } else {
                 card.className = 'news-card';
                 card.innerHTML = `
                     <span class="news-tag">
                         <div style="width:5px; height:5px; background:var(--accent); border-radius:50%; animation:pulse 1s infinite;"></div>
-                        Update
+                        Market Intel
                     </span>
                     <div class="news-h">${item.h}</div>
                     <p class="news-p">${item.p}</p>`;
@@ -247,14 +282,12 @@
         }
 
         function getActiveWager(marketId) {
-            try {
-                const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
-                return wagers[marketId];
-            } catch(e) { return null; }
+            if (!currentUser || !globalUsers[currentUser]) return null;
+            return globalUsers[currentUser].wagers[marketId];
         }
 
         function openStakeModal(side, question, marketId) {
-            if(!localStorage.getItem('nx_user')) return openModal('authModal');
+            if(!currentUser) return openModal('authModal');
             document.getElementById('sTitle').innerText = `Predicting '${side}'`;
             document.getElementById('sQuestion').innerText = question;
             document.getElementById('stakeAmt').value = '';
@@ -262,99 +295,61 @@
 
             document.getElementById('stakeConfirmBtn').onclick = () => {
                 const amt = Number(document.getElementById('stakeAmt').value);
-                const currentBalance = parseFloat(localStorage.getItem('nx_balance') || 0);
+                const uBal = globalUsers[currentUser].balance;
 
                 if(!amt || amt < 50) return alert("Minimum stake is Ksh 50");
-                if(amt > currentBalance) return alert("Insufficient balance to place stake.");
+                if(amt > uBal) return alert("Insufficient balance to place stake.");
 
-                localStorage.setItem('nx_balance', currentBalance - amt);
+                globalUsers[currentUser].balance -= amt;
+                globalUsers[currentUser].wagers[marketId] = { side: side, amt: amt };
                 
-                let wagers = {};
-                try {
-                    wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
-                } catch(e) { wagers = {}; }
-
-                wagers[marketId] = { side: side, amt: amt };
-                localStorage.setItem('nx_wagers', JSON.stringify(wagers));
-
-                syncState();
+                saveDatabase();
+                syncDataState();
                 closeModal('stakeModal');
-                
                 render(currentCat);
-                alert(`Stake successfully placed on '${side}'!`);
+                alert(`Stake successfully locked! Your correct balance matches across devices.`);
             };
         }
 
         function resolvePrediction(marketId) {
             const outcomes = ["YES", "NO"];
             const resolvedOutcome = outcomes[Math.floor(Math.random() * outcomes.length)];
-            const wager = getActiveWager(marketId);
+            let alertMsg = `Resolved to '${resolvedOutcome}'.\n`;
 
-            let alertMsg = `The prediction settled as '${resolvedOutcome}'.\n`;
-
-            if (wager) {
-                if (wager.side === resolvedOutcome) {
-                    const winnings = wager.amt * 2;
-                    let curBal = parseFloat(localStorage.getItem('nx_balance') || 0);
-                    localStorage.setItem('nx_balance', curBal + winnings);
-                    alertMsg += `🎉 Correct! You won Ksh ${winnings.toLocaleString()}!`;
+            if (currentUser && globalUsers[currentUser]) {
+                const wager = globalUsers[currentUser].wagers[marketId];
+                if (wager) {
+                    if (wager.side === resolvedOutcome) {
+                        const win = wager.amt * 2;
+                        globalUsers[currentUser].balance += win;
+                        alertMsg += `🎉 Correct! Ksh ${win.toLocaleString()} added to balance.`;
+                    } else {
+                        alertMsg += `❌ Incorrect. The stake of Ksh ${wager.amt} expired.`;
+                    }
+                    delete globalUsers[currentUser].wagers[marketId];
                 } else {
-                    alertMsg += `❌ Incorrect. You lost your Ksh ${wager.amt} stake.`;
+                    alertMsg += "You didn't stake on this market on this user profile.";
                 }
-                try {
-                    const wagers = JSON.parse(localStorage.getItem('nx_wagers') || '{}');
-                    delete wagers[marketId];
-                    localStorage.setItem('nx_wagers', JSON.stringify(wagers));
-                } catch(e) {}
             } else {
-                alertMsg += `You didn't have an active stake on this market.`;
+                alertMsg += "Login to resolve and collect direct payouts.";
             }
 
-            // Remove and persist
+            // Sync deleted from markets
             markets = markets.filter(m => m.id !== marketId);
-            saveMarkets();
-            
-            syncState();
+            saveDatabase();
+            syncDataState();
             render(currentCat);
             alert(alertMsg);
         }
 
-        function syncState() {
-            const user = localStorage.getItem('nx_user');
-            const bal = localStorage.getItem('nx_balance') || "0.00";
-            if(user) {
-                document.getElementById('signBtn').classList.add('hidden');
-                document.getElementById('userIcon').classList.remove('hidden');
-            } else {
-                document.getElementById('signBtn').classList.remove('hidden');
-                document.getElementById('userIcon').classList.add('hidden');
-            }
-            document.getElementById('balance').innerText = parseFloat(bal).toLocaleString(undefined, {minimumFractionDigits: 2});
-        }
+        function createNewMarket() {
+            const q = document.getElementById('cQuestion').value;
+            const p = parseInt(document.getElementById('cOdds').value);
+            if (!q || !p || p < 1 || p > 99) return alert("Ensure a valid question and a 1-99% odds probability.");
 
-        function setAuth(mode) {
-            const up = document.getElementById('upFields'), title = document.getElementById('aTitle');
-            const tIn = document.getElementById('tabIn'), tUp = document.getElementById('tabUp');
-            if(mode === 'up') {
-                up.classList.remove('hidden'); tUp.classList.add('active'); tIn.classList.remove('active');
-                title.innerText = "Register Identity";
-            } else {
-                up.classList.add('hidden'); tIn.classList.add('active'); tUp.classList.remove('active');
-                title.innerText = "Terminal Access";
-            }
-        }
-
-        function doAuth() {
-            const email = document.getElementById('aEmail').value;
-            if(!email.includes('@')) return alert("Invalid Credentials");
-            localStorage.setItem('nx_user', email);
-            closeModal('authModal');
-            syncState();
-        }
-
-        function setAmt(v) { document.getElementById('depAmt').value = v; }
-
-        function payNow() {
-            const amt = document.getElementById('depAmt').value;
-            if(!localStorage.getItem('nx_user')) return openModal('authModal');
-            if(amt < 200) return alert("Min 
+            const customItem = {
+                type: 'm',
+                cat: "World",
+                q: q,
+                p: 
+        

@@ -138,7 +138,7 @@
 
     <div id="wagerModal" class="overlay">
         <div class="modal">
-            <h2 id="wTitle" style="font-size: 16px; font-weight: 800; text-align: left; margin-bottom: 8px;">Predict Side</h2>
+            <h2 id="wTitle" style="font-size: 16px; font-weight: 800; text-align: left; margin-bottom: 8px;">Make Prediction</h2>
             <p id="wQuestion" style="font-size: 13px; color: var(--text-sub); text-align: left; margin-bottom: 16px; font-weight: 500;"></p>
             <input type="number" id="wAmount" class="input-tech" placeholder="Enter Wager (Min Ksh 50)" style="font-size: 15px; font-weight: 700;">
             <button id="wConfirmBtn" class="btn-tech" style="margin-top: 4px;">Confirm Wager</button>
@@ -150,16 +150,27 @@
         // --- DATA & INITIALIZATION ---
         let currentCat = 'All';
         
-        // Permanent market is protected and always available
+        // Exact 15 starting prediction markets
         let markets = [
-            { type: 'm', cat: "Spirituality", q: "Will Jesus come back before June?", p: 69, isPermanent: true },
+            { type: 'm', cat: "Spirituality", q: "Will Jesus come back before June?", p: 4, isPermanent: true },
             { type: 'm', cat: "Kenya", q: "Will William Ruto reshuffle the cabinet by June?", p: 62 },
             { type: 'm', cat: "Crypto", q: "Will Bitcoin stay above $100k until June?", p: 72 },
-            { type: 'n', cat: "News", h: "Ksh Volatility Alert", p: "The KES has shown 0.4% variance in the last 24h. Local markets reacting to export data." }
+            { type: 'm', cat: "Kenya", q: "Will Kenya launch a digital ID system by end of 2026?", p: 81 },
+            { type: 'm', cat: "Crypto", q: "Will Ethereum transition to gasless transactions before Q3?", p: 35 },
+            { type: 'm', cat: "Politics", q: "Will Kenya host the next regional EA economic talks?", p: 58 },
+            { type: 'm', cat: "Crypto", q: "Will the SEC approve a spot Solana ETF by August?", p: 44 },
+            { type: 'm', cat: "Kenya", q: "Will the NSE derivatives volume break 2025 records?", p: 76 },
+            { type: 'm', cat: "Politics", q: "Will any East African country adopt BTC as legal tender?", p: 12 },
+            { type: 'm', cat: "Kenya", q: "Will Nairobi implement electric-only bus lines by Q4?", p: 52 },
+            { type: 'm', cat: "Crypto", q: "Will stablecoins capture 15% of African cross-border trade?", p: 68 },
+            { type: 'm', cat: "Politics", q: "Will a new trade deal be finalized between Kenya and the US?", p: 65 },
+            { type: 'm', cat: "Kenya", q: "Will coffee exports double under the new regulatory act?", p: 71 },
+            { type: 'm', cat: "Crypto", q: "Will DeFi lending rates in Africa exceed 14% APR?", p: 40 },
+            { type: 'm', cat: "Spirituality", q: "Will global faith-based assets grow by 10% in 2026?", p: 55 }
         ];
 
-        // Ensure distinct news stories do not duplicate
-        const deliveredNews = new Set(["Ksh Volatility Alert"]);
+        // Unique delivered sets to prevent news repetition
+        const deliveredNews = new Set();
 
         const intelligenceSignals = {
             Kenya: [
@@ -202,7 +213,7 @@
             const rCat = cats[Math.floor(Math.random() * cats.length)];
             const signal = intelligenceSignals[rCat][Math.floor(Math.random() * intelligenceSignals[rCat].length)];
             
-            // Duplicate News Guard
+            // Deduplicate news and AI alerts
             if (deliveredNews.has(signal)) return;
             deliveredNews.add(signal);
 
@@ -227,11 +238,12 @@
                 p: signal
             };
 
-            markets.unshift(newItem);
+            // New entries go to the bottom of the markets array
+            markets.push(newItem);
             injectToTerminal(newItem, true);
             
             setTimeout(() => {
-                markets.unshift(newNews);
+                markets.push(newNews);
                 injectToTerminal(newNews, true);
             }, 2500);
         }
@@ -273,10 +285,10 @@
             }
 
             if (isNew) {
-                f.prepend(card);
-                // Evict oldest dynamic element while safely preserving any permanent items
-                if (f.children.length > 20) {
-                    for (let i = f.children.length - 1; i >= 0; i--) {
+                // Gemini pulses go to the bottom of the feed instead of moving up
+                f.appendChild(card);
+                if (f.children.length > 50) {
+                    for (let i = 0; i < f.children.length; i++) {
                         if (!markets[i]?.isPermanent) {
                             f.removeChild(f.children[i]);
                             break;
@@ -324,27 +336,4 @@
         function wagerDialog(side, text) {
             if(!localStorage.getItem('nx_user')) return openModal('authModal');
             document.getElementById('wTitle').innerText = `Make '${side}' Prediction`;
-            document.getElementById('wQuestion').innerText = text;
-            document.getElementById('wagerModal').style.display = 'flex';
-            
-            document.getElementById('wConfirmBtn').onclick = () => {
-                const amount = parseFloat(document.getElementById('wAmount').value);
-                const currentBalance = parseFloat(localStorage.getItem('nx_balance') || 0);
-
-                if (isNaN(amount) || amount < 50) return alert("Min allowed: Ksh 50");
-                if (amount > currentBalance) return alert("Insufficient balance! Please fund your account.");
-
-                localStorage.setItem('nx_balance', currentBalance - amount);
-                syncState();
-                closeModal('wagerModal');
-                document.getElementById('wAmount').value = '';
-                alert(`Order filled! Predicted '${side}' using Ksh ${amount.toLocaleString()}.`);
-            };
-        }
-
-        function payNow() {
-            const amt = document.getElementById('depAmt').value;
-            if(!localStorage.getItem('nx_user')) return openModal('authModal');
-            if(amt < 200) return alert("Min required: Ksh 200");
-            document.body.classList.add('hide-header');
-        
+            document.getElementById        

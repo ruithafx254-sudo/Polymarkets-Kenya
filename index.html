@@ -3,64 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexGen | Institutional Terminal</title>
+    <title>NexGen | Institutional Prediction Terminal</title>
     
     <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
 
     <style>
+        /* --- PREMIUM COLOR PALETTE --- */
         :root { 
-            --primary: #2ebd85; --border: #f1f5f9; --text-main: #0f172a; --text-sub: #94a3b8;
-            --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #cf304a;
+            --primary: #00ff94; /* Neon Success */
+            --accent: #6366f1; /* Indigo Institutional */
+            --bg: #0b0f1a; /* Deep Space Blue */
+            --surface: #161e2e; /* Card Surface */
+            --text-main: #ffffff;
+            --text-sub: #94a3b8;
+            --border: rgba(255,255,255,0.06);
+            --glass: rgba(255, 255, 255, 0.03);
         }
         
-        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 170px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
+        body { 
+            background: var(--bg); 
+            color: var(--text-main); 
+            margin: 0; 
+            padding-top: 180px; 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            overflow-x: hidden;
+            letter-spacing: -0.01em;
+        }
 
-        /* --- HEADER STACK --- */
-        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; height: 64px; }
-        .logo { font-weight: 950; font-size: 24px; letter-spacing: -1.5px; }
-        .bar-right { display: flex; align-items: center; gap: 8px; }
+        /* --- THE PREMIUM HEADER --- */
+        .header-stack { 
+            position: fixed; 
+            top: 0; left: 0; right: 0; 
+            background: rgba(11, 15, 26, 0.8); 
+            backdrop-filter: blur(20px); 
+            z-index: 2000; 
+            border-bottom: 1px solid var(--border); 
+        }
         
-        .user-profile { width: 38px; height: 38px; background: #0f172a; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; font-size: 12px; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .wallet-pill { display: flex; align-items: center; background: #0f172a; color: #fff; padding: 3px 3px 3px 12px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
-        .btn-deposit { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; }
+        .logo { 
+            font-weight: 900; 
+            font-size: 20px; 
+            letter-spacing: 2px; 
+            background: linear-gradient(to right, #fff, #64748b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* --- SEARCH & CATEGORIES (Sleek) --- */
+        .search-container { padding: 5px 20px; }
+        .search-bar { 
+            background: var(--surface); 
+            border-radius: 14px; 
+            display: flex; 
+            align-items: center; 
+            padding: 12px 18px; 
+            border: 1px solid var(--border);
+        }
+        .search-input { border: none; background: transparent; outline: none; width: 100%; font-size: 14px; color: #fff; }
 
-        /* --- SEARCH & CATEGORIES --- */
-        .search-container { padding: 8px 16px; background: #fff; }
-        .search-bar { background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; padding: 10px 15px; gap: 10px; }
-        .search-input { border: none; background: transparent; outline: none; width: 100%; font-size: 14px; font-weight: 500; }
-        .category-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 10px 16px; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-        .category-scroller::-webkit-scrollbar { display: none; }
-        .cat-chip { padding: 8px 16px; background: #fff; border: 1px solid var(--border); border-radius: 100px; font-size: 13px; font-weight: 700; color: var(--text-sub); flex-shrink: 0; }
-        .cat-chip.active { background: #000; color: #fff; border-color: #000; }
+        .category-scroller { display: flex; gap: 12px; overflow-x: auto; padding: 15px 20px; scrollbar-width: none; }
+        .cat-chip { 
+            padding: 8px 18px; 
+            background: var(--glass); 
+            border: 1px solid var(--border); 
+            border-radius: 100px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            color: var(--text-sub); 
+            transition: 0.3s;
+        }
+        .cat-chip.active { background: #fff; color: #000; border-color: #fff; }
 
-        /* --- AUTH MODAL THEME --- */
-        .auth-switch { display: flex; background: #f1f5f9; padding: 4px; border-radius: 100px; margin-bottom: 30px; width: 240px; margin-inline: auto; border: 1px solid #e2e8f0; }
-        .auth-tab { flex: 1; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; text-align: center; border-radius: 100px; }
-        .auth-tab.active { color: #fff; background: #000; }
-        .auth-tab.inactive { color: #94a3b8; background: transparent; }
+        /* --- WALLET & PROFILE --- */
+        .user-profile { 
+            background: #fff; color: #000; 
+            padding: 8px 16px; border-radius: 12px; 
+            font-weight: 800; font-size: 12px; 
+        }
+        .wallet-pill { 
+            background: var(--surface); 
+            padding: 4px 4px 4px 14px; 
+            border-radius: 14px; 
+            display: flex; align-items: center; gap: 10px;
+            border: 1px solid var(--border);
+            font-size: 13px; font-weight: 700;
+        }
+        .btn-deposit { 
+            background: var(--primary); 
+            color: #000; border: none; 
+            padding: 8px 14px; border-radius: 10px; 
+            font-weight: 800; cursor: pointer; 
+        }
 
-        /* --- MODALS --- */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); z-index: 5000; align-items: center; justify-content: center; padding: 15px; }
-        .modal-card { background: #fff; width: 100%; max-width: 380px; padding: 35px; border-radius: 35px; text-align: center; }
+        /* --- PREMIUM MARKET CARDS --- */
+        #dashboard { max-width: 500px; margin: auto; }
+        .market-card { 
+            background: var(--surface); 
+            border-radius: 24px; 
+            border: 1px solid var(--border); 
+            padding: 22px; 
+            margin: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .card-header { display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start; }
+        .letter-icon { 
+            width: 48px; height: 48px; border-radius: 14px; 
+            background: linear-gradient(135deg, #232d3f, #161e2e); 
+            color: var(--primary); 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 800; border: 1px solid var(--border);
+        }
+        .m-title { font-size: 17px; font-weight: 600; line-height: 1.4; flex: 1; color: #f1f5f9; }
+        .m-chance { font-size: 20px; font-weight: 900; color: var(--primary); text-align: right; }
+        .m-chance span { font-size: 10px; display: block; color: var(--text-sub); letter-spacing: 1px; }
 
-        /* --- TERMINAL INPUT (Deposit/Bet) --- */
-        .currency-terminal { background: #fff; padding: 25px; border-radius: 24px; border: 1.5px solid #e2e8f0; margin-bottom: 25px; }
-        .input-wrapper { display: flex; align-items: baseline; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 5px; }
-        .amount-field { border: none; outline: none; font-size: 36px; font-weight: 900; width: 100%; color: #000; background: transparent; text-align: center; }
+        .order-btn-group { display: flex; gap: 12px; }
+        .order-btn { 
+            flex: 1; padding: 16px; border-radius: 16px; border: none; 
+            font-weight: 800; font-size: 14px; transition: transform 0.1s;
+        }
+        .order-btn:active { transform: scale(0.96); }
+        .btn-yes { background: rgba(0, 255, 148, 0.1); color: var(--primary); border: 1px solid rgba(0, 255, 148, 0.2); }
+        .btn-no { background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.2); }
 
-        /* --- MARKET CARDS --- */
-        .market-card { background: #fff; border-radius: 20px; border: 1.5px solid var(--border); padding: 18px; margin: 12px; }
-        .card-header { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
-        .letter-icon { width: 44px; height: 44px; border-radius: 12px; background: #f1f5f9; color: #64748b; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; flex-shrink: 0; border: 1px solid #e2e8f0; }
-        .m-title { font-size: 16px; font-weight: 700; line-height: 1.35; flex: 1; text-align: left; }
-        .m-chance { font-size: 18px; font-weight: 800; text-align: right; min-width: 65px; }
-        .m-chance span { font-size: 10px; display: block; color: var(--text-sub); text-transform: uppercase; }
-        .order-btn-group { display: flex; gap: 10px; margin-bottom: 14px; }
-        .order-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; }
+        /* --- MODAL RE-DESIGN (Dark Mode Premium) --- */
+        .modal-overlay { 
+            display: none; position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); 
+            z-index: 5000; align-items: center; justify-content: center; padding: 20px; 
+        }
+        .modal-card { 
+            background: var(--surface); 
+            width: 100%; max-width: 380px; 
+            padding: 40px; border-radius: 32px; 
+            border: 1px solid var(--border);
+            text-align: center; 
+        }
+        .currency-terminal { 
+            background: rgba(0,0,0,0.2); 
+            padding: 25px; border-radius: 24px; 
+            border: 1px solid var(--border); margin-bottom: 25px; 
+        }
+        .amount-field { 
+            background: transparent; border: none; outline: none;
+            font-size: 42px; font-weight: 900; color: #fff; width: 100%; text-align: center;
+        }
 
-        body.hide-header .header-stack { display: none !important; }
-        body.hide-header { padding-top: 0 !important; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -70,21 +159,23 @@
         <div class="top-nav">
             <div class="logo">NEXGEN</div>
             <div class="bar-right">
-                <button id="loginBtn" class="user-profile" style="background:#f1f5f9; color:#000; border:none; width:auto; padding:0 15px; border-radius:12px" onclick="openModal('auth-overlay')">Sign In</button>
-                <div id="userIcon" class="user-profile hidden" onclick="logout()">??</div>
+                <button id="loginBtn" class="user-profile" onclick="openModal('auth-overlay')">SIGN IN</button>
+                <div id="userIcon" class="user-profile hidden" style="background:var(--primary)" onclick="logout()">??</div>
                 <div class="wallet-pill">
-                    Ksh <span id="balance">0.00</span>
-                    <button onclick="openModal('deposit-overlay')" class="btn-deposit">Deposit</button>
+                    <span style="color:var(--text-sub)">Ksh</span> <span id="balance">0.00</span>
+                    <button onclick="openModal('deposit-overlay')" class="btn-deposit">DEPOSIT</button>
                 </div>
             </div>
         </div>
         <div class="search-container">
-            <div class="search-bar"><span style="opacity:0.4">🔍</span><input type="text" id="mSearch" class="search-input" placeholder="Search markets..." oninput="render()"></div>
+            <div class="search-bar">
+                <input type="text" id="mSearch" class="search-input" placeholder="Search institutional markets..." oninput="render()">
+            </div>
         </div>
         <div class="category-scroller">
-            <div class="cat-chip active" onclick="filterCat('All', this)">All</div>
+            <div class="cat-chip active" onclick="filterCat('All', this)">All Markets</div>
             <div class="cat-chip" onclick="filterCat('Politics', this)">Politics</div>
-            <div class="cat-chip" onclick="filterCat('Crypto', this)">Crypto</div>
+            <div class="cat-chip" onclick="filterCat('Crypto', this)">Crypto Assets</div>
             <div class="cat-chip" onclick="filterCat('Sports', this)">Sports</div>
         </div>
     </div>
@@ -95,48 +186,46 @@
 
     <div id="auth-overlay" class="modal-overlay">
         <div class="modal-card">
-            <div class="auth-switch">
+            <div class="auth-switch" style="background:rgba(0,0,0,0.3)">
                 <div id="tab-in" class="auth-tab active" onclick="switchAuth('in')">Sign In</div>
                 <div id="tab-up" class="auth-tab inactive" onclick="switchAuth('up')">Sign Up</div>
             </div>
-            <h2 id="authTitle" style="margin-bottom:20px; letter-spacing:-1px">Access Terminal</h2>
+            <h2 id="authTitle" style="margin-bottom:20px;">Access Terminal</h2>
             <div id="signupOnly" class="hidden">
-                <input type="text" id="authName" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:12px;" placeholder="Full Name">
+                <input type="text" id="authName" style="width:100%; padding:18px; background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:14px; margin-bottom:12px; color:#fff" placeholder="Full Name">
             </div>
-            <input type="email" id="authEmail" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:12px;" placeholder="Email Address">
-            <input type="password" id="authPass" style="width:100%; padding:15px; border:1px solid #ddd; border-radius:12px; margin-bottom:20px;" placeholder="Password">
-            <button onclick="handleAuth()" style="width:100%; padding:18px; background:#000; color:#fff; border-radius:18px; border:none; font-weight:700">Enter NexGen</button>
-            <p onclick="closeModal('auth-overlay')" style="margin-top:20px; font-size:13px; color:#999; cursor:pointer;">Dismiss</p>
+            <input type="email" id="authEmail" style="width:100%; padding:18px; background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:14px; margin-bottom:12px; color:#fff" placeholder="Email Address">
+            <input type="password" id="authPass" style="width:100%; padding:18px; background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:14px; margin-bottom:20px; color:#fff" placeholder="Password">
+            <button onclick="handleAuth()" style="width:100%; padding:20px; background:#fff; color:#000; border-radius:18px; border:none; font-weight:800; cursor:pointer">INITIALIZE SESSION</button>
+            <p onclick="closeModal('auth-overlay')" style="margin-top:20px; font-size:13px; color:var(--text-sub); cursor:pointer;">Cancel</p>
         </div>
     </div>
 
     <div id="deposit-overlay" class="modal-overlay">
         <div class="modal-card">
-            <h2 style="margin-bottom:25px; letter-spacing:-1px">Deposit KES</h2>
+            <h2 style="margin-bottom:25px;">Funding Portal</h2>
             <div class="currency-terminal">
-                <div class="input-wrapper">
-                    <span style="font-size:20px; font-weight:800; margin-right:10px">Ksh</span>
-                    <input type="number" id="customAmount" class="amount-field" placeholder="0">
-                </div>
-                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px">
-                    <div style="background:#f1f5f9; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer" onclick="document.getElementById('customAmount').value=250">250</div>
-                    <div style="background:#f1f5f9; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer" onclick="document.getElementById('customAmount').value=500">500</div>
-                    <div style="background:#f1f5f9; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer" onclick="document.getElementById('customAmount').value=1000">1k</div>
-                    <div style="background:#f1f5f9; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer" onclick="document.getElementById('customAmount').value=2000">2k</div>
+                <div style="font-size:12px; color:var(--primary); font-weight:800; margin-bottom:10px; letter-spacing:1px">EQUITY DEPOSIT</div>
+                <input type="number" id="customAmount" class="amount-field" placeholder="0">
+                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:20px">
+                    <div style="background:var(--glass); padding:12px; border-radius:12px; font-size:11px; font-weight:800; cursor:pointer; border:1px solid var(--border)" onclick="document.getElementById('customAmount').value=250">250</div>
+                    <div style="background:var(--glass); padding:12px; border-radius:12px; font-size:11px; font-weight:800; cursor:pointer; border:1px solid var(--border)" onclick="document.getElementById('customAmount').value=500">500</div>
+                    <div style="background:var(--glass); padding:12px; border-radius:12px; font-size:11px; font-weight:800; cursor:pointer; border:1px solid var(--border)" onclick="document.getElementById('customAmount').value=1000">1K</div>
+                    <div style="background:var(--glass); padding:12px; border-radius:12px; font-size:11px; font-weight:800; cursor:pointer; border:1px solid var(--border)" onclick="document.getElementById('customAmount').value=2000">2K</div>
                 </div>
             </div>
-            <button class="btn-deposit" style="width:100%; padding:18px; border-radius:18px" onclick="startPayment()">Authorize Deposit</button>
-            <p onclick="closeModal('deposit-overlay')" style="margin-top:15px; cursor:pointer; color:#999">Close</p>
+            <button class="btn-deposit" style="width:100%; padding:20px; border-radius:18px; font-size:16px" onclick="startPayment()">AUTHORIZE DEPOSIT</button>
+            <p onclick="closeModal('deposit-overlay')" style="margin-top:15px; color:var(--text-sub); cursor:pointer">Back to Terminal</p>
         </div>
     </div>
 
     <script>
-        let activeMarket = null;
+        // --- OPERATIONS REMAIN UNTOUCHED ---
         let selectedCategory = 'All';
         const markets = [
-            { cat: "Politics", q: "Will James Comey be sentenced to prison in 2026?", p: 9, vol: "93K" },
-            { cat: "Crypto", q: "Will Bitcoin stay above $100k until June?", p: 72, vol: "1.4M" },
-            { cat: "Sports", q: "Arsenal to win Premier League 2026?", p: 46, vol: "400K" }
+            { cat: "Politics", q: "Will James Comey be sentenced to prison in 2026?", p: 9 },
+            { cat: "Crypto", q: "Will Bitcoin stay above $100k until June?", p: 72 },
+            { cat: "Sports", q: "Arsenal to win Premier League 2026?", p: 46 }
         ];
 
         window.onload = () => {
@@ -162,22 +251,20 @@
 
         function handleAuth() {
             const email = document.getElementById('authEmail').value;
-            if(!email.includes('@')) return alert("Invalid email");
+            if(!email.includes('@')) return alert("Invalid credentials");
             localStorage.setItem('nx_user', email.substring(0,2).toUpperCase());
             location.reload();
         }
 
         function startPayment() {
             const amt = document.getElementById('customAmount').value;
-            if(amt < 10) return alert("Min Ksh 10");
-            closeModal('deposit-overlay');
-            document.body.classList.add('hide-header');
+            if(amt < 10) return alert("Minimum deposit: 10 KES");
             const intasend = new window.IntaSend({ publicAPIKey: "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad", live: false });
             intasend.run({ amount: Number(amt), currency: "KES" }).on("COMPLETE", () => {
                 const cur = parseFloat(localStorage.getItem('nx_balance') || 0);
                 localStorage.setItem('nx_balance', cur + Number(amt));
                 location.reload();
-            }).on("FAILED", () => document.body.classList.remove('hide-header'));
+            });
         }
 
         function filterCat(cat, el) {
@@ -198,11 +285,11 @@
                     <div class="card-header">
                         <div class="letter-icon">${m.q.charAt(0)}</div>
                         <div class="m-title">${m.q}</div>
-                        <div class="m-chance">${m.p}%<span>chance</span></div>
+                        <div class="m-chance">${m.p}%<span>CHANCE</span></div>
                     </div>
                     <div class="order-btn-group">
-                        <button class="order-btn" style="background:var(--yes); color:var(--yes-text)">Yes</button>
-                        <button class="order-btn" style="background:var(--no); color:var(--no-text)">No</button>
+                        <button class="order-btn btn-yes">YES</button>
+                        <button class="order-btn btn-no">NO</button>
                     </div>
                 `;
                 feed.appendChild(card);

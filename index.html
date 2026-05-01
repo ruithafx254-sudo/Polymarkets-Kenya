@@ -9,22 +9,28 @@
 
     <style>
         :root { 
-            --accent: #2ebd85; --border: #eceef2; --text-main: #0f172a; --text-sub: #64748b;
-            --yes: #f0fdf4; --yes-text: #166534; --no: #fef2f2; --no-text: #991b1b;
+            --accent: #2ebd85; 
+            --border: #e2e8f0; 
+            --text-main: #0f172a; 
+            --text-sub: #64748b;
+            --yes-blue: #096cfb; 
+            --yes-bg: #eff6ff; 
+            --no-red: #df1c41; 
+            --no-bg: #fff1f2;
             --tech-bg: #0f172a;
         }
         
-        body { background: #fafafa; color: var(--text-main); margin: 0; padding-top: 80px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 80px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
 
-        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); transition: transform 0.3s ease-in-out; }
+        .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
         .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 68px; }
         .logo-wrap { display: flex; flex-direction: column; line-height: 1; }
-        .logo-main { font-weight: 900; font-size: 19px; letter-spacing: -0.5px; color: #000; text-transform: uppercase; }
-        .logo-sub { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+        .logo-main { font-weight: 900; font-size: 20px; letter-spacing: -0.6px; color: #0f172a; text-transform: uppercase; }
+        .logo-sub { font-size: 10px; font-weight: 700; color: var(--yes-blue); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
         
         .nav-right { display: flex; align-items: center; gap: 10px; }
-        .wallet-pill { display: flex; align-items: center; background: #f8fafc; border: 1px solid var(--border); padding: 4px 4px 4px 12px; border-radius: 10px; gap: 8px; font-size: 13px; font-weight: 700; }
-        .btn-deposit { background: #000; color: #fff; border: none; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .wallet-pill { display: flex; align-items: center; background: #f1f5f9; border: 1px solid var(--border); padding: 4px 4px 4px 12px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
+        .btn-deposit { background: #000; color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.2s; }
         .btn-deposit:active { opacity: 0.8; }
         
         .user-id { width: 36px; height: 36px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -33,28 +39,30 @@
         body.hide-header .header-stack { transform: translateY(-100%); }
         body.hide-header { padding-top: 20px; }
 
-        #dashboard { max-width: 600px; margin: auto; padding: 12px; box-sizing: border-box; }
+        #dashboard { max-width: 620px; margin: auto; padding: 12px; box-sizing: border-box; }
         
-        /* Market Card Display */
-        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
-        .market-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
-        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
-        .m-title { font-size: 15px; font-weight: 600; line-height: 1.45; color: #0f172a; padding-right: 12px; }
-        .odds-val { font-size: 18px; font-weight: 800; color: #000; }
-        .odds-lbl { font-size: 10px; color: var(--text-sub); text-transform: uppercase; display: block; text-align: right; }
-        
-        .m-category { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent); background: #f0fdf4; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 12px; letter-spacing: 0.5px; }
+        /* 1:1 Accurate Polymarket Card UI */
+        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 12px; transition: box-shadow 0.2s; }
+        .market-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.03); }
+        .m-category { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-sub); display: inline-block; margin-bottom: 8px; letter-spacing: 0.3px; }
+        .m-header { margin-bottom: 16px; }
+        .m-title { font-size: 16px; font-weight: 600; line-height: 1.4; color: #0f172a; }
 
-        .btn-group { display: flex; gap: 10px; }
-        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .trade-btn:active { opacity: 0.7; }
-        .trade-btn.yes { background: var(--yes); color: var(--yes-text); }
-        .trade-btn.no { background: var(--no); color: var(--no-text); }
-        .multiplier { font-size: 11px; font-weight: 700; opacity: 0.8; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .trade-btn { width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid transparent; font-weight: 700; font-size: 15px; cursor: pointer; transition: background 0.15s; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
+        .trade-btn:active { opacity: 0.75; }
+        
+        .trade-btn.yes { background: var(--yes-bg); color: var(--yes-blue); border-color: #dbeafe; }
+        .trade-btn.yes:hover { background: #dbeafe; }
+        .trade-btn.no { background: var(--no-bg); color: var(--no-red); border-color: #ffe4e6; }
+        .trade-btn.no:hover { background: #ffe4e6; }
+        
+        .btn-label { font-size: 14px; font-weight: 700; }
+        .btn-price { font-size: 15px; font-weight: 800; letter-spacing: -0.2px; }
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
         
-        /* Modal Content */
+        /* Modal Window Design */
         .modal { background: #fff; width: 100%; max-width: 380px; padding: 32px 28px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); box-sizing: border-box; border: 1px solid rgba(255,255,255,0.2); max-height: 90vh; overflow-y: auto; }
         .auth-nav { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 24px; }
         .auth-tab { flex: 1; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); transition: 0.2s; text-align: center; }
@@ -172,7 +180,7 @@
                 </div>
             </div>
             
-            <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--accent);">Confirm Deposit</button>
+            <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--yes-blue);">Confirm Deposit</button>
             
             <div id="sharedBadge" class="badge-wrap">
                 <span style="display:block; text-align: center">
@@ -191,7 +199,7 @@
         let activeTab = 'in';
         let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
 
-        const categories = ["Finance", "Sports", "Politics", "Tech", "Entertainment"];
+        const categories = ["Politics", "Crypto", "Sports", "Pop Culture", "Global Affairs", "Business"];
         let markets = [];
         let currentFundsMode = 'deposit';
 
@@ -203,17 +211,17 @@
 
         function initializeMarkets() {
             markets = [];
-            let totalMarketsCount = 525; // Create 500+ unique predictions without repeating
+            let totalMarketsCount = 1005; 
             
             for (let i = 0; i < totalMarketsCount; i++) {
+                // Placed exactly between 8 and 9 (index 8 is 9th on display)
                 if (i === 8) {
                     markets.push({
                         id: `m-jesus`,
                         q: "Will Jesus be back before June 5th?",
                         category: "Culture",
-                        p: 25,
-                        yesMult: "4.00",
-                        noMult: "1.33"
+                        yesPrice: "25",
+                        noPrice: "75"
                     });
                     continue;
                 }
@@ -221,36 +229,37 @@
                 const cat = categories[i % categories.length];
                 let question = "";
 
-                // Fully unique dynamic predictions based on the counter to prevent any repetition
+                // Generate 1000+ unique questions without sequential repetition
                 switch (cat) {
-                    case "Finance":
-                        question = `Will the NSE index close with a net positive margin exceeding ${4.2 + (i * 0.05).toFixed(2)}% in Quarter ${1 + (i % 4)}?`;
+                    case "Politics":
+                        question = `Will candidate #${100 + i} claim more than ${(45 + (i * 0.04)).toFixed(1)}% in regional election polls?`;
+                        break;
+                    case "Crypto":
+                        question = `Will Bitcoin complete the third quarter trading with a price floor above $${(90000 + (i * 12)).toLocaleString()}?`;
                         break;
                     case "Sports":
-                        question = `Will the regional team complete a top-tier season with exactly ${(18 + (i % 12))} consecutive wins?`;
+                        question = `Will team ID #${50 + (i % 80)} finish the domestic league tournament with at least ${(i % 30) + 12} points?`;
                         break;
-                    case "Politics":
-                        question = `Will the regional council approve the new cross-border trade guidelines for the ${(2025 + (i % 5))} season?`;
+                    case "Pop Culture":
+                        question = `Will the sequel to media project #${10 + (i % 200)} top the local weekly box office with over $${(100 + (i * 0.2)).toFixed(1)}M?`;
                         break;
-                    case "Tech":
-                        question = `Will the local software ecosystem surpass ${(120 + (i * 3))} active enterprise tech launches this year?`;
+                    case "Global Affairs":
+                        question = `Will treaty consensus #${i + 20} receive full validation from ${(i % 5) + 4} major continental assemblies?`;
                         break;
-                    case "Entertainment":
-                        question = `Will the upcoming regional festival set an attendance record above ${(5000 + (i * 150))} participants?`;
+                    case "Business":
+                        question = `Will enterprise corporate #${200 + i} declare gross revenue expansion exceeding ${(2.2 + (i * 0.01)).toFixed(2)}% this year?`;
                         break;
                 }
 
-                const chanceValue = Math.floor(20 + ((i * 3) % 65));
-                const yesMultiplier = (100 / chanceValue).toFixed(2);
-                const noMultiplier = (100 / (100 - chanceValue)).toFixed(2);
+                const probabilityYes = Math.floor(10 + ((i * 3) % 78));
+                const probabilityNo = 100 - probabilityYes;
 
                 markets.push({
                     id: `m-ext-${i}`,
                     q: question,
                     category: cat,
-                    p: chanceValue,
-                    yesMult: yesMultiplier,
-                    noMult: noMultiplier
+                    yesPrice: probabilityYes.toString(),
+                    noPrice: probabilityNo.toString()
                 });
             }
         }
@@ -267,16 +276,15 @@
                     <div class="m-category">${item.category}</div>
                     <div class="m-header">
                         <div class="m-title">${item.q}</div>
-                        <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
                     </div>
                     <div class="btn-group">
                         <button class="trade-btn yes" onclick="handleWagerClick('${item.q}')">
-                            <span>Yes</span>
-                            <span class="multiplier">${item.yesMult}x</span>
+                            <span class="btn-label">Yes</span>
+                            <span class="btn-price">${item.yesPrice}¢</span>
                         </button>
                         <button class="trade-btn no" onclick="handleWagerClick('${item.q}')">
-                            <span>No</span>
-                            <span class="multiplier">${item.noMult}x</span>
+                            <span class="btn-label">No</span>
+                            <span class="btn-price">${item.noPrice}¢</span>
                         </button>
                     </div>`;
                 f.appendChild(card);
@@ -330,7 +338,7 @@
                 tDep.classList.add('active'); tWith.classList.remove('active');
                 fTitle.innerText = "Fund Balance"; fDesc.innerText = "Direct M-Pesa Integration via IntaSend";
                 amtLabel.innerText = "Deposit Amount (Ksh)"; fSubmit.innerText = "Confirm Deposit";
-                fSubmit.style.background = "var(--accent)";
+                fSubmit.style.background = "var(--yes-blue)";
             }
         }
 
@@ -352,7 +360,6 @@
                 userDB[email] = { name, email, pass, country, balance: "0.00" };
                 localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
                 
-                // Direct authentication with the newly registered user
                 localStorage.setItem('nx_user', email);
                 localStorage.setItem('nx_balance', "0.00");
                 
@@ -365,11 +372,10 @@
                     return alert("Access denied. Incorrect email address or password.");
                 }
                 
-                // Update dynamic profile values across multiple logged in sessions
                 localStorage.setItem('nx_user', userRecord.email);
                 localStorage.setItem('nx_balance', userRecord.balance || "0.00");
                 
-                alert(`Session initialized for ${userRecord.name || userRecord.email}`);
+                alert(`Welcome back, ${userRecord.name || userRecord.email}`);
                 closeModal('authModal');
                 syncState();
             }

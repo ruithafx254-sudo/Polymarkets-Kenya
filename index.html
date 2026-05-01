@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Polymarkets Africa | Terminal</title>
     
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
-
     <style>
         :root { 
             --accent: #2ebd85; --border: #e2e8f0; --text-main: #0f172a; --text-sub: #64748b;
@@ -25,8 +23,7 @@
         
         .nav-right { display: flex; align-items: center; gap: 8px; }
         .wallet-pill { display: flex; align-items: center; background: #f1f5f9; border: 1px solid var(--border); padding: 4px 4px 4px 12px; border-radius: 8px; gap: 8px; font-size: 13px; font-weight: 700; }
-        .btn-deposit { background: #000; color: #fff; border: none; padding: 7px 14px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; transition: background 0.2s ease; }
-        .btn-deposit:active { background: #334155; }
+        .btn-deposit { background: #000; color: #fff; border: none; padding: 7px 14px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
         
         .user-id { width: 34px; height: 34px; background: var(--tech-bg); color: rgba(255,255,255,0.95); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; font-weight: 800; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
 
@@ -44,8 +41,7 @@
         .odds-lbl { font-size: 10px; color: var(--text-sub); text-transform: uppercase; display: block; text-align: right; }
         
         .btn-group { display: flex; gap: 8px; }
-        .trade-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; transition: opacity 0.2s; }
-        .trade-btn:active { opacity: 0.8; }
+        .trade-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; }
         .trade-btn.yes { background: var(--yes); color: var(--yes-text); }
         .trade-btn.no { background: var(--no); color: var(--no-text); }
         
@@ -56,26 +52,21 @@
         .news-h { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: #000; }
         .news-p { font-size: 13px; color: var(--text-sub); line-height: 1.45; margin: 0; }
 
-        /* Professional Overlay Styles */
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
-        .modal { background: #fff; width: 100%; max-width: 350px; padding: 28px; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); box-sizing: border-box; }
+        .modal { background: #fff; width: 100%; max-width: 350px; padding: 28px; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); box-sizing: border-box; }
         
-        /* High-Tier Forms */
         .auth-nav { display: flex; background: #f1f5f9; padding: 4px; border-radius: 10px; margin-bottom: 20px; }
         .auth-tab { flex: 1; padding: 8px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 7px; text-align: center; color: var(--text-sub); }
         .auth-tab.active { background: #fff; color: #000; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 
         .input-group { text-align: left; margin-bottom: 14px; }
         .input-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-sub); margin-bottom: 5px; display: block; }
-        .input-tech { width: 100%; padding: 12px 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; box-sizing: border-box; outline: none; transition: border 0.2s ease; }
-        .input-tech:focus { border-color: #cbd5e1; background: #fff; }
+        .input-tech { width: 100%; padding: 12px 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; box-sizing: border-box; outline: none; }
 
-        .btn-tech { width: 100%; padding: 14px; background: #0f172a; color: #fff; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 14px; transition: background 0.2s ease; margin-top: 6px; }
-        .btn-tech:active { background: #1e293b; }
+        .btn-tech { width: 100%; padding: 14px; background: #0f172a; color: #fff; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 14px; margin-top: 6px; }
 
         .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0 16px 0; }
         .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; text-align: center; }
-        .amt-chip:active { background: #f8fafc; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -121,13 +112,13 @@
 
             <div id="upFields" class="hidden">
                 <div class="input-group">
-                    <span class="input-label">Full Legal Name</span>
-                    <input type="text" id="aName" class="input-tech" placeholder="e.g. John Doe">
+                    <span class="input-label">Full Name</span>
+                    <input type="text" id="aName" class="input-tech" placeholder="e.g. Jane Doe">
                 </div>
             </div>
             
             <div class="input-group">
-                <span class="input-label">Account Identification (Email)</span>
+                <span class="input-label">Account Identity (Email)</span>
                 <input type="email" id="aEmail" class="input-tech" placeholder="name@domain.com">
             </div>
 
@@ -147,21 +138,17 @@
             <p style="color: var(--text-sub); font-size: 13px; margin-top: 0; margin-bottom:16px;">Verified via M-Pesa (Min Ksh 200)</p>
             
             <div style="background:#f8fafc; padding:14px; border-radius:12px; border: 1px solid var(--border);">
-                <span class="input-label" style="text-align: center; display: block; margin-bottom: 8px;">Select or Enter Custom Stake Amount</span>
                 <input type="number" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800; background: transparent; border: none; margin:0;" placeholder="0">
                 
                 <div class="chip-grid">
                     <div class="amt-chip" onclick="setAmt(250)">250</div>
                     <div class="amt-chip" onclick="setAmt(500)">500</div>
                     <div class="amt-chip" onclick="setAmt(1000)">1k</div>
-                    <div class="amt-chip" onclick="setAmt(2000)">2k</div>
-                    <div class="amt-chip" onclick="setAmt(5000)">5k</div>
-                    <div class="amt-chip" onclick="setAmt(10000)">10k</div>
                 </div>
             </div>
 
-            <button id="depBtn" onclick="payNow()" class="btn-tech" style="background:var(--accent); margin-top:14px;">Deploy IntaSend Checkout</button>
-            <p style="font-size: 12px; color: var(--text-sub); text-align:center; margin-top: 16px; cursor: pointer; font-weight: 600;" onclick="closeModal('depositModal')">Cancel Request</p>
+            <button id="depBtn" onclick="payNow()" class="btn-tech" style="background:var(--accent); margin-top:14px;">Confirm Deposit</button>
+            <p style="font-size: 12px; color: var(--text-sub); text-align:center; margin-top: 16px; cursor: pointer; font-weight: 600;" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
 
@@ -182,28 +169,27 @@
         let currentCat = 'All';
         let markets = [];
 
-        // Comprehensive default live catalog without external delays
         const baseMarkets = [
             { type: 'm', cat: "World", q: "Will Jesus come back before June?", p: 4, id: "m-jesus" },
             { type: 'm', cat: "World", q: "Will global central banks reduce interest rates by June?", p: 72, id: "m-rates" },
             { type: 'm', cat: "Sports", q: "Will Arsenal win their next Premier League match?", p: 68, id: "m-arsenal" },
             { type: 'm', cat: "Sports", q: "Will Real Madrid win the Champions League this season?", p: 79, id: "m-realmadrid" },
-            { type: 'm', cat: "Entertainment", q: "Will Marvel announce Black Panther 3 by the end of this year?", p: 55, id: "m-bp3" },
-            { type: 'm', cat: "Entertainment", q: "Will the next James Bond actor be officially announced before August?", p: 41, id: "m-jamesbond" },
+            { type: 'm', cat: "Entertainment", q: "Will Marvel announce Black Panther 3 by end of this year?", p: 55, id: "m-bp3" },
+            { type: 'm', cat: "Entertainment", q: "Will the next James Bond actor be announced before August?", p: 41, id: "m-jamesbond" },
             { type: 'm', cat: "Tech", q: "Will Apple release a foldable iPhone next year?", p: 35, id: "m-fold" },
             { type: 'm', cat: "Tech", q: "Will OpenAI release GPT-5 before July?", p: 58, id: "m-gpt" },
-            { type: 'n', cat: "News", h: "Global Markets Review", p: "Indices fluctuate as inflation metrics point to sustained interest rates from central banks.", id: "n-global" },
-            { type: 'n', cat: "News", h: "Prediction Engine Expansion", p: "The terminal reports a 20% user volume expansion over alternative markets.", id: "n-volume" }
+            { type: 'n', cat: "News", h: "Global Markets Review", p: "Indices fluctuate as inflation metrics point to sustained rates.", id: "n-global" }
         ];
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // LOAD IMMEDIATELY - NO EXTERNAL DEPENDENCY WAITING
+        window.addEventListener('DOMContentLoaded', () => {
             loadPersistedMarkets();
             syncState(); 
             render('All');
         });
 
         function loadPersistedMarkets() {
-            const stored = localStorage.getItem('nx_lite_v3_markets');
+            const stored = localStorage.getItem('nx_safe_markets');
             if (stored) {
                 try {
                     markets = JSON.parse(stored);
@@ -218,7 +204,7 @@
         }
 
         function saveMarkets() {
-            localStorage.setItem('nx_lite_v3_markets', JSON.stringify(markets));
+            localStorage.setItem('nx_safe_markets', JSON.stringify(markets));
         }
 
         function render(cat) {
@@ -234,7 +220,7 @@
             });
 
             if (filtered.length === 0) {
-                f.innerHTML = `<p style="text-align:center; color:var(--text-sub); padding:40px 0; font-size:13px; font-weight:600;">No active outcomes found under this category.</p>`;
+                f.innerHTML = `<p style="text-align:center; color:var(--text-sub); padding:40px 0; font-size:13px; font-weight:600;">No listings found in this category.</p>`;
                 return;
             }
 
@@ -256,7 +242,7 @@
                             <button class="trade-btn yes" onclick="openStakeModal('YES', '${m.q.replace(/'/g, "\\'")}', '${m.id}')">Yes</button>
                             <button class="trade-btn no" onclick="openStakeModal('NO', '${m.q.replace(/'/g, "\\'")}', '${m.id}')">No</button>
                         </div>
-                        <button class="resolve-btn" onclick="resolvePrediction('${m.id}')">Determine Settlement & Payout</button>`;
+                        <button class="resolve-btn" onclick="resolvePrediction('${m.id}')">Determine Settlement</button>`;
                 } else {
                     card.className = 'news-card';
                     card.innerHTML = `
@@ -275,12 +261,12 @@
         }
 
         function getActiveWager(marketId) {
-            const wagers = JSON.parse(localStorage.getItem('nx_lite_v3_wagers') || '{}');
+            const wagers = JSON.parse(localStorage.getItem('nx_safe_wagers') || '{}');
             return wagers[marketId];
         }
 
         function openStakeModal(side, question, marketId) {
-            if(!localStorage.getItem('nx_lite_user')) return openModal('authModal');
+            if(!localStorage.getItem('nx_safe_user')) return openModal('authModal');
             document.getElementById('sTitle').innerText = `Place '${side}'`;
             document.getElementById('sQuestion').innerText = question;
             document.getElementById('stakeAmt').value = '';
@@ -288,21 +274,21 @@
 
             document.getElementById('stakeConfirmBtn').onclick = () => {
                 const amt = Number(document.getElementById('stakeAmt').value);
-                const currentBalance = parseFloat(localStorage.getItem('nx_lite_balance') || 0);
+                const currentBalance = parseFloat(localStorage.getItem('nx_safe_balance') || 0);
 
                 if(!amt || amt < 50) return alert("Minimum stake required: Ksh 50");
-                if(amt > currentBalance) return alert("Limit Exceeded: Deposit more credits.");
+                if(amt > currentBalance) return alert("Insufficient balance.");
 
-                localStorage.setItem('nx_lite_balance', currentBalance - amt);
+                localStorage.setItem('nx_safe_balance', currentBalance - amt);
                 
-                const wagers = JSON.parse(localStorage.getItem('nx_lite_v3_wagers') || '{}');
+                const wagers = JSON.parse(localStorage.getItem('nx_safe_wagers') || '{}');
                 wagers[marketId] = { side: side, amt: amt };
-                localStorage.setItem('nx_lite_v3_wagers', JSON.stringify(wagers));
+                localStorage.setItem('nx_safe_wagers', JSON.stringify(wagers));
 
                 syncState();
                 closeModal('stakeModal');
                 render(currentCat);
-                alert(`Authorization Complete: Stake of Ksh ${amt} submitted successfully.`);
+                alert(`Stake placed on '${side}'!`);
             };
         }
 
@@ -316,15 +302,15 @@
             if (wager) {
                 if (wager.side === resolvedOutcome) {
                     const winnings = wager.amt * 2;
-                    let curBal = parseFloat(localStorage.getItem('nx_lite_balance') || 0);
-                    localStorage.setItem('nx_lite_balance', curBal + winnings);
-                    alertMsg += `🎉 Correct Choice! Account credited with Ksh ${winnings.toLocaleString()}.`;
+                    let curBal = parseFloat(localStorage.getItem('nx_safe_balance') || 0);
+                    localStorage.setItem('nx_safe_balance', curBal + winnings);
+                    alertMsg += `🎉 Correct! Added Ksh ${winnings.toLocaleString()}.`;
                 } else {
-                    alertMsg += `❌ Incorrect settlement. Positional loss incurred.`;
+                    alertMsg += `❌ Incorrect outcome. Stake lost.`;
                 }
-                const wagers = JSON.parse(localStorage.getItem('nx_lite_v3_wagers') || '{}');
+                const wagers = JSON.parse(localStorage.getItem('nx_safe_wagers') || '{}');
                 delete wagers[marketId];
-                localStorage.setItem('nx_lite_v3_wagers', JSON.stringify(wagers));
+                localStorage.setItem('nx_safe_wagers', JSON.stringify(wagers));
             } else {
                 alertMsg += `No active position resolved for this specific market.`;
             }
@@ -337,7 +323,36 @@
         }
 
         function syncState() {
-            const user = localStorage.getItem('nx_lite_user');
-            const bal = localStorage.getItem('nx_lite_balance') || "0.00";
+            const user = localStorage.getItem('nx_safe_user');
+            const bal = localStorage.getItem('nx_safe_balance') || "0.00";
             if(user) {
-                document.g
+                document.getElementById('signBtn').classList.add('hidden');
+                document.getElementById('userIcon').classList.remove('hidden');
+            }
+            document.getElementById('balance').innerText = parseFloat(bal).toLocaleString(undefined, {minimumFractionDigits: 2});
+        }
+
+        function setAuth(mode) {
+            const up = document.getElementById('upFields'), title = document.getElementById('aTitle');
+            const tIn = document.getElementById('tabIn'), tUp = document.getElementById('tabUp');
+            if(mode === 'up') {
+                up.classList.remove('hidden'); tUp.classList.add('active'); tIn.classList.remove('active');
+                title.innerText = "Register Identity";
+            } else {
+                up.classList.add('hidden'); tIn.classList.add('active'); tUp.classList.remove('active');
+                title.innerText = "Secure Login";
+            }
+        }
+
+        function doAuth() {
+            const email = document.getElementById('aEmail').value;
+            if(!email.includes('@')) return alert("Enter a valid email address.");
+            localStorage.setItem('nx_safe_user', email);
+            closeModal('authModal');
+            syncState();
+        }
+
+        function setAmt(v) { document.getElementById('depAmt').value = v; }
+
+        function payNow() {
+            const amt = document.ge

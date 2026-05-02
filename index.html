@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Polymarkets Africa | Terminal</title>
     
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
-
     <style>
         :root { 
             --accent: #2ebd85; 
@@ -257,7 +255,7 @@
             </div>
             
             <h2 id="fundsTitle" style="margin: 0 0 6px 0; font-weight:800; font-size:20px; letter-spacing:-0.5px;">Fund Balance</h2>
-            <p id="fundsDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Direct M-Pesa Integration via IntaSend</p>
+            <p id="fundsDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Direct M-Pesa Integration via Lipwa</p>
             
             <div style="background:#f8fafc; padding:18px; border-radius:18px; border: 1px solid var(--border); margin-bottom:16px;">
                 
@@ -302,7 +300,6 @@
     </div>
 
     <script>
-        const INTASEND_PUBLIC_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad";
         let activeTab = 'in';
         let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
         let markets = [];
@@ -584,7 +581,7 @@
                 withFields.classList.remove('hidden');
             } else {
                 tDep.classList.add('active'); tWith.classList.remove('active');
-                fTitle.innerText = "Fund Balance"; fDesc.innerText = "Direct M-Pesa Integration via IntaSend";
+                fTitle.innerText = "Fund Balance"; fDesc.innerText = "Direct M-Pesa Integration via Lipwa";
                 amtLabel.innerText = "Deposit Amount (Ksh)"; fSubmit.innerText = "Confirm Deposit";
                 fSubmit.style.background = "var(--yes-blue)";
                 withFields.classList.add('hidden');
@@ -669,35 +666,13 @@
             if(!amt || amt < 100) return alert("Minimum deposit amount required is Ksh 100");
 
             closeModal('depositModal');
-            document.body.classList.add('hide-header');
+            document.body.classList.remove('hide-header');
 
-            let intasend = new window.IntaSend({
-                publicAPIKey: INTASEND_PUBLIC_KEY,
-                live: false 
-            });
+            // Opens Lipwa payment link in a new tab
+            window.open('https://lipwa.link/8367', '_blank');
 
-            intasend.on("COMPLETE", (results) => {
-                document.body.classList.remove('hide-header');
-                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-                const newBal = (cur + Number(amt)).toFixed(2);
-                localStorage.setItem('nx_balance', newBal);
-
-                if (userDB[userEmail]) {
-                    userDB[userEmail].balance = newBal;
-                    localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
-                }
-                syncState();
-                alert(`Success! Ksh ${amt.toLocaleString()} added to balance.`);
-            })
-            .on("FAILED", () => {
-                document.body.classList.remove('hide-header');
-                alert("The transaction was not completed.");
-            })
-            .on("IN-PROGRESS", () => {
-                document.body.classList.add('hide-header');
-            });
-
-            intasend.run({ amount: amt, currency: "KES", email: userEmail });
+            // Alert user to check their phone or window for checkout completion
+            alert("The Lipwa checkout has opened in a new tab. Please proceed to complete payment.");
         }
 
         function openModal(id) { 

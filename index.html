@@ -270,6 +270,10 @@
 
         window.onload = () => {
             initializeMarkets();
+            
+            // Checks URL params for a successful callback from payment redirect
+            checkPaymentCallback();
+            
             syncState(); 
             renderFeed();
             renderHistory();
@@ -283,6 +287,42 @@
                 localStorage.setItem('nx_deposit_amount', this.value);
             });
         };
+
+        function checkPaymentCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            const amount = parseFloat(urlParams.get('amount'));
+            const user = localStorage.getItem('nx_user');
+
+            if (status === 'success' && !isNaN(amount) && amount > 0 && user) {
+                const txRef = urlParams.get('reference');
+                const processedTx = JSON.parse(localStorage.getItem('processed_tx') || '[]');
+
+                // Prevent multiple balance additions for the same transaction ref on page refresh
+                if (!processedTx.includes(txRef)) {
+                    userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
+                    
+                    if (userDB[user]) {
+                        let currentBal = parseFloat(userDB[user].balance || 0);
+                        let newBal = (currentBal + amount).toFixed(2);
+                        
+                        userDB[user].balance = newBal;
+                        localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
+                        localStorage.setItem('nx_balance', newBal);
+                        
+                        if (txRef) {
+                            processedTx.push(txRef);
+                            localStorage.setItem('processed_tx', JSON.stringify(processedTx));
+                        }
+
+                        alert(`Deposit Successful! Ksh ${amount.toLocaleString()} has been added to your balance.`);
+                        
+                        // Clear the URL parameters without reloading the page
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    }
+                }
+            }
+        }
 
         function initializeMarkets() {
             markets = [];
@@ -441,7 +481,6 @@
         }
 
         function syncState() {
-            // Read fresh user record directly from saved databases
             userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
             const user = localStorage.getItem('nx_user');
             
@@ -449,7 +488,6 @@
                 document.getElementById('signBtn').classList.add('hidden');
                 document.getElementById('userIcon').classList.remove('hidden');
                 
-                // Keep individual data keys exactly in sync
                 const currentBal = userDB[user].balance || "0.00";
                 localStorage.setItem('nx_balance', currentBal);
                 document.getElementById('balance').innerText = parseFloat(currentBal).toLocaleString(undefined, {minimumFractionDigits: 2});
@@ -592,7 +630,9 @@
             const invoiceRef = "INV-" + Math.floor(Date.now() / 1000);
             closeModal('depositModal');
             
-            const checkoutUrl = `${LIPWA_LINK}?amount=${amt}&name=${name}&phone=${phone}&reference=${invoiceRef}`;
+            // Build absolute redirect callback URL
+            const returnUrl = encodeURIComponent(`${window.location.origin}${window.location.pathname}?status=success&amount=${amt}&reference=${invoiceRef}`);
+            const checkoutUrl = `${LIPWA_LINK}?amount=${amt}&name=${name}&phone=${phone}&reference=${invoiceRef}&callback=${returnUrl}`;
             window.location.href = checkoutUrl;
         }
 

@@ -224,36 +224,37 @@
         let activeSelection = null; 
         const LIPWA_LINK = "https://lipwa.link/8367";
 
-        // Initial base markets
-        const markets = [
-            { id: "m-1", q: "Will Spain win the FIFA World Cup?", category: "Sports", yesMult: "5.20", noMult: "1.18" },
-            { id: "m-2", q: "Will Bitcoin hit an all-time high above $120k in 2026?", category: "Crypto", yesMult: "1.69", noMult: "2.44" },
-            { id: "m-3", q: "Will Jesus be back before June 5th?", category: "Culture", yesMult: "9.00", noMult: "3.00" }
-        ];
+        const markets = [];
+        let itemsRendered = 0;
+        const CHUNK_SIZE = 20;
 
-        // Dynamic market generator to reach exactly 500 total markets simple and fast
-        function generateExtraMarkets() {
-            const subjects = ["Bitcoin", "Ethereum", "Solana", "AI", "OpenAI", "Apple", "Tesla", "Google", "Man City", "Arsenal", "Real Madrid", "NASA", "SpaceX", "TikTok", "Kenya"];
+        // Dynamic market generator to hit 1000 items instantly with ZERO performance lag
+        function generate1000Markets() {
+            const subjects = [
+                "Bitcoin", "Ethereum", "Solana", "AI Models", "OpenAI", "Apple Vision", "Tesla FSD", "Google DeepMind", 
+                "Man City", "Arsenal", "Real Madrid", "SpaceX Starship", "TikTok", "Kenya Tech", "Nvidia", "Microsoft",
+                "World Bank", "IMF", "Supercomputers", "Neuralink", "Boeing", "Metaverse", "Gold", "Petroleum"
+            ];
             const scopes = [
-                "break above its previous high", "introduce new regulation changes", "win their upcoming match", 
-                "announce a major new platform integration", "launch a next-gen feature before next month", 
-                "surpass targeted metrics by Q3", "break the record for active users"
+                "break above key resistance limits", "win targeted regulatory approval", "secure top tier expansion",
+                "achieve record-breaking transactions", "deploy next-generation automation", "reach target adoption metrics",
+                "outperform market analyst projections", "integrate fully into African payment ecosystems",
+                "launch a high-impact infrastructure upgrade", "set new highs in daily active engagement"
             ];
             const categories = ["Crypto", "Tech", "Sports", "Culture", "Business", "Finance"];
 
-            for (let i = 4; i <= 500; i++) {
+            for (let i = 1; i <= 1000; i++) {
                 const sub = subjects[i % subjects.length];
                 const scope = scopes[i % scopes.length];
                 const cat = categories[i % categories.length];
 
-                // Logic for varied multiplier values
-                const randomBias = (i * 7) % 75 + 15; // results in 15 to 90
+                const randomBias = (i * 13) % 70 + 15; // Balanced bias between 15 and 85
                 const yesMult = (100 / randomBias).toFixed(2);
                 const noMult = (100 / (100 - randomBias)).toFixed(2);
 
                 markets.push({
                     id: `m-${i}`,
-                    q: `Will ${sub} successfully ${scope} this year?`,
+                    q: `Will ${sub} successfully ${scope} this fiscal quarter?`,
                     category: cat,
                     yesMult: yesMult,
                     noMult: noMult
@@ -262,11 +263,48 @@
         }
 
         window.onload = async () => {
-            generateExtraMarkets();
-            renderFeed();
+            generate1000Markets();
+            renderMore();
+            window.addEventListener('scroll', handleInfiniteScroll);
             await checkPaymentCallback();
             await syncSupabaseState();
         };
+
+        // Renders chunks of markets to make DOM performance ultra-fast
+        function renderMore() {
+            const f = document.getElementById('feed'); 
+            const end = Math.min(itemsRendered + CHUNK_SIZE, markets.length);
+            
+            let chunkHtml = '';
+            for (let i = itemsRendered; i < end; i++) {
+                const m = markets[i];
+                chunkHtml += `
+                <div class="market-card">
+                    <div class="m-category">${m.category}</div>
+                    <div class="m-header">
+                        <div class="m-title">${m.q}</div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="trade-btn yes" onclick="openSlip('${m.id}', 'YES', '${m.yesMult}')">
+                            <span>YES</span><span style="font-weight:700;">${m.yesMult}x</span>
+                        </button>
+                        <button class="trade-btn no" onclick="openSlip('${m.id}', 'NO', '${m.noMult}')">
+                            <span>NO</span><span style="font-weight:700;">${m.noMult}x</span>
+                        </button>
+                    </div>
+                </div>`;
+            }
+            f.insertAdjacentHTML('beforeend', chunkHtml);
+            itemsRendered = end;
+        }
+
+        function handleInfiniteScroll() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 400) {
+                if (itemsRendered < markets.length) {
+                    renderMore();
+                }
+            }
+        }
 
         async function syncSupabaseState() {
             const savedEmail = localStorage.getItem('nx_user');
@@ -330,28 +368,6 @@
                     }
                 }
             }
-        }
-
-        function renderFeed() {
-            const f = document.getElementById('feed'); 
-            f.innerHTML = '';
-            markets.forEach(m => {
-                f.innerHTML += `
-                <div class="market-card">
-                    <div class="m-category">${m.category}</div>
-                    <div class="m-header">
-                        <div class="m-title">${m.q}</div>
-                    </div>
-                    <div class="btn-group">
-                        <button class="trade-btn yes" onclick="openSlip('${m.id}', 'YES', '${m.yesMult}')">
-                            <span>YES</span><span style="font-weight:700;">${m.yesMult}x</span>
-                        </button>
-                        <button class="trade-btn no" onclick="openSlip('${m.id}', 'NO', '${m.noMult}')">
-                            <span>NO</span><span style="font-weight:700;">${m.noMult}x</span>
-                        </button>
-                    </div>
-                </div>`;
-            });
         }
 
         function openSlip(id, side, mult) {

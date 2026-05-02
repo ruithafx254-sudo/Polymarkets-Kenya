@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Polymarkets Africa | Terminal</title>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root { 
             --accent: #2ebd85; 
@@ -34,57 +36,44 @@
         .user-id { width: 36px; height: 36px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .person-icon { width: 18px; height: 18px; fill: currentColor; }
 
-        body.hide-header .header-stack { transform: translateY(-100%); }
-        body.hide-header { padding-top: 20px; }
-
         #dashboard { max-width: 620px; margin: auto; padding: 12px; box-sizing: border-box; }
         
         .section-nav { display: flex; gap: 8px; margin-bottom: 16px; background: #f1f5f9; padding: 4px; border-radius: 12px; }
         .section-tab { flex: 1; text-align: center; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); transition: 0.2s; }
         .section-tab.active { background: #fff; color: #000; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
 
-        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
-        .market-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
-        .m-category { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-sub); display: inline-block; margin-bottom: 12px; letter-spacing: 0.5px; }
+        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .m-category { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-sub); display: inline-block; margin-bottom: 12px; }
         .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
-        .m-title { font-size: 16px; font-weight: 600; line-height: 1.45; color: #0f172a; padding-right: 12px; }
-        .odds-val { font-size: 18px; font-weight: 800; color: #000; }
-        .odds-lbl { font-size: 10px; color: var(--text-sub); text-transform: uppercase; display: block; text-align: right; }
+        .m-title { font-size: 16px; font-weight: 600; line-height: 1.45; color: #0f172a; }
 
         .btn-group { display: flex; gap: 10px; }
-        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid transparent; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .trade-btn:active { opacity: 0.7; }
-        
+        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid transparent; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .trade-btn.yes { background: var(--yes-bg); color: var(--yes-blue); border-color: #dbeafe; }
         .trade-btn.no { background: var(--no-bg); color: var(--no-red); border-color: #ffe4e6; }
-        .multiplier { font-size: 11px; font-weight: 700; opacity: 0.8; }
 
         .history-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .hist-meta { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.4px; }
-        .hist-title { font-size: 14px; font-weight: 600; color: #0f172a; line-height: 1.4; }
+        .hist-meta { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
+        .hist-title { font-size: 14px; font-weight: 600; color: #0f172a; }
         .hist-stats { display: flex; justify-content: space-between; border-top: 1px dashed var(--border); padding-top: 8px; font-size: 13px; font-weight: 700; }
-        .status-badge { background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .status-badge { background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; }
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
-        
-        .modal { background: #fff; width: 100%; max-width: 380px; padding: 32px 28px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); box-sizing: border-box; border: 1px solid rgba(255,255,255,0.2); max-height: 90vh; overflow-y: auto; }
+        .modal { background: #fff; width: 100%; max-width: 380px; padding: 32px 28px; border-radius: 24px; text-align: center; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         .auth-nav { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 24px; }
-        .auth-tab { flex: 1; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); transition: 0.2s; text-align: center; }
-        .auth-tab.active { background: #fff; color: #000; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+        .auth-tab { flex: 1; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); text-align: center; }
+        .auth-tab.active { background: #fff; color: #000; }
         
         .input-group { position: relative; margin-bottom: 14px; text-align: left; }
-        .input-group label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
-        .input-tech { width: 100%; padding: 14px 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; box-sizing: border-box; outline: none; transition: 0.2s; color: #0f172a; font-family: inherit; }
-        .input-tech:focus { border-color: #cbd5e1; background: #fff; }
+        .input-group label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; }
+        .input-tech { width: 100%; padding: 14px 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; box-sizing: border-box; outline: none; color: #0f172a; }
         
-        .btn-tech { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 14px; transition: 0.2s; letter-spacing: 0.5px; text-transform: uppercase; margin-top: 8px; }
+        .btn-tech { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 14px; text-transform: uppercase; margin-top: 8px; }
         .btn-tech:active { opacity: 0.8; }
         
         .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
         .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; text-align: center; }
-        .amt-chip:active { background: #f1f5f9; }
         
-        .badge-wrap { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -115,39 +104,11 @@
             <div id="tabHist" class="section-tab" onclick="switchMainTab('history')">My Bets</div>
         </div>
 
-        <div id="mainFeedView">
-            <div id="feed"></div>
-        </div>
-
+        <div id="mainFeedView"><div id="feed"></div></div>
         <div id="mainHistoryView" class="hidden">
             <div id="histFeed" style="margin-top:4px;">
-                <p style="text-align:center; color:var(--text-sub); font-size:13px; font-weight:600; padding:20px 0;">No predictions submitted yet.</p>
+                <p style="text-align:center; color:var(--text-sub);">No predictions submitted yet.</p>
             </div>
-        </div>
-    </div>
-
-    <div id="betSlipModal" class="overlay">
-        <div class="modal">
-            <h2 id="slipMarketTitle" style="margin:0 0 6px 0; font-weight:800; font-size:18px; line-height:1.35; letter-spacing:-0.5px; text-align: left;">Open Wager</h2>
-            <p id="slipPickMeta" style="color:var(--text-sub); font-size: 13px; margin: 0 0 20px 0; font-weight:700; text-align: left; text-transform: uppercase; letter-spacing:0.5px;">Pick: <span id="slipPickText" style="color:#000;">YES</span> &nbsp;|&nbsp; Multiplier: <span id="slipMultText" style="color:#000;">2.10x</span></p>
-
-            <div style="background:#f8fafc; padding:18px; border-radius:18px; border: 1px solid var(--border); margin-bottom:16px;">
-                <div class="input-group" style="margin-bottom:0;">
-                    <label>Your Wager Amount (Min. Ksh 20)</label>
-                    <input type="text" id="betAmt" class="input-tech" style="font-size: 26px; text-align: center; font-weight: 800; color: #000;" value="20.00" onfocus="if(this.value==='20.00')this.value='';" onblur="if(this.value==='')this.value='20.00';">
-                </div>
-                <div class="chip-grid" style="margin-bottom: 0;">
-                    <div class="amt-chip" onclick="setWagerAmt(20)">20</div>
-                    <div class="amt-chip" onclick="setWagerAmt(50)">50</div>
-                    <div class="amt-chip" onclick="setWagerAmt(100)">100</div>
-                    <div class="amt-chip" onclick="setWagerAmt(250)">250</div>
-                    <div class="amt-chip" onclick="setWagerAmt(500)">500</div>
-                    <div class="amt-chip" onclick="setWagerAmt(1000)">1k</div>
-                </div>
-            </div>
-
-            <button onclick="confirmWager()" class="btn-tech" style="background:var(--yes-blue);">Place Bet</button>
-            <p style="font-size: 13px; color: var(--text-sub); margin-top: 14px; cursor: pointer; font-weight:700;" onclick="closeModal('betSlipModal')">Cancel</p>
         </div>
     </div>
 
@@ -157,20 +118,18 @@
                 <div id="tabIn" class="auth-tab active" onclick="setAuth('in')">Sign In</div>
                 <div id="tabUp" class="auth-tab" onclick="setAuth('up')">Sign Up</div>
             </div>
-            <h2 id="aTitle" style="margin:0 0 8px 0; font-weight:800; font-size:20px; letter-spacing:-0.5px;">Terminal Access</h2>
-            <p id="aDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Enter credentials to connect to terminal</p>
+            <h2 id="aTitle" style="margin:0;">Terminal Access</h2>
+            <p id="aDesc" style="color:var(--text-sub); margin-bottom:20px;">Sign in to your account</p>
             
             <div id="upFields" class="hidden">
                 <div class="input-group">
-                    <label>Your Full Name</label>
-                    <input type="text" id="aName" class="input-tech" placeholder="e.g. Wanny Doe">
+                    <label>Full Name</label>
+                    <input type="text" id="aName" class="input-tech" placeholder="Jane Doe">
                 </div>
                 <div class="input-group">
                     <label>Country</label>
                     <select id="aCountry" class="input-tech">
-                        <option value="" disabled selected>Choose country</option>
-                        <option value="Algeria">Algeria</option>
-                        <option value="Kenya">Kenya</option>
+                        <option value="Kenya" selected>Kenya</option>
                         <option value="South Africa">South Africa</option>
                     </select>
                 </div>
@@ -178,21 +137,15 @@
             
             <div class="input-group">
                 <label>Email Address</label>
-                <input type="email" id="aEmail" class="input-tech" placeholder="name@domain.com">
+                <input type="email" id="aEmail" class="input-tech" placeholder="example@gmail.com">
             </div>
-            
             <div class="input-group">
                 <label>Password</label>
                 <input type="password" id="aPass" class="input-tech" placeholder="••••••••">
             </div>
 
-            <div id="confirmPassWrapper" class="input-group hidden">
-                <label>Confirm Password</label>
-                <input type="password" id="aConfirmPass" class="input-tech" placeholder="••••••••">
-            </div>
-            
-            <button onclick="doAuth()" class="btn-tech">Initialize Session</button>
-            <p style="font-size: 13px; color: var(--text-sub); margin-top: 22px; cursor: pointer; font-weight:700;" onclick="closeModal('authModal')">Dismiss</p>
+            <button onclick="doAuth()" class="btn-tech">Access Account</button>
+            <p style="margin-top:20px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('authModal')">Cancel</p>
         </div>
     </div>
 
@@ -203,188 +156,363 @@
                 <div id="tabWithdraw" class="auth-tab" onclick="setFundsMode('withdraw')">Withdraw</div>
             </div>
             
-            <h2 id="fundsTitle" style="margin: 0 0 6px 0; font-weight:800; font-size:20px; letter-spacing:-0.5px;">Fund Balance</h2>
-            <p id="fundsDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">M-Pesa Checkout via Lipwa</p>
+            <h2 id="fundsTitle" style="margin:0;">Fund Balance</h2>
+            <p id="fundsDesc" style="color:var(--text-sub); margin-bottom:20px;">Pay Hero Checkout via Lipwa</p>
             
-            <div style="background:#f8fafc; padding:18px; border-radius:18px; border: 1px solid var(--border); margin-bottom:16px;">
-                
-                <div id="withdrawalFields" class="hidden">
-                    <div class="input-group">
-                        <label>M-Pesa Registered Name</label>
-                        <input type="text" id="withName" class="input-tech" placeholder="First and Last Name">
-                    </div>
-                    <div class="input-group">
-                        <label>M-Pesa Phone Number</label>
-                        <input type="tel" id="withPhone" class="input-tech" placeholder="e.g. 0712345678">
-                    </div>
-                </div>
-
+            <div style="background:#f8fafc; padding:18px; border-radius:18px; border:1px solid var(--border);">
                 <div id="depositFormFields">
                     <div class="input-group">
                         <label>Your Name</label>
-                        <input type="text" id="depName" class="input-tech" placeholder="e.g. Jane Doe">
+                        <input type="text" id="depName" class="input-tech" placeholder="Jane Doe">
                     </div>
                     <div class="input-group">
-                        <label>M-Pesa Phone Number</label>
+                        <label>M-Pesa Number</label>
                         <input type="tel" id="depPhone" class="input-tech" placeholder="e.g. 0712345678">
                     </div>
                 </div>
-
-                <div class="input-group">
-                    <label id="amtLabel">Deposit Amount (Ksh)</label>
-                    <input type="text" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800; color: #000;" value="100.00" onfocus="if(this.value==='100.00')this.value='';" onblur="if(this.value==='')this.value='100.00';">
+                <div id="withdrawalFields" class="hidden">
+                    <div class="input-group">
+                        <label>M-Pesa Name</label>
+                        <input type="text" id="withName" class="input-tech">
+                    </div>
+                    <div class="input-group">
+                        <label>M-Pesa Number</label>
+                        <input type="tel" id="withPhone" class="input-tech">
+                    </div>
                 </div>
-                
-                <div id="fundsChips" class="chip-grid">
+                <div class="input-group">
+                    <label id="amtLabel">Amount (Ksh)</label>
+                    <input type="text" id="depAmt" class="input-tech" style="font-size:24px; font-weight:800; text-align:center;" value="100.00">
+                </div>
+                <div class="chip-grid">
                     <div class="amt-chip" onclick="setAmt(100)">100</div>
                     <div class="amt-chip" onclick="setAmt(250)">250</div>
                     <div class="amt-chip" onclick="setAmt(500)">500</div>
-                    <div class="amt-chip" onclick="setAmt(1000)">1k</div>
-                    <div class="amt-chip" onclick="setAmt(2000)">2k</div>
-                    <div class="amt-chip" onclick="setAmt(5000)">5k</div>
                 </div>
             </div>
             
-            <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--yes-blue);">Confirm Deposit</button>
-            
-            <div id="sharedBadge" class="badge-wrap">
-                <span style="display:block; text-align: center">
-                    <a href="https://intasend.com/security" target="_blank">
-                        <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" width="375px" style="max-width:100%; height:auto;" alt="IntaSend Secure Payments">
-                    </a>
-                </span>
+            <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--yes-blue);">Confirm Action</button>
+            <p style="margin-top:20px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('depositModal')">Cancel</p>
+        </div>
+    </div>
+
+    <div id="betSlipModal" class="overlay">
+        <div class="modal">
+            <h2 id="slipMarketTitle" style="text-align:left; font-size:18px; margin:0;">Open Prediction</h2>
+            <p id="slipPickMeta" style="text-align:left; color:var(--text-sub); margin:5px 0 20px 0;">Pick: <span id="slipPickText">YES</span> @ <span id="slipMultText">2.1x</span></p>
+
+            <div style="background:#f8fafc; padding:18px; border-radius:18px; border:1px solid var(--border); margin-bottom:16px;">
+                <div class="input-group">
+                    <label>Amount (Min. Ksh 20)</label>
+                    <input type="text" id="betAmt" class="input-tech" style="font-size:24px; text-align:center; font-weight:800;" value="20.00">
+                </div>
             </div>
 
-            <p style="font-size: 13px; color: var(--text-sub); margin-top: 14px; cursor: pointer; font-weight:700;" onclick="closeModal('depositModal')">Cancel</p>
+            <button onclick="confirmWager()" class="btn-tech" style="background:var(--yes-blue);">Place Bet</button>
+            <p style="margin-top:14px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('betSlipModal')">Cancel</p>
         </div>
     </div>
 
     <script>
+        // Directly utilizing Supabase Credentials
+        const SB_URL = "https://hwxnfzuwaeseszgsjeny.supabase.co";
+        const SB_KEY = "sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL";
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+
+        let userProfile = null;
         let activeTab = 'in';
-        let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
-        let markets = [];
         let currentFundsMode = 'deposit';
         let activeSelection = null; 
-
         const LIPWA_LINK = "https://lipwa.link/8367";
 
-        window.onload = () => {
-            initializeMarkets();
-            
-            // Checks URL params for a successful callback from payment redirect
-            checkPaymentCallback();
-            
-            syncState(); 
+        const markets = [
+            { id: "m-1", q: "Will Spain win the FIFA World Cup?", category: "Sports", yesMult: "5.20", noMult: "1.18" },
+            { id: "m-2", q: "Will Bitcoin hit an all-time high above $120k in 2026?", category: "Crypto", yesMult: "1.69", noMult: "2.44" },
+            { id: "m-3", q: "Will Jesus be back before June 5th?", category: "Culture", yesMult: "9.00", noMult: "3.00" }
+        ];
+
+        window.onload = async () => {
             renderFeed();
-            renderHistory();
-
-            const savedDepositAmount = localStorage.getItem('nx_deposit_amount');
-            if (savedDepositAmount) {
-                document.getElementById('depAmt').value = parseFloat(savedDepositAmount).toFixed(2);
-            }
-
-            document.getElementById('depAmt').addEventListener('input', function() {
-                localStorage.setItem('nx_deposit_amount', this.value);
-            });
+            await checkPaymentCallback();
+            await syncSupabaseState();
         };
 
-        function checkPaymentCallback() {
+        async function syncSupabaseState() {
+            const savedEmail = localStorage.getItem('nx_user');
+            if (savedEmail) {
+                const { data, error } = await supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('email', savedEmail)
+                    .single();
+
+                if (!error && data) {
+                    userProfile = data;
+                    document.getElementById('signBtn').classList.add('hidden');
+                    document.getElementById('userIcon').classList.remove('hidden');
+                    
+                    const balance = parseFloat(userProfile.balance || 0).toFixed(2);
+                    document.getElementById('balance').innerText = parseFloat(balance).toLocaleString(undefined, {minimumFractionDigits: 2});
+                    
+                    if (userProfile.name) {
+                        document.getElementById('depName').value = userProfile.name;
+                    }
+                    renderHistory();
+                    return;
+                }
+            }
+            document.getElementById('signBtn').classList.remove('hidden');
+            document.getElementById('userIcon').classList.add('hidden');
+            document.getElementById('balance').innerText = "0.00";
+        }
+
+        async function checkPaymentCallback() {
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status');
             const amount = parseFloat(urlParams.get('amount'));
-            const user = localStorage.getItem('nx_user');
+            const userEmail = localStorage.getItem('nx_user');
 
-            if (status === 'success' && !isNaN(amount) && amount > 0 && user) {
+            if (status === 'success' && !isNaN(amount) && amount > 0 && userEmail) {
                 const txRef = urlParams.get('reference');
-                const processedTx = JSON.parse(localStorage.getItem('processed_tx') || '[]');
+                const processed = JSON.parse(localStorage.getItem('processed_tx') || '[]');
 
-                // Prevent multiple balance additions for the same transaction ref on page refresh
-                if (!processedTx.includes(txRef)) {
-                    userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
-                    
-                    if (userDB[user]) {
-                        let currentBal = parseFloat(userDB[user].balance || 0);
-                        let newBal = (currentBal + amount).toFixed(2);
-                        
-                        userDB[user].balance = newBal;
-                        localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
-                        localStorage.setItem('nx_balance', newBal);
-                        
-                        if (txRef) {
-                            processedTx.push(txRef);
-                            localStorage.setItem('processed_tx', JSON.stringify(processedTx));
-                        }
+                if (!processed.includes(txRef)) {
+                    const { data: profile } = await supabaseClient
+                        .from('profiles')
+                        .select('balance')
+                        .eq('email', userEmail)
+                        .single();
 
-                        alert(`Deposit Successful! Ksh ${amount.toLocaleString()} has been added to your balance.`);
+                    if (profile) {
+                        const newBal = (parseFloat(profile.balance || 0) + amount).toFixed(2);
                         
-                        // Clear the URL parameters without reloading the page
+                        await supabaseClient
+                            .from('profiles')
+                            .update({ balance: newBal })
+                            .eq('email', userEmail);
+
+                        processed.push(txRef);
+                        localStorage.setItem('processed_tx', JSON.stringify(processed));
+                        
+                        alert(`Deposit credited! Ksh ${amount.toLocaleString()} added.`);
                         window.history.replaceState({}, document.title, window.location.pathname);
                     }
                 }
             }
         }
 
-        function initializeMarkets() {
-            markets = [];
-            const baseMarkets = [
-                { q: "Will Spain win the FIFA World Cup?", category: "Sports", p: 16 },
-                { q: "Will Super Bowl LX be won by the Los Angeles Rams?", category: "Sports", p: 14 },
-                { q: "Will the International Court of Justice win the Nobel Peace Prize?", category: "Global Affairs", p: 19 },
-                { q: "Will Spider-Man: Brand New Day be the highest grossing movie in 2026?", category: "Pop Culture", p: 32 },
-                { q: "Will the Federal Reserve cut rates by 0.50% or more by end of year?", category: "Finance", p: 58 },
-                { q: "Will Bitcoin hit an all-time high above $120,000 in 2026?", category: "Crypto", p: 59 },
-                { q: "Will the US pass a comprehensive cryptocurrency Clarity Act in Q1?", category: "Politics", p: 44 },
-                { q: "Will 2026 be the hottest year on record according to NASA?", category: "Global Affairs", p: 9 }
-            ];
-
-            baseMarkets.forEach((bm, i) => {
-                const yesMult = (100 / bm.p).toFixed(2);
-                const noMult = (100 / (100 - bm.p)).toFixed(2);
-                markets.push({
-                    id: `m-base-${i}`, q: bm.q, category: bm.category, p: bm.p, yesMult: yesMult, noMult: noMult
-                });
-            });
-
-            markets.splice(8, 0, {
-                id: "m-jesus",
-                q: "Will Jesus be back before June 5th?",
-                category: "Culture",
-                p: 11,
-                yesMult: "9.00",
-                noMult: "3.00"
-            });
-        }
-
         function renderFeed() {
             const f = document.getElementById('feed'); 
             f.innerHTML = '';
-            
-            markets.forEach(item => {
-                const card = document.createElement('div');
-                card.id = 'market-el-' + item.id;
-                card.className = 'market-card';
-                card.innerHTML = `
-                    <div class="m-category">${item.category}</div>
+            markets.forEach(m => {
+                f.innerHTML += `
+                <div class="market-card">
+                    <div class="m-category">${m.category}</div>
                     <div class="m-header">
-                        <div class="m-title">${item.q}</div>
-                        <div class="m-odds"><span class="odds-val">${item.p}%</span><span class="odds-lbl">chance</span></div>
+                        <div class="m-title">${m.q}</div>
                     </div>
                     <div class="btn-group">
-                        <button class="trade-btn yes" onclick="openSlip('${item.id}', 'YES', '${item.yesMult}')">
-                            <span>Yes</span>
-                            <span class="multiplier">${item.yesMult}x</span>
+                        <button class="trade-btn yes" onclick="openSlip('${m.id}', 'YES', '${m.yesMult}')">
+                            <span>YES</span><span style="font-weight:700;">${m.yesMult}x</span>
                         </button>
-                        <button class="trade-btn no" onclick="openSlip('${item.id}', 'NO', '${item.noMult}')">
-                            <span>No</span>
-                            <span class="multiplier">${item.noMult}x</span>
+                        <button class="trade-btn no" onclick="openSlip('${m.id}', 'NO', '${m.noMult}')">
+                            <span>NO</span><span style="font-weight:700;">${m.noMult}x</span>
                         </button>
-                    </div>`;
-                f.appendChild(card);
+                    </div>
+                </div>`;
             });
         }
 
-        function switchMainTab(view) {
-            if(view === 'feed') {
+        function openSlip(id, side, mult) {
+            if (!userProfile) return openModal('authModal');
+            const target = markets.find(m => m.id === id);
+            activeSelection = { id, q: target.q, side, mult };
+            document.getElementById('slipMarketTitle').innerText = target.q;
+            document.getElementById('slipPickText').innerText = side;
+            document.getElementById('slipPickText').style.color = side === 'YES' ? 'var(--yes-blue)' : 'var(--no-red)';
+            document.getElementById('slipMultText').innerText = mult + 'x';
+            openModal('betSlipModal');
+        }
+
+        async function confirmWager() {
+            const amt = Number(document.getElementById('betAmt').value);
+            if (isNaN(amt) || amt < 20) return alert("The minimum prediction is Ksh 20.00.");
+
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('balance, bets')
+                .eq('email', userProfile.email)
+                .single();
+
+            const curBal = parseFloat(profile.balance || 0);
+            if (amt > curBal) return alert("Insufficient account balance.");
+
+            const newBal = (curBal - amt).toFixed(2);
+            const userBets = profile.bets || [];
+
+            userBets.unshift({
+                id: 'bet-' + Date.now(),
+                q: activeSelection.q,
+                side: activeSelection.side,
+                mult: activeSelection.mult,
+                stake: amt.toFixed(2),
+                status: 'Active',
+                date: new Date().toLocaleDateString()
+            });
+
+            await supabaseClient
+                .from('profiles')
+                .update({ balance: newBal, bets: userBets })
+                .eq('email', userProfile.email);
+
+            await syncSupabaseState();
+            closeModal('betSlipModal');
+            alert("Prediction posted successfully!");
+            switchMainTab('history');
+        }
+
+        function renderHistory() {
+            const hFeed = document.getElementById('histFeed');
+            hFeed.innerHTML = '';
+            const bets = userProfile?.bets || [];
+
+            if (bets.length === 0) {
+                hFeed.innerHTML = `<p style="text-align:center; color:var(--text-sub);">No predictions submitted yet.</p>`;
+                return;
+            }
+
+            bets.forEach(b => {
+                const estRet = (parseFloat(b.stake) * parseFloat(b.mult)).toFixed(2);
+                hFeed.innerHTML += `
+                    <div class="history-card">
+                        <div class="hist-meta">
+                            <div>${b.date}</div>
+                            <div class="status-badge">${b.status}</div>
+                        </div>
+                        <div class="hist-title">${b.q}</div>
+                        <div class="hist-stats">
+                            <div>Stake<br>Ksh ${parseFloat(b.stake).toLocaleString()}</div>
+                            <div>Side<br><span style="color:${b.side==='YES'?'var(--yes-blue)':'var(--no-red)'}">${b.side}</span></div>
+                            <div style="text-align:right;">Payout<br>Ksh ${parseFloat(estRet).toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function setAuth(mode) {
+            activeTab = mode;
+            const up = document.getElementById('upFields');
+            if (mode === 'up') {
+                up.classList.remove('hidden');
+                document.getElementById('tabUp').classList.add('active');
+                document.getElementById('tabIn').classList.remove('active');
+            } else {
+                up.classList.add('hidden');
+                document.getElementById('tabIn').classList.add('active');
+                document.getElementById('tabUp').classList.remove('active');
+            }
+        }
+
+        async function doAuth() {
+            const email = document.getElementById('aEmail').value.trim().toLowerCase();
+            const pass = document.getElementById('aPass').value.trim();
+
+            if (!email.includes('@')) return alert("Enter a valid email address.");
+            if (pass.length < 4) return alert("Enter password (minimum 4 characters).");
+
+            if (activeTab === 'up') {
+                const name = document.getElementById('aName').value.trim();
+                const country = document.getElementById('aCountry').value;
+                if (!name) return alert("Your full name is required.");
+
+                const { data: existingUser } = await supabaseClient
+                    .from('profiles')
+                    .select('email')
+                    .eq('email', email)
+                    .single();
+
+                if (existingUser) return alert("An account with this email exists. Sign in instead.");
+
+                const { error } = await supabaseClient
+                    .from('profiles')
+                    .insert([{ email, pass, name, country, balance: 0.00, bets: [] }]);
+
+                if (error) return alert("Registration error: " + error.message);
+                
+                localStorage.setItem('nx_user', email);
+                alert("Account created successfully!");
+                closeModal('authModal');
+                await syncSupabaseState();
+            } else {
+                const { data, error } = await supabaseClient
+                    .from('profiles')
+                    .select('*')
+                    .eq('email', email)
+                    .eq('pass', pass)
+                    .single();
+
+                if (error || !data) return alert("Invalid credentials.");
+
+                localStorage.setItem('nx_user', data.email);
+                alert(`Logged in as ${data.name || data.email}`);
+                closeModal('authModal');
+                await syncSupabaseState();
+            }
+        }
+
+        function setFundsMode(mode) {
+            currentFundsMode = mode;
+            if (mode === 'withdraw') {
+                document.getElementById('tabWithdraw').classList.add('active');
+                document.getElementById('tabDeposit').classList.remove('active');
+                document.getElementById('withdrawalFields').classList.remove('hidden');
+                document.getElementById('depositFormFields').classList.add('hidden');
+            } else {
+                document.getElementById('tabDeposit').classList.add('active');
+                document.getElementById('tabWithdraw').classList.remove('active');
+                document.getElementById('withdrawalFields').classList.add('hidden');
+                document.getElementById('depositFormFields').classList.remove('hidden');
+            }
+        }
+
+        function setAmt(v) { document.getElementById('depAmt').value = parseFloat(v).toFixed(2); }
+
+        async function handleFundsAction() {
+            const amt = Number(document.getElementById('depAmt').value);
+            if (isNaN(amt) || amt < 100) return alert("Minimum transaction amount is Ksh 100.00.");
+
+            if (currentFundsMode === 'withdraw') {
+                const phone = document.getElementById('withPhone').value.trim();
+                const curBal = parseFloat(userProfile.balance || 0);
+                if (amt > curBal) return alert("Insufficient available balance.");
+
+                const newBal = (curBal - amt).toFixed(2);
+                await supabaseClient
+                    .from('profiles')
+                    .update({ balance: newBal })
+                    .eq('email', userProfile.email);
+
+                await syncSupabaseState();
+                closeModal('depositModal');
+                alert(`Withdrawal processing. Your new balance is Ksh ${newBal}.`);
+            } else {
+                const phone = document.getElementById('depPhone').value.trim();
+                const name = encodeURIComponent(document.getElementById('depName').value.trim());
+                if (!phone || !name) return alert("Please fill out your name and active phone number.");
+
+                const invoiceRef = "INV-" + Math.floor(Date.now() / 1000);
+                closeModal('depositModal');
+
+                const currentUrl = window.location.origin + window.location.pathname;
+                const returnUrl = encodeURIComponent(`${currentUrl}?status=success&amount=${amt}&reference=${invoiceRef}`);
+                
+                window.location.href = `${LIPWA_LINK}?amount=${amt}&name=${name}&phone=${phone}&reference=${invoiceRef}&callback=${returnUrl}`;
+            }
+        }
+
+        function switchMainTab(v) {
+            if (v === 'feed') {
                 document.getElementById('tabFeed').classList.add('active');
                 document.getElementById('tabHist').classList.remove('active');
                 document.getElementById('mainFeedView').classList.remove('hidden');
@@ -398,261 +526,13 @@
             }
         }
 
-        function openSlip(id, side, mult) {
-            const user = localStorage.getItem('nx_user');
-            if(!user) return openModal('authModal');
-            
-            const target = markets.find(m => m.id === id);
-            if(!target) return;
-
-            activeSelection = { marketId: id, q: target.q, side: side, mult: mult };
-            document.getElementById('slipMarketTitle').innerText = target.q;
-            document.getElementById('slipPickText').innerText = side;
-            document.getElementById('slipPickText').style.color = side === 'YES' ? 'var(--yes-blue)' : 'var(--no-red)';
-            document.getElementById('slipMultText').innerText = mult + 'x';
-            document.getElementById('betAmt').value = "20.00";
-            
-            openModal('betSlipModal');
-        }
-
-        function setWagerAmt(v) { document.getElementById('betAmt').value = parseFloat(v).toFixed(2); }
-
-        function confirmWager() {
-            const amt = Number(document.getElementById('betAmt').value);
-            const userEmail = localStorage.getItem('nx_user');
-            let curBal = parseFloat(localStorage.getItem('nx_balance') || 0);
-
-            if(!userEmail) return openModal('authModal');
-            if(isNaN(amt) || amt < 20) return alert("The minimum wager is Ksh 20.00.");
-            if(amt > curBal) return alert("Insufficient funds in your account. Top up to place bets.");
-
-            const newBal = (curBal - amt).toFixed(2);
-            localStorage.setItem('nx_balance', newBal);
-
-            if(userDB[userEmail]) {
-                userDB[userEmail].balance = newBal;
-                if(!userDB[userEmail].bets) userDB[userEmail].bets = [];
-                userDB[userEmail].bets.unshift({
-                    id: 'bet-' + Date.now(),
-                    q: activeSelection.q,
-                    side: activeSelection.side,
-                    mult: activeSelection.mult,
-                    stake: amt.toFixed(2),
-                    status: 'Active',
-                    date: new Date().toLocaleDateString()
-                });
-                localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
-            }
-
-            syncState();
-            closeModal('betSlipModal');
-            alert(`Your wager on ${activeSelection.side} has been placed successfully! View it in "My Bets".`);
-            switchMainTab('history');
-        }
-
-        function renderHistory() {
-            const user = localStorage.getItem('nx_user');
-            const hFeed = document.getElementById('histFeed');
-            hFeed.innerHTML = '';
-
-            if(!user || !userDB[user] || !userDB[user].bets || userDB[user].bets.length === 0) {
-                hFeed.innerHTML = `<p style="text-align:center; color:var(--text-sub); font-size:13px; font-weight:600; padding:20px 0;">No predictions submitted yet.</p>`;
-                return;
-            }
-
-            userDB[user].bets.forEach(b => {
-                const hCard = document.createElement('div');
-                hCard.className = 'history-card';
-                const pPayout = (parseFloat(b.stake) * parseFloat(b.mult)).toFixed(2);
-                hCard.innerHTML = `
-                    <div class="hist-meta">
-                        <div><span>Date:</span> ${b.date}</div>
-                        <div class="status-badge">${b.status}</div>
-                    </div>
-                    <div class="hist-title">${b.q}</div>
-                    <div class="hist-stats">
-                        <div style="color:var(--text-sub);">Stake <span style="color:#000; display:block;">Ksh ${parseFloat(b.stake).toLocaleString()}</span></div>
-                        <div style="color:var(--text-sub); text-align:center;">Side <span style="color:${b.side==='YES'?'var(--yes-blue)':'var(--no-red)'}; display:block;">${b.side}</span></div>
-                        <div style="color:var(--text-sub); text-align:right;">Est. Return <span style="color:var(--accent); display:block; font-weight:800;">Ksh ${parseFloat(pPayout).toLocaleString()}</span></div>
-                    </div>
-                `;
-                hFeed.appendChild(hCard);
-            });
-        }
-
-        function syncState() {
-            userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
-            const user = localStorage.getItem('nx_user');
-            
-            if(user && userDB[user]) {
-                document.getElementById('signBtn').classList.add('hidden');
-                document.getElementById('userIcon').classList.remove('hidden');
-                
-                const currentBal = userDB[user].balance || "0.00";
-                localStorage.setItem('nx_balance', currentBal);
-                document.getElementById('balance').innerText = parseFloat(currentBal).toLocaleString(undefined, {minimumFractionDigits: 2});
-                
-                if (userDB[user].name) {
-                    document.getElementById('depName').value = userDB[user].name;
-                }
-            } else {
-                document.getElementById('signBtn').classList.remove('hidden');
-                document.getElementById('userIcon').classList.add('hidden');
-                document.getElementById('balance').innerText = "0.00";
-            }
-        }
-
-        function setAuth(mode) {
-            activeTab = mode;
-            const up = document.getElementById('upFields'), title = document.getElementById('aTitle'), desc = document.getElementById('aDesc');
-            const tIn = document.getElementById('tabIn'), tUp = document.getElementById('tabUp');
-            const confirmPass = document.getElementById('confirmPassWrapper');
-            if(mode === 'up') {
-                up.classList.remove('hidden'); confirmPass.classList.remove('hidden'); tUp.classList.add('active'); tIn.classList.remove('active');
-                title.innerText = "Register Identity"; desc.innerText = "Create an account to begin using the terminal";
-            } else {
-                up.classList.add('hidden'); confirmPass.classList.add('hidden'); tIn.classList.add('active'); tUp.classList.remove('active');
-                title.innerText = "Terminal Access"; desc.innerText = "Enter credentials to connect to the terminal";
-            }
-        }
-
-        function setFundsMode(mode) {
-            currentFundsMode = mode;
-            const tDep = document.getElementById('tabDeposit'), tWith = document.getElementById('tabWithdraw');
-            const fTitle = document.getElementById('fundsTitle'), fDesc = document.getElementById('fundsDesc');
-            const amtLabel = document.getElementById('amtLabel'), fSubmit = document.getElementById('fundsSubmit');
-            const withFields = document.getElementById('withdrawalFields');
-            const depFormFields = document.getElementById('depositFormFields');
-
-            if(mode === 'withdraw') {
-                tWith.classList.add('active'); tDep.classList.remove('active');
-                fTitle.innerText = "Withdraw Balance"; fDesc.innerText = "Enter your details to finalize the withdrawal";
-                amtLabel.innerText = "Withdrawal Amount (Ksh)"; fSubmit.innerText = "Confirm Withdrawal";
-                fSubmit.style.background = "#000";
-                withFields.classList.remove('hidden');
-                depFormFields.classList.add('hidden');
-            } else {
-                tDep.classList.add('active'); tWith.classList.remove('active');
-                fTitle.innerText = "Fund Balance"; fDesc.innerText = "M-Pesa Checkout via Lipwa";
-                amtLabel.innerText = "Deposit Amount (Ksh)"; fSubmit.innerText = "Confirm Deposit";
-                fSubmit.style.background = "var(--yes-blue)";
-                withFields.classList.add('hidden');
-                depFormFields.classList.remove('hidden');
-            }
-        }
-
-        function doAuth() {
-            const email = document.getElementById('aEmail').value.trim().toLowerCase();
-            const pass = document.getElementById('aPass').value.trim();
-
-            if (!email.includes('@') || email.length < 5) return alert("Please enter a valid email address.");
-            if (pass.length < 4) return alert("Password should be at least 4 characters long.");
-
-            if (activeTab === 'up') {
-                const name = document.getElementById('aName').value.trim();
-                const confirmPass = document.getElementById('aConfirmPass').value.trim();
-                const country = document.getElementById('aCountry').value;
-
-                if (!name) return alert("Full Name is required.");
-                if (!country) return alert("Please select your country.");
-                if (pass !== confirmPass) return alert("Passwords do not match.");
-
-                userDB[email] = { name, email, pass, country, balance: "0.00", bets: [] };
-                localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
-                
-                localStorage.setItem('nx_user', email);
-                localStorage.setItem('nx_balance', "0.00");
-                
-                alert(`Account created successfully!`);
-                closeModal('authModal');
-                syncState();
-                renderHistory();
-            } else {
-                const userRecord = userDB[email];
-                if (!userRecord || userRecord.pass !== pass) {
-                    return alert("Access denied. Incorrect email address or password.");
-                }
-                
-                localStorage.setItem('nx_user', userRecord.email);
-                localStorage.setItem('nx_balance', userRecord.balance || "0.00");
-                
-                alert(`Welcome back, ${userRecord.name || userRecord.email}`);
-                closeModal('authModal');
-                syncState();
-                renderHistory();
-            }
-        }
-
-        function setAmt(v) { 
-            const formatted = parseFloat(v).toFixed(2);
-            document.getElementById('depAmt').value = formatted; 
-            localStorage.setItem('nx_deposit_amount', formatted);
-        }
-
-        function handleFundsAction() {
-            if (currentFundsMode === 'withdraw') { withdrawNow(); } else { payNow(); }
-        }
-
-        function withdrawNow() {
-            const amt = Number(document.getElementById('depAmt').value);
-            const wName = document.getElementById('withName').value.trim();
-            const wPhone = document.getElementById('withPhone').value.trim();
-            const userEmail = localStorage.getItem('nx_user');
-            let curBal = parseFloat(localStorage.getItem('nx_balance') || 0);
-
-            if(!userEmail) { closeModal('depositModal'); return openModal('authModal'); }
-            if(!wName || !wPhone) return alert("Both M-Pesa account name and number are required to process withdrawals.");
-            if(!amt || amt < 100) return alert("Minimum withdrawal amount required is Ksh 100");
-            if(amt > curBal) return alert("Insufficient funds");
-
-            closeModal('depositModal');
-            const newBal = (curBal - amt).toFixed(2);
-            localStorage.setItem('nx_balance', newBal);
-            
-            if (userDB[userEmail]) {
-                userDB[userEmail].balance = newBal;
-                localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
-            }
-            syncState();
-            alert(`Withdrawal request successful. Ksh ${amt.toLocaleString()} will be settled to ${wName} (${wPhone}) shortly.`);
-        }
-
-        function payNow() {
-            const amt = Number(document.getElementById('depAmt').value);
-            const name = encodeURIComponent(document.getElementById('depName').value.trim());
-            const phone = document.getElementById('depPhone').value.trim();
-            const userEmail = localStorage.getItem('nx_user');
-
-            if(!userEmail) { closeModal('depositModal'); return openModal('authModal'); }
-            if(!amt || amt < 100) return alert("Minimum deposit amount required is Ksh 100");
-            if(!name || !phone) return alert("Both Name and M-Pesa phone number are required.");
-
-            const invoiceRef = "INV-" + Math.floor(Date.now() / 1000);
-            closeModal('depositModal');
-            
-            // Build absolute redirect callback URL
-            const returnUrl = encodeURIComponent(`${window.location.origin}${window.location.pathname}?status=success&amount=${amt}&reference=${invoiceRef}`);
-            const checkoutUrl = `${LIPWA_LINK}?amount=${amt}&name=${name}&phone=${phone}&reference=${invoiceRef}&callback=${returnUrl}`;
-            window.location.href = checkoutUrl;
-        }
-
-        function openModal(id) { 
-            document.body.classList.add('hide-header');
-            document.getElementById(id).style.display = 'flex'; 
-        }
-
-        function closeModal(id) { 
-            document.body.classList.remove('hide-header');
-            document.getElementById(id).style.display = 'none'; 
-            if(id === 'betSlipModal') document.getElementById('betAmt').value = '20.00';
-        }
-
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function logout() { 
-            if(confirm("Terminate session?")) { 
+            if(confirm("Sign out of the current terminal?")) {
                 localStorage.removeItem('nx_user');
-                localStorage.removeItem('nx_balance');
                 location.reload(); 
-            } 
+            }
         }
     </script>
 </body>

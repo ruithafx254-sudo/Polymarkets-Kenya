@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Polymarkets Africa | Terminal</title>
+    
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
 
     <style>
         :root { 
@@ -84,6 +86,7 @@
         .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; text-align: center; }
         .amt-chip:active { background: #f1f5f9; }
         
+        .badge-wrap { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -169,8 +172,6 @@
                     <select id="aCountry" class="input-tech">
                         <option value="" disabled selected>Choose country</option>
                         <option value="Kenya">Kenya</option>
-                        <option value="Nigeria">Nigeria</option>
-                        <option value="South Africa">South Africa</option>
                         <option value="Uganda">Uganda</option>
                     </select>
                 </div>
@@ -204,7 +205,7 @@
             </div>
             
             <h2 id="fundsTitle" style="margin: 0 0 6px 0; font-weight:800; font-size:20px; letter-spacing:-0.5px;">Fund Balance</h2>
-            <p id="fundsDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Secure M-Pesa & Card Direct Processing</p>
+            <p id="fundsDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Safe Payment Processing</p>
             
             <div style="background:#f8fafc; padding:18px; border-radius:18px; border: 1px solid var(--border); margin-bottom:16px;">
                 
@@ -236,12 +237,20 @@
             
             <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--yes-blue);">Confirm Deposit</button>
 
+            <div id="sharedBadge" class="badge-wrap">
+                <span style="display:block; text-align: center">
+                    <a href="https://intasend.com/security" target="_blank">
+                        <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" width="375px" style="max-width:100%; height:auto;" alt="IntaSend Secure Payments">
+                    </a>
+                </span>
+            </div>
+
             <p style="font-size: 13px; color: var(--text-sub); margin-top: 14px; cursor: pointer; font-weight:700;" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
 
     <script>
-        const LIPWA_LINK = "https://lipwa.link/8367";
+        const INTASEND_PUBLIC_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad";
         let activeTab = 'in';
         let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
         let markets = [];
@@ -274,15 +283,6 @@
                 markets.push({
                     id: `m-base-${i}`, q: bm.q, category: bm.category, p: bm.p, yesMult: yesMult, noMult: noMult
                 });
-            });
-
-            markets.splice(8, 0, {
-                id: "m-jesus",
-                q: "Will Jesus be back before June 5th?",
-                category: "Culture",
-                p: 11,
-                yesMult: "9.00",
-                noMult: "3.00"
             });
         }
 
@@ -538,21 +538,37 @@
             if(!amt || amt < 100) return alert("Minimum deposit amount required is Ksh 100");
 
             closeModal('depositModal');
+            document.body.classList.add('hide-header');
 
-            // Opens Lipwa checkout in a new tab for seamless user payment
-            window.open(`${LIPWA_LINK}?amount=${amt}&reference=${encodeURIComponent(userEmail)}`, '_blank');
+            let intasend = new window.IntaSend({
+                publicAPIKey: INTASEND_PUBLIC_KEY,
+                live: false // Switch this to true when using your real production key
+            });
 
-            // Instantly credit user balance locally on this terminal
-            let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-            const newBal = (cur + Number(amt)).toFixed(2);
-            localStorage.setItem('nx_balance', newBal);
+            // The code listens to the IntaSend popup. 
+            // It ONLY updates the balance if the customer actually completes payment.
+            intasend.on("COMPLETE", (results) => {
+                document.body.classList.remove('hide-header');
+                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
+                const newBal = (cur + Number(amt)).toFixed(2);
+                localStorage.setItem('nx_balance', newBal);
 
-            if (userDB[userEmail]) {
-                userDB[userEmail].balance = newBal;
-                localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
-            }
-            syncState();
-            alert(`Opening payment window for Ksh ${amt.toLocaleString()}... Balance will be credited automatically.`);
+                if (userDB[userEmail]) {
+                    userDB[userEmail].balance = newBal;
+                    localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
+                }
+                syncState();
+                alert(`Success! Ksh ${amt.toLocaleString()} added to balance.`);
+            })
+            .on("FAILED", () => {
+                document.body.classList.remove('hide-header');
+                alert("The transaction was not completed.");
+            })
+            .on("IN-PROGRESS", () => {
+                document.body.classList.add('hide-header');
+            });
+
+            intasend.run({ amount: amt, currency: "KES", email: userEmail });
         }
 
         function openModal(id) { 

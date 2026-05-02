@@ -61,9 +61,9 @@
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); z-index: 5000; align-items: center; justify-content: center; padding: 12px; }
         .modal { background: #fff; width: 100%; max-width: 360px; padding: 14px 18px; border-radius: 20px; text-align: center; box-sizing: border-box; max-height: 98vh; overflow: hidden; }
         
-        .auth-nav { display: flex; background: #f1f5f9; padding: 3px; border-radius: 10px; margin-bottom: 10px; }
-        .auth-tab { flex: 1; padding: 8px; font-size: 12px; font-weight: 800; cursor: pointer; border-radius: 6px; color: var(--text-sub); text-align: center; }
-        .auth-tab.active { background: #fff; color: #000; }
+        .auth-nav { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 14px; }
+        .auth-tab { flex: 1; padding: 11px 8px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); text-align: center; transition: 0.2s ease-in-out; }
+        .auth-tab.active { background: #fff; color: #000; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
         
         .input-group { position: relative; margin-bottom: 6px; text-align: left; }
         .input-group label { display: block; font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 2px; }
@@ -260,51 +260,35 @@
         const CHUNK_SIZE = 20;
 
         function generate1000Markets() {
-            const scenarios = [
-                { cat: "Politics", format: (v) => `Will the ${v} US Midterm elections result in a Senate majority flip?` },
-                { cat: "Politics", format: (v) => `Will Donald Trump be impeached again before the end of ${v}?` },
-                { cat: "Politics", format: (v) => `Will there be a complete US Federal Government shutdown lasting more than 5 days in Q${v}?` },
-                { cat: "Politics", format: (v) => `Will the US impose additional trade restrictions on chip exports to market ${v}?` },
-                
-                { cat: "Crypto", format: (v) => `Will Bitcoin cross $${v}0,000 before the close of this quarter?` },
-                { cat: "Crypto", format: (v) => `Will Ethereum's total market cap exceed $${v}00 Billion this month?` },
-                { cat: "Crypto", format: (v) => `Will Solana process a record high of ${v}0,000 transactions per second by June?` },
-                { cat: "Crypto", format: (v) => `Will the SEC approve an institutional ETF for token ${v} this year?` },
+            const categories = ["Sports", "Politics", "Crypto", "Finance", "Science", "Pop Culture"];
+            
+            const prefixes = [
+                "Will Arsenal win their matchday", "Will Donald Trump achieve higher ratings in", "Will Bitcoin reach a new peak value by week", 
+                "Will Crude Oil close higher in week", "Will SpaceX conduct a major test launch in week", "Will Taylor Swift release a new album in week", 
+                "Will the Federal Reserve adjust rates in week", "Will the S&P 500 exceed targets in week", "Will Ethereum see a supply drop in week",
+                "Will Manchester City score more than 3 goals in week"
+            ];
 
-                { cat: "Finance", format: (v) => `Will Crude Oil hit $${v}5 per barrel by the end of May?` },
-                { cat: "Finance", format: (v) => `Will the Federal Reserve cut key interest rates at the next FOMC meeting by ${v} basis points?` },
-                { cat: "Finance", format: (v) => `Will gold futures close above $${v},500 per ounce by Friday?` },
-                { cat: "Finance", format: (v) => `Will the inflation index increase by more than 1.${v}% in the upcoming monthly report?` },
-
-                { cat: "Sports", format: (v) => `Will Arsenal win the Premier League matchday ${v} with a clean sheet?` },
-                { cat: "Sports", format: (v) => `Will the Boston Celtics sweep their upcoming NBA playoff series game ${v}?` },
-                { cat: "Sports", format: (v) => `Will Real Madrid win their match by ${v} or more goals this weekend?` },
-                { cat: "Sports", format: (v) => `Will the upcoming F1 Grand Prix see ${v} or more DNFs?` },
-
-                { cat: "Science", format: (v) => `Will SpaceX successfully launch Starship flight test ${v} before month-end?` },
-                { cat: "Pop Culture", format: (v) => `Will the highest-grossing movie this weekend surpass $${v}0 Million at the box office?` },
-                { cat: "Science", format: (v) => `Will OpenAI announce GPT-${v} as their next flagship frontier model?` },
-                { cat: "Pop Culture", format: (v) => `Will the top trending hashtag on X/Twitter surpass ${v} Million posts today?` }
+            const events = [
+                "with a clean sheet?", "under current guidelines?", "surpassing market estimates?", 
+                "breaking a multi-year trend?", "and influence regional metrics?", "following global announcements?"
             ];
 
             for (let i = 1; i <= 1000; i++) {
-                const sIndex = i % scenarios.length;
-                const scenario = scenarios[sIndex];
+                const cat = categories[i % categories.length];
+                const prefix = prefixes[i % prefixes.length];
+                const event = events[i % events.length];
                 
-                let valueVariant = (i % 8) + 1;
-                if (scenario.cat === "Crypto" && i > 100) valueVariant = (i % 25) + 10;
-                if (scenario.cat === "Finance" && i > 200) valueVariant = (i % 5) + 1;
-                
-                const uniqueQuestion = scenario.format(valueVariant);
-                
-                const randomBias = (i * 17) % 65 + 18;
+                // Build unique question
+                const uniqueQuestion = `${prefix} #${i} ${event}`;
+                const randomBias = (i * 23) % 65 + 18;
                 const yesMult = (100 / randomBias).toFixed(2);
                 const noMult = (100 / (100 - randomBias)).toFixed(2);
 
                 markets.push({
                     id: `m-${i}`,
                     q: uniqueQuestion,
-                    category: scenario.cat,
+                    category: cat,
                     yesMult: yesMult,
                     noMult: noMult
                 });

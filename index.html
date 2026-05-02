@@ -257,7 +257,7 @@
             </div>
             
             <h2 id="fundsTitle" style="margin: 0 0 6px 0; font-weight:800; font-size:20px; letter-spacing:-0.5px;">Fund Balance</h2>
-            <p id="fundsDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Direct M-Pesa Integration via Lipwa</p>
+            <p id="fundsDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Direct M-Pesa Integration via IntaSend</p>
             
             <div style="background:#f8fafc; padding:18px; border-radius:18px; border: 1px solid var(--border); margin-bottom:16px;">
                 
@@ -288,13 +288,21 @@
             </div>
             
             <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--yes-blue);">Confirm Deposit</button>
+            
+            <div id="sharedBadge" class="badge-wrap">
+                <span style="display:block; text-align: center">
+                    <a href="https://intasend.com/security" target="_blank">
+                        <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" width="375px" style="max-width:100%; height:auto;" alt="IntaSend Secure Payments">
+                    </a>
+                </span>
+            </div>
 
             <p style="font-size: 13px; color: var(--text-sub); margin-top: 14px; cursor: pointer; font-weight:700;" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
 
     <script>
-        const LIPWA_PAYMENT_URL = "https://lipwa.link/8367";
+        const INTASEND_PUBLIC_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad";
         let activeTab = 'in';
         let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
         let markets = [];
@@ -576,7 +584,7 @@
                 withFields.classList.remove('hidden');
             } else {
                 tDep.classList.add('active'); tWith.classList.remove('active');
-                fTitle.innerText = "Fund Balance"; fDesc.innerText = "Direct M-Pesa Integration via Lipwa";
+                fTitle.innerText = "Fund Balance"; fDesc.innerText = "Direct M-Pesa Integration via IntaSend";
                 amtLabel.innerText = "Deposit Amount (Ksh)"; fSubmit.innerText = "Confirm Deposit";
                 fSubmit.style.background = "var(--yes-blue)";
                 withFields.classList.add('hidden');
@@ -657,36 +665,39 @@
             const amt = Number(document.getElementById('depAmt').value);
             const userEmail = localStorage.getItem('nx_user');
 
-            if (!userEmail) { closeModal('depositModal'); return openModal('authModal'); }
-            if (!amt || amt < 100) return alert("Minimum deposit amount required is Ksh 100");
+            if(!userEmail) { closeModal('depositModal'); return openModal('authModal'); }
+            if(!amt || amt < 100) return alert("Minimum deposit amount required is Ksh 100");
 
             closeModal('depositModal');
+            document.body.classList.add('hide-header');
 
-            // Opens dynamic standalone window containing the cropped checkout
-            const paymentWindow = window.open(
-                `${LIPWA_PAYMENT_URL}?amount=${amt}`,
-                'Lipwa_Payment_Window',
-                'width=450,height=600,scrollbars=no,resizable=no'
-            );
+            let intasend = new window.IntaSend({
+                publicAPIKey: INTASEND_PUBLIC_KEY,
+                live: false 
+            });
 
-            // Periodically check if the user returned from checkout to credit balance
-            const pollWindowStatus = setInterval(() => {
-                if (!paymentWindow || paymentWindow.closed) {
-                    clearInterval(pollWindowStatus);
-                    
-                    // Transaction Success handling
-                    let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-                    const newBal = (cur + Number(amt)).toFixed(2);
-                    localStorage.setItem('nx_balance', newBal);
+            intasend.on("COMPLETE", (results) => {
+                document.body.classList.remove('hide-header');
+                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
+                const newBal = (cur + Number(amt)).toFixed(2);
+                localStorage.setItem('nx_balance', newBal);
 
-                    if (userDB[userEmail]) {
-                        userDB[userEmail].balance = newBal;
-                        localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
-                    }
-                    syncState();
-                    alert(`Success! Ksh ${amt.toLocaleString()} added to balance.`);
+                if (userDB[userEmail]) {
+                    userDB[userEmail].balance = newBal;
+                    localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
                 }
-            }, 1000);
+                syncState();
+                alert(`Success! Ksh ${amt.toLocaleString()} added to balance.`);
+            })
+            .on("FAILED", () => {
+                document.body.classList.remove('hide-header');
+                alert("The transaction was not completed.");
+            })
+            .on("IN-PROGRESS", () => {
+                document.body.classList.add('hide-header');
+            });
+
+            intasend.run({ amount: amt, currency: "KES", email: userEmail });
         }
 
         function openModal(id) { 

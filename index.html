@@ -266,7 +266,6 @@
         let currentFundsMode = 'deposit';
         let activeSelection = null; 
 
-        // YOUR LIPWA LINK CONFIGURATION
         const LIPWA_LINK = "https://lipwa.link/8367";
 
         window.onload = () => {
@@ -275,13 +274,11 @@
             renderFeed();
             renderHistory();
 
-            // Load saved deposit amount on page load
             const savedDepositAmount = localStorage.getItem('nx_deposit_amount');
             if (savedDepositAmount) {
                 document.getElementById('depAmt').value = parseFloat(savedDepositAmount).toFixed(2);
             }
 
-            // Save deposit amount immediately as the user types
             document.getElementById('depAmt').addEventListener('input', function() {
                 localStorage.setItem('nx_deposit_amount', this.value);
             });
@@ -450,7 +447,6 @@
                 document.getElementById('signBtn').classList.add('hidden');
                 document.getElementById('userIcon').classList.remove('hidden');
                 
-                // Prefill existing details if logged in
                 if(userDB[user]) {
                     if (userDB[user].name) document.getElementById('depName').value = userDB[user].name;
                 }
@@ -584,15 +580,10 @@
             if(!amt || amt < 100) return alert("Minimum deposit amount required is Ksh 100");
             if(!name || !phone) return alert("Both Name and M-Pesa phone number are required.");
 
-            // Create a locked, custom reference using the timestamp
             const invoiceRef = "INV-" + Math.floor(Date.now() / 1000);
-
             closeModal('depositModal');
             
-            // Build checkout URL with parameters to permanently lock them
             const checkoutUrl = `${LIPWA_LINK}?amount=${amt}&name=${name}&phone=${phone}&reference=${invoiceRef}`;
-            
-            // Take the customer directly to the customized Lipwa checkout page
             window.location.href = checkoutUrl;
         }
 

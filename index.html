@@ -75,9 +75,24 @@
         .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; text-align: center; }
         
         .hidden { display: none !important; }
+
+        /* Advanced layout optimizations for the payment container */
+        .funds-card-container {
+            background: #fafcff;
+            padding: 18px;
+            border-radius: 18px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.015);
+        }
         
-        /* Optimized payment badge container */
-        .badge-container { display: block; text-align: center; max-width: 100%; margin: 0 auto; box-sizing: border-box; overflow: hidden; }
+        .badge-container { 
+            display: block; 
+            text-align: center; 
+            max-width: 100%; 
+            margin: 16px auto; 
+            box-sizing: border-box; 
+            overflow: hidden; 
+        }
         .badge-img { width: 300px; max-width: 100%; height: auto; display: block; margin: 0 auto; }
     </style>
 </head>
@@ -163,7 +178,7 @@
             <h2 id="fundsTitle" style="margin:0;">Fund Balance</h2>
             <p id="fundsDesc" style="color:var(--text-sub); margin-bottom:20px;">Pay Hero Checkout via Lipwa</p>
             
-            <div style="background:#f8fafc; padding:18px; border-radius:18px; border:1px solid var(--border);">
+            <div class="funds-card-container">
                 <div id="depositFormFields">
                     <div class="input-group">
                         <label>Your Name</label>
@@ -177,11 +192,11 @@
                 <div id="withdrawalFields" class="hidden">
                     <div class="input-group">
                         <label>M-Pesa Name</label>
-                        <input type="text" id="withName" class="input-tech">
+                        <input type="text" id="withName" class="input-tech" placeholder="e.g. Joseph Murithi">
                     </div>
                     <div class="input-group">
                         <label>M-Pesa Number</label>
-                        <input type="tel" id="withPhone" class="input-tech">
+                        <input type="tel" id="withPhone" class="input-tech" placeholder="e.g. 0712345678">
                     </div>
                 </div>
                 <div class="input-group">
@@ -195,7 +210,7 @@
                 </div>
             </div>
             
-            <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--yes-blue); margin-bottom:18px;">Confirm Action</button>
+            <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--yes-blue); margin-bottom:12px;">Confirm Action</button>
             
             <span class="badge-container">
                 <a href="https://intasend.com/security" target="_blank">
@@ -206,7 +221,7 @@
                 </strong>
             </span>
 
-            <p style="margin-top:20px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('depositModal')">Cancel</p>
+            <p style="margin-top:14px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
 

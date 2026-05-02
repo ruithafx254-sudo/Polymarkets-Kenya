@@ -58,44 +58,43 @@
         .hist-stats { display: flex; justify-content: space-between; border-top: 1px dashed var(--border); padding-top: 6px; font-size: 12px; font-weight: 700; }
         .status-badge { background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; }
 
-        /* Highly Optimized Modal Rules to prevent scrolling entirely */
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); z-index: 5000; align-items: center; justify-content: center; padding: 12px; }
-        .modal { background: #fff; width: 100%; max-width: 360px; padding: 16px 20px; border-radius: 20px; text-align: center; box-sizing: border-box; max-height: 96vh; overflow: hidden; }
+        .modal { background: #fff; width: 100%; max-width: 360px; padding: 14px 18px; border-radius: 20px; text-align: center; box-sizing: border-box; max-height: 98vh; overflow: hidden; }
         
-        .auth-nav { display: flex; background: #f1f5f9; padding: 3px; border-radius: 10px; margin-bottom: 12px; }
+        .auth-nav { display: flex; background: #f1f5f9; padding: 3px; border-radius: 10px; margin-bottom: 10px; }
         .auth-tab { flex: 1; padding: 8px; font-size: 12px; font-weight: 800; cursor: pointer; border-radius: 6px; color: var(--text-sub); text-align: center; }
         .auth-tab.active { background: #fff; color: #000; }
         
-        .input-group { position: relative; margin-bottom: 8px; text-align: left; }
-        .input-group label { display: block; font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 3px; }
-        .input-tech { width: 100%; padding: 10px 12px; background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; box-sizing: border-box; outline: none; color: #0f172a; }
+        .input-group { position: relative; margin-bottom: 6px; text-align: left; }
+        .input-group label { display: block; font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 2px; }
+        .input-tech { width: 100%; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; box-sizing: border-box; outline: none; color: #0f172a; }
         
         .btn-tech { width: 100%; padding: 12px; background: #000; color: #fff; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 13px; text-transform: uppercase; margin-top: 4px; }
         .btn-tech:active { opacity: 0.8; }
         
-        .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 0; }
-        .amt-chip { border: 1px solid var(--border); padding: 8px; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer; background: #fff; text-align: center; }
+        .chip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 6px 0; }
+        .amt-chip { border: 1px solid var(--border); padding: 6px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; background: #fff; text-align: center; }
         
         .hidden { display: none !important; }
 
         .funds-card-container {
             background: #fafcff;
-            padding: 12px;
+            padding: 10px;
             border-radius: 14px;
             border: 1px solid rgba(226, 232, 240, 0.8);
             box-shadow: 0 2px 8px rgba(0,0,0,0.01);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         
         .badge-container { 
             display: block; 
             text-align: center; 
             max-width: 100%; 
-            margin: 8px auto 4px auto; 
+            margin: 6px auto 2px auto; 
             box-sizing: border-box; 
             overflow: hidden; 
         }
-        .badge-img { width: 230px; max-width: 100%; height: auto; display: block; margin: 0 auto; }
+        .badge-img { width: 220px; max-width: 100%; height: auto; display: block; margin: 0 auto; }
     </style>
 </head>
 <body>
@@ -140,7 +139,7 @@
                 <div id="tabUp" class="auth-tab" onclick="setAuth('up')">Sign Up</div>
             </div>
             <h2 id="aTitle" style="margin:0; font-size: 16px;">Terminal Access</h2>
-            <p id="aDesc" style="color:var(--text-sub); font-size:12px; margin: 2px 0 12px 0;">Sign in to your account</p>
+            <p id="aDesc" style="color:var(--text-sub); font-size:12px; margin: 2px 0 10px 0;">Sign in to your account</p>
             
             <div id="upFields" class="hidden">
                 <div class="input-group">
@@ -166,7 +165,7 @@
             </div>
 
             <button onclick="doAuth()" class="btn-tech">Access Account</button>
-            <p style="margin-top:10px; cursor:pointer; color:var(--text-sub); font-size:12px;" onclick="closeModal('authModal')">Cancel</p>
+            <p style="margin-top:8px; cursor:pointer; color:var(--text-sub); font-size:12px;" onclick="closeModal('authModal')">Cancel</p>
         </div>
     </div>
 
@@ -177,8 +176,8 @@
                 <div id="tabWithdraw" class="auth-tab" onclick="setFundsMode('withdraw')">Withdraw</div>
             </div>
             
-            <h2 id="fundsTitle" style="margin:0; font-size:16px;">Fund Balance</h2>
-            <p id="fundsDesc" style="color:var(--text-sub); font-size:11px; margin: 2px 0 10px 0;">Pay Hero Checkout via Lipwa</p>
+            <h2 id="fundsTitle" style="margin:0; font-size:15px;">Fund Balance</h2>
+            <p id="fundsDesc" style="color:var(--text-sub); font-size:11px; margin: 2px 0 8px 0;">Pay Hero Checkout via Lipwa</p>
             
             <div class="funds-card-container">
                 <div id="depositFormFields">
@@ -201,14 +200,18 @@
                         <input type="tel" id="withPhone" class="input-tech" placeholder="e.g. 0712345678">
                     </div>
                 </div>
-                <div class="input-group" style="margin-bottom:4px;">
+                <div class="input-group" style="margin-bottom:2px;">
                     <label id="amtLabel">Amount (Ksh)</label>
-                    <input type="text" id="depAmt" class="input-tech" style="font-size:18px; font-weight:800; text-align:center; padding: 6px;" value="10.00">
+                    <input type="text" id="depAmt" class="input-tech" style="font-size:18px; font-weight:800; text-align:center; padding: 6px;" placeholder="0.00" value="100.00">
                 </div>
                 <div class="chip-grid">
                     <div class="amt-chip" onclick="setAmt(10)">10</div>
                     <div class="amt-chip" onclick="setAmt(50)">50</div>
                     <div class="amt-chip" onclick="setAmt(100)">100</div>
+                    <div class="amt-chip" onclick="setAmt(500)">500</div>
+                    <div class="amt-chip" onclick="setAmt(1000)">1k</div>
+                    <div class="amt-chip" onclick="setAmt(2000)">2k</div>
+                    <div class="amt-chip" onclick="setAmt(5000)">5k</div>
                 </div>
             </div>
             
@@ -220,7 +223,7 @@
                 </a>
             </span>
 
-            <p style="margin-top:6px; cursor:pointer; color:var(--text-sub); font-size:12px;" onclick="closeModal('depositModal')">Cancel</p>
+            <p style="margin-top:4px; cursor:pointer; color:var(--text-sub); font-size:12px;" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
 
@@ -232,7 +235,7 @@
             <div style="background:#f8fafc; padding:12px; border-radius:14px; border:1px solid var(--border); margin-bottom:12px;">
                 <div class="input-group">
                     <label>Amount (Min. Ksh 20)</label>
-                    <input type="text" id="betAmt" class="input-tech" style="font-size:20px; text-align:center; font-weight:800;" value="20.00">
+                    <input type="text" id="betAmt" class="input-tech" style="font-size:20px; text-align:center; font-weight:800;" placeholder="0.00" value="100.00">
                 </div>
             </div>
 
@@ -257,8 +260,6 @@
         const CHUNK_SIZE = 20;
 
         function generate1000Markets() {
-            const categories = ["Politics", "Crypto", "Finance", "Sports", "Pop Culture", "Science"];
-            
             const scenarios = [
                 { cat: "Politics", format: (v) => `Will the ${v} US Midterm elections result in a Senate majority flip?` },
                 { cat: "Politics", format: (v) => `Will Donald Trump be impeached again before the end of ${v}?` },
@@ -425,6 +426,7 @@
             document.getElementById('slipPickText').innerText = side;
             document.getElementById('slipPickText').style.color = side === 'YES' ? 'var(--yes-blue)' : 'var(--no-red)';
             document.getElementById('slipMultText').innerText = mult + 'x';
+            document.getElementById('betAmt').value = "100.00";
             openModal('betSlipModal');
         }
 
@@ -557,6 +559,7 @@
 
         function setFundsMode(mode) {
             currentFundsMode = mode;
+            document.getElementById('depAmt').value = "100.00";
             if (mode === 'withdraw') {
                 document.getElementById('tabWithdraw').classList.add('active');
                 document.getElementById('tabDeposit').classList.remove('active');

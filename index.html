@@ -214,7 +214,6 @@
     </div>
 
     <script>
-        // Directly utilizing Supabase Credentials
         const SB_URL = "https://hwxnfzuwaeseszgsjeny.supabase.co";
         const SB_KEY = "sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL";
         const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
@@ -480,7 +479,6 @@
 
         async function handleFundsAction() {
             const amt = Number(document.getElementById('depAmt').value);
-            // Minimum validation lowered to Ksh 10.00
             if (isNaN(amt) || amt < 10) return alert("Minimum transaction amount is Ksh 10.00.");
 
             if (currentFundsMode === 'withdraw') {
@@ -508,7 +506,8 @@
                 const currentUrl = window.location.origin + window.location.pathname;
                 const returnUrl = encodeURIComponent(`${currentUrl}?status=success&amount=${amt}&reference=${invoiceRef}`);
                 
-                window.location.href = `${LIPWA_LINK}?amount=${amt}&name=${name}&phone=${phone}&reference=${invoiceRef}&callback=${returnUrl}`;
+                // Fixed: Added success_url along with callback to ensure automatic page redirect on completion
+                window.location.href = `${LIPWA_LINK}?amount=${amt}&name=${name}&phone=${phone}&reference=${invoiceRef}&success_url=${returnUrl}&callback=${returnUrl}`;
             }
         }
 

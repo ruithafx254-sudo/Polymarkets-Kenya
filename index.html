@@ -219,6 +219,17 @@
                     </div>
                 </div>
 
+                <div id="depositFormFields">
+                    <div class="input-group">
+                        <label>Your Name</label>
+                        <input type="text" id="depName" class="input-tech" placeholder="e.g. Jane Doe">
+                    </div>
+                    <div class="input-group">
+                        <label>M-Pesa Phone Number</label>
+                        <input type="tel" id="depPhone" class="input-tech" placeholder="e.g. 0712345678">
+                    </div>
+                </div>
+
                 <div class="input-group">
                     <label id="amtLabel">Deposit Amount (Ksh)</label>
                     <input type="text" id="depAmt" class="input-tech" style="font-size: 28px; text-align: center; font-weight: 800; color: #000;" value="100.00" onfocus="if(this.value==='100.00')this.value='';" onblur="if(this.value==='')this.value='100.00';">
@@ -255,11 +266,25 @@
         let currentFundsMode = 'deposit';
         let activeSelection = null; 
 
+        // YOUR LIPWA LINK CONFIGURATION
+        const LIPWA_LINK = "https://lipwa.link/8367";
+
         window.onload = () => {
             initializeMarkets();
             syncState(); 
             renderFeed();
             renderHistory();
+
+            // Load saved deposit amount on page load
+            const savedDepositAmount = localStorage.getItem('nx_deposit_amount');
+            if (savedDepositAmount) {
+                document.getElementById('depAmt').value = parseFloat(savedDepositAmount).toFixed(2);
+            }
+
+            // Save deposit amount immediately as the user types
+            document.getElementById('depAmt').addEventListener('input', function() {
+                localStorage.setItem('nx_deposit_amount', this.value);
+            });
         };
 
         function initializeMarkets() {
@@ -424,6 +449,11 @@
             if(user) {
                 document.getElementById('signBtn').classList.add('hidden');
                 document.getElementById('userIcon').classList.remove('hidden');
+                
+                // Prefill existing details if logged in
+                if(userDB[user]) {
+                    if (userDB[user].name) document.getElementById('depName').value = userDB[user].name;
+                }
             } else {
                 document.getElementById('signBtn').classList.remove('hidden');
                 document.getElementById('userIcon').classList.add('hidden');
@@ -451,6 +481,7 @@
             const fTitle = document.getElementById('fundsTitle'), fDesc = document.getElementById('fundsDesc');
             const amtLabel = document.getElementById('amtLabel'), fSubmit = document.getElementById('fundsSubmit');
             const withFields = document.getElementById('withdrawalFields');
+            const depFormFields = document.getElementById('depositFormFields');
 
             if(mode === 'withdraw') {
                 tWith.classList.add('active'); tDep.classList.remove('active');
@@ -458,12 +489,14 @@
                 amtLabel.innerText = "Withdrawal Amount (Ksh)"; fSubmit.innerText = "Confirm Withdrawal";
                 fSubmit.style.background = "#000";
                 withFields.classList.remove('hidden');
+                depFormFields.classList.add('hidden');
             } else {
                 tDep.classList.add('active'); tWith.classList.remove('active');
                 fTitle.innerText = "Fund Balance"; fDesc.innerText = "M-Pesa Checkout via Lipwa";
                 amtLabel.innerText = "Deposit Amount (Ksh)"; fSubmit.innerText = "Confirm Deposit";
                 fSubmit.style.background = "var(--yes-blue)";
                 withFields.classList.add('hidden');
+                depFormFields.classList.remove('hidden');
             }
         }
 
@@ -507,7 +540,11 @@
             }
         }
 
-        function setAmt(v) { document.getElementById('depAmt').value = parseFloat(v).toFixed(2); }
+        function setAmt(v) { 
+            const formatted = parseFloat(v).toFixed(2);
+            document.getElementById('depAmt').value = formatted; 
+            localStorage.setItem('nx_deposit_amount', formatted);
+        }
 
         function handleFundsAction() {
             if (currentFundsMode === 'withdraw') { withdrawNow(); } else { payNow(); }
@@ -539,15 +576,24 @@
 
         function payNow() {
             const amt = Number(document.getElementById('depAmt').value);
+            const name = encodeURIComponent(document.getElementById('depName').value.trim());
+            const phone = document.getElementById('depPhone').value.trim();
             const userEmail = localStorage.getItem('nx_user');
 
             if(!userEmail) { closeModal('depositModal'); return openModal('authModal'); }
             if(!amt || amt < 100) return alert("Minimum deposit amount required is Ksh 100");
+            if(!name || !phone) return alert("Both Name and M-Pesa phone number are required.");
+
+            // Create a locked, custom reference using the timestamp
+            const invoiceRef = "INV-" + Math.floor(Date.now() / 1000);
 
             closeModal('depositModal');
             
-            // Seamless Redirect directly to your customized Lipwa checkout link
-            window.location.href = "https://lipwa.link/8367";
+            // Build checkout URL with parameters to permanently lock them
+            const checkoutUrl = `${LIPWA_LINK}?amount=${amt}&name=${name}&phone=${phone}&reference=${invoiceRef}`;
+            
+            // Take the customer directly to the customized Lipwa checkout page
+            window.location.href = checkoutUrl;
         }
 
         function openModal(id) { 
@@ -558,7 +604,6 @@
         function closeModal(id) { 
             document.body.classList.remove('hide-header');
             document.getElementById(id).style.display = 'none'; 
-            if(id === 'depositModal') document.getElementById('depAmt').value = '100.00';
             if(id === 'betSlipModal') document.getElementById('betAmt').value = '20.00';
         }
 

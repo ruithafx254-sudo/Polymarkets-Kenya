@@ -36,33 +36,33 @@
         .user-id { width: 36px; height: 36px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .person-icon { width: 18px; height: 18px; fill: currentColor; }
 
-        #dashboard { max-width: 680px; margin: auto; padding: 12px; box-sizing: border-box; }
+        #dashboard { max-width: 660px; margin: auto; padding: 12px; box-sizing: border-box; }
         
         .section-nav { display: flex; gap: 8px; margin-bottom: 16px; background: #f1f5f9; padding: 6px; border-radius: 12px; }
         .section-tab { flex: 1; text-align: center; padding: 12px; font-size: 14px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); transition: 0.2s; }
         .section-tab.active { background: #fff; color: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 
-        /* Upsized prediction cards */
-        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
-        .m-category { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-sub); display: inline-block; margin-bottom: 10px; letter-spacing: 0.5px; }
-        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-        .m-title { font-size: 17px; font-weight: 700; line-height: 1.45; color: #0f172a; }
+        /* Fine-tuned prediction cards (slightly smaller than previous, still highly visible) */
+        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 12px; box-shadow: 0 3px 12px rgba(0,0,0,0.03); }
+        .m-category { font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: var(--text-sub); display: inline-block; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .m-title { font-size: 16px; font-weight: 700; line-height: 1.4; color: #0f172a; }
 
-        .btn-group { display: flex; gap: 12px; }
-        .trade-btn { flex: 1; padding: 14px; border-radius: 12px; border: 1px solid transparent; font-weight: 800; font-size: 15px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.15s; }
+        .btn-group { display: flex; gap: 10px; }
+        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid transparent; font-weight: 800; font-size: 14.5px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: 0.15s; }
         .trade-btn:active { transform: scale(0.98); }
         .trade-btn.yes { background: var(--yes-bg); color: var(--yes-blue); border-color: #bfdbfe; }
         .trade-btn.no { background: var(--no-bg); color: var(--no-red); border-color: #fecdd3; }
 
-        .history-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .history-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
         .hist-meta { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
-        .hist-title { font-size: 15px; font-weight: 700; color: #0f172a; }
-        .hist-stats { display: flex; justify-content: space-between; border-top: 1px dashed var(--border); padding-top: 10px; font-size: 14px; font-weight: 700; }
+        .hist-title { font-size: 14.5px; font-weight: 700; color: #0f172a; }
+        .hist-stats { display: flex; justify-content: space-between; border-top: 1px dashed var(--border); padding-top: 8px; font-size: 13.5px; font-weight: 700; }
         .status-badge { background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; }
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); z-index: 5000; align-items: center; justify-content: center; padding: 12px; }
         
-        /* Upsized Modal dimensions */
+        /* Modal Dimensions (unaltered and perfect as requested) */
         .modal { background: #fff; width: 100%; max-width: 420px; padding: 22px 26px; border-radius: 24px; text-align: center; box-sizing: border-box; max-height: 98vh; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         
         .auth-nav { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 16px; }
@@ -266,7 +266,6 @@
         const CHUNK_SIZE = 20;
 
         function generate1000Markets() {
-            // Updated scenarios including the explicit user request at Position 8
             const scenarios = [
                 { cat: "Politics", format: (v) => `Will the ${v} US Midterm elections result in a Senate majority flip?` },
                 { cat: "Politics", format: (v) => `Will Donald Trump be impeached again before the end of ${v}?` },
@@ -304,12 +303,10 @@
                 
                 const uniqueQuestion = scenario.format(valueVariant);
                 
-                // Defaults for most cards
                 let randomBias = (i * 17) % 65 + 18;
                 let yesMult = (100 / randomBias).toFixed(2);
                 let noMult = (100 / (100 - randomBias)).toFixed(2);
 
-                // For scenario item #8, force dynamic odds requested: Yes (9.00x) and No (3.00x)
                 if (sIndex === 7) {
                     yesMult = "9.00";
                     noMult = "3.00";

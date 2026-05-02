@@ -441,20 +441,27 @@
         }
 
         function syncState() {
+            // Read fresh user record directly from saved databases
+            userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
             const user = localStorage.getItem('nx_user');
-            const bal = localStorage.getItem('nx_balance') || "0.00";
-            if(user) {
+            
+            if(user && userDB[user]) {
                 document.getElementById('signBtn').classList.add('hidden');
                 document.getElementById('userIcon').classList.remove('hidden');
                 
-                if(userDB[user]) {
-                    if (userDB[user].name) document.getElementById('depName').value = userDB[user].name;
+                // Keep individual data keys exactly in sync
+                const currentBal = userDB[user].balance || "0.00";
+                localStorage.setItem('nx_balance', currentBal);
+                document.getElementById('balance').innerText = parseFloat(currentBal).toLocaleString(undefined, {minimumFractionDigits: 2});
+                
+                if (userDB[user].name) {
+                    document.getElementById('depName').value = userDB[user].name;
                 }
             } else {
                 document.getElementById('signBtn').classList.remove('hidden');
                 document.getElementById('userIcon').classList.add('hidden');
+                document.getElementById('balance').innerText = "0.00";
             }
-            document.getElementById('balance').innerText = parseFloat(bal).toLocaleString(undefined, {minimumFractionDigits: 2});
         }
 
         function setAuth(mode) {
@@ -521,6 +528,7 @@
                 alert(`Account created successfully!`);
                 closeModal('authModal');
                 syncState();
+                renderHistory();
             } else {
                 const userRecord = userDB[email];
                 if (!userRecord || userRecord.pass !== pass) {
@@ -533,6 +541,7 @@
                 alert(`Welcome back, ${userRecord.name || userRecord.email}`);
                 closeModal('authModal');
                 syncState();
+                renderHistory();
             }
         }
 

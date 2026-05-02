@@ -182,12 +182,12 @@
                 </div>
                 <div class="input-group">
                     <label id="amtLabel">Amount (Ksh)</label>
-                    <input type="text" id="depAmt" class="input-tech" style="font-size:24px; font-weight:800; text-align:center;" value="100.00">
+                    <input type="text" id="depAmt" class="input-tech" style="font-size:24px; font-weight:800; text-align:center;" value="10.00">
                 </div>
                 <div class="chip-grid">
+                    <div class="amt-chip" onclick="setAmt(10)">10</div>
+                    <div class="amt-chip" onclick="setAmt(50)">50</div>
                     <div class="amt-chip" onclick="setAmt(100)">100</div>
-                    <div class="amt-chip" onclick="setAmt(250)">250</div>
-                    <div class="amt-chip" onclick="setAmt(500)">500</div>
                 </div>
             </div>
             
@@ -480,7 +480,8 @@
 
         async function handleFundsAction() {
             const amt = Number(document.getElementById('depAmt').value);
-            if (isNaN(amt) || amt < 100) return alert("Minimum transaction amount is Ksh 100.00.");
+            // Minimum validation lowered to Ksh 10.00
+            if (isNaN(amt) || amt < 10) return alert("Minimum transaction amount is Ksh 10.00.");
 
             if (currentFundsMode === 'withdraw') {
                 const phone = document.getElementById('withPhone').value.trim();

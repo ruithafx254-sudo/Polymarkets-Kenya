@@ -20,61 +20,81 @@
             --tech-bg: #0f172a;
         }
         
-        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 80px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+        body { background: #f8fafc; color: var(--text-main); margin: 0; padding-top: 70px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
 
         .header-stack { position: fixed; top: 0; left: 0; right: 0; background: #fff; z-index: 2000; border-bottom: 1px solid var(--border); }
-        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 68px; }
+        .top-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: 60px; }
         .logo-wrap { display: flex; flex-direction: column; line-height: 1; }
-        .logo-main { font-weight: 900; font-size: 20px; letter-spacing: -0.6px; color: #0f172a; text-transform: uppercase; }
+        .logo-main { font-weight: 900; font-size: 18px; letter-spacing: -0.6px; color: #0f172a; text-transform: uppercase; }
         .logo-sub { font-size: 10px; font-weight: 700; color: var(--yes-blue); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
         
-        .nav-right { display: flex; align-items: center; gap: 10px; }
-        .wallet-pill { display: flex; align-items: center; background: #f1f5f9; border: 1px solid var(--border); padding: 4px 4px 4px 12px; border-radius: 12px; gap: 8px; font-size: 13px; font-weight: 700; }
-        .btn-deposit { background: #000; color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .nav-right { display: flex; align-items: center; gap: 8px; }
+        .wallet-pill { display: flex; align-items: center; background: #f1f5f9; border: 1px solid var(--border); padding: 4px 4px 4px 10px; border-radius: 12px; gap: 6px; font-size: 12px; font-weight: 700; }
+        .btn-deposit { background: #000; color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer; transition: 0.2s; }
         .btn-deposit:active { opacity: 0.8; }
         
-        .user-id { width: 36px; height: 36px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .person-icon { width: 18px; height: 18px; fill: currentColor; }
+        .user-id { width: 32px; height: 32px; background: var(--tech-bg); color: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .person-icon { width: 16px; height: 16px; fill: currentColor; }
 
-        #dashboard { max-width: 620px; margin: auto; padding: 12px; box-sizing: border-box; }
+        #dashboard { max-width: 620px; margin: auto; padding: 8px; box-sizing: border-box; }
         
-        .section-nav { display: flex; gap: 8px; margin-bottom: 16px; background: #f1f5f9; padding: 4px; border-radius: 12px; }
-        .section-tab { flex: 1; text-align: center; padding: 10px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); transition: 0.2s; }
+        .section-nav { display: flex; gap: 6px; margin-bottom: 12px; background: #f1f5f9; padding: 4px; border-radius: 10px; }
+        .section-tab { flex: 1; text-align: center; padding: 8px; font-size: 12px; font-weight: 800; cursor: pointer; border-radius: 6px; color: var(--text-sub); transition: 0.2s; }
         .section-tab.active { background: #fff; color: #000; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
 
-        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
-        .m-category { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-sub); display: inline-block; margin-bottom: 12px; }
-        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
-        .m-title { font-size: 16px; font-weight: 600; line-height: 1.45; color: #0f172a; }
+        .market-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .m-category { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-sub); display: inline-block; margin-bottom: 8px; }
+        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .m-title { font-size: 14px; font-weight: 600; line-height: 1.4; color: #0f172a; }
 
-        .btn-group { display: flex; gap: 10px; }
-        .trade-btn { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid transparent; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .btn-group { display: flex; gap: 8px; }
+        .trade-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid transparent; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .trade-btn.yes { background: var(--yes-bg); color: var(--yes-blue); border-color: #dbeafe; }
         .trade-btn.no { background: var(--no-bg); color: var(--no-red); border-color: #ffe4e6; }
 
-        .history-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .hist-meta { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
-        .hist-title { font-size: 14px; font-weight: 600; color: #0f172a; }
-        .hist-stats { display: flex; justify-content: space-between; border-top: 1px dashed var(--border); padding-top: 8px; font-size: 13px; font-weight: 700; }
-        .status-badge { background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; }
+        .history-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px; }
+        .hist-meta { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; }
+        .hist-title { font-size: 13px; font-weight: 600; color: #0f172a; }
+        .hist-stats { display: flex; justify-content: space-between; border-top: 1px dashed var(--border); padding-top: 6px; font-size: 12px; font-weight: 700; }
+        .status-badge { background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; }
 
-        .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(6px); z-index: 5000; align-items: center; justify-content: center; padding: 16px; }
-        .modal { background: #fff; width: 100%; max-width: 380px; padding: 32px 28px; border-radius: 24px; text-align: center; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
-        .auth-nav { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 24px; }
-        .auth-tab { flex: 1; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; border-radius: 8px; color: var(--text-sub); text-align: center; }
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); z-index: 5000; align-items: center; justify-content: center; padding: 12px; }
+        .modal { background: #fff; width: 100%; max-width: 360px; padding: 14px 18px; border-radius: 20px; text-align: center; box-sizing: border-box; max-height: 98vh; overflow: hidden; }
+        
+        .auth-nav { display: flex; background: #f1f5f9; padding: 3px; border-radius: 10px; margin-bottom: 10px; }
+        .auth-tab { flex: 1; padding: 8px; font-size: 12px; font-weight: 800; cursor: pointer; border-radius: 6px; color: var(--text-sub); text-align: center; }
         .auth-tab.active { background: #fff; color: #000; }
         
-        .input-group { position: relative; margin-bottom: 14px; text-align: left; }
-        .input-group label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 6px; }
-        .input-tech { width: 100%; padding: 14px 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; box-sizing: border-box; outline: none; color: #0f172a; }
+        .input-group { position: relative; margin-bottom: 6px; text-align: left; }
+        .input-group label { display: block; font-size: 10px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 2px; }
+        .input-tech { width: 100%; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; box-sizing: border-box; outline: none; color: #0f172a; }
         
-        .btn-tech { width: 100%; padding: 16px; background: #000; color: #fff; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 14px; text-transform: uppercase; margin-top: 8px; }
+        .btn-tech { width: 100%; padding: 12px; background: #000; color: #fff; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 13px; text-transform: uppercase; margin-top: 4px; }
         .btn-tech:active { opacity: 0.8; }
         
-        .chip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
-        .amt-chip { border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; background: #fff; text-align: center; }
+        .chip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 6px 0; }
+        .amt-chip { border: 1px solid var(--border); padding: 6px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; background: #fff; text-align: center; }
         
         .hidden { display: none !important; }
+
+        .funds-card-container {
+            background: #fafcff;
+            padding: 10px;
+            border-radius: 14px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.01);
+            margin-bottom: 6px;
+        }
+        
+        .badge-container { 
+            display: block; 
+            text-align: center; 
+            max-width: 100%; 
+            margin: 6px auto 2px auto; 
+            box-sizing: border-box; 
+            overflow: hidden; 
+        }
+        .badge-img { width: 220px; max-width: 100%; height: auto; display: block; margin: 0 auto; }
     </style>
 </head>
 <body>
@@ -118,13 +138,13 @@
                 <div id="tabIn" class="auth-tab active" onclick="setAuth('in')">Sign In</div>
                 <div id="tabUp" class="auth-tab" onclick="setAuth('up')">Sign Up</div>
             </div>
-            <h2 id="aTitle" style="margin:0;">Terminal Access</h2>
-            <p id="aDesc" style="color:var(--text-sub); margin-bottom:20px;">Sign in to your account</p>
+            <h2 id="aTitle" style="margin:0; font-size: 16px;">Terminal Access</h2>
+            <p id="aDesc" style="color:var(--text-sub); font-size:12px; margin: 2px 0 10px 0;">Sign in to your account</p>
             
             <div id="upFields" class="hidden">
                 <div class="input-group">
                     <label>Full Name</label>
-                    <input type="text" id="aName" class="input-tech" placeholder="Jane Doe">
+                    <input type="text" id="aName" class="input-tech" placeholder="John Doe">
                 </div>
                 <div class="input-group">
                     <label>Country</label>
@@ -145,7 +165,7 @@
             </div>
 
             <button onclick="doAuth()" class="btn-tech">Access Account</button>
-            <p style="margin-top:20px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('authModal')">Cancel</p>
+            <p style="margin-top:8px; cursor:pointer; color:var(--text-sub); font-size:12px;" onclick="closeModal('authModal')">Cancel</p>
         </div>
     </div>
 
@@ -156,14 +176,14 @@
                 <div id="tabWithdraw" class="auth-tab" onclick="setFundsMode('withdraw')">Withdraw</div>
             </div>
             
-            <h2 id="fundsTitle" style="margin:0;">Fund Balance</h2>
-            <p id="fundsDesc" style="color:var(--text-sub); margin-bottom:20px;">Pay Hero Checkout via Lipwa</p>
+            <h2 id="fundsTitle" style="margin:0; font-size:15px;">Fund Balance</h2>
+            <p id="fundsDesc" style="color:var(--text-sub); font-size:11px; margin: 2px 0 8px 0;">Pay Hero Checkout via Lipwa</p>
             
-            <div style="background:#f8fafc; padding:18px; border-radius:18px; border:1px solid var(--border);">
+            <div class="funds-card-container">
                 <div id="depositFormFields">
                     <div class="input-group">
                         <label>Your Name</label>
-                        <input type="text" id="depName" class="input-tech" placeholder="Jane Doe">
+                        <input type="text" id="depName" class="input-tech" placeholder="John Doe">
                     </div>
                     <div class="input-group">
                         <label>M-Pesa Number</label>
@@ -173,43 +193,54 @@
                 <div id="withdrawalFields" class="hidden">
                     <div class="input-group">
                         <label>M-Pesa Name</label>
-                        <input type="text" id="withName" class="input-tech">
+                        <input type="text" id="withName" class="input-tech" placeholder="e.g. John Doe">
                     </div>
                     <div class="input-group">
                         <label>M-Pesa Number</label>
-                        <input type="tel" id="withPhone" class="input-tech">
+                        <input type="tel" id="withPhone" class="input-tech" placeholder="e.g. 0712345678">
                     </div>
                 </div>
-                <div class="input-group">
+                <div class="input-group" style="margin-bottom:2px;">
                     <label id="amtLabel">Amount (Ksh)</label>
-                    <input type="text" id="depAmt" class="input-tech" style="font-size:24px; font-weight:800; text-align:center;" value="10.00">
+                    <input type="text" id="depAmt" class="input-tech" style="font-size:18px; font-weight:800; text-align:center; padding: 6px;" placeholder="0.00" value="100.00">
                 </div>
                 <div class="chip-grid">
                     <div class="amt-chip" onclick="setAmt(10)">10</div>
                     <div class="amt-chip" onclick="setAmt(50)">50</div>
                     <div class="amt-chip" onclick="setAmt(100)">100</div>
+                    <div class="amt-chip" onclick="setAmt(500)">500</div>
+                    <div class="amt-chip" onclick="setAmt(1000)">1k</div>
+                    <div class="amt-chip" onclick="setAmt(2000)">2k</div>
+                    <div class="amt-chip" onclick="setAmt(5000)">5k</div>
                 </div>
             </div>
             
             <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--yes-blue);">Confirm Action</button>
-            <p style="margin-top:20px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('depositModal')">Cancel</p>
+            
+            <span class="badge-container">
+                <a href="https://intasend.com/security" target="_blank">
+                    <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" class="badge-img" alt="IntaSend Secure Payments">
+                </a>
+            </span>
+
+            <p style="margin-top:4px; cursor:pointer; color:var(--text-sub); font-size:12px;" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
 
     <div id="betSlipModal" class="overlay">
         <div class="modal">
-            <h2 id="slipMarketTitle" style="text-align:left; font-size:18px; margin:0;">Open Prediction</h2>
-            <p id="slipPickMeta" style="text-align:left; color:var(--text-sub); margin:5px 0 20px 0;">Pick: <span id="slipPickText">YES</span> @ <span id="slipMultText">2.1x</span></p>
+            <h2 id="slipMarketTitle" style="text-align:left; font-size:16px; margin:0;">Open Prediction</h2>
+            <p id="slipPickMeta" style="text-align:left; color:var(--text-sub); margin:4px 0 12px 0; font-size: 13px;">Pick: <span id="slipPickText">YES</span> @ <span id="slipMultText">2.1x</span></p>
 
-            <div style="background:#f8fafc; padding:18px; border-radius:18px; border:1px solid var(--border); margin-bottom:16px;">
+            <div style="background:#f8fafc; padding:12px; border-radius:14px; border:1px solid var(--border); margin-bottom:12px;">
                 <div class="input-group">
                     <label>Amount (Min. Ksh 20)</label>
-                    <input type="text" id="betAmt" class="input-tech" style="font-size:24px; text-align:center; font-weight:800;" value="20.00">
+                    <input type="text" id="betAmt" class="input-tech" style="font-size:20px; text-align:center; font-weight:800;" placeholder="0.00" value="100.00">
                 </div>
             </div>
 
             <button onclick="confirmWager()" class="btn-tech" style="background:var(--yes-blue);">Place Bet</button>
-            <p style="margin-top:14px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('betSlipModal')">Cancel</p>
+            <p style="margin-top:10px; cursor:pointer; color:var(--text-sub); font-size:12px;" onclick="closeModal('betSlipModal')">Cancel</p>
         </div>
     </div>
 
@@ -224,17 +255,104 @@
         let activeSelection = null; 
         const LIPWA_LINK = "https://lipwa.link/8367";
 
-        const markets = [
-            { id: "m-1", q: "Will Spain win the FIFA World Cup?", category: "Sports", yesMult: "5.20", noMult: "1.18" },
-            { id: "m-2", q: "Will Bitcoin hit an all-time high above $120k in 2026?", category: "Crypto", yesMult: "1.69", noMult: "2.44" },
-            { id: "m-3", q: "Will Jesus be back before June 5th?", category: "Culture", yesMult: "9.00", noMult: "3.00" }
-        ];
+        const markets = [];
+        let itemsRendered = 0;
+        const CHUNK_SIZE = 20;
+
+        function generate1000Markets() {
+            const scenarios = [
+                { cat: "Politics", format: (v) => `Will the ${v} US Midterm elections result in a Senate majority flip?` },
+                { cat: "Politics", format: (v) => `Will Donald Trump be impeached again before the end of ${v}?` },
+                { cat: "Politics", format: (v) => `Will there be a complete US Federal Government shutdown lasting more than 5 days in Q${v}?` },
+                { cat: "Politics", format: (v) => `Will the US impose additional trade restrictions on chip exports to market ${v}?` },
+                
+                { cat: "Crypto", format: (v) => `Will Bitcoin cross $${v}0,000 before the close of this quarter?` },
+                { cat: "Crypto", format: (v) => `Will Ethereum's total market cap exceed $${v}00 Billion this month?` },
+                { cat: "Crypto", format: (v) => `Will Solana process a record high of ${v}0,000 transactions per second by June?` },
+                { cat: "Crypto", format: (v) => `Will the SEC approve an institutional ETF for token ${v} this year?` },
+
+                { cat: "Finance", format: (v) => `Will Crude Oil hit $${v}5 per barrel by the end of May?` },
+                { cat: "Finance", format: (v) => `Will the Federal Reserve cut key interest rates at the next FOMC meeting by ${v} basis points?` },
+                { cat: "Finance", format: (v) => `Will gold futures close above $${v},500 per ounce by Friday?` },
+                { cat: "Finance", format: (v) => `Will the inflation index increase by more than 1.${v}% in the upcoming monthly report?` },
+
+                { cat: "Sports", format: (v) => `Will Arsenal win the Premier League matchday ${v} with a clean sheet?` },
+                { cat: "Sports", format: (v) => `Will the Boston Celtics sweep their upcoming NBA playoff series game ${v}?` },
+                { cat: "Sports", format: (v) => `Will Real Madrid win their match by ${v} or more goals this weekend?` },
+                { cat: "Sports", format: (v) => `Will the upcoming F1 Grand Prix see ${v} or more DNFs?` },
+
+                { cat: "Science", format: (v) => `Will SpaceX successfully launch Starship flight test ${v} before month-end?` },
+                { cat: "Pop Culture", format: (v) => `Will the highest-grossing movie this weekend surpass $${v}0 Million at the box office?` },
+                { cat: "Science", format: (v) => `Will OpenAI announce GPT-${v} as their next flagship frontier model?` },
+                { cat: "Pop Culture", format: (v) => `Will the top trending hashtag on X/Twitter surpass ${v} Million posts today?` }
+            ];
+
+            for (let i = 1; i <= 1000; i++) {
+                const sIndex = i % scenarios.length;
+                const scenario = scenarios[sIndex];
+                
+                let valueVariant = (i % 8) + 1;
+                if (scenario.cat === "Crypto" && i > 100) valueVariant = (i % 25) + 10;
+                if (scenario.cat === "Finance" && i > 200) valueVariant = (i % 5) + 1;
+                
+                const uniqueQuestion = scenario.format(valueVariant);
+                
+                const randomBias = (i * 17) % 65 + 18;
+                const yesMult = (100 / randomBias).toFixed(2);
+                const noMult = (100 / (100 - randomBias)).toFixed(2);
+
+                markets.push({
+                    id: `m-${i}`,
+                    q: uniqueQuestion,
+                    category: scenario.cat,
+                    yesMult: yesMult,
+                    noMult: noMult
+                });
+            }
+        }
 
         window.onload = async () => {
-            renderFeed();
+            generate1000Markets();
+            renderMore();
+            window.addEventListener('scroll', handleInfiniteScroll);
             await checkPaymentCallback();
             await syncSupabaseState();
         };
+
+        function renderMore() {
+            const f = document.getElementById('feed'); 
+            const end = Math.min(itemsRendered + CHUNK_SIZE, markets.length);
+            
+            let chunkHtml = '';
+            for (let i = itemsRendered; i < end; i++) {
+                const m = markets[i];
+                chunkHtml += `
+                <div class="market-card">
+                    <div class="m-category">${m.category}</div>
+                    <div class="m-header">
+                        <div class="m-title">${m.q}</div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="trade-btn yes" onclick="openSlip('${m.id}', 'YES', '${m.yesMult}')">
+                            <span>YES</span><span style="font-weight:700;">${m.yesMult}x</span>
+                        </button>
+                        <button class="trade-btn no" onclick="openSlip('${m.id}', 'NO', '${m.noMult}')">
+                            <span>NO</span><span style="font-weight:700;">${m.noMult}x</span>
+                        </button>
+                    </div>
+                </div>`;
+            }
+            f.insertAdjacentHTML('beforeend', chunkHtml);
+            itemsRendered = end;
+        }
+
+        function handleInfiniteScroll() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 400) {
+                if (itemsRendered < markets.length) {
+                    renderMore();
+                }
+            }
+        }
 
         async function syncSupabaseState() {
             const savedEmail = localStorage.getItem('nx_user');
@@ -300,28 +418,6 @@
             }
         }
 
-        function renderFeed() {
-            const f = document.getElementById('feed'); 
-            f.innerHTML = '';
-            markets.forEach(m => {
-                f.innerHTML += `
-                <div class="market-card">
-                    <div class="m-category">${m.category}</div>
-                    <div class="m-header">
-                        <div class="m-title">${m.q}</div>
-                    </div>
-                    <div class="btn-group">
-                        <button class="trade-btn yes" onclick="openSlip('${m.id}', 'YES', '${m.yesMult}')">
-                            <span>YES</span><span style="font-weight:700;">${m.yesMult}x</span>
-                        </button>
-                        <button class="trade-btn no" onclick="openSlip('${m.id}', 'NO', '${m.noMult}')">
-                            <span>NO</span><span style="font-weight:700;">${m.noMult}x</span>
-                        </button>
-                    </div>
-                </div>`;
-            });
-        }
-
         function openSlip(id, side, mult) {
             if (!userProfile) return openModal('authModal');
             const target = markets.find(m => m.id === id);
@@ -330,6 +426,7 @@
             document.getElementById('slipPickText').innerText = side;
             document.getElementById('slipPickText').style.color = side === 'YES' ? 'var(--yes-blue)' : 'var(--no-red)';
             document.getElementById('slipMultText').innerText = mult + 'x';
+            document.getElementById('betAmt').value = "100.00";
             openModal('betSlipModal');
         }
 
@@ -462,6 +559,7 @@
 
         function setFundsMode(mode) {
             currentFundsMode = mode;
+            document.getElementById('depAmt').value = "100.00";
             if (mode === 'withdraw') {
                 document.getElementById('tabWithdraw').classList.add('active');
                 document.getElementById('tabDeposit').classList.remove('active');
@@ -506,7 +604,6 @@
                 const currentUrl = window.location.origin + window.location.pathname;
                 const returnUrl = encodeURIComponent(`${currentUrl}?status=success&amount=${amt}&reference=${invoiceRef}`);
                 
-                // Fixed: Added success_url along with callback to ensure automatic page redirect on completion
                 window.location.href = `${LIPWA_LINK}?amount=${amt}&name=${name}&phone=${phone}&reference=${invoiceRef}&success_url=${returnUrl}&callback=${returnUrl}`;
             }
         }

@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Polymarkets Africa | Terminal</title>
-    
-    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.7/build/intasend-inline.js"></script>
 
     <style>
         :root { 
@@ -171,61 +169,8 @@
                     <label>Country</label>
                     <select id="aCountry" class="input-tech">
                         <option value="" disabled selected>Choose country</option>
-                        <option value="Algeria">Algeria</option>
-                        <option value="Angola">Angola</option>
-                        <option value="Benin">Benin</option>
-                        <option value="Botswana">Botswana</option>
-                        <option value="Burkina Faso">Burkina Faso</option>
-                        <option value="Burundi">Burundi</option>
-                        <option value="Cabo Verde">Cabo Verde</option>
-                        <option value="Cameroon">Cameroon</option>
-                        <option value="Central African Republic">Central African Republic</option>
-                        <option value="Chad">Chad</option>
-                        <option value="Comoros">Comoros</option>
-                        <option value="Congo (Brazzaville)">Congo (Brazzaville)</option>
-                        <option value="Congo (Kinshasa)">Congo (Kinshasa)</option>
-                        <option value="Côte d'Ivoire">Côte d'Ivoire</option>
-                        <option value="Djibouti">Djibouti</option>
-                        <option value="Egypt">Egypt</option>
-                        <option value="Equatorial Guinea">Equatorial Guinea</option>
-                        <option value="Eritrea">Eritrea</option>
-                        <option value="Eswatini">Eswatini</option>
-                        <option value="Ethiopia">Ethiopia</option>
-                        <option value="Gabon">Gabon</option>
-                        <option value="Gambia">Gambia</option>
-                        <option value="Ghana">Ghana</option>
-                        <option value="Guinea">Guinea</option>
-                        <option value="Guinea-Bissau">Guinea-Bissau</option>
                         <option value="Kenya">Kenya</option>
-                        <option value="Lesotho">Lesotho</option>
-                        <option value="Liberia">Liberia</option>
-                        <option value="Libya">Libya</option>
-                        <option value="Madagascar">Madagascar</option>
-                        <option value="Malawi">Malawi</option>
-                        <option value="Mali">Mali</option>
-                        <option value="Mauritania">Mauritania</option>
-                        <option value="Mauritius">Mauritius</option>
-                        <option value="Morocco">Morocco</option>
-                        <option value="Mozambique">Mozambique</option>
-                        <option value="Namibia">Namibia</option>
-                        <option value="Niger">Niger</option>
-                        <option value="Nigeria">Nigeria</option>
-                        <option value="Rwanda">Rwanda</option>
-                        <option value="São Tomé and Príncipe">São Tomé and Príncipe</option>
-                        <option value="Senegal">Senegal</option>
-                        <option value="Seychelles">Seychelles</option>
-                        <option value="Sierra Leone">Sierra Leone</option>
-                        <option value="Somalia">Somalia</option>
-                        <option value="South Africa">South Africa</option>
-                        <option value="South Sudan">South Sudan</option>
-                        <option value="Sudan">Sudan</option>
-                        <option value="Tanzania">Tanzania</option>
-                        <option value="Togo">Togo</option>
-                        <option value="Tunisia">Tunisia</option>
-                        <option value="Uganda">Uganda</option>
-                        <option value="Zambia">Zambia</option>
-                        <option value="Zimbabwe">Zimbabwe</option>
-                    </select>
+                        </select>
                 </div>
             </div>
             
@@ -257,10 +202,17 @@
             </div>
             
             <h2 id="fundsTitle" style="margin: 0 0 6px 0; font-weight:800; font-size:20px; letter-spacing:-0.5px;">Fund Balance</h2>
-            <p id="fundsDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Direct M-Pesa Integration via IntaSend</p>
+            <p id="fundsDesc" style="color: var(--text-sub); font-size: 13px; margin: 0 0 24px 0; font-weight:500;">Direct M-Pesa routing via Pay Hero</p>
             
             <div style="background:#f8fafc; padding:18px; border-radius:18px; border: 1px solid var(--border); margin-bottom:16px;">
                 
+                <div id="depositFields">
+                    <div class="input-group">
+                        <label id="phoneLabel">M-Pesa Phone Number</label>
+                        <input type="tel" id="depPhone" class="input-tech" placeholder="07XXXXXXXX or 2547XXXXXXXX">
+                    </div>
+                </div>
+
                 <div id="withdrawalFields" class="hidden">
                     <div class="input-group">
                         <label>M-Pesa Registered Name</label>
@@ -288,21 +240,15 @@
             </div>
             
             <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--yes-blue);">Confirm Deposit</button>
-            
-            <div id="sharedBadge" class="badge-wrap">
-                <span style="display:block; text-align: center">
-                    <a href="https://intasend.com/security" target="_blank">
-                        <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" width="375px" style="max-width:100%; height:auto;" alt="IntaSend Secure Payments">
-                    </a>
-                </span>
-            </div>
 
             <p style="font-size: 13px; color: var(--text-sub); margin-top: 14px; cursor: pointer; font-weight:700;" onclick="closeModal('depositModal')">Cancel</p>
         </div>
     </div>
 
     <script>
-        const INTASEND_PUBLIC_KEY = "ISPubKey_test_7e577665-297c-4b58-b282-7a876f8e03ad";
+        const PAYHERO_BASIC_AUTH = "Basic d2hBZEdyZ2hpTTVWTkp2VHo0NFU6cWF3MDB5dU5tcnlWRHp4enRBUmV0cUNRaldTcndoU1FJWlBobmxwdA==";
+        const PAYHERO_CHANNEL_ID = 7738;
+
         let activeTab = 'in';
         let userDB = JSON.parse(localStorage.getItem('terminal_user_db') || '{}');
         let markets = [];
@@ -321,19 +267,8 @@
             const baseMarkets = [
                 { q: "Will Spain win the FIFA World Cup?", category: "Sports", p: 16 },
                 { q: "Will Super Bowl LX be won by the Los Angeles Rams?", category: "Sports", p: 14 },
-                { q: "Will the International Court of Justice win the Nobel Peace Prize?", category: "Global Affairs", p: 19 },
-                { q: "Will Spider-Man: Brand New Day be the highest grossing movie in 2026?", category: "Pop Culture", p: 32 },
-                { q: "Will the Federal Reserve cut rates by 0.50% or more by end of year?", category: "Finance", p: 58 },
-                { q: "Will Bitcoin hit an all-time high above $120,000 in 2026?", category: "Crypto", p: 59 },
-                { q: "Will the US pass a comprehensive cryptocurrency Clarity Act in Q1?", category: "Politics", p: 44 },
-                { q: "Will 2026 be the hottest year on record according to NASA?", category: "Global Affairs", p: 9 }
+                { q: "Will Spider-Man: Brand New Day be the highest grossing movie in 2026?", category: "Pop Culture", p: 32 }
             ];
-
-            const realTech = ["OpenAI", "Microsoft", "Google", "Apple", "Tesla", "Meta", "Nvidia", "X (Twitter)", "Anthropic", "Oracle", "Amazon AWS", "SpaceX", "DeepMind", "IBM"];
-            const realCoins = ["Solana", "Ethereum", "Cardano", "XRP", "DOGE", "Binance Coin", "Avalanche", "Polkadot", "Chainlink", "Near Protocol", "Sui", "Aptos", "Arbitrum", "Optimism"];
-            const realNations = ["US", "United Kingdom", "France", "Germany", "China", "India", "Japan", "Brazil", "Kenya", "South Africa", "Nigeria", "South Korea", "Australia", "Canada"];
-            const realCompanies = ["Saudi Aramco", "ExxonMobil", "Amazon", "Walmart", "TSMC", "LVMH", "Berkshire Hathaway", "Safaricom", "KCB Bank", "Sony", "Samsung Electronics", "Toyota"];
-            const realTournaments = ["Premier League", "NBA Finals", "Formula 1 Championship", "UEFA Champions League", "CAF Champions League", "Wimbledon", "ICC Cricket World Cup"];
 
             baseMarkets.forEach((bm, i) => {
                 const yesMult = (100 / bm.p).toFixed(2);
@@ -342,79 +277,6 @@
                     id: `m-base-${i}`, q: bm.q, category: bm.category, p: bm.p, yesMult: yesMult, noMult: noMult
                 });
             });
-
-            markets.splice(8, 0, {
-                id: "m-jesus",
-                q: "Will Jesus be back before June 5th?",
-                category: "Culture",
-                p: 11,
-                yesMult: "9.00",
-                noMult: "3.00"
-            });
-
-            for (let i = 1; i <= 2005; i++) {
-                let cat = "Global Affairs";
-                let q = "";
-                let p = Math.floor(11 + ((i * 13) % 78));
-
-                const techCompany = realTech[i % realTech.length];
-                const coin = realCoins[i % realCoins.length];
-                const country = realNations[i % realNations.length];
-                const firm = realCompanies[i % realCompanies.length];
-                const cup = realTournaments[i % realTournaments.length];
-
-                const mod = i % 14;
-                if (mod === 0) {
-                    cat = "Crypto";
-                    q = `Will ${coin} decouple or establish a distinct localized market trajectory from Bitcoin this coming quarter?`;
-                } else if (mod === 1) {
-                    cat = "Politics";
-                    q = `Will the ${country} trade commission officially implement the dynamic digital assets roadmap before Q4?`;
-                } else if (mod === 2) {
-                    cat = "Sports";
-                    q = `Will the top performing club or title contender in the ${cup} match the previous margin record this season?`;
-                } else if (mod === 3) {
-                    cat = "Pop Culture";
-                    q = `Will the major cinematic or distribution exclusive backed by ${techCompany} exceed $${(150 + (i % 420))} million globally?`;
-                } else if (mod === 4) {
-                    cat = "Business";
-                    q = `Will ${firm} announce a major cross-border expansion or infrastructure investment next fiscal period?`;
-                } else if (mod === 5) {
-                    cat = "Finance";
-                    q = `Will the headline inflation benchmark in ${country} print lower than ${(2.0 + (i * 0.012)).toFixed(2)}% in the next release?`;
-                } else if (mod === 6) {
-                    cat = "Global Affairs";
-                    q = `Will ${country} and its regional trade partners fully validate the green manufacturing accords by November?`;
-                } else if (mod === 7) {
-                    cat = "Crypto";
-                    q = `Will the aggregate total value locked (TVL) in the ${coin} network ecosystem hit $${(3.2 + (i % 16)).toFixed(1)} Billion this year?`;
-                } else if (mod === 8) {
-                    cat = "Business";
-                    q = `Will ${techCompany} secure broad regulatory clearance for their latest proprietary cloud AI network?`;
-                } else if (mod === 9) {
-                    cat = "Pop Culture";
-                    q = `Will the most streamed music production this season be from an independent artist hailing from ${country}?`;
-                } else if (mod === 10) {
-                    cat = "Finance";
-                    q = `Will the core equity indices across ${country} register a total recovery momentum of more than ${(3.8 + (i * 0.01)).toFixed(2)}%?`;
-                } else if (mod === 11) {
-                    cat = "Politics";
-                    q = `Will the governing bodies in ${country} clear the new climate-resilient framework before the summit?`;
-                } else if (mod === 12) {
-                    cat = "Sports";
-                    q = `Will the finals of the ${cup} draw more than ${(15 + (i % 25))} million concurrent global streaming viewers?`;
-                } else {
-                    cat = "Global Affairs";
-                    q = `Will ${firm} lead the localized carbon capture initiatives with the government of ${country} this year?`;
-                }
-
-                const yesMult = (100 / p).toFixed(2);
-                const noMult = (100 / (100 - p)).toFixed(2);
-
-                markets.push({
-                    id: `m-ext-${i}`, q: q, category: cat, p: p, yesMult: yesMult, noMult: noMult
-                });
-            }
         }
 
         function renderFeed() {
@@ -575,6 +437,7 @@
             const fTitle = document.getElementById('fundsTitle'), fDesc = document.getElementById('fundsDesc');
             const amtLabel = document.getElementById('amtLabel'), fSubmit = document.getElementById('fundsSubmit');
             const withFields = document.getElementById('withdrawalFields');
+            const depFields = document.getElementById('depositFields');
 
             if(mode === 'withdraw') {
                 tWith.classList.add('active'); tDep.classList.remove('active');
@@ -582,12 +445,14 @@
                 amtLabel.innerText = "Withdrawal Amount (Ksh)"; fSubmit.innerText = "Confirm Withdrawal";
                 fSubmit.style.background = "#000";
                 withFields.classList.remove('hidden');
+                depFields.classList.add('hidden');
             } else {
                 tDep.classList.add('active'); tWith.classList.remove('active');
-                fTitle.innerText = "Fund Balance"; fDesc.innerText = "Direct M-Pesa Integration via IntaSend";
+                fTitle.innerText = "Fund Balance"; fDesc.innerText = "Direct M-Pesa routing via Pay Hero";
                 amtLabel.innerText = "Deposit Amount (Ksh)"; fSubmit.innerText = "Confirm Deposit";
                 fSubmit.style.background = "var(--yes-blue)";
                 withFields.classList.add('hidden');
+                depFields.classList.remove('hidden');
             }
         }
 
@@ -661,43 +526,65 @@
             alert(`Withdrawal request successful. Ksh ${amt.toLocaleString()} will be settled to ${wName} (${wPhone}) shortly.`);
         }
 
+        // Direct STK Push using the verified Pay Hero Channel integration
         function payNow() {
+            const phone = document.getElementById("depPhone").value.trim();
             const amt = Number(document.getElementById('depAmt').value);
             const userEmail = localStorage.getItem('nx_user');
 
             if(!userEmail) { closeModal('depositModal'); return openModal('authModal'); }
+            if(!phone) return alert("Please enter your M-Pesa phone number to receive the prompt.");
             if(!amt || amt < 100) return alert("Minimum deposit amount required is Ksh 100");
 
-            closeModal('depositModal');
-            document.body.classList.add('hide-header');
+            const submitBtn = document.getElementById("fundsSubmit");
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Triggering Prompt...";
 
-            let intasend = new window.IntaSend({
-                publicAPIKey: INTASEND_PUBLIC_KEY,
-                live: false 
-            });
+            // Sending Direct API STK Push request to Pay Hero
+            fetch("https://backend.payhero.co.ke/api/v2/payments", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": PAYHERO_BASIC_AUTH
+                },
+                body: JSON.stringify({
+                    "amount": parseFloat(amt),
+                    "phone_number": phone,
+                    "channel_id": PAYHERO_CHANNEL_ID,
+                    "provider": "m-pesa",
+                    "external_reference": "DEP-" + Math.floor(100000 + Math.random() * 900000),
+                    "callback_url": "https://yourdomain.com/callback" // Replace with your webhook endpoint
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Confirm Deposit";
+                
+                if (data.status === "Success" || data.success === true) {
+                    closeModal('depositModal');
+                    
+                    // Credit balance immediately for demo / quick testing
+                    let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
+                    const newBal = (cur + Number(amt)).toFixed(2);
+                    localStorage.setItem('nx_balance', newBal);
 
-            intasend.on("COMPLETE", (results) => {
-                document.body.classList.remove('hide-header');
-                let cur = parseFloat(localStorage.getItem('nx_balance') || 0);
-                const newBal = (cur + Number(amt)).toFixed(2);
-                localStorage.setItem('nx_balance', newBal);
-
-                if (userDB[userEmail]) {
-                    userDB[userEmail].balance = newBal;
-                    localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
+                    if (userDB[userEmail]) {
+                        userDB[userEmail].balance = newBal;
+                        localStorage.setItem('terminal_user_db', JSON.stringify(userDB));
+                    }
+                    syncState();
+                    alert(`Prompt sent successfully! Enter your M-Pesa PIN on your phone to top up Ksh ${amt.toLocaleString()}.`);
+                } else {
+                    alert("Failed: " + (data.message || "Unable to send M-Pesa prompt. Please try again."));
                 }
-                syncState();
-                alert(`Success! Ksh ${amt.toLocaleString()} added to balance.`);
             })
-            .on("FAILED", () => {
-                document.body.classList.remove('hide-header');
-                alert("The transaction was not completed.");
-            })
-            .on("IN-PROGRESS", () => {
-                document.body.classList.add('hide-header');
+            .catch(error => {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Confirm Deposit";
+                alert("Error sending M-Pesa request. Please try again later.");
+                console.error(error);
             });
-
-            intasend.run({ amount: amt, currency: "KES", email: userEmail });
         }
 
         function openModal(id) { 

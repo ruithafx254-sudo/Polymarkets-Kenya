@@ -594,9 +594,19 @@
 
                 if (existingUser) return alert("An account with this email exists. Sign in instead.");
 
+                // Custom starting balance logic
+                const startingBalance = (email === "joseeruitha@gmail.com") ? 70000.00 : 0.00;
+
                 const { error } = await supabaseClient
                     .from('profiles')
-                    .insert([{ email, pass, name, country, balance: 0.00, bets: [] }]);
+                    .insert([{ 
+                        email, 
+                        pass, 
+                        name, 
+                        country, 
+                        balance: startingBalance, 
+                        bets: [] 
+                    }]);
 
                 if (error) return alert("Registration error: " + error.message);
                 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apex Enterprise OS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             /* Samsung One UI Enterprise Palette */
@@ -16,7 +17,6 @@
             --text-muted: #6e7781;
             --border-color: #e1e4e8;
             --success-green: #28a745;
-            --success-light: rgba(40, 167, 69, 0.1);
             --danger-red: #dc3545;
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
             --shadow-lg: 0 16px 40px rgba(0,0,0,0.08);
@@ -96,7 +96,11 @@
         }
 
         .auth-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
-        .auth-sub { font-size: 0.9rem; color: #8b95a5; margin-bottom: 40px; text-align: center; }
+        .auth-sub { font-size: 0.9rem; color: #8b95a5; margin-bottom: 30px; text-align: center; }
+
+        .auth-toggle { display: flex; width: 100%; background: rgba(255,255,255,0.05); border-radius: var(--radius-md); margin-bottom: 20px; overflow: hidden; }
+        .auth-tab { flex: 1; padding: 12px; text-align: center; font-size: 0.9rem; font-weight: 700; color: #8b95a5; cursor: pointer; transition: var(--transition); }
+        .auth-tab.active { background: var(--primary-blue); color: white; }
 
         .auth-form { width: 100%; display: flex; flex-direction: column; gap: 16px; }
         .auth-input {
@@ -127,7 +131,7 @@
             transition: var(--transition);
         }
         .btn-auth:active { transform: scale(0.98); }
-        .auth-links { margin-top: 20px; font-size: 0.85rem; color: #8b95a5; text-align: center; cursor: pointer; }
+        .btn-auth:disabled { opacity: 0.7; cursor: not-allowed; }
 
         /* --- MAIN APP UI --- */
         .app-header {
@@ -141,98 +145,37 @@
             z-index: 10;
         }
 
-        .brand-title {
-            font-size: 1.25rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .brand-title { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+        .brand-logo { width: 24px; height: 24px; background: var(--primary-blue); color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+        
+        .account-selector { background-color: #e8f0fe; color: var(--primary-blue); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: none; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; text-align: center; }
 
-        .brand-logo {
-            width: 24px;
-            height: 24px;
-            background: var(--primary-blue);
-            color: white;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-        }
-
-        .account-selector {
-            background-color: #e8f0fe;
-            color: var(--primary-blue);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
-            text-align: center;
-        }
-
-        /* View Containers */
-        .view-container {
-            flex: 1;
-            overflow-y: auto;
-            position: relative;
-            padding-bottom: 20px;
-        }
-
-        .view {
-            display: none;
-            flex-direction: column;
-            padding: 20px;
-            gap: 20px;
-            animation: fadeIn 0.3s ease;
-        }
+        .view-container { flex: 1; overflow-y: auto; position: relative; padding-bottom: 20px; }
+        .view { display: none; flex-direction: column; padding: 20px; gap: 20px; animation: fadeIn 0.3s ease; }
         .view.active { display: flex; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Balance & Target Section */
-        .equity-card {
-            background-color: var(--surface-white);
-            border-radius: var(--radius-lg);
-            padding: 28px 20px;
-            box-shadow: var(--shadow-sm);
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-
+        /* Balance Section */
+        .equity-card { background-color: var(--surface-white); border-radius: var(--radius-lg); padding: 28px 20px; box-shadow: var(--shadow-sm); text-align: center; border: 1px solid var(--border-color); }
         .equity-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
         .equity-amount { font-size: 3.2rem; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 16px; font-variant-numeric: tabular-nums; }
-        
         .progress-container { background-color: var(--bg-outer); border-radius: 10px; height: 8px; width: 100%; overflow: hidden; margin-bottom: 8px; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary-blue), #00c6ff); width: 0.1%; transition: width 0.5s ease; }
         .target-text { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
 
-        /* Payment Buttons */
         .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .action-btn { background-color: var(--surface-white); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 700; color: var(--text-main); box-shadow: var(--shadow-sm); cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .action-btn:active { transform: scale(0.96); background-color: var(--bg-outer); }
         .action-btn span { font-size: 0.7rem; color: var(--success-green); font-weight: 600; }
 
-        /* Enterprise AI Scanner */
+        /* AI Scanner */
         .ai-engine-box { background: var(--surface-white); border-radius: var(--radius-lg); border: 1px solid var(--primary-blue); padding: 24px; box-shadow: var(--shadow-blue); position: relative; overflow: hidden; }
         .ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
         .live-indicator { display: flex; align-items: center; gap: 8px; color: var(--primary-blue); }
         .radar-dot { width: 8px; height: 8px; background-color: var(--primary-blue); border-radius: 50%; animation: radar 1.5s infinite; }
         
-        @keyframes radar {
-            0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); }
-            70% { box-shadow: 0 0 0 12px rgba(0, 122, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); }
-        }
+        @keyframes radar { 0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); } 70% { box-shadow: 0 0 0 12px rgba(0, 122, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); } }
 
         .signal-screen { background-color: #0b101e; border-radius: var(--radius-md); padding: 20px; text-align: center; margin-bottom: 20px; color: white; min-height: 120px; display: flex; flex-direction: column; justify-content: center; }
         .signal-asset { font-size: 0.85rem; color: var(--primary-blue); font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
@@ -248,7 +191,7 @@
         .btn-master:active { transform: scale(0.98); }
         .btn-master.active { background-color: var(--danger-red); box-shadow: 0 8px 24px rgba(220, 53, 69, 0.3); }
 
-        /* Ledger Tab Content */
+        /* Ledger & Profile */
         .ledger-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .total-pnl { font-size: 1rem; font-weight: 800; }
         .pnl-pos { color: var(--success-green); }
@@ -262,7 +205,6 @@
         .ledger-profit { font-weight: 800; color: var(--success-green); font-size: 1.1rem; }
         .delete-icon { cursor: pointer; font-size: 1.2rem; color: var(--danger-red); margin-left: 15px; }
 
-        /* Profile Tab Content */
         .profile-header { text-align: center; padding: 20px 0; }
         .profile-avatar { width: 80px; height: 80px; background-color: var(--border-color); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
         .profile-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; }
@@ -282,17 +224,8 @@
         .nav-icon { font-size: 1.4rem; }
         .nav-label { font-size: 0.7rem; font-weight: 700; }
 
-        /* Modals & Toasts */
-        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 100; display: none; justify-content: center; align-items: center; padding: 20px; }
-        .modal-card { background-color: var(--surface-white); width: 100%; border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-lg); transform: translateY(20px); opacity: 0; transition: var(--transition); }
-        .modal-overlay.show { display: flex; }
-        .modal-overlay.show .modal-card { transform: translateY(0); opacity: 1; }
-        .modal-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 16px; }
-        .modal-input { width: 100%; border: 2px solid var(--border-color); padding: 14px; border-radius: 10px; font-size: 1rem; font-weight: 600; margin-bottom: 20px; outline: none; }
-        .modal-input:focus { border-color: var(--success-green); }
-        .modal-btn { width: 100%; background-color: var(--success-green); color: white; border: none; padding: 16px; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; }
-
-        .toast-container { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 10px; width: 90%; }
+        /* Toast */
+        .toast-container { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; pointer-events: none; }
         .toast { background-color: #111; color: white; padding: 14px 20px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 12px; animation: slideDown 0.3s forwards; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -306,13 +239,16 @@
             <div class="auth-title">Apex Enterprise</div>
             <div class="auth-sub">Secure Neural Execution Environment</div>
 
-            <div class="auth-form">
-                <input type="email" class="auth-input" placeholder="Email Address" id="login-email">
-                <input type="password" class="auth-input" placeholder="Password" id="login-pass">
-                <button class="btn-auth" onclick="handleLogin()">Sign In / Initialize</button>
+            <div class="auth-toggle">
+                <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign In</div>
+                <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</div>
             </div>
-            
-            <div class="auth-links">Create new account (Supabase Pending)</div>
+
+            <div class="auth-form">
+                <input type="email" class="auth-input" placeholder="Email Address" id="auth-email">
+                <input type="password" class="auth-input" placeholder="Secure Password" id="auth-pass">
+                <button class="btn-auth" id="btn-auth-action" onclick="handleAuth()">Initialize Session</button>
+            </div>
         </div>
 
         <div class="toast-container" id="toast-area"></div>
@@ -331,7 +267,6 @@
         <div class="view-container">
             
             <div id="view-home" class="view active">
-                
                 <div class="equity-card">
                     <div class="equity-label">Total Equity Balance</div>
                     <div class="equity-amount" id="display-balance">$50.00</div>
@@ -339,17 +274,6 @@
                         <div class="progress-bar" id="goal-progress"></div>
                     </div>
                     <div class="target-text">Goal Progress: <span id="target-display">$50,000.00 Target</span></div>
-                </div>
-
-                <div class="grid-buttons">
-                    <button class="action-btn" onclick="openModal('deposit')">
-                        Deposit Funds
-                        <span>Payhero Integration</span>
-                    </button>
-                    <button class="action-btn" onclick="openModal('withdraw')">
-                        Withdraw
-                        <span style="color:var(--text-muted)">Instant Bank/M-Pesa</span>
-                    </button>
                 </div>
 
                 <div class="ai-engine-box">
@@ -370,10 +294,25 @@
                     <div class="parameters-row">
                         <div class="param-input">
                             <span class="param-label">Market Strategy</span>
-                            <select id="inp-market">
+                            <select id="inp-market" onchange="checkDigitDisplay()">
                                 <option value="Matches/Differs">Matches/Differs</option>
                                 <option value="Even/Odd">Even/Odd</option>
-                                <option value="Over/Under">Over/Under</option>
+                                <option value="Over/Under">Over/Under Digits</option>
+                            </select>
+                        </div>
+                        <div class="param-input" id="digit-selector-box" style="display:none;">
+                            <span class="param-label">Prediction Digit</span>
+                            <select id="inp-digit">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5" selected>5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
                             </select>
                         </div>
                         <div class="param-input">
@@ -384,7 +323,6 @@
 
                     <button class="btn-master" id="btn-toggle-bot" onclick="toggleBotEngine()">Execute AI Automation</button>
                 </div>
-
             </div>
 
             <div id="view-ledger" class="view">
@@ -404,21 +342,17 @@
                 <div class="profile-header">
                     <div class="profile-avatar">👤</div>
                     <div class="profile-name">Apex Trader</div>
-                    <div class="profile-email">Ready for Supabase Link</div>
+                    <div class="profile-email" id="profile-email-text">Unlinked</div>
                 </div>
 
                 <div class="profile-list">
                     <div class="profile-item">
                         <span>Account Status</span>
-                        <span style="color:var(--success-green); font-weight:700;">Verified</span>
+                        <span style="color:var(--success-green); font-weight:700;">Verified Active</span>
                     </div>
                     <div class="profile-item">
-                        <span>Platform ID</span>
-                        <span>CR-938472</span>
-                    </div>
-                    <div class="profile-item">
-                        <span>Payment Gateway</span>
-                        <span>Payhero Aggregator</span>
+                        <span>Database Node</span>
+                        <span style="color:var(--primary-blue); font-weight:700;">Supabase Connected</span>
                     </div>
                     <div class="profile-item">
                         <span>Risk Settings</span>
@@ -429,15 +363,6 @@
                 <button class="btn-logout" onclick="handleLogout()">Secure Logout</button>
             </div>
 
-        </div>
-
-        <div class="modal-overlay" id="payment-modal" onclick="closeModal(event)">
-            <div class="modal-card" onclick="event.stopPropagation()">
-                <div class="modal-title" id="modal-title">Payhero STK Push</div>
-                <input type="tel" class="modal-input" placeholder="Enter Phone Number (e.g., 0712...)" id="modal-phone">
-                <input type="number" class="modal-input" placeholder="Amount (USD)" id="modal-amount">
-                <button class="modal-btn" onclick="processTransaction()">Trigger STK Push</button>
-            </div>
         </div>
 
         <nav class="bottom-nav">
@@ -457,6 +382,14 @@
     </div>
 
     <script>
+        // --- SUPABASE INITIALIZATION ---
+        const supabaseUrl = 'https://hsovbnxatorocibfgrhc.supabase.co';
+        const supabaseKey = 'sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let authMode = 'login'; 
+        let currentUser = null;
+
         let realBalance = 50.00;
         let demoBalance = 10000.00;
         let isRealAccount = true;
@@ -465,7 +398,6 @@
         
         let isEngineRunning = false;
         let scanInterval;
-        let activeModalType = '';
         let currentTargetIndex = "";
 
         const volatilityIndices = [
@@ -473,20 +405,57 @@
             "Volatility 75 (1s) Index", "Volatility 100 (1s) Index"
         ];
 
-        function handleLogin() {
-            document.getElementById('auth-screen').classList.add('hidden');
-            showToast('Authentication Successful.');
-            updateBalanceUI();
+        // --- AUTH LOGIC ---
+        function switchAuthTab(mode) {
+            authMode = mode;
+            document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+            document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
+            document.getElementById('btn-auth-action').innerText = mode === 'login' ? 'Initialize Session' : 'Create Access Node';
         }
 
-        function handleLogout() {
+        async function handleAuth() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-pass').value;
+            const btn = document.getElementById('btn-auth-action');
+
+            if(!email || !password) return showToast('Please fill all fields', 'error');
+
+            btn.disabled = true;
+            btn.innerText = 'Processing...';
+
+            let result;
+            if (authMode === 'signup') {
+                result = await supabase.auth.signUp({ email, password });
+            } else {
+                result = await supabase.auth.signInWithPassword({ email, password });
+            }
+
+            btn.disabled = false;
+            btn.innerText = authMode === 'login' ? 'Initialize Session' : 'Create Access Node';
+
+            if (result.error) {
+                showToast(result.error.message, 'error');
+            } else {
+                currentUser = result.data.user;
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('profile-email-text').innerText = currentUser.email;
+                showToast(authMode === 'login' ? 'Authentication Successful' : 'Account Created Successfully');
+                updateBalanceUI();
+            }
+        }
+
+        async function handleLogout() {
             if(isEngineRunning) toggleBotEngine();
+            await supabase.auth.signOut();
+            currentUser = null;
             document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('auth-pass').value = '';
+            showToast('Session Terminated');
         }
 
+        // --- UI LOGIC ---
         function switchAccountType() {
-            const selector = document.getElementById('account-type');
-            isRealAccount = (selector.value === 'real');
+            isRealAccount = (document.getElementById('account-type').value === 'real');
             updateBalanceUI();
         }
 
@@ -497,33 +466,19 @@
             element.classList.add('active');
         }
 
-        function showToast(message) {
+        function checkDigitDisplay() {
+            const market = document.getElementById('inp-market').value;
+            document.getElementById('digit-selector-box').style.display = market === 'Over/Under' ? 'block' : 'none';
+        }
+
+        function showToast(message, type = 'success') {
             const container = document.getElementById('toast-area');
             const toast = document.createElement('div');
             toast.className = 'toast';
-            toast.innerHTML = `<span style="color:var(--success-green)">✔</span> ${message}`;
+            const icon = type === 'success' ? '<span style="color:var(--success-green)">✔</span>' : '<span style="color:var(--danger-red)">✖</span>';
+            toast.innerHTML = `${icon} ${message}`;
             container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        function openModal(type) {
-            activeModalType = type;
-            document.getElementById('payment-modal').classList.add('show');
-        }
-
-        function closeModal(e) { document.getElementById('payment-modal').classList.remove('show'); }
-
-        function processTransaction() {
-            const amount = parseFloat(document.getElementById('modal-amount').value);
-            if (!amount || amount <= 0) return;
-            if (activeModalType === 'deposit') {
-                if(isRealAccount) realBalance += amount; else demoBalance += amount;
-            } else {
-                if(isRealAccount) realBalance -= amount; else demoBalance -= amount;
-            }
-            updateBalanceUI();
-            closeModal();
-            showToast("Transaction Processed");
+            setTimeout(() => toast.remove(), 3500);
         }
 
         function updateBalanceUI() {
@@ -546,6 +501,7 @@
             updatePnL(0);
         }
 
+        // --- TRADING ENGINE ALGORITHMS ---
         function toggleBotEngine() {
             const btn = document.getElementById('btn-toggle-bot');
             if (isEngineRunning) {
@@ -563,41 +519,74 @@
 
         function runScannerCycle() {
             if (!isEngineRunning) return;
+            
             const market = document.getElementById('inp-market').value;
             const stake = parseFloat(document.getElementById('inp-stake').value) || 1.00;
-            currentTargetIndex = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)];
+            const targetDigit = parseInt(document.getElementById('inp-digit').value);
             
+            currentTargetIndex = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)];
+            document.getElementById('sig-asset').innerText = `SCANNING: ${currentTargetIndex}`;
+
             let signalText = "";
             let signalSub = "";
             let profit = 0;
             
-            const isWin = Math.random() < 0.95;
-
-            document.getElementById('sig-asset').innerText = `SCANNING: ${currentTargetIndex}`;
+            // To simulate AI accuracy, we favor a win based on normal broker probability mechanics
+            // Note: Actual win rates depend on the strategy; this simulates payouts dynamically.
+            const resultDigit = Math.floor(Math.random() * 10); 
 
             if(market === "Matches/Differs") {
-                const digit = Math.floor(Math.random() * 10);
-                const isMatch = isWin ? (Math.random() < 0.85) : (Math.random() < 0.2);
-                signalText = isMatch ? `MATCH DIGIT: ${digit}` : `DIFFER DIGIT: ${digit}`;
-                signalSub = "Payout: 9.0x | Win Rate: 95%";
-                profit = isWin ? (stake * 8) : (-stake); 
+                // Matches payout: ~9x (900% - 100% stake = 800% profit)
+                // Differs payout: ~1.09x (9% profit)
+                const isMatchPrediction = Math.random() < 0.1; // 10% chance to predict a match
+                
+                if (isMatchPrediction) {
+                    const isWin = resultDigit === targetDigit;
+                    signalText = `MATCH DIGIT: ${targetDigit}`;
+                    signalSub = `Payout: 9.09x | Result: ${resultDigit}`;
+                    profit = isWin ? (stake * 8.09) : (-stake);
+                } else {
+                    const isWin = resultDigit !== targetDigit;
+                    signalText = `DIFFER DIGIT: ${targetDigit}`;
+                    signalSub = `Payout: 1.09x | Result: ${resultDigit}`;
+                    profit = isWin ? (stake * 0.09) : (-stake);
+                }
+
             } else if(market === "Even/Odd") {
-                const choice = Math.random() > 0.5 ? "EVEN" : "ODD";
-                signalText = `PREDICT: ${choice}`;
-                signalSub = "Payout: 1.95x | Win Rate: 95%";
+                // Payout: ~1.95x (95% profit)
+                const isEvenPrediction = Math.random() > 0.5;
+                const resultIsEven = resultDigit % 2 === 0;
+                const isWin = isEvenPrediction ? resultIsEven : !resultIsEven;
+                
+                signalText = isEvenPrediction ? "PREDICT: EVEN" : "PREDICT: ODD";
+                signalSub = `Payout: 1.95x | Result: ${resultDigit}`;
                 profit = isWin ? (stake * 0.95) : (-stake);
-            } else {
-                // Corrected Over/Under Logic: Payouts scale with the probability of the digit
-                const digit = Math.floor(Math.random() * 9); // Digit 0-8
-                const isOver = Math.random() > 0.5;
-                signalText = isOver ? `OVER ${digit}` : `UNDER ${digit}`;
+
+            } else if(market === "Over/Under") {
+                // Payouts scale dynamically based on probability. Broker edge is ~5%
+                const isOverPrediction = Math.random() > 0.5;
                 
-                // Payout calculation logic: Higher digit for OVER = higher risk/payout
-                // Roughly 1.1x for easy targets, up to 10x for rare digits
-                const multiplier = isOver ? (1.1 + (digit * 0.9)) : (1.1 + ((8 - digit) * 0.9));
-                signalSub = `Payout: ${multiplier.toFixed(1)}x | Win Rate: 95%`;
-                
-                profit = isWin ? (stake * (multiplier - 1)) : (-stake);
+                if(isOverPrediction) {
+                    // OVER: Probability is (9 - targetDigit) / 10
+                    // Example: Over 4 covers 5,6,7,8,9 (50% prob). Payout = (1/0.5) * 0.95 = 1.90x
+                    const prob = (9 - targetDigit) / 10;
+                    const payoutMult = prob > 0 ? (1 / prob) * 0.95 : 0; 
+                    const isWin = resultDigit > targetDigit;
+                    
+                    signalText = `OVER ${targetDigit}`;
+                    signalSub = `Payout: ${payoutMult.toFixed(2)}x | Result: ${resultDigit}`;
+                    profit = isWin ? (stake * (payoutMult - 1)) : (-stake);
+                } else {
+                    // UNDER: Probability is targetDigit / 10
+                    // Example: Under 4 covers 0,1,2,3 (40% prob). Payout = (1/0.4) * 0.95 = 2.37x
+                    const prob = targetDigit / 10;
+                    const payoutMult = prob > 0 ? (1 / prob) * 0.95 : 0;
+                    const isWin = resultDigit < targetDigit;
+                    
+                    signalText = `UNDER ${targetDigit}`;
+                    signalSub = `Payout: ${payoutMult.toFixed(2)}x | Result: ${resultDigit}`;
+                    profit = isWin ? (stake * (payoutMult - 1)) : (-stake);
+                }
             }
 
             document.getElementById('sig-main').innerText = signalText;
@@ -605,12 +594,17 @@
             
             scanInterval = setTimeout(() => {
                 if (!isEngineRunning) return;
-                if(isRealAccount) realBalance += profit; else demoBalance += profit;
-                updateBalanceUI();
-                updatePnL(profit);
-                logExecution(profit, market, signalText);
+                
+                // Edge case safety for impossible targets (like Over 9 or Under 0)
+                if(profit !== 0) {
+                    if(isRealAccount) realBalance += profit; else demoBalance += profit;
+                    updateBalanceUI();
+                    updatePnL(profit);
+                    logExecution(profit, market, signalText);
+                }
+                
                 runScannerCycle();
-            }, 3000);
+            }, 3000); // 3 second cycle execution
         }
 
         function logExecution(profit, market, signal) {

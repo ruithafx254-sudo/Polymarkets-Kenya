@@ -459,7 +459,8 @@
 
     <script>
         // Supabase Initialization
-        const supabase = supabase.createClient(
+        // FIXED: Using window.supabase to ensure the library is correctly accessed
+        const supabase = window.supabase.createClient(
             'https://hsovbnxatorocibfgrhc.supabase.co',
             'sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP'
         );
@@ -489,8 +490,9 @@
         }
 
         async function handleAuth() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-pass').value;
+            // FIXED: Added .trim() to ensure input data is clean
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-pass').value.trim();
 
             if(isLoginMode) {
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });

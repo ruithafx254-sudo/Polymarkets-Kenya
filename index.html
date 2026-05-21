@@ -470,8 +470,8 @@
         let currentTargetIndex = "";
 
         const volatilityIndices = [
-            "Volatility 10 Index", "Volatility 25 Index", "Volatility 50 Index", 
-            "Volatility 75 Index", "Volatility 100 Index"
+            "Volatility 10 (1s) Index", "Volatility 25 (1s) Index", "Volatility 50 (1s) Index", 
+            "Volatility 75 (1s) Index", "Volatility 100 (1s) Index"
         ];
 
         function handleLogin() {
@@ -571,13 +571,14 @@
             let signalText = "";
             let signalSub = "";
             let profit = 0;
+            
+            // 95% Win rate logic
+            const isWin = Math.random() < 0.95;
 
             document.getElementById('sig-asset').innerText = `SCANNING: ${currentTargetIndex}`;
 
             if(market === "Matches/Differs") {
                 const digit = Math.floor(Math.random() * 10);
-                // 95% win rate, bias towards MATCHES (85% of wins)
-                const isWin = Math.random() < 0.95;
                 const isMatch = isWin ? (Math.random() < 0.85) : (Math.random() < 0.2);
                 
                 signalText = isMatch ? `MATCH DIGIT: ${digit}` : `DIFFER DIGIT: ${digit}`;
@@ -587,13 +588,13 @@
                 const choice = Math.random() > 0.5 ? "EVEN" : "ODD";
                 signalText = `PREDICT: ${choice}`;
                 signalSub = "Payout: 1.95x | Win Rate: 95%";
-                profit = (Math.random() < 0.95) ? (stake * 0.95) : (-stake);
+                profit = isWin ? (stake * 0.95) : (-stake);
             } else {
                 const digit = Math.floor(Math.random() * 9);
                 const choice = Math.random() > 0.5 ? "OVER" : "UNDER";
                 signalText = `${choice} ${digit}`;
                 signalSub = "Payout: 1.5x | Win Rate: 95%";
-                profit = (Math.random() < 0.95) ? (stake * 0.5) : (-stake);
+                profit = isWin ? (stake * 0.5) : (-stake);
             }
 
             document.getElementById('sig-main').innerText = signalText;

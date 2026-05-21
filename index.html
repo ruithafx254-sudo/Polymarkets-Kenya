@@ -576,21 +576,24 @@
 
             if(market === "Matches/Differs") {
                 const digit = Math.floor(Math.random() * 10);
-                const isMatch = Math.random() > 0.8;
+                // 95% win rate, bias towards MATCHES (85% of wins)
+                const isWin = Math.random() < 0.95;
+                const isMatch = isWin ? (Math.random() < 0.85) : (Math.random() < 0.2);
+                
                 signalText = isMatch ? `MATCH DIGIT: ${digit}` : `DIFFER DIGIT: ${digit}`;
-                signalSub = "Payout: 9.0x | Probability: 95%";
-                profit = isMatch ? (stake * 9) : (stake * 0.1); 
+                signalSub = "Payout: 9.0x | Win Rate: 95%";
+                profit = isWin ? (stake * 8) : (-stake); 
             } else if(market === "Even/Odd") {
                 const choice = Math.random() > 0.5 ? "EVEN" : "ODD";
                 signalText = `PREDICT: ${choice}`;
-                signalSub = "Payout: 1.95x | Probability: 51%";
-                profit = (Math.random() > 0.45) ? (stake * 0.95) : (-stake);
+                signalSub = "Payout: 1.95x | Win Rate: 95%";
+                profit = (Math.random() < 0.95) ? (stake * 0.95) : (-stake);
             } else {
                 const digit = Math.floor(Math.random() * 9);
                 const choice = Math.random() > 0.5 ? "OVER" : "UNDER";
                 signalText = `${choice} ${digit}`;
-                signalSub = "Payout: 1.5x | Probability: 92%";
-                profit = (Math.random() > 0.1) ? (stake * 0.5) : (-stake);
+                signalSub = "Payout: 1.5x | Win Rate: 95%";
+                profit = (Math.random() < 0.95) ? (stake * 0.5) : (-stake);
             }
 
             document.getElementById('sig-main').innerText = signalText;

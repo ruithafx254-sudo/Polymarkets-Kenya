@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexTrade | Advanced Bot Automation</title>
+    <title>ApexBot | Professional Trading Engine</title>
     <style>
         :root {
-            --bg-dark: #10141c;
-            --card-bg: #1a1f2c;
-            --input-bg: #242b3d;
+            --bg-dark: #0e121a;
+            --card-bg: #161d2a;
+            --input-bg: #1f2838;
             --primary-red: #ff444f;
             --primary-green: #00b15e;
             --text-main: #ffffff;
-            --text-muted: #98a1b6;
-            --border-color: #2e374a;
+            --text-muted: #9aa6bc;
+            --border-color: #263246;
+            --glow-green: rgba(0, 177, 94, 0.15);
+            --glow-red: rgba(255, 68, 79, 0.15);
         }
 
         * {
@@ -25,289 +27,414 @@
         }
 
         body {
-            background-color: #090b0f;
+            background-color: #06080c;
             color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 10px;
+            padding: 15px;
         }
 
         .app-container {
             width: 100%;
-            max-width: 420px;
+            max-width: 430px;
             background-color: var(--bg-dark);
-            border-radius: 28px;
+            border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
             border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            min-height: 720px;
+            height: 820px;
         }
 
-        /* Top Header */
+        /* Fixed Top Navbar */
         .app-header {
             padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
+            background-color: rgba(22, 29, 42, 0.6);
+            backdrop-filter: blur(10px);
+            z-index: 10;
         }
 
         .logo-area {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-weight: 700;
-            font-size: 1.15rem;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: -0.3px;
         }
 
-        .logo-dot {
-            width: 10px;
-            height: 10px;
-            background-color: var(--primary-red);
-            border-radius: 50%;
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary-red), #d6222d);
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .account-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .account-toggle {
             display: flex;
-            background-color: var(--card-bg);
-            border-radius: 20px;
+            background-color: #0b0e14;
+            border-radius: 30px;
             padding: 3px;
             border: 1px solid var(--border-color);
         }
 
         .toggle-btn {
-            padding: 5px 14px;
-            border-radius: 16px;
+            padding: 6px 16px;
+            border-radius: 30px;
             font-size: 0.8rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             border: none;
             color: var(--text-muted);
             background: transparent;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .toggle-btn.active {
             background-color: var(--primary-red);
             color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(255, 68, 79, 0.4);
         }
 
-        /* Views management */
+        /* Content Views Layer */
+        .view-wrapper {
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+        }
+
         .view {
             display: none;
-            flex: 1;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
             flex-direction: column;
             padding: 20px;
         }
 
-        .view.active {
-            display: flex;
-        }
+        .view.active { display: flex; }
 
-        /* Home View Styles */
-        .balance-card {
+        /* Dashboard Overview Card Layout */
+        .balance-hero {
+            background: radial-gradient(circle at top left, var(--card-bg), #0e121a);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            padding: 24px;
             text-align: center;
-            padding: 30px 0;
+            margin-bottom: 20px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
         }
 
         .balance-label {
             font-size: 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
         }
 
         .balance-amount {
-            font-size: 2.4rem;
-            font-weight: 700;
+            font-size: 2.6rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            font-variant-numeric: tabular-nums;
         }
 
-        .action-buttons {
-            display: flex;
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
             margin-bottom: 24px;
         }
 
-        .btn {
-            flex: 1;
+        .btn-wallet {
             padding: 14px;
-            border-radius: 14px;
+            border-radius: 12px;
             font-size: 0.95rem;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-deposit { background-color: var(--primary-red); color: white; }
-        .btn-withdraw { background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); }
-
-        .btn-trade-start {
-            background: linear-gradient(135deg, var(--primary-red), #d62c37);
-            color: white;
-            padding: 16px;
-            border-radius: 16px;
-            font-size: 1.05rem;
             font-weight: 700;
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(255, 68, 79, 0.3);
+            transition: opacity 0.2s;
+        }
+        .btn-wallet.deposit { background-color: var(--primary-green); color: white; }
+        .btn-wallet.withdraw { background-color: var(--input-bg); color: white; border: 1px solid var(--border-color); }
+        .btn-wallet:hover { opacity: 0.9; }
+
+        .btn-primary-action {
+            background: linear-gradient(135deg, var(--primary-red), #cf2d38);
+            color: white;
+            padding: 18px;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 68, 79, 0.35);
             margin-top: auto;
+            transition: transform 0.1s;
         }
+        .btn-primary-action:active { transform: scale(0.99); }
 
-        /* Market / Bot Selection Panel */
-        .section-title {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-
-        .selector-box {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 12px 16px;
+        /* Professional Live Workspaces */
+        .section-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: pointer;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
-        .bot-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 24px;
+        .section-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 700;
         }
 
-        .bot-card {
+        .selector-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 14px 8px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            transition: all 0.2s;
-        }
-
-        .bot-card.active {
-            border-color: var(--primary-red);
-            background-color: rgba(255, 68, 79, 0.08);
-            color: var(--text-main);
-        }
-
-        /* Deriv Config Panel Styles */
-        .config-group {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
+            padding: 14px 16px;
             display: flex;
-            flex-direction: column;
-            gap: 14px;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 18px;
+            font-weight: 600;
+        }
+
+        /* Trading Mode Filters Grid */
+        .bot-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
             margin-bottom: 20px;
         }
 
-        .input-row {
+        .bot-option-tab {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 6px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .bot-option-tab.active {
+            border-color: var(--primary-red);
+            background-color: rgba(255, 68, 79, 0.06);
+            color: var(--text-main);
+        }
+
+        /* Live Market Feed Component */
+        .live-ticker-container {
+            background-color: #0b0e14;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .live-price-wrapper { display: flex; flex-direction: column; }
+        .live-price { font-size: 1.2rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .live-price.up { color: var(--primary-green); }
+        .live-price.down { color: var(--primary-red); }
+
+        .tick-stream-strip {
+            display: flex;
+            gap: 6px;
+        }
+
+        .tick-digit-pill {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            transition: all 0.1s;
+        }
+        .tick-digit-pill.active-last {
+            background-color: var(--primary-red);
+            color: white;
+            transform: scale(1.15);
+        }
+
+        /* Grid Controls Parameters Box */
+        .parameter-block {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .param-field {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .input-row label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            width: 140px;
-        }
-
-        .input-wrapper input, .input-wrapper select {
+        .param-field label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+        .field-input-box { width: 130px; position: relative; }
+        
+        .field-input-box input, .field-input-box select {
             width: 100%;
             background-color: var(--input-bg);
             border: 1px solid var(--border-color);
-            color: white;
+            color: #fff;
             padding: 8px 12px;
             border-radius: 8px;
-            font-weight: 600;
+            font-weight: 700;
             text-align: right;
             outline: none;
         }
 
-        .input-wrapper select {
-            text-align-last: right;
-            padding-right: 24px;
-            appearance: none;
-        }
-
-        /* Custom Payout/Prediction Section */
-        .payout-info {
-            background: rgba(0, 177, 94, 0.1);
-            border: 1px dashed var(--primary-green);
-            padding: 12px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .payout-rate { color: var(--primary-green); }
-
-        .bot-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: auto;
-        }
-
-        .btn-back {
-            background-color: var(--card-bg);
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
-            flex: 0.4;
-        }
-
-        .btn-run {
-            background-color: var(--primary-green);
-            color: white;
+        /* Advanced Realtime Operations Log */
+        .execution-log-card {
             flex: 1;
-            box-shadow: 0 4px 15px rgba(0, 177, 94, 0.3);
+            background-color: #0b0e14;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            min-height: 160px;
+            margin-bottom: 16px;
+        }
+
+        .log-header-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1.2fr 1fr;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+            margin-bottom: 6px;
             font-weight: 700;
         }
 
-        /* Persistent Navigation Header/Footer */
-        .bottom-nav {
+        .log-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.75rem;
+        }
+
+        .log-item-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1.2fr 1fr;
+            font-variant-numeric: tabular-nums;
+            align-items: center;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(38, 50, 70, 0.3);
+        }
+
+        .status-win { color: var(--primary-green); font-weight: 700; }
+        .status-loss { color: var(--primary-red); font-weight: 700; }
+
+        /* Floating Analytics Banner Overlay */
+        .payout-pnl-banner {
+            display: flex;
+            justify-content: space-between;
+            background: linear-gradient(90deg, rgba(0, 177, 94, 0.1), transparent);
+            border-left: 3px solid var(--primary-green);
+            padding: 10px 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .workspace-actions { display: flex; gap: 10px; margin-top: auto; }
+        .btn-control { padding: 16px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; }
+        .btn-control.back { background-color: var(--card-bg); color: var(--text-muted); border: 1px solid var(--border-color); flex: 0.35; }
+        .btn-control.run { background-color: var(--primary-green); color: white; flex: 1; box-shadow: 0 4px 15px rgba(0, 177, 94, 0.3); }
+        .btn-control.run.running { background-color: var(--primary-red); box-shadow: 0 4px 15px rgba(255, 68, 79, 0.3); }
+
+        /* Core Footer Utility Panel */
+        .app-footer-nav {
             display: flex;
             justify-content: space-around;
             background-color: var(--card-bg);
             border-top: 1px solid var(--border-color);
-            padding: 14px 0;
-            margin-top: auto;
+            padding: 12px 0;
         }
 
-        .nav-item {
+        .nav-link {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
             color: var(--text-muted);
             font-size: 0.75rem;
+            font-weight: 600;
             cursor: pointer;
         }
+        .nav-link.active { color: var(--primary-red); }
 
-        .nav-item.active { color: var(--primary-red); }
+        /* Asset Dropdown Drawer Modal Window */
+        .asset-modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            align-items: flex-end;
+        }
+        .asset-modal {
+            width: 100%;
+            background-color: var(--bg-dark);
+            border-top: 1px solid var(--border-color);
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            max-height: 60%;
+            overflow-y: auto;
+        }
+        .asset-option {
+            padding: 14px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+        }
+        .asset-option:hover { background-color: var(--card-bg); }
     </style>
 </head>
 <body>
@@ -315,181 +442,358 @@
     <div class="app-container">
         <header class="app-header">
             <div class="logo-area">
-                <div class="logo-dot"></div>
-                <span>ApexTrade</span>
+                <div class="logo-icon">A</div>
+                <span>ApexBot</span>
             </div>
-            <div class="account-toggle">
-                <button class="toggle-btn active" id="real-toggle" onclick="switchAccount('real')">Real</button>
-                <button class="toggle-btn" id="demo-toggle" onclick="switchAccount('demo')">Demo</button>
+            <div class="account-wrapper">
+                <div class="account-toggle">
+                    <button class="toggle-btn active" id="mode-real" onclick="toggleAccountMode('real')">Real</button>
+                    <button class="toggle-btn" id="mode-demo" onclick="toggleAccountMode('demo')">Demo</button>
+                </div>
             </div>
         </header>
 
-        <div id="view-dashboard" class="view active">
-            <div class="balance-card">
-                <div class="balance-label" id="balance-label">Your real balance</div>
-                <div class="balance-amount" id="balance-amount">$30.04</div>
+        <div class="view-wrapper">
+            <div id="view-dashboard" class="view active">
+                <div class="balance-hero">
+                    <div class="balance-label" id="lbl-balance-scope">Total Account Balance</div>
+                    <div class="balance-amount" id="val-balance-display">$30.04</div>
+                </div>
+
+                <div class="action-grid">
+                    <button class="btn-wallet deposit">Instant Deposit</button>
+                    <button class="btn-wallet withdraw">Withdrawal</button>
+                </div>
+
+                <button class="btn-primary-action" onclick="switchView('view-trading')">Initialize Automated Engine</button>
             </div>
 
-            <div class="action-buttons">
-                <button class="btn btn-deposit">Deposit</button>
-                <button class="btn btn-withdraw">Withdraw</button>
-            </div>
+            <div id="view-trading" class="view">
+                <div class="section-row">
+                    <div class="section-title">Derived Synthesis Indexes</div>
+                </div>
+                <div class="selector-card" onclick="openAssetModal()">
+                    <span id="txt-active-asset">Volatility 100 (1s) Index</span>
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">▼</span>
+                </div>
 
-            <button class="btn-trade-start" onclick="changeView('view-trading')">Start real trading</button>
+                <div class="bot-selection-grid">
+                    <div class="bot-option-tab active" id="tab-matches_differs" onclick="switchStrategyProfile('matches_differs')">Matches/Differs</div>
+                    <div class="bot-option-tab" id="tab-even_odd" onclick="switchStrategyProfile('even_odd')">Even/Odd</div>
+                    <div class="bot-option-tab" id="tab-over_under" onclick="switchStrategyProfile('over_under')">Over/Under</div>
+                </div>
+
+                <div class="live-ticker-container">
+                    <div class="live-price-wrapper">
+                        <span style="font-size: 0.7rem; color: var(--text-muted); font-weight:700;">LIVE TICKER</span>
+                        <span class="live-price up" id="lbl-live-price">7432.18</span>
+                    </div>
+                    <div class="tick-stream-strip" id="strip-digits-history">
+                        <div class="tick-digit-pill">2</div>
+                        <div class="tick-digit-pill">5</div>
+                        <div class="tick-digit-pill">9</div>
+                        <div class="tick-digit-pill">1</div>
+                        <div class="tick-digit-pill active-last" id="lbl-last-tick-digit">8</div>
+                    </div>
+                </div>
+
+                <div class="parameter-block">
+                    <div class="param-field">
+                        <label>Base Contract Stake</label>
+                        <div class="field-input-box">
+                            <input type="number" id="inp-stake" value="1.00" step="0.5" oninput="syncContractProjections()">
+                        </div>
+                    </div>
+                    <div class="param-field" id="row-target-prediction">
+                        <label>Target Digit Prediction</label>
+                        <div class="field-input-box">
+                            <select id="inp-prediction" onchange="syncContractProjections()">
+                                <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+                                <option value="3">3</option><option value="4">4</option><option value="5" selected>5</option>
+                                <option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="param-field">
+                        <label>Martingale Factor</label>
+                        <div class="field-input-box">
+                            <input type="number" id="inp-martingale" value="2.1" step="0.1">
+                        </div>
+                    </div>
+                    <div class="param-field">
+                        <label>Take Profit Limit</label>
+                        <div class="field-input-box">
+                            <input type="number" id="inp-tp" value="50.00" step="5">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payout-pnl-banner">
+                    <span style="color: var(--text-muted);">Contract Target ROI:</span>
+                    <span id="lbl-roi-calc-payout">+$9.09 (909.1%)</span>
+                </div>
+
+                <div class="section-title" style="margin-bottom: 6px;">Live Core Processor Registry</div>
+                <div class="execution-log-card">
+                    <div class="log-header-row">
+                        <span>Asset Index</span>
+                        <span>Stake</span>
+                        <span>Prediction</span>
+                        <span style="text-align: right;">Profit/Loss</span>
+                    </div>
+                    <div class="log-scroll-area" id="box-log-rows-container">
+                        </div>
+                </div>
+
+                <div class="workspace-actions">
+                    <button class="btn-control back" onclick="switchView('view-dashboard')">Exit</button>
+                    <button class="btn-control run" id="btn-engine-toggle" onclick="toggleEngineRuntime()">Execute Automation Engine</button>
+                </div>
+            </div>
         </div>
 
-        <div id="view-trading" class="view">
-            <div class="section-title">Asset Market</div>
-            <div class="selector-box">
-                <span style="font-weight: 600;" id="market-asset">Volatility 100 (1s) Index</span>
-                <span style="color: var(--text-muted); font-size: 0.85rem;">▼</span>
-            </div>
-
-            <div class="section-title">Trade Type Bot</div>
-            <div class="bot-grid">
-                <div class="bot-card active" onclick="selectBot('matches_differs', this)">Matches / Differs</div>
-                <div class="bot-card" onclick="selectBot('even_odd', this)">Even / Odd</div>
-                <div class="bot-card" onclick="selectBot('over_under', this)">Over / Under</div>
-            </div>
-
-            <div class="section-title">Configuration Parameters</div>
-            <div class="config-group">
-                <div class="input-row">
-                    <label>Initial Stake</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="param-stake" value="1.00" step="0.5" oninput="calculatePayout()">
-                    </div>
-                </div>
-                
-                <div class="input-row" id="prediction-row">
-                    <label>Last Digit Prediction</label>
-                    <div class="input-wrapper">
-                        <select id="param-prediction" onchange="calculatePayout()">
-                            <option value="0">0</option><option value="1">1</option><option value="2">2</option>
-                            <option value="3">3</option><option value="4">4</option><option value="5" selected>5</option>
-                            <option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="input-row">
-                    <label>Martingale Multiplier</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="param-martingale" value="2.1" step="0.1">
-                    </div>
-                </div>
-
-                <div class="input-row">
-                    <label>Max Loss Steps</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="param-max-steps" value="5">
-                    </div>
-                </div>
-            </div>
-
-            <div class="payout-info">
-                <span>Expected Return / Payout:</span>
-                <span class="payout-rate" id="payout-calc">+$9.09 (909.1%)</span>
-            </div>
-
-            <div class="bot-actions">
-                <button class="btn btn-back" onclick="changeView('view-dashboard')">Back</button>
-                <button class="btn btn-run" onclick="toggleBotRun(this)">Run Bot Layout</button>
+        <div class="asset-modal-overlay" id="box-asset-modal" onclick="closeAssetModal()">
+            <div class="asset-modal" onclick="event.stopPropagation()">
+                <div class="section-title" style="margin-bottom: 12px; padding-bottom:6px; border-bottom:1px solid var(--border-color)">Select Volatility Stream Index</div>
+                <div class="asset-option" onclick="selectAssetAsset('Volatility 10 (1s) Index')"><span>Volatility 10 (1s) Index</span><span style="color:var(--primary-green)">24/7 Live</span></div>
+                <div class="asset-option" onclick="selectAssetAsset('Volatility 25 (1s) Index')"><span>Volatility 25 (1s) Index</span><span style="color:var(--primary-green)">24/7 Live</span></div>
+                <div class="asset-option" onclick="selectAssetAsset('Volatility 50 (1s) Index')"><span>Volatility 50 (1s) Index</span><span style="color:var(--primary-green)">24/7 Live</span></div>
+                <div class="asset-option" onclick="selectAssetAsset('Volatility 100 (1s) Index')"><span>Volatility 100 (1s) Index</span><span style="color:var(--primary-green)">24/7 Live</span></div>
             </div>
         </div>
 
-        <nav class="bottom-nav">
-            <div class="nav-item active" onclick="changeView('view-dashboard')">
-                <span>📊</span><span>Trading</span>
-            </div>
-            <div class="nav-item">
-                <span>⚙️</span><span>Settings</span>
-            </div>
+        <nav class="app-footer-nav">
+            <div class="nav-link active" onclick="switchView('view-dashboard')"><span>📊</span><span>Terminal</span></div>
+            <div class="nav-link"><span>💳</span><span>Cashier</span></div>
+            <div class="nav-link"><span>🛡️</span><span>Security</span></div>
         </nav>
     </div>
 
     <script>
-        let currentBalance = 30.04;
-        let isRunning = false;
-        let activeBotType = 'matches_differs';
+        // Core System Global State Variables
+        let systemState = {
+            accountScope: 'real',
+            realBalance: 30.04,
+            demoBalance: 10000.00,
+            activeAsset: 'Volatility 100 (1s) Index',
+            activeStrategy: 'matches_differs',
+            engineRunning: false,
+            currentStakeLevel: 1.00,
+            initialBaseStake: 1.00,
+            tickEngineTimer: null,
+            executionCycleTimer: null,
+            simulatedBaseAssetPrice: 7430.50
+        };
 
-        function changeView(viewId) {
+        // Initialize Global Ticker Core Engine Loops upon Document Execution
+        function initSystemTicker() {
+            systemState.tickEngineTimer = setInterval(() => {
+                // Generate natural high frequency drift variations
+                let priceDrift = (Math.random() - 0.495) * 4.5;
+                systemState.simulatedBaseAssetPrice += priceDrift;
+                
+                const lblPrice = document.getElementById('lbl-live-price');
+                lblPrice.innerText = systemState.simulatedBaseAssetPrice.toFixed(2);
+                
+                if (priceDrift > 0) {
+                    lblPrice.className = "live-price up";
+                } else {
+                    lblPrice.className = "live-price down";
+                }
+
+                // Extrapolate integer fractional decimals to power digital contracts mechanics
+                let priceString = systemState.simulatedBaseAssetPrice.toFixed(2);
+                let currentLastDigit = priceString.charAt(priceString.length - 1);
+                
+                updateTickerHistoryStrip(currentLastDigit);
+            }, 1000);
+        }
+
+        function updateTickerHistoryStrip(newDigit) {
+            const container = document.getElementById('strip-digits-history');
+            const pills = container.getElementsByClassName('tick-digit-pill');
+            
+            // Cycle history values through active display indexes
+            for(let i = 0; i < pills.length - 1; i++) {
+                pills[i].innerText = pills[i+1].innerText;
+            }
+            
+            const activePill = document.getElementById('lbl-last-tick-digit');
+            activePill.innerText = newDigit;
+        }
+
+        function switchView(viewId) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
         }
 
-        function switchAccount(type) {
-            const realBtn = document.getElementById('real-toggle');
-            const demoBtn = document.getElementById('demo-toggle');
-            const label = document.getElementById('balance-label');
-            const amount = document.getElementById('balance-amount');
-
-            if(type === 'real') {
-                realBtn.classList.add('active');
-                demoBtn.classList.remove('active');
-                label.innerText = "Your real balance";
-                amount.innerText = "$30.04";
-            } else {
-                demoBtn.classList.add('active');
-                realBtn.classList.remove('active');
-                label.innerText = "Your demo balance";
-                amount.innerText = "$11,249.76";
-            }
-        }
-
-        function selectBot(botType, element) {
-            activeBotType = botType;
-            document.querySelectorAll('.bot-card').forEach(c => c.classList.remove('active'));
-            element.classList.add('active');
-
-            const predictionRow = document.getElementById('prediction-row');
+        function toggleAccountMode(mode) {
+            systemState.accountScope = mode;
+            const btnReal = document.getElementById('mode-real');
+            const btnDemo = document.getElementById('mode-demo');
+            const lblScope = document.getElementById('lbl-balance-scope');
             
-            // Adjust form inputs based on selected strategy
-            if (botType === 'even_odd') {
-                predictionRow.style.display = 'none';
+            if (mode === 'real') {
+                btnReal.classList.add('active');
+                btnDemo.classList.remove('active');
+                lblScope.innerText = "Real Account Balance";
             } else {
-                predictionRow.style.display = 'flex';
+                btnDemo.classList.add('active');
+                btnReal.classList.remove('active');
+                lblScope.innerText = "Demo Account Balance Set";
             }
-            calculatePayout();
+            refreshBalanceDisplayUI();
         }
 
-        // Simulates realistic Deriv binary options risk premium scales
-        function calculatePayout() {
-            const stake = parseFloat(document.getElementById('param-stake').value) || 0;
-            const pred = parseInt(document.getElementById('param-prediction').value);
-            const display = document.getElementById('payout-calc');
-
-            if(activeBotType === 'matches_differs') {
-                // Matches return high rewards (~9x payout), Differs returned lower baseline (~10%)
-                // Simulating a "Matches" selection return option for high premium display
-                let profit = stake * 9.09;
-                display.innerText = `+$${profit.toFixed(2)} (+909.1%)`;
-            } else if (activeBotType === 'even_odd') {
-                let profit = stake * 0.95;
-                display.innerText = `+$${profit.toFixed(2)} (+95.0%)`;
-            } else if (activeBotType === 'over_under') {
-                // Return calculation moves dynamically relative to digit limits
-                let scale = pred > 5 ? (10 - pred) * 0.25 : (pred + 1) * 0.22;
-                let profit = stake * scale;
-                display.innerText = `+$${profit.toFixed(2)} (+${(scale * 100).toFixed(1)}%)`;
-            }
-        }
-
-        function toggleBotRun(btn) {
-            isRunning = !isRunning;
-            if(isRunning) {
-                btn.innerText = "Stop Bot Setup";
-                btn.style.backgroundColor = "var(--primary-red)";
-                btn.style.boxShadow = "0 4px 15px rgba(255, 68, 79, 0.3)";
+        function refreshBalanceDisplayUI() {
+            const display = document.getElementById('val-balance-display');
+            if (systemState.accountScope === 'real') {
+                display.innerText = `$${systemState.realBalance.toFixed(2)}`;
             } else {
-                btn.innerText = "Run Bot Layout";
-                btn.style.backgroundColor = "var(--primary-green)";
-                btn.style.boxShadow = "0 4px 15px rgba(0, 177, 94, 0.3)";
+                display.innerText = `$${systemState.demoBalance.toFixed(2)}`;
             }
         }
+
+        function openAssetModal() { document.getElementById('box-asset-modal').style.display = 'flex'; }
+        function closeAssetModal() { document.getElementById('box-asset-modal').style.display = 'none'; }
         
-        // Initial setup run
-        calculatePayout();
+        function selectAssetAsset(assetName) {
+            systemState.activeAsset = assetName;
+            document.getElementById('txt-active-asset').innerText = assetName;
+            closeAssetModal();
+        }
+
+        function switchStrategyProfile(strategyKey) {
+            systemState.activeStrategy = strategyKey;
+            document.querySelectorAll('.bot-option-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`tab-${strategyKey}`).classList.add('active');
+
+            const predRow = document.getElementById('row-target-prediction');
+            if (strategyKey === 'even_odd') {
+                predRow.style.display = 'none';
+            } else {
+                predRow.style.display = 'flex';
+            }
+            syncContractProjections();
+        }
+
+        function syncContractProjections() {
+            const stake = parseFloat(document.getElementById('inp-stake').value) || 1.00;
+            const targetDisplay = document.getElementById('lbl-roi-calc-payout');
+            
+            if (systemState.activeStrategy === 'matches_differs') {
+                targetDisplay.innerText = `+$${(stake * 9.09).toFixed(2)} (+909.1%)`;
+            } else if (systemState.activeStrategy === 'even_odd') {
+                targetDisplay.innerText = `+$${(stake * 0.95).toFixed(2)} (+95.0%)`;
+            } else {
+                targetDisplay.innerText = `+$${(stake * 0.92).toFixed(2)} (+92.0%)`;
+            }
+        }
+
+        // Main Trading Execution Loop Engine Handler
+        function toggleEngineRuntime() {
+            const btn = document.getElementById('btn-engine-toggle');
+            
+            if (systemState.engineRunning) {
+                // Halt engine systems safely
+                systemState.engineRunning = false;
+                btn.innerText = "Execute Automation Engine";
+                btn.className = "btn-control run";
+                clearInterval(systemState.executionCycleTimer);
+            } else {
+                // Initialize engine components
+                systemState.engineRunning = true;
+                btn.innerText = "Halt System Execution";
+                btn.className = "btn-control run running";
+                
+                systemState.initialBaseStake = parseFloat(document.getElementById('inp-stake').value) || 1.00;
+                systemState.currentStakeLevel = systemState.initialBaseStake;
+                
+                executeAutomatedTradingCycle();
+            }
+        }
+
+        function executeAutomatedTradingCycle() {
+            // Evaluates cycles asynchronously to emulate complex network calculations
+            systemState.executionCycleTimer = setInterval(() => {
+                if (!systemState.engineRunning) return;
+
+                const selectedPrediction = parseInt(document.getElementById('inp-prediction').value);
+                const currentLastDigit = parseInt(document.getElementById('lbl-last-tick-digit').innerText);
+                const martingaleFactor = parseFloat(document.getElementById('inp-martingale').value) || 2.0;
+                
+                let isWin = false;
+                let calculatedPayoutNet = 0;
+                
+                // Real mathematical confirmation logic for multi-tier indices
+                if (systemState.activeStrategy === 'matches_differs') {
+                    // Win parameters evaluated on raw ticks criteria
+                    isWin = (currentLastDigit === selectedPrediction);
+                    calculatedPayoutNet = isWin ? (systemState.currentStakeLevel * 9.09) : -systemState.currentStakeLevel;
+                } else if (systemState.activeStrategy === 'even_odd') {
+                    let isEven = (currentLastDigit % 2 === 0);
+                    isWin = isEven; // Simplified base-rate assignment trace configurations
+                    calculatedPayoutNet = isWin ? (systemState.currentStakeLevel * 0.95) : -systemState.currentStakeLevel;
+                } else if (systemState.activeStrategy === 'over_under') {
+                    isWin = (currentLastDigit > selectedPrediction);
+                    calculatedPayoutNet = isWin ? (systemState.currentStakeLevel * 0.92) : -systemState.currentStakeLevel;
+                }
+
+                // Balance Updates
+                if (systemState.accountScope === 'real') {
+                    systemState.realBalance += calculatedPayoutNet;
+                } else {
+                    systemState.demoBalance += calculatedPayoutNet;
+                }
+                refreshBalanceDisplayUI();
+
+                // Append contract execution summary to processing ledger container
+                appendRowToLedger(systemState.activeAsset, systemState.currentStakeLevel, isWin, calculatedPayoutNet);
+
+                // Professional automated martingale scaling adjustments 
+                if (isWin) {
+                    systemState.currentStakeLevel = systemState.initialBaseStake;
+                } else {
+                    systemState.currentStakeLevel = systemState.currentStakeLevel * martingaleFactor;
+                }
+                
+                // Auto sync display inputs
+                document.getElementById('inp-stake').value = systemState.currentStakeLevel.toFixed(2);
+                syncContractProjections();
+
+            }, 2500); // 2.5s real processing speed execution window
+        }
+
+        function appendRowToLedger(assetName, stakeUsed, isWin, resultPnl) {
+            const container = document.getElementById('box-log-rows-container');
+            const row = document.createElement('div');
+            row.className = "log-item-row";
+            
+            let displayPrediction = systemState.activeStrategy === 'even_odd' ? 'Even' : document.getElementById('inp-prediction').value;
+            let statusClass = isWin ? "status-win" : "status-loss";
+            let premiumPrefix = isWin ? "+" : "";
+
+            row.innerHTML = `
+                <span style="font-weight:600; color:#fff;">${assetName.split(' ')[1]}</span>
+                <span style="color:var(--text-muted);">$${stakeUsed.toFixed(2)}</span>
+                <span style="color:var(--text-muted);">${displayPrediction}</span>
+                <span class="${statusClass}" style="text-align:right;">${premiumPrefix}$${resultPnl.toFixed(2)}</span>
+            `;
+            
+            container.insertBefore(row, container.firstChild);
+            
+            // Caps max memory allocations rows inside DOM container view frames
+            if (container.children.length > 25) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        // Launch system background micro tasks on boot
+        window.onload = () => {
+            initSystemTicker();
+            syncContractProjections();
+            refreshBalanceDisplayUI();
+        };
     </script>
 </body>
 </html>

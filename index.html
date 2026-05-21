@@ -454,7 +454,6 @@
                 <span class="nav-label">Profile</span>
             </div>
         </nav>
-
     </div>
 
     <script>
@@ -572,7 +571,6 @@
             let signalSub = "";
             let profit = 0;
             
-            // 95% Win rate logic
             const isWin = Math.random() < 0.95;
 
             document.getElementById('sig-asset').innerText = `SCANNING: ${currentTargetIndex}`;
@@ -580,7 +578,6 @@
             if(market === "Matches/Differs") {
                 const digit = Math.floor(Math.random() * 10);
                 const isMatch = isWin ? (Math.random() < 0.85) : (Math.random() < 0.2);
-                
                 signalText = isMatch ? `MATCH DIGIT: ${digit}` : `DIFFER DIGIT: ${digit}`;
                 signalSub = "Payout: 9.0x | Win Rate: 95%";
                 profit = isWin ? (stake * 8) : (-stake); 
@@ -590,11 +587,17 @@
                 signalSub = "Payout: 1.95x | Win Rate: 95%";
                 profit = isWin ? (stake * 0.95) : (-stake);
             } else {
-                const digit = Math.floor(Math.random() * 9);
-                const choice = Math.random() > 0.5 ? "OVER" : "UNDER";
-                signalText = `${choice} ${digit}`;
-                signalSub = "Payout: 1.5x | Win Rate: 95%";
-                profit = isWin ? (stake * 0.5) : (-stake);
+                // Corrected Over/Under Logic: Payouts scale with the probability of the digit
+                const digit = Math.floor(Math.random() * 9); // Digit 0-8
+                const isOver = Math.random() > 0.5;
+                signalText = isOver ? `OVER ${digit}` : `UNDER ${digit}`;
+                
+                // Payout calculation logic: Higher digit for OVER = higher risk/payout
+                // Roughly 1.1x for easy targets, up to 10x for rare digits
+                const multiplier = isOver ? (1.1 + (digit * 0.9)) : (1.1 + ((8 - digit) * 0.9));
+                signalSub = `Payout: ${multiplier.toFixed(1)}x | Win Rate: 95%`;
+                
+                profit = isWin ? (stake * (multiplier - 1)) : (-stake);
             }
 
             document.getElementById('sig-main').innerText = signalText;

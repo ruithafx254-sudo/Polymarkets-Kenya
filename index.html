@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apex Enterprise OS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             /* Samsung One UI Enterprise Palette */
@@ -457,6 +458,12 @@
     </div>
 
     <script>
+        // Supabase Initialization
+        const supabase = supabase.createClient(
+            'https://hsovbnxatorocibfgrhc.supabase.co',
+            'sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP'
+        );
+
         let realBalance = 50.00;
         let demoBalance = 10000.00;
         let isRealAccount = true;

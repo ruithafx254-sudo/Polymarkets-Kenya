@@ -242,18 +242,25 @@
         .parameters-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .param-input { background-color: var(--bg-app); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 8px; }
         .param-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 4px; }
-        .param-input input { width: 100%; border: none; background: transparent; font-size: 1rem; font-weight: 800; color: var(--text-main); outline: none; }
+        .param-input input, .param-input select { width: 100%; border: none; background: transparent; font-size: 1rem; font-weight: 800; color: var(--text-main); outline: none; }
 
         .btn-master { width: 100%; background-color: var(--primary-blue); color: white; border: none; padding: 18px; border-radius: var(--radius-lg); font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-blue); }
         .btn-master:active { transform: scale(0.98); }
         .btn-master.active { background-color: var(--danger-red); box-shadow: 0 8px 24px rgba(220, 53, 69, 0.3); }
 
         /* Ledger Tab Content */
+        .ledger-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .total-pnl { font-size: 1rem; font-weight: 800; }
+        .pnl-pos { color: var(--success-green); }
+        .pnl-neg { color: var(--danger-red); }
+        .delete-all { font-size: 0.8rem; color: var(--danger-red); cursor: pointer; font-weight: 700; }
+
         .ledger-row { background-color: var(--surface-white); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
         .ledger-details { display: flex; flex-direction: column; gap: 4px; }
         .ledger-asset { font-weight: 700; font-size: 0.9rem; }
         .ledger-type { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
         .ledger-profit { font-weight: 800; color: var(--success-green); font-size: 1.1rem; }
+        .delete-icon { cursor: pointer; font-size: 1.2rem; color: var(--danger-red); margin-left: 15px; }
 
         /* Profile Tab Content */
         .profile-header { text-align: center; padding: 20px 0; }
@@ -362,12 +369,16 @@
 
                     <div class="parameters-row">
                         <div class="param-input">
-                            <span class="param-label">Base Stake ($)</span>
-                            <input type="number" id="inp-stake" value="1.00" step="1">
+                            <span class="param-label">Market Strategy</span>
+                            <select id="inp-market">
+                                <option value="Matches/Differs">Matches/Differs</option>
+                                <option value="Even/Odd">Even/Odd</option>
+                                <option value="Over/Under">Over/Under</option>
+                            </select>
                         </div>
                         <div class="param-input">
-                            <span class="param-label">Tight TP Limit ($)</span>
-                            <input type="number" id="inp-tp" value="20.00" step="5">
+                            <span class="param-label">Base Stake ($)</span>
+                            <input type="number" id="inp-stake" value="1.00" step="1">
                         </div>
                     </div>
 
@@ -377,7 +388,13 @@
             </div>
 
             <div id="view-ledger" class="view">
-                <h3 style="font-size:1.1rem; font-weight:800; margin-bottom:10px;">Live Execution Ledger</h3>
+                <div class="ledger-header">
+                    <h3 style="font-size:1.1rem; font-weight:800;">Live Ledger</h3>
+                    <div style="display:flex; gap: 15px; align-items:center;">
+                        <span class="total-pnl" id="total-pnl">P&L: $0.00</span>
+                        <span class="delete-all" onclick="clearLedger()">Clear All</span>
+                    </div>
+                </div>
                 <div id="ledger-list">
                     <div style="text-align:center; padding: 40px 0; color:var(--text-muted); font-weight:600; font-size:0.85rem;">No executions recorded yet.</div>
                 </div>
@@ -441,48 +458,39 @@
     </div>
 
     <script>
-        // System State Variables
         let realBalance = 50.00;
         let demoBalance = 10000.00;
         let isRealAccount = true;
         const targetBalance = 50000.00;
+        let totalPnL = 0;
         
         let isEngineRunning = false;
         let scanInterval;
         let activeModalType = '';
         let currentTargetIndex = "";
 
-        // Deriv Volatility Indices Pool
         const volatilityIndices = [
             "Volatility 10 Index", "Volatility 25 Index", "Volatility 50 Index", 
-            "Volatility 75 Index", "Volatility 100 Index", "Volatility 10 (1s) Index", 
-            "Volatility 25 (1s) Index", "Volatility 50 (1s) Index", "Volatility 75 (1s) Index", 
-            "Volatility 100 (1s) Index", "Jump 10 Index", "Jump 100 Index"
+            "Volatility 75 Index", "Volatility 100 Index", "Jump 10 Index", "Jump 100 Index"
         ];
 
-        // Auth Functions
         function handleLogin() {
             document.getElementById('auth-screen').classList.add('hidden');
-            showToast('Authentication Successful. Secure Connection Established.');
+            showToast('Authentication Successful.');
             updateBalanceUI();
         }
 
         function handleLogout() {
-            if(isEngineRunning) toggleBotEngine(); // Stop bot if running
+            if(isEngineRunning) toggleBotEngine();
             document.getElementById('auth-screen').classList.remove('hidden');
-            document.getElementById('login-email').value = '';
-            document.getElementById('login-pass').value = '';
         }
 
-        // Account Switcher
         function switchAccountType() {
             const selector = document.getElementById('account-type');
             isRealAccount = (selector.value === 'real');
             updateBalanceUI();
-            showToast(`Switched to ${isRealAccount ? 'Real' : 'Demo'} Environment`);
         }
 
-        // View Navigation
         function switchTab(viewId, element) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -490,85 +498,62 @@
             element.classList.add('active');
         }
 
-        // Toast Notification System
         function showToast(message) {
             const container = document.getElementById('toast-area');
             const toast = document.createElement('div');
             toast.className = 'toast';
             toast.innerHTML = `<span style="color:var(--success-green)">✔</span> ${message}`;
             container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(-20px)';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            setTimeout(() => toast.remove(), 3000);
         }
 
-        // Modal Handlers
         function openModal(type) {
             activeModalType = type;
-            const modal = document.getElementById('payment-modal');
-            document.getElementById('modal-title').innerText = type === 'deposit' ? 'Payhero M-Pesa Deposit' : 'Instant Bank Withdrawal';
-            modal.classList.add('show');
+            document.getElementById('payment-modal').classList.add('show');
         }
 
         function closeModal(e) { document.getElementById('payment-modal').classList.remove('show'); }
 
         function processTransaction() {
             const amount = parseFloat(document.getElementById('modal-amount').value);
-            if (!amount || amount <= 0) { showToast("Please enter a valid amount."); return; }
-            closeModal();
-            
+            if (!amount || amount <= 0) return;
             if (activeModalType === 'deposit') {
-                showToast(`STK Push sent. Processing deposit...`);
-                setTimeout(() => {
-                    if(isRealAccount) realBalance += amount; else demoBalance += amount;
-                    updateBalanceUI();
-                    showToast(`Deposit Successful! +$${amount.toFixed(2)} added.`);
-                }, 2500);
+                if(isRealAccount) realBalance += amount; else demoBalance += amount;
             } else {
-                let currentBal = isRealAccount ? realBalance : demoBalance;
-                if (amount > currentBal) { showToast("Insufficient funds."); return; }
-                showToast(`Processing withdrawal...`);
-                setTimeout(() => {
-                    if(isRealAccount) realBalance -= amount; else demoBalance -= amount;
-                    updateBalanceUI();
-                    showToast(`Withdrawal Successful! -$${amount.toFixed(2)} deducted.`);
-                }, 2500);
+                if(isRealAccount) realBalance -= amount; else demoBalance -= amount;
             }
-            document.getElementById('modal-amount').value = '';
-            document.getElementById('modal-phone').value = '';
+            updateBalanceUI();
+            closeModal();
+            showToast("Transaction Processed");
         }
 
-        // Balance & Progress UI updates
         function updateBalanceUI() {
             let bal = isRealAccount ? realBalance : demoBalance;
-            document.getElementById('display-balance').innerText = `$${bal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            
+            document.getElementById('display-balance').innerText = `$${bal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
             let progress = (bal / targetBalance) * 100;
-            if (progress > 100) progress = 100;
-            document.getElementById('goal-progress').style.width = `${progress}%`;
-            
-            document.getElementById('target-display').innerText = isRealAccount ? "$50,000.00 Target" : "Demo Simulation";
+            document.getElementById('goal-progress').style.width = `${Math.min(progress, 100)}%`;
         }
 
-        // Core AI Simulation Engine
+        function updatePnL(val) {
+            totalPnL += val;
+            const pnlEl = document.getElementById('total-pnl');
+            pnlEl.innerText = `P&L: $${totalPnL.toFixed(2)}`;
+            pnlEl.className = `total-pnl ${totalPnL >= 0 ? 'pnl-pos' : 'pnl-neg'}`;
+        }
+
+        function clearLedger() {
+            document.getElementById('ledger-list').innerHTML = '<div style="text-align:center; padding: 40px 0; color:var(--text-muted); font-weight:600; font-size:0.85rem;">No executions recorded yet.</div>';
+            totalPnL = 0;
+            updatePnL(0);
+        }
+
         function toggleBotEngine() {
             const btn = document.getElementById('btn-toggle-bot');
-            const sigAsset = document.getElementById('sig-asset');
-            const sigMain = document.getElementById('sig-main');
-            const sigTimer = document.getElementById('sig-timer');
-
             if (isEngineRunning) {
                 isEngineRunning = false;
                 btn.innerText = "Execute AI Automation";
                 btn.classList.remove('active');
                 clearTimeout(scanInterval);
-                sigAsset.innerText = "ENGINE IDLE";
-                sigAsset.style.color = "#8b95a5";
-                sigMain.innerText = "--";
-                sigMain.style.color = "#8b95a5";
-                sigTimer.innerText = "Awaiting execution command";
             } else {
                 isEngineRunning = true;
                 btn.innerText = "Halt System Process";
@@ -579,71 +564,37 @@
 
         function runScannerCycle() {
             if (!isEngineRunning) return;
-
-            const sigAsset = document.getElementById('sig-asset');
-            const sigMain = document.getElementById('sig-main');
-            const sigTimer = document.getElementById('sig-timer');
-
-            // Pick Random Volatility Index
+            const market = document.getElementById('inp-market').value;
             currentTargetIndex = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)];
-
-            sigAsset.innerText = `SCANNING: ${currentTargetIndex}`;
-            sigAsset.style.color = "var(--primary-blue)";
-            sigMain.innerText = "ANALYZING";
-            sigMain.style.color = "white";
-            sigTimer.innerText = "Locating 100% Match probability pattern...";
-
+            
+            document.getElementById('sig-asset').innerText = `SCANNING: ${currentTargetIndex} (${market})`;
+            document.getElementById('sig-main').innerText = "CALCULATING 95%...";
+            
             scanInterval = setTimeout(() => {
                 if (!isEngineRunning) return;
-
-                const targetDigit = Math.floor(Math.random() * 10);
-                sigAsset.innerText = `LOCKED: ${currentTargetIndex}`;
-                sigAsset.style.color = "var(--success-green)";
-                sigMain.innerText = `MATCH DIGIT: ${targetDigit}`;
-                sigMain.style.color = "var(--success-green)";
-                
-                let countdown = 3; 
-                sigTimer.innerText = `Executing strict parameters in ${countdown}s...`;
-
-                const countInt = setInterval(() => {
-                    countdown--;
-                    if(countdown > 0) {
-                        sigTimer.innerText = `Executing strict parameters in ${countdown}s...`;
-                    } else {
-                        clearInterval(countInt);
-                        if (isEngineRunning) executePerfectTrade(targetDigit);
-                    }
-                }, 1000);
-
-            }, 2500);
+                const profit = 9.09;
+                if(isRealAccount) realBalance += profit; else demoBalance += profit;
+                updateBalanceUI();
+                updatePnL(profit);
+                logExecution(profit, market);
+                runScannerCycle();
+            }, 3000);
         }
 
-        function executePerfectTrade(digit) {
-            const stake = parseFloat(document.getElementById('inp-stake').value) || 1.00;
-            const profit = stake * 9.09;
-            
-            if(isRealAccount) realBalance += profit; else demoBalance += profit;
-            updateBalanceUI();
-            
-            logExecution(stake, profit, digit, currentTargetIndex);
-            showToast(`Match Executed! +$${profit.toFixed(2)} on ${currentTargetIndex}`);
-
-            document.getElementById('sig-timer').innerText = "Contract closed in profit. Recalibrating...";
-            scanInterval = setTimeout(() => { runScannerCycle(); }, 2000);
-        }
-
-        function logExecution(stake, profit, digit, asset) {
+        function logExecution(profit, market) {
             const ledger = document.getElementById('ledger-list');
-            if (ledger.innerText.includes("No executions")) { ledger.innerHTML = ''; }
-
+            if (ledger.innerText.includes("No executions")) ledger.innerHTML = '';
             const row = document.createElement('div');
             row.className = 'ledger-row';
             row.innerHTML = `
                 <div class="ledger-details">
-                    <span class="ledger-asset">${asset}</span>
-                    <span class="ledger-type">${isRealAccount ? 'Real' : 'Demo'} | Matches | Stake: $${stake.toFixed(2)} | Target: ${digit}</span>
+                    <span class="ledger-asset">${currentTargetIndex}</span>
+                    <span class="ledger-type">${market} | +$${profit.toFixed(2)}</span>
                 </div>
-                <div class="ledger-profit">+$${profit.toFixed(2)}</div>
+                <div style="display:flex; align-items:center;">
+                    <span class="ledger-profit">+$${profit.toFixed(2)}</span>
+                    <span class="delete-icon" onclick="this.parentElement.parentElement.remove(); updatePnL(-${profit})">×</span>
+                </div>
             `;
             ledger.insertBefore(row, ledger.firstChild);
         }

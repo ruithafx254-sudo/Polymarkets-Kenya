@@ -3,24 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Enterprise | Trading</title>
+    <title>Apex Enterprise OS</title>
     <style>
         :root {
-            /* Samsung One UI / Enterprise Light Theme */
-            --bg-body: #f4f5f7;
-            --bg-surface: #ffffff;
+            /* Samsung One UI Enterprise Palette */
+            --bg-outer: #e3e6e8;
+            --bg-app: #f7f9fa;
+            --surface-white: #ffffff;
             --primary-blue: #007aff;
-            --primary-blue-hover: #005bb5;
-            --text-dark: #1d1d1f;
-            --text-gray: #86868b;
-            --border-light: #e5e5ea;
-            --status-green: #34c759;
-            --status-red: #ff3b30;
-            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.04);
-            --shadow-btn: 0 4px 14px rgba(0, 122, 255, 0.3);
-            --radius-lg: 28px;
-            --radius-md: 18px;
-            --radius-sm: 12px;
+            --primary-hover: #005bb5;
+            --text-main: #111111;
+            --text-muted: #6e7781;
+            --border-color: #e1e4e8;
+            --success-green: #28a745;
+            --success-light: rgba(40, 167, 69, 0.1);
+            --danger-red: #dc3545;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-lg: 0 16px 40px rgba(0,0,0,0.08);
+            --shadow-blue: 0 8px 24px rgba(0, 122, 255, 0.25);
+            --radius-xl: 32px;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         * {
@@ -32,416 +36,731 @@
         }
 
         body {
-            background-color: #e8eaed; /* Outer background to frame the app */
-            color: var(--text-dark);
+            background-color: var(--bg-outer);
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 10px;
+            height: 100vh;
+            overflow: hidden;
+            color: var(--text-main);
         }
 
+        /* Device Hardware Frame */
         .device-frame {
             width: 100%;
-            max-width: 414px; /* Standard premium mobile width */
-            background-color: var(--bg-body);
-            border-radius: 40px;
-            overflow: hidden;
-            box-shadow: 0 24px 80px rgba(0,0,0,0.15);
-            border: 8px solid #ffffff;
+            max-width: 414px;
+            height: 850px;
+            max-height: 95vh;
+            background-color: var(--bg-app);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg), inset 0 0 0 8px #fff;
             display: flex;
             flex-direction: column;
-            height: 850px;
             position: relative;
+            overflow: hidden;
         }
 
-        /* Clean Enterprise Header */
-        .header {
-            background-color: var(--bg-surface);
-            padding: 24px 24px 16px 24px;
+        /* Header Area */
+        .app-header {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 24px 20px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border-color);
             z-index: 10;
         }
 
-        .brand {
-            font-size: 1.3rem;
+        .brand-title {
+            font-size: 1.25rem;
             font-weight: 800;
             letter-spacing: -0.5px;
-            color: var(--text-dark);
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .brand-icon {
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, var(--primary-blue), #00c6ff);
-            border-radius: 8px;
+        .brand-logo {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-blue);
             color: white;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
 
-        .account-badge {
-            background-color: #f2f2f7;
-            padding: 6px 14px;
+        .status-badge {
+            background-color: #e8f0fe;
+            color: var(--primary-blue);
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-gray);
-            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        /* Scrollable Content Area */
-        .content {
+        /* View Containers */
+        .view-container {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            position: relative;
+            padding-bottom: 20px;
         }
 
-        /* Core Balance Card */
-        .balance-card {
-            background-color: var(--bg-surface);
+        .view {
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .view.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Balance & Target Section */
+        .equity-card {
+            background-color: var(--surface-white);
             border-radius: var(--radius-lg);
-            padding: 28px 24px;
-            box-shadow: var(--shadow-soft);
+            padding: 28px 20px;
+            box-shadow: var(--shadow-sm);
             text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .equity-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .equity-amount {
+            font-size: 3.2rem;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin-bottom: 16px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .progress-container {
+            background-color: var(--bg-outer);
+            border-radius: 10px;
+            height: 8px;
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), #00c6ff);
+            width: 0.1%; /* Start based on 50 / 50000 */
+            transition: width 0.5s ease;
+        }
+
+        .target-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Payment Buttons */
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .action-btn {
+            background-color: var(--surface-white);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-btn:active { transform: scale(0.96); background-color: var(--bg-outer); }
+        .action-btn span { font-size: 0.7rem; color: var(--success-green); font-weight: 600; }
+
+        /* Enterprise AI Scanner */
+        .ai-engine-box {
+            background: var(--surface-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--primary-blue);
+            padding: 24px;
+            box-shadow: var(--shadow-blue);
             position: relative;
             overflow: hidden;
         }
 
-        .balance-title {
-            font-size: 0.9rem;
-            color: var(--text-gray);
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .balance-value {
-            font-size: 3rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            color: var(--text-dark);
-            margin-bottom: 8px;
-        }
-
-        .goal-tracker {
-            display: inline-block;
-            background-color: rgba(0, 122, 255, 0.1);
-            color: var(--primary-blue);
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-
-        /* Primary Actions */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .btn-secondary {
-            background-color: var(--bg-surface);
-            border: 1px solid var(--border-light);
-            padding: 16px;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: var(--text-dark);
-            box-shadow: var(--shadow-soft);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-secondary:active { transform: scale(0.98); background-color: #f2f2f7; }
-        
-        .m-pesa-text { color: #34c759; font-weight: 700; font-size: 0.75rem; display: block; margin-top: 4px; }
-
-        /* The AI Engine Scanner Card */
-        .ai-scanner-card {
-            background: linear-gradient(180deg, #ffffff 0%, #f4f5f7 100%);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid var(--border-light);
-            position: relative;
-        }
-
-        .section-header {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-gray);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 16px;
+        .ai-header {
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
         }
 
-        .ai-status {
+        .live-indicator {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             color: var(--primary-blue);
         }
 
-        .pulse-dot {
+        .radar-dot {
             width: 8px;
             height: 8px;
             background-color: var(--primary-blue);
             border-radius: 50%;
-            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.5);
+            animation: radar 1.5s infinite;
         }
 
-        @keyframes pulse {
+        @keyframes radar {
             0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(0, 122, 255, 0); }
+            70% { box-shadow: 0 0 0 12px rgba(0, 122, 255, 0); }
             100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); }
         }
 
-        .signal-display {
-            background-color: #1d1d1f;
+        .signal-screen {
+            background-color: #0b101e;
             border-radius: var(--radius-md);
-            padding: 20px;
-            color: white;
+            padding: 24px;
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
+            color: white;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        .signal-target { font-size: 1rem; color: #86868b; margin-bottom: 4px; }
-        .signal-action { font-size: 2.2rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; }
-        .signal-action.even { color: #00c6ff; }
-        .signal-action.odd { color: #ff9500; }
-        
-        .signal-timing {
-            background: rgba(255,255,255,0.1);
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 0.9rem;
+        .signal-text {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            color: var(--success-green);
+        }
+
+        .signal-sub {
+            font-size: 0.85rem;
+            color: #8b95a5;
             font-weight: 600;
         }
 
-        /* Trading Parameters */
-        .param-grid {
+        .parameters-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
+            margin-bottom: 20px;
         }
 
-        .input-group {
-            background-color: var(--bg-surface);
-            border: 1px solid var(--border-light);
-            padding: 12px 16px;
-            border-radius: var(--radius-sm);
+        .param-input {
+            background-color: var(--bg-app);
+            border: 1px solid var(--border-color);
+            padding: 10px 14px;
+            border-radius: 8px;
         }
 
-        .input-label { font-size: 0.75rem; color: var(--text-gray); font-weight: 600; margin-bottom: 4px; display: block; }
-        .input-field {
+        .param-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .param-input input {
             width: 100%;
             border: none;
-            outline: none;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text-dark);
             background: transparent;
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-main);
+            outline: none;
         }
 
-        /* Execute Button */
-        .btn-execute {
+        .btn-master {
+            width: 100%;
             background-color: var(--primary-blue);
             color: white;
-            width: 100%;
-            padding: 20px;
-            border-radius: var(--radius-lg);
             border: none;
+            padding: 18px;
+            border-radius: var(--radius-lg);
             font-size: 1.1rem;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
-            box-shadow: var(--shadow-btn);
-            transition: all 0.2s;
-            margin-top: 10px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-blue);
         }
 
-        .btn-execute:active { transform: scale(0.98); }
-        .btn-execute.running { background-color: var(--status-red); box-shadow: 0 4px 14px rgba(255, 59, 48, 0.3); }
+        .btn-master:active { transform: scale(0.98); }
+        .btn-master.active { background-color: var(--danger-red); box-shadow: 0 8px 24px rgba(220, 53, 69, 0.3); }
 
-        /* Minimal Footer Nav */
+        /* Ledger Tab Content */
+        .ledger-row {
+            background-color: var(--surface-white);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .ledger-details { display: flex; flex-direction: column; gap: 4px; }
+        .ledger-asset { font-weight: 700; font-size: 0.9rem; }
+        .ledger-type { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+        .ledger-profit { font-weight: 800; color: var(--success-green); font-size: 1.1rem; }
+
+        /* Navigation Bar */
         .bottom-nav {
-            background-color: var(--bg-surface);
-            padding: 16px 24px 24px 24px;
-            border-top: 1px solid var(--border-light);
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border-color);
+            padding: 16px 20px 24px;
             display: flex;
             justify-content: space-around;
+            z-index: 10;
         }
 
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
-            color: var(--text-gray);
-            font-size: 0.75rem;
-            font-weight: 600;
+            gap: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
         }
 
         .nav-item.active { color: var(--primary-blue); }
-        .nav-icon { font-size: 1.3rem; }
+        .nav-icon { font-size: 1.4rem; }
+        .nav-label { font-size: 0.7rem; font-weight: 700; }
 
+        /* Modals & Toasts */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background-color: var(--surface-white);
+            width: 100%;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.show { display: flex; }
+        .modal-overlay.show .modal-card { transform: translateY(0); opacity: 1; }
+
+        .modal-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 16px; }
+        .modal-input {
+            width: 100%;
+            border: 2px solid var(--border-color);
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            outline: none;
+        }
+        .modal-input:focus { border-color: var(--success-green); }
+
+        .modal-btn {
+            width: 100%;
+            background-color: var(--success-green);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .toast-container {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 90%;
+        }
+
+        .toast {
+            background-color: #111;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideDown 0.3s forwards;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
 
     <div class="device-frame">
         
-        <header class="header">
-            <div class="brand">
-                <div class="brand-icon">A</div>
-                Apex OS
+        <div class="toast-container" id="toast-area"></div>
+
+        <header class="app-header">
+            <div class="brand-title">
+                <div class="brand-logo">A</div>
+                ApexOS
             </div>
-            <div class="account-badge">Real Account</div>
+            <div class="status-badge">Live System</div>
         </header>
 
-        <div class="content">
+        <div class="view-container">
             
-            <div class="balance-card">
-                <div class="balance-title">Available Equity</div>
-                <div class="balance-value" id="main-balance">$50.00</div>
-                <div class="goal-tracker">Milestone Target: $50,000.00</div>
+            <div id="view-home" class="view active">
+                
+                <div class="equity-card">
+                    <div class="equity-label">Total Equity Balance</div>
+                    <div class="equity-amount" id="display-balance">$50.00</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="goal-progress"></div>
+                    </div>
+                    <div class="target-text">Goal Progress: $50,000.00 Target</div>
+                </div>
+
+                <div class="grid-buttons">
+                    <button class="action-btn" onclick="openModal('deposit')">
+                        Deposit Funds
+                        <span>Payhero Integration</span>
+                    </button>
+                    <button class="action-btn" onclick="openModal('withdraw')">
+                        Withdraw
+                        <span style="color:var(--text-muted)">Instant Bank/M-Pesa</span>
+                    </button>
+                </div>
+
+                <div class="ai-engine-box">
+                    <div class="ai-header">
+                        <span>Neural Match Scanner</span>
+                        <div class="live-indicator">
+                            <div class="radar-dot"></div>
+                            Monitoring Feed
+                        </div>
+                    </div>
+
+                    <div class="signal-screen">
+                        <div class="signal-sub" id="sig-status">ENGINE IDLE</div>
+                        <div class="signal-text" id="sig-main">--</div>
+                        <div class="signal-sub" id="sig-timer" style="margin-top: 8px;">Awaiting execution command</div>
+                    </div>
+
+                    <div class="parameters-row">
+                        <div class="param-input">
+                            <span class="param-label">Base Stake ($)</span>
+                            <input type="number" id="inp-stake" value="1.00" step="1">
+                        </div>
+                        <div class="param-input">
+                            <span class="param-label">Tight TP Limit ($)</span>
+                            <input type="number" id="inp-tp" value="20.00" step="5">
+                        </div>
+                    </div>
+
+                    <button class="btn-master" id="btn-toggle-bot" onclick="toggleBotEngine()">Execute AI Automation</button>
+                </div>
+
             </div>
 
-            <div class="quick-actions">
-                <button class="btn-secondary">
-                    Deposit Funds
-                    <span class="m-pesa-text">Payhero / M-Pesa Ready</span>
-                </button>
-                <button class="btn-secondary">
-                    Withdraw
-                    <span class="m-pesa-text" style="color:var(--text-gray)">Instant Payout</span>
-                </button>
-            </div>
-
-            <div class="ai-scanner-card">
-                <div class="section-header">
-                    <span>Neural Signal Engine</span>
-                    <div class="ai-status">
-                        <div class="pulse-dot"></div>
-                        Scanning Live
-                    </div>
+            <div id="view-ledger" class="view">
+                <h3 style="font-size:1.1rem; font-weight:800; margin-bottom:10px;">Live Execution Ledger</h3>
+                <div id="ledger-list">
+                    <div style="text-align:center; padding: 40px 0; color:var(--text-muted); font-weight:600; font-size:0.85rem;">No executions recorded yet.</div>
                 </div>
-
-                <div class="signal-display">
-                    <div class="signal-target">Asset: Volatility 100 Index</div>
-                    <div class="signal-action even" id="ai-prediction">PREPARING...</div>
-                    <div class="signal-timing" id="ai-timing">Awaiting next tick cycle</div>
-                </div>
-
-                <div class="param-grid">
-                    <div class="input-group">
-                        <span class="input-label">Base Stake ($)</span>
-                        <input type="number" class="input-field" value="2.00" step="0.5">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-label">Tight TP Limit ($)</span>
-                        <input type="number" class="input-field" value="5.00" step="1">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-label">Martingale Split</span>
-                        <input type="number" class="input-field" value="2.1" step="0.1">
-                    </div>
-                    <div class="input-group">
-                        <span class="input-label">Max Steps</span>
-                        <input type="number" class="input-field" value="4">
-                    </div>
-                </div>
-
-                <button class="btn-execute" id="btn-run" onclick="toggleEngine()">Initialize Automated Bot</button>
             </div>
 
         </div>
 
+        <div class="modal-overlay" id="payment-modal" onclick="closeModal(event)">
+            <div class="modal-card" onclick="event.stopPropagation()">
+                <div class="modal-title" id="modal-title">Payhero STK Push</div>
+                <input type="tel" class="modal-input" placeholder="Enter Phone Number (e.g., 0712...)" id="modal-phone">
+                <input type="number" class="modal-input" placeholder="Amount (USD)" id="modal-amount">
+                <button class="modal-btn" onclick="processTransaction()">Trigger STK Push</button>
+            </div>
+        </div>
+
         <nav class="bottom-nav">
-            <div class="nav-item active">
-                <span class="nav-icon">📊</span>
-                <span>Workspace</span>
+            <div class="nav-item active" onclick="switchTab('view-home', this)">
+                <span class="nav-icon">⎈</span>
+                <span class="nav-label">Engine</span>
             </div>
-            <div class="nav-item">
-                <span class="nav-icon">⚙️</span>
-                <span>Config</span>
+            <div class="nav-item" onclick="switchTab('view-ledger', this)">
+                <span class="nav-icon">≡</span>
+                <span class="nav-label">Ledger</span>
             </div>
-            <div class="nav-item">
-                <span class="nav-icon">👤</span>
-                <span>Profile</span>
+            <div class="nav-item" onclick="showToast('Profile settings are secure.')">
+                <span class="nav-icon">⚙</span>
+                <span class="nav-label">System</span>
             </div>
         </nav>
 
     </div>
 
     <script>
-        let isRunning = false;
-        let aiInterval;
-        let countdownInterval;
+        // System State Variables
+        let currentBalance = 50.00;
+        const targetBalance = 50000.00;
+        let isEngineRunning = false;
+        let scanInterval;
+        let activeModalType = '';
 
-        function simulateAISignal() {
-            const predictionEl = document.getElementById('ai-prediction');
-            const timingEl = document.getElementById('ai-timing');
+        // Initialize UI on load
+        updateBalanceUI();
+
+        // View Navigation
+        function switchTab(viewId, element) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             
-            // Logic to simulate highly advanced analysis
-            const isEven = Math.random() > 0.5;
-            const targetSecond = Math.floor(Math.random() * 5) + 3; // 3 to 7 seconds out
-            let countdown = targetSecond;
-
-            if (isEven) {
-                predictionEl.innerText = "ENTER EVEN";
-                predictionEl.className = "signal-action even";
-            } else {
-                predictionEl.innerText = "ENTER ODD";
-                predictionEl.className = "signal-action odd";
-            }
-
-            timingEl.innerText = `Confidence: 94% | Execute in ${countdown}s`;
-
-            clearInterval(countdownInterval);
-            countdownInterval = setInterval(() => {
-                countdown--;
-                if(countdown > 0) {
-                    timingEl.innerText = `Confidence: 94% | Execute in ${countdown}s`;
-                } else {
-                    timingEl.innerText = `EXECUTING TRADE NOW...`;
-                    clearInterval(countdownInterval);
-                    // Cycle next signal after brief pause
-                    setTimeout(simulateAISignal, 2000);
-                }
-            }, 1000);
+            document.getElementById(viewId).classList.add('active');
+            element.classList.add('active');
         }
 
-        function toggleEngine() {
-            const btn = document.getElementById('btn-run');
+        // Toast Notification System
+        function showToast(message) {
+            const container = document.getElementById('toast-area');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span style="color:var(--success-green)">✔</span> ${message}`;
             
-            if (isRunning) {
-                isRunning = false;
-                btn.innerText = "Initialize Automated Bot";
-                btn.classList.remove('running');
-                clearInterval(countdownInterval);
-                document.getElementById('ai-prediction').innerText = "SYSTEM PAUSED";
-                document.getElementById('ai-prediction').className = "signal-action";
-                document.getElementById('ai-timing').innerText = "Awaiting manual initialization";
-            } else {
-                isRunning = true;
-                btn.innerText = "Halt Active Trading";
-                btn.classList.add('running');
-                simulateAISignal();
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Modal Handlers
+        function openModal(type) {
+            activeModalType = type;
+            const modal = document.getElementById('payment-modal');
+            const title = document.getElementById('modal-title');
+            
+            title.innerText = type === 'deposit' ? 'Payhero M-Pesa Deposit' : 'Instant Bank Withdrawal';
+            modal.classList.add('show');
+        }
+
+        function closeModal(e) {
+            document.getElementById('payment-modal').classList.remove('show');
+        }
+
+        function processTransaction() {
+            const amount = parseFloat(document.getElementById('modal-amount').value);
+            if (!amount || amount <= 0) {
+                showToast("Please enter a valid amount.");
+                return;
             }
+
+            closeModal();
+            
+            if (activeModalType === 'deposit') {
+                showToast(`STK Push sent. Processing deposit of $${amount.toFixed(2)}...`);
+                setTimeout(() => {
+                    currentBalance += amount;
+                    updateBalanceUI();
+                    showToast(`Deposit Successful! +$${amount.toFixed(2)} added.`);
+                }, 2500);
+            } else {
+                if (amount > currentBalance) {
+                    showToast("Insufficient funds for withdrawal.");
+                    return;
+                }
+                showToast(`Processing withdrawal of $${amount.toFixed(2)}...`);
+                setTimeout(() => {
+                    currentBalance -= amount;
+                    updateBalanceUI();
+                    showToast(`Withdrawal Successful! -$${amount.toFixed(2)} deducted.`);
+                }, 2500);
+            }
+            
+            document.getElementById('modal-amount').value = '';
+            document.getElementById('modal-phone').value = '';
+        }
+
+        // Balance & Progress UI updates
+        function updateBalanceUI() {
+            document.getElementById('display-balance').innerText = `$${currentBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            
+            let progress = (currentBalance / targetBalance) * 100;
+            if (progress > 100) progress = 100;
+            document.getElementById('goal-progress').style.width = `${progress}%`;
+        }
+
+        // Core AI Simulation Engine
+        function toggleBotEngine() {
+            const btn = document.getElementById('btn-toggle-bot');
+            const sigStatus = document.getElementById('sig-status');
+            const sigMain = document.getElementById('sig-main');
+            const sigTimer = document.getElementById('sig-timer');
+
+            if (isEngineRunning) {
+                // Stop Engine
+                isEngineRunning = false;
+                btn.innerText = "Execute AI Automation";
+                btn.classList.remove('active');
+                clearTimeout(scanInterval);
+                
+                sigStatus.innerText = "ENGINE IDLE";
+                sigStatus.style.color = "#8b95a5";
+                sigMain.innerText = "--";
+                sigMain.style.color = "#8b95a5";
+                sigTimer.innerText = "Awaiting execution command";
+            } else {
+                // Start Engine
+                isEngineRunning = true;
+                btn.innerText = "Halt System Process";
+                btn.classList.add('active');
+                
+                runScannerCycle();
+            }
+        }
+
+        function runScannerCycle() {
+            if (!isEngineRunning) return;
+
+            const sigStatus = document.getElementById('sig-status');
+            const sigMain = document.getElementById('sig-main');
+            const sigTimer = document.getElementById('sig-timer');
+
+            sigStatus.innerText = "SCANNING VOLATILITY INDICES...";
+            sigStatus.style.color = "var(--primary-blue)";
+            sigMain.innerText = "ANALYZING";
+            sigMain.style.color = "white";
+            sigTimer.innerText = "Locating 100% Match probability pattern...";
+
+            // Simulate the time it takes to "find" a perfect signal
+            scanInterval = setTimeout(() => {
+                if (!isEngineRunning) return;
+
+                const targetDigit = Math.floor(Math.random() * 10);
+                sigStatus.innerText = "PERFECT SIGNAL LOCKED";
+                sigStatus.style.color = "var(--success-green)";
+                sigMain.innerText = `MATCH DIGIT: ${targetDigit}`;
+                sigMain.style.color = "var(--success-green)";
+                
+                let countdown = 3; // 3 second countdown to execution
+                sigTimer.innerText = `Executing strict parameters in ${countdown}s...`;
+
+                const countInt = setInterval(() => {
+                    countdown--;
+                    if(countdown > 0) {
+                        sigTimer.innerText = `Executing strict parameters in ${countdown}s...`;
+                    } else {
+                        clearInterval(countInt);
+                        if (isEngineRunning) executePerfectTrade(targetDigit);
+                    }
+                }, 1000);
+
+            }, 2500);
+        }
+
+        function executePerfectTrade(digit) {
+            const stake = parseFloat(document.getElementById('inp-stake').value) || 1.00;
+            
+            // Deriv Matches payout is typically stake * 9.09 for profit
+            const profit = stake * 9.09;
+            
+            // Add to balance
+            currentBalance += profit;
+            updateBalanceUI();
+            
+            // Append to Ledger
+            logExecution(stake, profit, digit);
+            showToast(`Match Executed Successfully! +$${profit.toFixed(2)}`);
+
+            // Check if Take Profit limit is reached (Simulation logic)
+            const tpLimit = parseFloat(document.getElementById('inp-tp').value) || 20.00;
+            
+            // Loop scanner back
+            document.getElementById('sig-timer').innerText = "Contract closed in profit. Recalibrating...";
+            scanInterval = setTimeout(() => {
+                runScannerCycle();
+            }, 2000);
+        }
+
+        function logExecution(stake, profit, digit) {
+            const ledger = document.getElementById('ledger-list');
+            
+            // Clear default message if it exists
+            if (ledger.innerText.includes("No executions")) {
+                ledger.innerHTML = '';
+            }
+
+            const row = document.createElement('div');
+            row.className = 'ledger-row';
+            row.innerHTML = `
+                <div class="ledger-details">
+                    <span class="ledger-asset">Volatility 100 (1s) Index</span>
+                    <span class="ledger-type">Matches | Stake: $${stake.toFixed(2)} | Target: ${digit}</span>
+                </div>
+                <div class="ledger-profit">+$${profit.toFixed(2)}</div>
+            `;
+            
+            // Insert at top
+            ledger.insertBefore(row, ledger.firstChild);
         }
     </script>
 </body>

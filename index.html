@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apex Enterprise OS</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             /* Samsung One UI Enterprise Palette */
@@ -352,7 +351,7 @@
                     </div>
                     <div class="profile-item">
                         <span>Database Node</span>
-                        <span style="color:var(--primary-blue); font-weight:700;">Supabase Connected</span>
+                        <span style="color:var(--primary-blue); font-weight:700;">Local Storage Connected</span>
                     </div>
                     <div class="profile-item">
                         <span>Risk Settings</span>
@@ -382,11 +381,6 @@
     </div>
 
     <script>
-        // --- SUPABASE INITIALIZATION ---
-        const supabaseUrl = 'https://hsovbnxatorocibfgrhc.supabase.co';
-        const supabaseKey = 'sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
         let authMode = 'login'; 
         let currentUser = null;
 
@@ -405,7 +399,18 @@
             "Volatility 75 (1s) Index", "Volatility 100 (1s) Index"
         ];
 
-        // --- AUTH LOGIC ---
+        // --- SESSION PERSISTENCE (Runs on load) ---
+        window.onload = () => {
+            const savedSession = localStorage.getItem('apex_session');
+            if(savedSession) {
+                currentUser = JSON.parse(savedSession);
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('profile-email-text').innerText = currentUser.email;
+                updateBalanceUI();
+            }
+        };
+
+        // --- AUTH LOGIC (Local Storage) ---
         function switchAuthTab(mode) {
             authMode = mode;
             document.getElementById('tab-login').classList.toggle('active', mode === 'login');
@@ -423,31 +428,49 @@
             btn.disabled = true;
             btn.innerText = 'Processing...';
 
-            let result;
-            if (authMode === 'signup') {
-                result = await supabase.auth.signUp({ email, password });
-            } else {
-                result = await supabase.auth.signInWithPassword({ email, password });
-            }
+            // Simulate slight network delay
+            setTimeout(() => {
+                let users = JSON.parse(localStorage.getItem('apex_users')) || {};
+                let success = false;
+                let errorMsg = '';
 
-            btn.disabled = false;
-            btn.innerText = authMode === 'login' ? 'Initialize Session' : 'Create Access Node';
+                if (authMode === 'signup') {
+                    if (users[email]) {
+                        errorMsg = 'Account already exists. Please sign in.';
+                    } else {
+                        users[email] = { password: password };
+                        localStorage.setItem('apex_users', JSON.stringify(users));
+                        success = true;
+                    }
+                } else {
+                    if (users[email] && users[email].password === password) {
+                        success = true;
+                    } else {
+                        errorMsg = 'Invalid credentials. Please try again.';
+                    }
+                }
 
-            if (result.error) {
-                showToast(result.error.message, 'error');
-            } else {
-                currentUser = result.data.user;
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('profile-email-text').innerText = currentUser.email;
-                showToast(authMode === 'login' ? 'Authentication Successful' : 'Account Created Successfully');
-                updateBalanceUI();
-            }
+                btn.disabled = false;
+                btn.innerText = authMode === 'login' ? 'Initialize Session' : 'Create Access Node';
+
+                if (!success) {
+                    showToast(errorMsg, 'error');
+                } else {
+                    currentUser = { email: email };
+                    localStorage.setItem('apex_session', JSON.stringify(currentUser));
+                    
+                    document.getElementById('auth-screen').classList.add('hidden');
+                    document.getElementById('profile-email-text').innerText = currentUser.email;
+                    showToast(authMode === 'login' ? 'Authentication Successful' : 'Account Created Successfully');
+                    updateBalanceUI();
+                }
+            }, 600);
         }
 
-        async function handleLogout() {
+        function handleLogout() {
             if(isEngineRunning) toggleBotEngine();
-            await supabase.auth.signOut();
             currentUser = null;
+            localStorage.removeItem('apex_session');
             document.getElementById('auth-screen').classList.remove('hidden');
             document.getElementById('auth-pass').value = '';
             showToast('Session Terminated');

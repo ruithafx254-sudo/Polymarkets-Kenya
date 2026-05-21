@@ -3,19 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexBot | Professional Trading Engine</title>
+    <title>Apex Enterprise | Trading</title>
     <style>
         :root {
-            --bg-dark: #0e121a;
-            --card-bg: #161d2a;
-            --input-bg: #1f2838;
-            --primary-red: #ff444f;
-            --primary-green: #00b15e;
-            --text-main: #ffffff;
-            --text-muted: #9aa6bc;
-            --border-color: #263246;
-            --glow-green: rgba(0, 177, 94, 0.15);
-            --glow-red: rgba(255, 68, 79, 0.15);
+            /* Samsung One UI / Enterprise Light Theme */
+            --bg-body: #f4f5f7;
+            --bg-surface: #ffffff;
+            --primary-blue: #007aff;
+            --primary-blue-hover: #005bb5;
+            --text-dark: #1d1d1f;
+            --text-gray: #86868b;
+            --border-light: #e5e5ea;
+            --status-green: #34c759;
+            --status-red: #ff3b30;
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.04);
+            --shadow-btn: 0 4px 14px rgba(0, 122, 255, 0.3);
+            --radius-lg: 28px;
+            --radius-md: 18px;
+            --radius-sm: 12px;
         }
 
         * {
@@ -27,773 +32,417 @@
         }
 
         body {
-            background-color: #06080c;
-            color: var(--text-main);
+            background-color: #e8eaed; /* Outer background to frame the app */
+            color: var(--text-dark);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 15px;
+            padding: 10px;
         }
 
-        .app-container {
+        .device-frame {
             width: 100%;
-            max-width: 430px;
-            background-color: var(--bg-dark);
-            border-radius: 24px;
+            max-width: 414px; /* Standard premium mobile width */
+            background-color: var(--bg-body);
+            border-radius: 40px;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
-            border: 1px solid var(--border-color);
+            box-shadow: 0 24px 80px rgba(0,0,0,0.15);
+            border: 8px solid #ffffff;
             display: flex;
             flex-direction: column;
-            height: 820px;
+            height: 850px;
+            position: relative;
         }
 
-        /* Fixed Top Navbar */
-        .app-header {
-            padding: 16px 20px;
+        /* Clean Enterprise Header */
+        .header {
+            background-color: var(--bg-surface);
+            padding: 24px 24px 16px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            background-color: rgba(22, 29, 42, 0.6);
-            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-light);
             z-index: 10;
         }
 
-        .logo-area {
+        .brand {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-dark);
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 800;
-            font-size: 1.2rem;
-            letter-spacing: -0.3px;
+            gap: 8px;
         }
 
-        .logo-icon {
-            background: linear-gradient(135deg, var(--primary-red), #d6222d);
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
+        .brand-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--primary-blue), #00c6ff);
+            border-radius: 8px;
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
-            font-weight: bold;
+            font-size: 0.9rem;
         }
 
-        .account-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .account-toggle {
-            display: flex;
-            background-color: #0b0e14;
-            border-radius: 30px;
-            padding: 3px;
-            border: 1px solid var(--border-color);
-        }
-
-        .toggle-btn {
-            padding: 6px 16px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            border: none;
-            color: var(--text-muted);
-            background: transparent;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .toggle-btn.active {
-            background-color: var(--primary-red);
-            color: var(--text-main);
-            box-shadow: 0 2px 8px rgba(255, 68, 79, 0.4);
-        }
-
-        /* Content Views Layer */
-        .view-wrapper {
-            flex: 1;
-            position: relative;
-            overflow-y: auto;
-        }
-
-        .view {
-            display: none;
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        .view.active { display: flex; }
-
-        /* Dashboard Overview Card Layout */
-        .balance-hero {
-            background: radial-gradient(circle at top left, var(--card-bg), #0e121a);
+        .account-badge {
+            background-color: #f2f2f7;
+            padding: 6px 14px;
             border-radius: 20px;
-            border: 1px solid var(--border-color);
-            padding: 24px;
-            text-align: center;
-            margin-bottom: 20px;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-gray);
+            cursor: pointer;
         }
 
-        .balance-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        /* Scrollable Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Core Balance Card */
+        .balance-card {
+            background-color: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            padding: 28px 24px;
+            box-shadow: var(--shadow-soft);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-title {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            font-weight: 500;
             margin-bottom: 8px;
         }
 
-        .balance-amount {
-            font-size: 2.6rem;
+        .balance-value {
+            font-size: 3rem;
             font-weight: 800;
             letter-spacing: -1px;
-            font-variant-numeric: tabular-nums;
+            color: var(--text-dark);
+            margin-bottom: 8px;
         }
 
-        .action-grid {
+        .goal-tracker {
+            display: inline-block;
+            background-color: rgba(0, 122, 255, 0.1);
+            color: var(--primary-blue);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* Primary Actions */
+        .quick-actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 24px;
         }
 
-        .btn-wallet {
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        .btn-wallet.deposit { background-color: var(--primary-green); color: white; }
-        .btn-wallet.withdraw { background-color: var(--input-bg); color: white; border: 1px solid var(--border-color); }
-        .btn-wallet:hover { opacity: 0.9; }
-
-        .btn-primary-action {
-            background: linear-gradient(135deg, var(--primary-red), #cf2d38);
-            color: white;
-            padding: 18px;
-            border-radius: 16px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(255, 68, 79, 0.35);
-            margin-top: auto;
-            transition: transform 0.1s;
-        }
-        .btn-primary-action:active { transform: scale(0.99); }
-
-        /* Professional Live Workspaces */
-        .section-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .section-title {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            font-weight: 700;
-        }
-
-        .selector-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 14px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            margin-bottom: 18px;
-            font-weight: 600;
-        }
-
-        /* Trading Mode Filters Grid */
-        .bot-selection-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .bot-option-tab {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px 6px;
-            text-align: center;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .bot-option-tab.active {
-            border-color: var(--primary-red);
-            background-color: rgba(255, 68, 79, 0.06);
-            color: var(--text-main);
-        }
-
-        /* Live Market Feed Component */
-        .live-ticker-container {
-            background-color: #0b0e14;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .live-price-wrapper { display: flex; flex-direction: column; }
-        .live-price { font-size: 1.2rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-        .live-price.up { color: var(--primary-green); }
-        .live-price.down { color: var(--primary-red); }
-
-        .tick-stream-strip {
-            display: flex;
-            gap: 6px;
-        }
-
-        .tick-digit-pill {
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-            background-color: var(--input-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: 700;
-            transition: all 0.1s;
-        }
-        .tick-digit-pill.active-last {
-            background-color: var(--primary-red);
-            color: white;
-            transform: scale(1.15);
-        }
-
-        /* Grid Controls Parameters Box */
-        .parameter-block {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
+        .btn-secondary {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-light);
             padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 16px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            box-shadow: var(--shadow-soft);
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .param-field {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .param-field label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
-        .field-input-box { width: 130px; position: relative; }
+        .btn-secondary:active { transform: scale(0.98); background-color: #f2f2f7; }
         
-        .field-input-box input, .field-input-box select {
-            width: 100%;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            text-align: right;
-            outline: none;
+        .m-pesa-text { color: #34c759; font-weight: 700; font-size: 0.75rem; display: block; margin-top: 4px; }
+
+        /* The AI Engine Scanner Card */
+        .ai-scanner-card {
+            background: linear-gradient(180deg, #ffffff 0%, #f4f5f7 100%);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+            position: relative;
         }
 
-        /* Advanced Realtime Operations Log */
-        .execution-log-card {
-            flex: 1;
-            background-color: #0b0e14;
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            min-height: 160px;
-            margin-bottom: 16px;
-        }
-
-        .log-header-row {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr 1.2fr 1fr;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 6px;
-            margin-bottom: 6px;
-            font-weight: 700;
-        }
-
-        .log-scroll-area {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            font-size: 0.75rem;
-        }
-
-        .log-item-row {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr 1.2fr 1fr;
-            font-variant-numeric: tabular-nums;
-            align-items: center;
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(38, 50, 70, 0.3);
-        }
-
-        .status-win { color: var(--primary-green); font-weight: 700; }
-        .status-loss { color: var(--primary-red); font-weight: 700; }
-
-        /* Floating Analytics Banner Overlay */
-        .payout-pnl-banner {
-            display: flex;
-            justify-content: space-between;
-            background: linear-gradient(90deg, rgba(0, 177, 94, 0.1), transparent);
-            border-left: 3px solid var(--primary-green);
-            padding: 10px 14px;
-            border-radius: 0 8px 8px 0;
+        .section-header {
             font-size: 0.85rem;
             font-weight: 700;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             margin-bottom: 16px;
-        }
-
-        .workspace-actions { display: flex; gap: 10px; margin-top: auto; }
-        .btn-control { padding: 16px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; }
-        .btn-control.back { background-color: var(--card-bg); color: var(--text-muted); border: 1px solid var(--border-color); flex: 0.35; }
-        .btn-control.run { background-color: var(--primary-green); color: white; flex: 1; box-shadow: 0 4px 15px rgba(0, 177, 94, 0.3); }
-        .btn-control.run.running { background-color: var(--primary-red); box-shadow: 0 4px 15px rgba(255, 68, 79, 0.3); }
-
-        /* Core Footer Utility Panel */
-        .app-footer-nav {
-            display: flex;
-            justify-content: space-around;
-            background-color: var(--card-bg);
-            border-top: 1px solid var(--border-color);
-            padding: 12px 0;
-        }
-
-        .nav-link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .nav-link.active { color: var(--primary-red); }
-
-        /* Asset Dropdown Drawer Modal Window */
-        .asset-modal-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0,0,0,0.7);
-            backdrop-filter: blur(4px);
-            z-index: 100;
-            display: none;
-            align-items: flex-end;
-        }
-        .asset-modal {
-            width: 100%;
-            background-color: var(--bg-dark);
-            border-top: 1px solid var(--border-color);
-            border-radius: 20px 20px 0 0;
-            padding: 20px;
-            max-height: 60%;
-            overflow-y: auto;
-        }
-        .asset-option {
-            padding: 14px;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            font-weight: 600;
             display: flex;
             justify-content: space-between;
         }
-        .asset-option:hover { background-color: var(--card-bg); }
+
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary-blue);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 122, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); }
+        }
+
+        .signal-display {
+            background-color: #1d1d1f;
+            border-radius: var(--radius-md);
+            padding: 20px;
+            color: white;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .signal-target { font-size: 1rem; color: #86868b; margin-bottom: 4px; }
+        .signal-action { font-size: 2.2rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; }
+        .signal-action.even { color: #00c6ff; }
+        .signal-action.odd { color: #ff9500; }
+        
+        .signal-timing {
+            background: rgba(255,255,255,0.1);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Trading Parameters */
+        .param-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .input-group {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+        }
+
+        .input-label { font-size: 0.75rem; color: var(--text-gray); font-weight: 600; margin-bottom: 4px; display: block; }
+        .input-field {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            background: transparent;
+        }
+
+        /* Execute Button */
+        .btn-execute {
+            background-color: var(--primary-blue);
+            color: white;
+            width: 100%;
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: var(--shadow-btn);
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-execute:active { transform: scale(0.98); }
+        .btn-execute.running { background-color: var(--status-red); box-shadow: 0 4px 14px rgba(255, 59, 48, 0.3); }
+
+        /* Minimal Footer Nav */
+        .bottom-nav {
+            background-color: var(--bg-surface);
+            padding: 16px 24px 24px 24px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-gray);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .nav-item.active { color: var(--primary-blue); }
+        .nav-icon { font-size: 1.3rem; }
+
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <header class="app-header">
-            <div class="logo-area">
-                <div class="logo-icon">A</div>
-                <span>ApexBot</span>
+    <div class="device-frame">
+        
+        <header class="header">
+            <div class="brand">
+                <div class="brand-icon">A</div>
+                Apex OS
             </div>
-            <div class="account-wrapper">
-                <div class="account-toggle">
-                    <button class="toggle-btn active" id="mode-real" onclick="toggleAccountMode('real')">Real</button>
-                    <button class="toggle-btn" id="mode-demo" onclick="toggleAccountMode('demo')">Demo</button>
-                </div>
-            </div>
+            <div class="account-badge">Real Account</div>
         </header>
 
-        <div class="view-wrapper">
-            <div id="view-dashboard" class="view active">
-                <div class="balance-hero">
-                    <div class="balance-label" id="lbl-balance-scope">Total Account Balance</div>
-                    <div class="balance-amount" id="val-balance-display">$30.04</div>
-                </div>
-
-                <div class="action-grid">
-                    <button class="btn-wallet deposit">Instant Deposit</button>
-                    <button class="btn-wallet withdraw">Withdrawal</button>
-                </div>
-
-                <button class="btn-primary-action" onclick="switchView('view-trading')">Initialize Automated Engine</button>
+        <div class="content">
+            
+            <div class="balance-card">
+                <div class="balance-title">Available Equity</div>
+                <div class="balance-value" id="main-balance">$50.00</div>
+                <div class="goal-tracker">Milestone Target: $50,000.00</div>
             </div>
 
-            <div id="view-trading" class="view">
-                <div class="section-row">
-                    <div class="section-title">Derived Synthesis Indexes</div>
-                </div>
-                <div class="selector-card" onclick="openAssetModal()">
-                    <span id="txt-active-asset">Volatility 100 (1s) Index</span>
-                    <span style="color: var(--text-muted); font-size: 0.8rem;">▼</span>
-                </div>
-
-                <div class="bot-selection-grid">
-                    <div class="bot-option-tab active" id="tab-matches_differs" onclick="switchStrategyProfile('matches_differs')">Matches/Differs</div>
-                    <div class="bot-option-tab" id="tab-even_odd" onclick="switchStrategyProfile('even_odd')">Even/Odd</div>
-                    <div class="bot-option-tab" id="tab-over_under" onclick="switchStrategyProfile('over_under')">Over/Under</div>
-                </div>
-
-                <div class="live-ticker-container">
-                    <div class="live-price-wrapper">
-                        <span style="font-size: 0.7rem; color: var(--text-muted); font-weight:700;">LIVE TICKER</span>
-                        <span class="live-price up" id="lbl-live-price">7432.18</span>
-                    </div>
-                    <div class="tick-stream-strip" id="strip-digits-history">
-                        <div class="tick-digit-pill">2</div>
-                        <div class="tick-digit-pill">5</div>
-                        <div class="tick-digit-pill">9</div>
-                        <div class="tick-digit-pill">1</div>
-                        <div class="tick-digit-pill active-last" id="lbl-last-tick-digit">8</div>
-                    </div>
-                </div>
-
-                <div class="parameter-block">
-                    <div class="param-field">
-                        <label>Base Contract Stake</label>
-                        <div class="field-input-box">
-                            <input type="number" id="inp-stake" value="1.00" step="0.5" oninput="syncContractProjections()">
-                        </div>
-                    </div>
-                    <div class="param-field" id="row-target-prediction">
-                        <label>Target Digit Prediction</label>
-                        <div class="field-input-box">
-                            <select id="inp-prediction" onchange="syncContractProjections()">
-                                <option value="0">0</option><option value="1">1</option><option value="2">2</option>
-                                <option value="3">3</option><option value="4">4</option><option value="5" selected>5</option>
-                                <option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="param-field">
-                        <label>Martingale Factor</label>
-                        <div class="field-input-box">
-                            <input type="number" id="inp-martingale" value="2.1" step="0.1">
-                        </div>
-                    </div>
-                    <div class="param-field">
-                        <label>Take Profit Limit</label>
-                        <div class="field-input-box">
-                            <input type="number" id="inp-tp" value="50.00" step="5">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="payout-pnl-banner">
-                    <span style="color: var(--text-muted);">Contract Target ROI:</span>
-                    <span id="lbl-roi-calc-payout">+$9.09 (909.1%)</span>
-                </div>
-
-                <div class="section-title" style="margin-bottom: 6px;">Live Core Processor Registry</div>
-                <div class="execution-log-card">
-                    <div class="log-header-row">
-                        <span>Asset Index</span>
-                        <span>Stake</span>
-                        <span>Prediction</span>
-                        <span style="text-align: right;">Profit/Loss</span>
-                    </div>
-                    <div class="log-scroll-area" id="box-log-rows-container">
-                        </div>
-                </div>
-
-                <div class="workspace-actions">
-                    <button class="btn-control back" onclick="switchView('view-dashboard')">Exit</button>
-                    <button class="btn-control run" id="btn-engine-toggle" onclick="toggleEngineRuntime()">Execute Automation Engine</button>
-                </div>
+            <div class="quick-actions">
+                <button class="btn-secondary">
+                    Deposit Funds
+                    <span class="m-pesa-text">Payhero / M-Pesa Ready</span>
+                </button>
+                <button class="btn-secondary">
+                    Withdraw
+                    <span class="m-pesa-text" style="color:var(--text-gray)">Instant Payout</span>
+                </button>
             </div>
+
+            <div class="ai-scanner-card">
+                <div class="section-header">
+                    <span>Neural Signal Engine</span>
+                    <div class="ai-status">
+                        <div class="pulse-dot"></div>
+                        Scanning Live
+                    </div>
+                </div>
+
+                <div class="signal-display">
+                    <div class="signal-target">Asset: Volatility 100 Index</div>
+                    <div class="signal-action even" id="ai-prediction">PREPARING...</div>
+                    <div class="signal-timing" id="ai-timing">Awaiting next tick cycle</div>
+                </div>
+
+                <div class="param-grid">
+                    <div class="input-group">
+                        <span class="input-label">Base Stake ($)</span>
+                        <input type="number" class="input-field" value="2.00" step="0.5">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-label">Tight TP Limit ($)</span>
+                        <input type="number" class="input-field" value="5.00" step="1">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-label">Martingale Split</span>
+                        <input type="number" class="input-field" value="2.1" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-label">Max Steps</span>
+                        <input type="number" class="input-field" value="4">
+                    </div>
+                </div>
+
+                <button class="btn-execute" id="btn-run" onclick="toggleEngine()">Initialize Automated Bot</button>
+            </div>
+
         </div>
 
-        <div class="asset-modal-overlay" id="box-asset-modal" onclick="closeAssetModal()">
-            <div class="asset-modal" onclick="event.stopPropagation()">
-                <div class="section-title" style="margin-bottom: 12px; padding-bottom:6px; border-bottom:1px solid var(--border-color)">Select Volatility Stream Index</div>
-                <div class="asset-option" onclick="selectAssetAsset('Volatility 10 (1s) Index')"><span>Volatility 10 (1s) Index</span><span style="color:var(--primary-green)">24/7 Live</span></div>
-                <div class="asset-option" onclick="selectAssetAsset('Volatility 25 (1s) Index')"><span>Volatility 25 (1s) Index</span><span style="color:var(--primary-green)">24/7 Live</span></div>
-                <div class="asset-option" onclick="selectAssetAsset('Volatility 50 (1s) Index')"><span>Volatility 50 (1s) Index</span><span style="color:var(--primary-green)">24/7 Live</span></div>
-                <div class="asset-option" onclick="selectAssetAsset('Volatility 100 (1s) Index')"><span>Volatility 100 (1s) Index</span><span style="color:var(--primary-green)">24/7 Live</span></div>
+        <nav class="bottom-nav">
+            <div class="nav-item active">
+                <span class="nav-icon">📊</span>
+                <span>Workspace</span>
             </div>
-        </div>
-
-        <nav class="app-footer-nav">
-            <div class="nav-link active" onclick="switchView('view-dashboard')"><span>📊</span><span>Terminal</span></div>
-            <div class="nav-link"><span>💳</span><span>Cashier</span></div>
-            <div class="nav-link"><span>🛡️</span><span>Security</span></div>
+            <div class="nav-item">
+                <span class="nav-icon">⚙️</span>
+                <span>Config</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span>Profile</span>
+            </div>
         </nav>
+
     </div>
 
     <script>
-        // Core System Global State Variables
-        let systemState = {
-            accountScope: 'real',
-            realBalance: 30.04,
-            demoBalance: 10000.00,
-            activeAsset: 'Volatility 100 (1s) Index',
-            activeStrategy: 'matches_differs',
-            engineRunning: false,
-            currentStakeLevel: 1.00,
-            initialBaseStake: 1.00,
-            tickEngineTimer: null,
-            executionCycleTimer: null,
-            simulatedBaseAssetPrice: 7430.50
-        };
+        let isRunning = false;
+        let aiInterval;
+        let countdownInterval;
 
-        // Initialize Global Ticker Core Engine Loops upon Document Execution
-        function initSystemTicker() {
-            systemState.tickEngineTimer = setInterval(() => {
-                // Generate natural high frequency drift variations
-                let priceDrift = (Math.random() - 0.495) * 4.5;
-                systemState.simulatedBaseAssetPrice += priceDrift;
-                
-                const lblPrice = document.getElementById('lbl-live-price');
-                lblPrice.innerText = systemState.simulatedBaseAssetPrice.toFixed(2);
-                
-                if (priceDrift > 0) {
-                    lblPrice.className = "live-price up";
+        function simulateAISignal() {
+            const predictionEl = document.getElementById('ai-prediction');
+            const timingEl = document.getElementById('ai-timing');
+            
+            // Logic to simulate highly advanced analysis
+            const isEven = Math.random() > 0.5;
+            const targetSecond = Math.floor(Math.random() * 5) + 3; // 3 to 7 seconds out
+            let countdown = targetSecond;
+
+            if (isEven) {
+                predictionEl.innerText = "ENTER EVEN";
+                predictionEl.className = "signal-action even";
+            } else {
+                predictionEl.innerText = "ENTER ODD";
+                predictionEl.className = "signal-action odd";
+            }
+
+            timingEl.innerText = `Confidence: 94% | Execute in ${countdown}s`;
+
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                countdown--;
+                if(countdown > 0) {
+                    timingEl.innerText = `Confidence: 94% | Execute in ${countdown}s`;
                 } else {
-                    lblPrice.className = "live-price down";
+                    timingEl.innerText = `EXECUTING TRADE NOW...`;
+                    clearInterval(countdownInterval);
+                    // Cycle next signal after brief pause
+                    setTimeout(simulateAISignal, 2000);
                 }
-
-                // Extrapolate integer fractional decimals to power digital contracts mechanics
-                let priceString = systemState.simulatedBaseAssetPrice.toFixed(2);
-                let currentLastDigit = priceString.charAt(priceString.length - 1);
-                
-                updateTickerHistoryStrip(currentLastDigit);
             }, 1000);
         }
 
-        function updateTickerHistoryStrip(newDigit) {
-            const container = document.getElementById('strip-digits-history');
-            const pills = container.getElementsByClassName('tick-digit-pill');
+        function toggleEngine() {
+            const btn = document.getElementById('btn-run');
             
-            // Cycle history values through active display indexes
-            for(let i = 0; i < pills.length - 1; i++) {
-                pills[i].innerText = pills[i+1].innerText;
-            }
-            
-            const activePill = document.getElementById('lbl-last-tick-digit');
-            activePill.innerText = newDigit;
-        }
-
-        function switchView(viewId) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-        }
-
-        function toggleAccountMode(mode) {
-            systemState.accountScope = mode;
-            const btnReal = document.getElementById('mode-real');
-            const btnDemo = document.getElementById('mode-demo');
-            const lblScope = document.getElementById('lbl-balance-scope');
-            
-            if (mode === 'real') {
-                btnReal.classList.add('active');
-                btnDemo.classList.remove('active');
-                lblScope.innerText = "Real Account Balance";
+            if (isRunning) {
+                isRunning = false;
+                btn.innerText = "Initialize Automated Bot";
+                btn.classList.remove('running');
+                clearInterval(countdownInterval);
+                document.getElementById('ai-prediction').innerText = "SYSTEM PAUSED";
+                document.getElementById('ai-prediction').className = "signal-action";
+                document.getElementById('ai-timing').innerText = "Awaiting manual initialization";
             } else {
-                btnDemo.classList.add('active');
-                btnReal.classList.remove('active');
-                lblScope.innerText = "Demo Account Balance Set";
-            }
-            refreshBalanceDisplayUI();
-        }
-
-        function refreshBalanceDisplayUI() {
-            const display = document.getElementById('val-balance-display');
-            if (systemState.accountScope === 'real') {
-                display.innerText = `$${systemState.realBalance.toFixed(2)}`;
-            } else {
-                display.innerText = `$${systemState.demoBalance.toFixed(2)}`;
+                isRunning = true;
+                btn.innerText = "Halt Active Trading";
+                btn.classList.add('running');
+                simulateAISignal();
             }
         }
-
-        function openAssetModal() { document.getElementById('box-asset-modal').style.display = 'flex'; }
-        function closeAssetModal() { document.getElementById('box-asset-modal').style.display = 'none'; }
-        
-        function selectAssetAsset(assetName) {
-            systemState.activeAsset = assetName;
-            document.getElementById('txt-active-asset').innerText = assetName;
-            closeAssetModal();
-        }
-
-        function switchStrategyProfile(strategyKey) {
-            systemState.activeStrategy = strategyKey;
-            document.querySelectorAll('.bot-option-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(`tab-${strategyKey}`).classList.add('active');
-
-            const predRow = document.getElementById('row-target-prediction');
-            if (strategyKey === 'even_odd') {
-                predRow.style.display = 'none';
-            } else {
-                predRow.style.display = 'flex';
-            }
-            syncContractProjections();
-        }
-
-        function syncContractProjections() {
-            const stake = parseFloat(document.getElementById('inp-stake').value) || 1.00;
-            const targetDisplay = document.getElementById('lbl-roi-calc-payout');
-            
-            if (systemState.activeStrategy === 'matches_differs') {
-                targetDisplay.innerText = `+$${(stake * 9.09).toFixed(2)} (+909.1%)`;
-            } else if (systemState.activeStrategy === 'even_odd') {
-                targetDisplay.innerText = `+$${(stake * 0.95).toFixed(2)} (+95.0%)`;
-            } else {
-                targetDisplay.innerText = `+$${(stake * 0.92).toFixed(2)} (+92.0%)`;
-            }
-        }
-
-        // Main Trading Execution Loop Engine Handler
-        function toggleEngineRuntime() {
-            const btn = document.getElementById('btn-engine-toggle');
-            
-            if (systemState.engineRunning) {
-                // Halt engine systems safely
-                systemState.engineRunning = false;
-                btn.innerText = "Execute Automation Engine";
-                btn.className = "btn-control run";
-                clearInterval(systemState.executionCycleTimer);
-            } else {
-                // Initialize engine components
-                systemState.engineRunning = true;
-                btn.innerText = "Halt System Execution";
-                btn.className = "btn-control run running";
-                
-                systemState.initialBaseStake = parseFloat(document.getElementById('inp-stake').value) || 1.00;
-                systemState.currentStakeLevel = systemState.initialBaseStake;
-                
-                executeAutomatedTradingCycle();
-            }
-        }
-
-        function executeAutomatedTradingCycle() {
-            // Evaluates cycles asynchronously to emulate complex network calculations
-            systemState.executionCycleTimer = setInterval(() => {
-                if (!systemState.engineRunning) return;
-
-                const selectedPrediction = parseInt(document.getElementById('inp-prediction').value);
-                const currentLastDigit = parseInt(document.getElementById('lbl-last-tick-digit').innerText);
-                const martingaleFactor = parseFloat(document.getElementById('inp-martingale').value) || 2.0;
-                
-                let isWin = false;
-                let calculatedPayoutNet = 0;
-                
-                // Real mathematical confirmation logic for multi-tier indices
-                if (systemState.activeStrategy === 'matches_differs') {
-                    // Win parameters evaluated on raw ticks criteria
-                    isWin = (currentLastDigit === selectedPrediction);
-                    calculatedPayoutNet = isWin ? (systemState.currentStakeLevel * 9.09) : -systemState.currentStakeLevel;
-                } else if (systemState.activeStrategy === 'even_odd') {
-                    let isEven = (currentLastDigit % 2 === 0);
-                    isWin = isEven; // Simplified base-rate assignment trace configurations
-                    calculatedPayoutNet = isWin ? (systemState.currentStakeLevel * 0.95) : -systemState.currentStakeLevel;
-                } else if (systemState.activeStrategy === 'over_under') {
-                    isWin = (currentLastDigit > selectedPrediction);
-                    calculatedPayoutNet = isWin ? (systemState.currentStakeLevel * 0.92) : -systemState.currentStakeLevel;
-                }
-
-                // Balance Updates
-                if (systemState.accountScope === 'real') {
-                    systemState.realBalance += calculatedPayoutNet;
-                } else {
-                    systemState.demoBalance += calculatedPayoutNet;
-                }
-                refreshBalanceDisplayUI();
-
-                // Append contract execution summary to processing ledger container
-                appendRowToLedger(systemState.activeAsset, systemState.currentStakeLevel, isWin, calculatedPayoutNet);
-
-                // Professional automated martingale scaling adjustments 
-                if (isWin) {
-                    systemState.currentStakeLevel = systemState.initialBaseStake;
-                } else {
-                    systemState.currentStakeLevel = systemState.currentStakeLevel * martingaleFactor;
-                }
-                
-                // Auto sync display inputs
-                document.getElementById('inp-stake').value = systemState.currentStakeLevel.toFixed(2);
-                syncContractProjections();
-
-            }, 2500); // 2.5s real processing speed execution window
-        }
-
-        function appendRowToLedger(assetName, stakeUsed, isWin, resultPnl) {
-            const container = document.getElementById('box-log-rows-container');
-            const row = document.createElement('div');
-            row.className = "log-item-row";
-            
-            let displayPrediction = systemState.activeStrategy === 'even_odd' ? 'Even' : document.getElementById('inp-prediction').value;
-            let statusClass = isWin ? "status-win" : "status-loss";
-            let premiumPrefix = isWin ? "+" : "";
-
-            row.innerHTML = `
-                <span style="font-weight:600; color:#fff;">${assetName.split(' ')[1]}</span>
-                <span style="color:var(--text-muted);">$${stakeUsed.toFixed(2)}</span>
-                <span style="color:var(--text-muted);">${displayPrediction}</span>
-                <span class="${statusClass}" style="text-align:right;">${premiumPrefix}$${resultPnl.toFixed(2)}</span>
-            `;
-            
-            container.insertBefore(row, container.firstChild);
-            
-            // Caps max memory allocations rows inside DOM container view frames
-            if (container.children.length > 25) {
-                container.removeChild(container.lastChild);
-            }
-        }
-
-        // Launch system background micro tasks on boot
-        window.onload = () => {
-            initSystemTicker();
-            syncContractProjections();
-            refreshBalanceDisplayUI();
-        };
     </script>
 </body>
 </html>

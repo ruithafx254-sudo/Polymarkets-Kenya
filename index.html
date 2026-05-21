@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apex Enterprise OS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             /* Samsung One UI Enterprise Palette */
@@ -303,16 +304,16 @@
         
         <div class="auth-screen" id="auth-screen">
             <div class="auth-logo">A</div>
-            <div class="auth-title">Apex Enterprise</div>
-            <div class="auth-sub">Secure Neural Execution Environment</div>
+            <div class="auth-title" id="auth-mode-title">Sign In</div>
+            <div class="auth-sub" id="auth-mode-sub">Secure Neural Execution Environment</div>
 
             <div class="auth-form">
                 <input type="email" class="auth-input" placeholder="Email Address" id="login-email">
                 <input type="password" class="auth-input" placeholder="Password" id="login-pass">
-                <button class="btn-auth" onclick="handleLogin()">Sign In / Initialize</button>
+                <button class="btn-auth" id="btn-auth" onclick="handleAuth()">Sign In</button>
             </div>
             
-            <div class="auth-links">Create new account (Supabase Pending)</div>
+            <div class="auth-links" id="auth-toggle" onclick="toggleAuthMode()">Create new account</div>
         </div>
 
         <div class="toast-container" id="toast-area"></div>
@@ -404,7 +405,7 @@
                 <div class="profile-header">
                     <div class="profile-avatar">👤</div>
                     <div class="profile-name">Apex Trader</div>
-                    <div class="profile-email">Ready for Supabase Link</div>
+                    <div class="profile-email" id="user-email-display">Not Signed In</div>
                 </div>
 
                 <div class="profile-list">
@@ -457,6 +458,13 @@
     </div>
 
     <script>
+        // Supabase Initialization
+        const supabase = supabase.createClient(
+            'https://hsovbnxatorocibfgrhc.supabase.co',
+            'sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP'
+        );
+
+        let isLoginMode = true;
         let realBalance = 50.00;
         let demoBalance = 10000.00;
         let isRealAccount = true;
@@ -473,15 +481,37 @@
             "Volatility 75 (1s) Index", "Volatility 100 (1s) Index"
         ];
 
-        function handleLogin() {
-            document.getElementById('auth-screen').classList.add('hidden');
-            showToast('Authentication Successful.');
-            updateBalanceUI();
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-mode-title').innerText = isLoginMode ? "Sign In" : "Create Account";
+            document.getElementById('btn-auth').innerText = isLoginMode ? "Sign In" : "Sign Up";
+            document.getElementById('auth-toggle').innerText = isLoginMode ? "Create new account" : "Back to Sign In";
         }
 
-        function handleLogout() {
+        async function handleAuth() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-pass').value;
+
+            if(isLoginMode) {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if(error) { showToast("Error: " + error.message); }
+                else { 
+                    document.getElementById('auth-screen').classList.add('hidden');
+                    document.getElementById('user-email-display').innerText = email;
+                    showToast('Authentication Successful.');
+                }
+            } else {
+                const { data, error } = await supabase.auth.signUp({ email, password });
+                if(error) { showToast("Error: " + error.message); }
+                else { showToast('Account created! Please check your email.'); }
+            }
+        }
+
+        async function handleLogout() {
             if(isEngineRunning) toggleBotEngine();
+            await supabase.auth.signOut();
             document.getElementById('auth-screen').classList.remove('hidden');
+            showToast('Logged out.');
         }
 
         function switchAccountType() {
@@ -570,7 +600,6 @@
             let signalText = "";
             let signalSub = "";
             let profit = 0;
-            
             const isWin = Math.random() < 0.95;
 
             document.getElementById('sig-asset').innerText = `SCANNING: ${currentTargetIndex}`;
@@ -587,16 +616,11 @@
                 signalSub = "Payout: 1.95x | Win Rate: 95%";
                 profit = isWin ? (stake * 0.95) : (-stake);
             } else {
-                // Corrected Over/Under Logic: Payouts scale with the probability of the digit
-                const digit = Math.floor(Math.random() * 9); // Digit 0-8
+                const digit = Math.floor(Math.random() * 9);
                 const isOver = Math.random() > 0.5;
                 signalText = isOver ? `OVER ${digit}` : `UNDER ${digit}`;
-                
-                // Payout calculation logic: Higher digit for OVER = higher risk/payout
-                // Roughly 1.1x for easy targets, up to 10x for rare digits
                 const multiplier = isOver ? (1.1 + (digit * 0.9)) : (1.1 + ((8 - digit) * 0.9));
                 signalSub = `Payout: ${multiplier.toFixed(1)}x | Win Rate: 95%`;
-                
                 profit = isWin ? (stake * (multiplier - 1)) : (-stake);
             }
 

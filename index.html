@@ -136,54 +136,21 @@
         .action-btn { background-color: var(--surface-white); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .action-btn span { font-size: 0.7rem; color: var(--success-green); font-weight: 600; }
 
-        /* --- UPDATED AI ENGINE BOX --- */
-        .ai-engine-box { 
-            background: #ffffff; 
-            border-radius: var(--radius-lg); 
-            border: 1px solid var(--border-color); 
-            padding: 24px; 
-            box-shadow: var(--shadow-sm); 
-            position: relative; 
-        }
-        
-        .ai-header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 20px; font-size: 0.75rem; font-weight: 700; 
-            color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
-        }
-
-        .live-indicator { display: flex; align-items: center; gap: 8px; color: var(--success-green); }
-        .radar-dot { width: 8px; height: 8px; background-color: var(--success-green); border-radius: 50%; animation: radar 1.5s infinite; }
-        
-        @keyframes radar {
-            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
-        }
-
-        .signal-screen { 
-            background: linear-gradient(145deg, #f8f9fa, #ffffff);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md); padding: 20px; text-align: center; 
-            margin-bottom: 20px; color: var(--text-main); min-height: 110px; 
-            display: flex; flex-direction: column; justify-content: center; 
-        }
-
-        .signal-asset { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
-        .signal-text { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
-        .signal-sub { font-size: 0.75rem; color: var(--primary-blue); font-weight: 600; margin-top: 8px; opacity: 0.8; }
-
+        /* --- NEW AI ENGINE BOX --- */
+        .ai-engine-box { background: #ffffff; border-radius: 20px; border: 1px solid #007aff; padding: 24px; box-shadow: 0 8px 24px rgba(0, 122, 255, 0.25); position: relative; }
+        .ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.85rem; font-weight: 700; color: #6e7781; text-transform: uppercase; }
+        .live-indicator { display: flex; align-items: center; gap: 8px; color: #007aff; }
+        .radar-dot { width: 8px; height: 8px; background-color: #007aff; border-radius: 50%; animation: radar 1.5s infinite; }
+        @keyframes radar { 0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); } 70% { box-shadow: 0 0 0 12px rgba(0, 122, 255, 0); } }
+        .signal-screen { background-color: #0b101e; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px; color: white; min-height: 110px; display: flex; flex-direction: column; justify-content: center; }
+        .signal-asset { font-size: 0.85rem; color: #007aff; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
+        .signal-text { font-size: 2rem; font-weight: 800; color: #28a745; margin-bottom: 8px; }
         .parameters-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .param-input { background-color: var(--bg-app); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 8px; }
-        .param-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 4px; }
-        .param-input input, .param-input select { width: 100%; border: none; background: transparent; font-size: 1rem; font-weight: 800; color: var(--text-main); outline: none; }
-
-        .btn-master { 
-            width: 100%; background-color: var(--primary-blue); color: white; border: none; 
-            padding: 16px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 700; 
-            cursor: pointer; transition: var(--transition); 
-        }
-        .btn-master.active { background-color: var(--danger-red); }
+        .param-input { background-color: #f7f9fa; border: 1px solid #e1e4e8; padding: 10px 14px; border-radius: 8px; }
+        .param-label { font-size: 0.7rem; color: #6e7781; font-weight: 700; display: block; margin-bottom: 4px; }
+        .param-input input, .param-input select { width: 100%; border: none; background: transparent; font-size: 1rem; font-weight: 800; }
+        .btn-master { width: 100%; background-color: #007aff; color: white; border: none; padding: 18px; border-radius: 20px; font-weight: 800; cursor: pointer; }
+        .btn-master.active { background-color: #dc3545; }
 
         .ledger-row { background-color: var(--surface-white); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
         .ledger-profit { font-weight: 800; color: var(--success-green); font-size: 1.1rem; }
@@ -241,12 +208,19 @@
                 </div>
 
                 <div class="ai-engine-box">
-                    <div class="ai-header"><span>Neural Match Scanner</span><div class="live-indicator"><div class="radar-dot"></div>Monitoring Feed</div></div>
+                    <div class="ai-header">
+                        <span>Neural Match Scanner</span>
+                        <div class="live-indicator">
+                            <div class="radar-dot"></div>
+                            Monitoring Feed
+                        </div>
+                    </div>
+
                     <div class="signal-screen">
                         <div class="signal-asset" id="sig-asset">SCANNING ASSETS...</div>
                         <div class="signal-text" id="sig-main">READY</div>
-                        <div class="signal-sub" id="sig-timer">System Idle</div>
                     </div>
+
                     <div class="parameters-row">
                         <div class="param-input">
                             <span class="param-label">Market Strategy</span>
@@ -260,6 +234,7 @@
                             <input type="number" id="inp-stake" value="1.00" step="1">
                         </div>
                     </div>
+
                     <button class="btn-master" id="btn-toggle-bot" onclick="toggleBotEngine()">Execute AI Automation</button>
                 </div>
             </div>

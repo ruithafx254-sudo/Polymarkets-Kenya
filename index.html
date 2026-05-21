@@ -1,552 +1,318 @@
-ue="Algeria">Algeria</option>
-                        <option value="Angola">Angola</option>
-                        <option value="Benin">Benin</option>
-                        <option value="Botswana">Botswana</option>
-                        <option value="Burkina Faso">Burkina Faso</option>
-                        <option value="Burundi">Burundi</option>
-                        <option value="Cabo Verde">Cabo Verde</option>
-                        <option value="Cameroon">Cameroon</option>
-                        <option value="Central African Republic">Central African Republic</option>
-                        <option value="Chad">Chad</option>
-                        <option value="Comoros">Comoros</option>
-                        <option value="Democratic Republic of the Congo">DR Congo</option>
-                        <option value="Republic of the Congo">Republic of the Congo</option>
-                        <option value="Djibouti">Djibouti</option>
-                        <option value="Egypt">Egypt</option>
-                        <option value="Equatorial Guinea">Equatorial Guinea</option>
-                        <option value="Eritrea">Eritrea</option>
-                        <option value="Eswatini">Eswatini</option>
-                        <option value="Ethiopia">Ethiopia</option>
-                        <option value="Gabon">Gabon</option>
-                        <option value="Gambia">Gambia</option>
-                        <option value="Ghana">Ghana</option>
-                        <option value="Guinea">Guinea</option>
-                        <option value="Guinea-Bissau">Guinea-Bissau</option>
-                        <option value="Ivory Coast">Ivory Coast</option>
-                        <option value="Kenya">Kenya</option>
-                        <option value="Lesotho">Lesotho</option>
-                        <option value="Liberia">Liberia</option>
-                        <option value="Libya">Libya</option>
-                        <option value="Madagascar">Madagascar</option>
-                        <option value="Malawi">Malawi</option>
-                        <option value="Mali">Mali</option>
-                        <option value="Mauritania">Mauritania</option>
-                        <option value="Mauritius">Mauritius</option>
-                        <option value="Morocco">Morocco</option>
-                        <option value="Mozambique">Mozambique</option>
-                        <option value="Namibia">Namibia</option>
-                        <option value="Niger">Niger</option>
-                        <option value="Nigeria">Nigeria</option>
-                        <option value="Rwanda">Rwanda</option>
-                        <option value="Sao Tome and Principe">Sao Tome and Principe</option>
-                        <option value="Senegal">Senegal</option>
-                        <option value="Seychelles">Seychelles</option>
-                        <option value="Sierra Leone">Sierra Leone</option>
-                        <option value="Somalia">Somalia</option>
-                        <option value="South Africa">South Africa</option>
-                        <option value="South Sudan">South Sudan</option>
-                        <option value="Sudan">Sudan</option>
-                        <option value="Tanzania">Tanzania</option>
-                        <option value="Togo">Togo</option>
-                        <option value="Tunisia">Tunisia</option>
-                        <option value="Uganda">Uganda</option>
-                        <option value="Zambia">Zambia</option>
-                        <option value="Zimbabwe">Zimbabwe</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="input-group">
-                <label>Email Address</label>
-                <input type="email" id="aEmail" class="input-tech" placeholder="example@gmail.com">
-            </div>
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" id="aPass" class="input-tech" placeholder="••••••••">
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Trading Dashboard</title>
+    <style>
+        :root {
+            --bg-dark: #0b0e14;
+            --card-bg: #161a22;
+            --primary-red: #f23645;
+            --primary-green: #089981;
+            --text-main: #ffffff;
+            --text-muted: #848e9c;
+            --border-color: #2a2e39;
+        }
 
-            <button onclick="doAuth()" class="btn-tech">Access Account</button>
-            <p style="margin-top:12px; cursor:pointer; color:var(--text-sub); font-size:13px;" onclick="closeModal('authModal')">Cancel</p>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        /* Mobile App Container Window */
+        .app-container {
+            width: 100%;
+            max-width: 410px;
+            background-color: var(--bg-dark);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Top Header Area */
+        .app-header {
+            padding: 20px 20px 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-dot {
+            width: 12px;
+            height: 12px;
+            background-color: var(--primary-red);
+            border-radius: 50%;
+        }
+
+        /* Account Type Switcher */
+        .account-toggle {
+            display: flex;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .toggle-btn {
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            color: var(--text-muted);
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--primary-red);
+            color: var(--text-main);
+        }
+
+        /* Balance Section */
+        .balance-card {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .balance-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .balance-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 20px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            padding: 0 20px;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s ease, opacity 0.2s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-deposit {
+            background-color: var(--primary-red);
+            color: var(--text-main);
+        }
+
+        .btn-withdraw {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Stats Row */
+        .stats-grid {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--card-bg);
+            margin: 0 20px 24px 20px;
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-item:not(:last-child) {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .stat-value.green { color: var(--primary-green); }
+
+        /* Main Action Call */
+        .cta-area {
+            padding: 0 20px 30px 20px;
+        }
+
+        .btn-trade-start {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-red), #b3202c);
+            color: var(--text-main);
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(242, 54, 69, 0.3);
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 12px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: var(--primary-red);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-dot"></div>
+                <span>ApexTrade</span>
+            </div>
+            <div class="account-toggle">
+                <button class="toggle-btn active" onclick="switchAccount('real')">Real</button>
+                <button class="toggle-btn" onclick="switchAccount('demo')">Demo</button>
+            </div>
+        </header>
+
+        <div class="balance-card">
+            <div class="balance-label" id="balance-title">Your real balance</div>
+            <div class="balance-amount" id="balance-display">$30.04</div>
         </div>
-    </div>
 
-    <div id="depositModal" class="overlay">
-        <div class="modal">
-            <div class="auth-nav">
-                <div id="tabDeposit" class="auth-tab active" onclick="setFundsMode('deposit')">Deposit</div>
-                <div id="tabWithdraw" class="auth-tab" onclick="setFundsMode('withdraw')">Withdraw</div>
-            </div>
-            
-            <h2 id="fundsTitle" style="margin:0; font-size:18px; font-weight: 800;">Fund Balance</h2>
-            <p id="fundsDesc" style="color:var(--text-sub); font-size:13px; margin: 4px 0 12px 0;">Pay Hero Checkout via Lipwa</p>
-            
-            <div class="funds-card-container">
-                <div id="depositFormFields">
-                    <div class="input-group">
-                        <label>Your Name</label>
-                        <input type="text" id="depName" class="input-tech" placeholder="John Doe">
-                    </div>
-                    <div class="input-group">
-                        <label>M-Pesa Number</label>
-                        <input type="tel" id="depPhone" class="input-tech" placeholder="e.g. 0712345678">
-                    </div>
-                </div>
-                <div id="withdrawalFields" class="hidden">
-                    <div class="input-group">
-                        <label>M-Pesa Name</label>
-                        <input type="text" id="withName" class="input-tech" placeholder="e.g. John Doe">
-                    </div>
-                    <div class="input-group">
-                        <label>M-Pesa Number</label>
-                        <input type="tel" id="withPhone" class="input-tech" placeholder="e.g. 0712345678">
-                    </div>
-                </div>
-                <div class="input-group" style="margin-bottom:4px;">
-                    <label id="amtLabel">Amount (Ksh)</label>
-                    <input type="text" id="depAmt" class="input-tech" style="font-size:22px; font-weight:800; text-align:center; padding: 10px;" placeholder="0.00" value="100.00">
-                </div>
-                <div class="chip-grid">
-                    <div class="amt-chip" onclick="setAmt(100)">100</div>
-                    <div class="amt-chip" onclick="setAmt(250)">250</div>
-                    <div class="amt-chip" onclick="setAmt(500)">500</div>
-                    <div class="amt-chip" onclick="setAmt(1000)">1k</div>
-                    <div class="amt-chip" onclick="setAmt(2000)">2k</div>
-                    <div class="amt-chip" onclick="setAmt(5000)">5k</div>
-                    <div class="amt-chip" onclick="setAmt(10000)">10k</div>
-                    <div class="amt-chip" onclick="setAmt(20000)">20k</div>
-                </div>
-            </div>
-            
-            <button id="fundsSubmit" onclick="handleFundsAction()" class="btn-tech" style="background:var(--yes-blue);">Confirm Action</button>
-            
-            <span class="badge-container">
-                <a href="https://intasend.com/security" target="_blank">
-                    <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" class="badge-img" alt="IntaSend Secure Payments">
-                </a>
-            </span>
-
-            <p style="margin-top:8px; cursor:pointer; color:var(--text-sub); font-size:13px;" onclick="closeModal('depositModal')">Cancel</p>
+        <div class="action-buttons">
+            <button class="btn btn-deposit">Deposit</button>
+            <button class="btn btn-withdraw">Withdraw</button>
         </div>
-    </div>
 
-    <div id="betSlipModal" class="overlay">
-        <div class="modal">
-            <h2 id="slipMarketTitle" style="text-align:left; font-size:18px; margin:0; font-weight:800;">Open Prediction</h2>
-            <p id="slipPickMeta" style="text-align:left; color:var(--text-sub); margin:6px 0 16px 0; font-size: 15px;">Pick: <span id="slipPickText">YES</span> @ <span id="slipMultText">2.1x</span></p>
-
-            <div style="background:#f8fafc; padding:16px; border-radius:16px; border:1px solid var(--border); margin-bottom:16px;">
-                <div class="input-group">
-                    <label>Amount (Min. Ksh 20)</label>
-                    <input type="text" id="betAmt" class="input-tech" style="font-size:24px; text-align:center; font-weight:800;" placeholder="0.00" value="100.00">
-                </div>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-label">Profit today</div>
+                <div class="stat-value green">+$0.00</div>
             </div>
-
-            <button onclick="confirmWager()" class="btn-tech" style="background:var(--yes-blue);">Place Bet</button>
-            <p style="margin-top:12px; cursor:pointer; color:var(--text-sub); font-size:13px;" onclick="closeModal('betSlipModal')">Cancel</p>
+            <div class="stat-item">
+                <div class="stat-label">Trades</div>
+                <div class="stat-value">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Winrate</div>
+                <div class="stat-value">100%</div>
+            </div>
         </div>
+
+        <div class="cta-area">
+            <button class="btn-trade-start" id="main-action-btn">Start real trading</button>
+        </div>
+
+        <nav class="bottom-nav">
+            <a class="nav-item active">
+                <span class="nav-icon">📊</span>
+                <span>Trading</span>
+            </a>
+            <a class="nav-item">
+                <span class="nav-icon">👥</span>
+                <span>Community</span>
+            </a>
+            <a class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span>Profile</span>
+            </a>
+        </nav>
     </div>
 
     <script>
-        const SB_URL = "https://hwxnfzuwaeseszgsjeny.supabase.co";
-        const SB_KEY = "sb_publishable_C_fx8fnHQ9c1x_ZkWIG-gQ_2l2Mt-NL";
-        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+        // Smooth switching handling logic for demo vs real accounts
+        function switchAccount(type) {
+            const buttons = document.querySelectorAll('.toggle-btn');
+            const balanceTitle = document.getElementById('balance-title');
+            const balanceDisplay = document.getElementById('balance-display');
+            const mainBtn = document.getElementById('main-action-btn');
 
-        let userProfile = null;
-        let activeTab = 'in';
-        let currentFundsMode = 'deposit';
-        let activeSelection = null; 
-        const LIPWA_LINK = "https://lipwa.link/8367";
+            buttons.forEach(btn => btn.classList.remove('active'));
 
-        const markets = [];
-        let itemsRendered = 0;
-        const CHUNK_SIZE = 20;
-
-        function generate1000Markets() {
-            const scenarios = [
-                { cat: "Politics", format: (v) => `Will the ${v} US Midterm elections result in a Senate majority flip?` },
-                { cat: "Politics", format: (v) => `Will Donald Trump be impeached again before the end of ${v}?` },
-                { cat: "Politics", format: (v) => `Will there be a complete US Federal Government shutdown lasting more than 5 days in Q${v}?` },
-                { cat: "Politics", format: (v) => `Will the US impose additional trade restrictions on chip exports to market ${v}?` },
-                
-                { cat: "Crypto", format: (v) => `Will Bitcoin cross $${v}0,000 before the close of this quarter?` },
-                { cat: "Crypto", format: (v) => `Will Ethereum's total market cap exceed $${v}00 Billion this month?` },
-                { cat: "Crypto", format: (v) => `Will Solana process a record high of ${v}0,000 transactions per second by June?` },
-                { cat: "Faith", format: (v) => `Will Jesus come back before June 8?` },
-
-                { cat: "Finance", format: (v) => `Will Crude Oil hit $${v}5 per barrel by the end of May?` },
-                { cat: "Finance", format: (v) => `Will the Federal Reserve cut key interest rates at the next FOMC meeting by ${v} basis points?` },
-                { cat: "Finance", format: (v) => `Will gold futures close above $${v},500 per ounce by Friday?` },
-                { cat: "Finance", format: (v) => `Will the inflation index increase by more than 1.${v}% in the upcoming monthly report?` },
-
-                { cat: "Sports", format: (v) => `Will Arsenal win the Premier League matchday ${v} with a clean sheet?` },
-                { cat: "Sports", format: (v) => `Will the Boston Celtics sweep their upcoming NBA playoff series game ${v}?` },
-                { cat: "Sports", format: (v) => `Will Real Madrid win their match by ${v} or more goals this weekend?` },
-                { cat: "Sports", format: (v) => `Will the upcoming F1 Grand Prix see ${v} or more DNFs?` },
-
-                { cat: "Science", format: (v) => `Will SpaceX successfully launch Starship flight test ${v} before month-end?` },
-                { cat: "Pop Culture", format: (v) => `Will the highest-grossing movie this weekend surpass $${v}0 Million at the box office?` },
-                { cat: "Science", format: (v) => `Will OpenAI announce GPT-${v} as their next flagship frontier model?` },
-                { cat: "Pop Culture", format: (v) => `Will the top trending hashtag on X/Twitter surpass ${v} Million posts today?` }
-            ];
-
-            for (let i = 1; i <= 1000; i++) {
-                const sIndex = i % scenarios.length;
-                const scenario = scenarios[sIndex];
-                
-                let valueVariant = (i % 8) + 1;
-                if (scenario.cat === "Crypto" && i > 100) valueVariant = (i % 25) + 10;
-                if (scenario.cat === "Finance" && i > 200) valueVariant = (i % 5) + 1;
-                
-                const uniqueQuestion = scenario.format(valueVariant);
-                
-                let randomBias = (i * 17) % 65 + 18;
-                let yesMult = (100 / randomBias).toFixed(2);
-                let noMult = (100 / (100 - randomBias)).toFixed(2);
-
-                if (sIndex === 7) {
-                    yesMult = "9.00";
-                    noMult = "3.00";
-                }
-
-                markets.push({
-                    id: `m-${i}`,
-                    q: uniqueQuestion,
-                    category: scenario.cat,
-                    yesMult: yesMult,
-                    noMult: noMult
-                });
-            }
-        }
-
-        window.onload = async () => {
-            generate1000Markets();
-            renderMore();
-            window.addEventListener('scroll', handleInfiniteScroll);
-            await checkPaymentCallback();
-            await syncSupabaseState();
-        };
-
-        function renderMore() {
-            const f = document.getElementById('feed'); 
-            const end = Math.min(itemsRendered + CHUNK_SIZE, markets.length);
-            
-            let chunkHtml = '';
-            for (let i = itemsRendered; i < end; i++) {
-                const m = markets[i];
-                chunkHtml += `
-                <div class="market-card">
-                    <div class="m-category">${m.category}</div>
-                    <div class="m-header">
-                        <div class="m-title">${m.q}</div>
-                    </div>
-                    <div class="btn-group">
-                        <button class="trade-btn yes" onclick="openSlip('${m.id}', 'YES', '${m.yesMult}')">
-                            <span>YES</span><span style="font-weight:700;">${m.yesMult}x</span>
-                        </button>
-                        <button class="trade-btn no" onclick="openSlip('${m.id}', 'NO', '${m.noMult}')">
-                            <span>NO</span><span style="font-weight:700;">${m.noMult}x</span>
-                        </button>
-                    </div>
-                </div>`;
-            }
-            f.insertAdjacentHTML('beforeend', chunkHtml);
-            itemsRendered = end;
-        }
-
-        function handleInfiniteScroll() {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 400) {
-                if (itemsRendered < markets.length) {
-                    renderMore();
-                }
-            }
-        }
-
-        async function syncSupabaseState() {
-            const savedEmail = localStorage.getItem('nx_user');
-            if (savedEmail) {
-                const { data, error } = await supabaseClient
-                    .from('profiles')
-                    .select('*')
-                    .eq('email', savedEmail)
-                    .single();
-
-                if (!error && data) {
-                    userProfile = data;
-                    document.getElementById('signBtn').classList.add('hidden');
-                    document.getElementById('userIcon').classList.remove('hidden');
-                    
-                    const balance = parseFloat(userProfile.balance || 0).toFixed(2);
-                    document.getElementById('balance').innerText = parseFloat(balance).toLocaleString(undefined, {minimumFractionDigits: 2});
-                    
-                    if (userProfile.name) {
-                        document.getElementById('depName').value = userProfile.name;
-                    }
-                    renderHistory();
-                    return;
-                }
-            }
-            document.getElementById('signBtn').classList.remove('hidden');
-            document.getElementById('userIcon').classList.add('hidden');
-            document.getElementById('balance').innerText = "0.00";
-        }
-
-        async function checkPaymentCallback() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const status = urlParams.get('status');
-            const amount = parseFloat(urlParams.get('amount'));
-            const userEmail = localStorage.getItem('nx_user');
-
-            if (status === 'success' && !isNaN(amount) && amount > 0 && userEmail) {
-                const txRef = urlParams.get('reference');
-                const processed = JSON.parse(localStorage.getItem('processed_tx') || '[]');
-
-                if (!processed.includes(txRef)) {
-                    const { data: profile } = await supabaseClient
-                        .from('profiles')
-                        .select('balance')
-                        .eq('email', userEmail)
-                        .single();
-
-                    if (profile) {
-                        const newBal = (parseFloat(profile.balance || 0) + amount).toFixed(2);
-                        
-                        await supabaseClient
-                            .from('profiles')
-                            .update({ balance: newBal })
-                            .eq('email', userEmail);
-
-                        processed.push(txRef);
-                        localStorage.setItem('processed_tx', JSON.stringify(processed));
-                        
-                        alert(`Deposit credited! Ksh ${amount.toLocaleString()} added.`);
-                        window.history.replaceState({}, document.title, window.location.pathname);
-                    }
-                }
-            }
-        }
-
-        function openSlip(id, side, mult) {
-            if (!userProfile) return openModal('authModal');
-            const target = markets.find(m => m.id === id);
-            activeSelection = { id, q: target.q, side, mult };
-            document.getElementById('slipMarketTitle').innerText = target.q;
-            document.getElementById('slipPickText').innerText = side;
-            document.getElementById('slipPickText').style.color = side === 'YES' ? 'var(--yes-blue)' : 'var(--no-red)';
-            document.getElementById('slipMultText').innerText = mult + 'x';
-            document.getElementById('betAmt').value = "100.00";
-            openModal('betSlipModal');
-        }
-
-        async function confirmWager() {
-            const amt = Number(document.getElementById('betAmt').value);
-            if (isNaN(amt) || amt < 20) return alert("The minimum prediction is Ksh 20.00.");
-
-            const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('balance, bets')
-                .eq('email', userProfile.email)
-                .single();
-
-            const curBal = parseFloat(profile.balance || 0);
-            if (amt > curBal) return alert("Insufficient account balance.");
-
-            const newBal = (curBal - amt).toFixed(2);
-            const userBets = profile.bets || [];
-
-            userBets.unshift({
-                id: 'bet-' + Date.now(),
-                q: activeSelection.q,
-                side: activeSelection.side,
-                mult: activeSelection.mult,
-                stake: amt.toFixed(2),
-                status: 'Active',
-                date: new Date().toLocaleDateString()
-            });
-
-            await supabaseClient
-                .from('profiles')
-                .update({ balance: newBal, bets: userBets })
-                .eq('email', userProfile.email);
-
-            await syncSupabaseState();
-            closeModal('betSlipModal');
-            alert("Prediction posted successfully!");
-            switchMainTab('history');
-        }
-
-        function renderHistory() {
-            const hFeed = document.getElementById('histFeed');
-            hFeed.innerHTML = '';
-            const bets = userProfile?.bets || [];
-
-            if (bets.length === 0) {
-                hFeed.innerHTML = `<p style="text-align:center; color:var(--text-sub); font-size:15px;">No predictions submitted yet.</p>`;
-                return;
-            }
-
-            bets.forEach(b => {
-                const estRet = (parseFloat(b.stake) * parseFloat(b.mult)).toFixed(2);
-                hFeed.innerHTML += `
-                    <div class="history-card">
-                        <div class="hist-meta">
-                            <div>${b.date}</div>
-                            <div class="status-badge">${b.status}</div>
-                        </div>
-                        <div class="hist-title">${b.q}</div>
-                        <div class="hist-stats">
-                            <div>Stake<br>Ksh ${parseFloat(b.stake).toLocaleString()}</div>
-                            <div>Side<br><span style="color:${b.side==='YES'?'var(--yes-blue)':'var(--no-red)'}">${b.side}</span></div>
-                            <div style="text-align:right;">Payout<br>Ksh ${parseFloat(estRet).toLocaleString()}</div>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function setAuth(mode) {
-            activeTab = mode;
-            const up = document.getElementById('upFields');
-            if (mode === 'up') {
-                up.classList.remove('hidden');
-                document.getElementById('tabUp').classList.add('active');
-                document.getElementById('tabIn').classList.remove('active');
+            if (type === 'real') {
+                buttons[0].classList.add('active');
+                balanceTitle.innerText = "Your real balance";
+                balanceDisplay.innerText = "$30.04";
+                mainBtn.innerText = "Start real trading";
+                mainBtn.style.background = "linear-gradient(135deg, var(--primary-red), #b3202c)";
+                mainBtn.style.boxShadow = "0 4px 15px rgba(242, 54, 69, 0.3)";
             } else {
-                up.classList.add('hidden');
-                document.getElementById('tabIn').classList.add('active');
-                document.getElementById('tabUp').classList.remove('active');
-            }
-        }
-
-        async function doAuth() {
-            const email = document.getElementById('aEmail').value.trim().toLowerCase();
-            const pass = document.getElementById('aPass').value.trim();
-
-            if (!email.includes('@')) return alert("Enter a valid email address.");
-            if (pass.length < 4) return alert("Enter password (minimum 4 characters).");
-
-            if (activeTab === 'up') {
-                const name = document.getElementById('aName').value.trim();
-                const country = document.getElementById('aCountry').value;
-                if (!name) return alert("Your full name is required.");
-                if (!country) return alert("Please choose your country.");
-
-                const { data: existingUser } = await supabaseClient
-                    .from('profiles')
-                    .select('email')
-                    .eq('email', email)
-                    .single();
-
-                if (existingUser) return alert("An account with this email exists. Sign in instead.");
-
-                // Custom starting balance logic
-                const startingBalance = (email === "joseeruitha@gmail.com") ? 70000.00 : 0.00;
-
-                const { error } = await supabaseClient
-                    .from('profiles')
-                    .insert([{ 
-                        email, 
-                        pass, 
-                        name, 
-                        country, 
-                        balance: startingBalance, 
-                        bets: [] 
-                    }]);
-
-                if (error) return alert("Registration error: " + error.message);
-                
-                localStorage.setItem('nx_user', email);
-                alert("Account created successfully!");
-                closeModal('authModal');
-                await syncSupabaseState();
-            } else {
-                const { data, error } = await supabaseClient
-                    .from('profiles')
-                    .select('*')
-                    .eq('email', email)
-                    .eq('pass', pass)
-                    .single();
-
-                if (error || !data) return alert("Invalid credentials.");
-
-                localStorage.setItem('nx_user', data.email);
-                alert(`Logged in as ${data.name || data.email}`);
-                closeModal('authModal');
-                await syncSupabaseState();
-            }
-        }
-
-        function setFundsMode(mode) {
-            currentFundsMode = mode;
-            document.getElementById('depAmt').value = "100.00";
-            if (mode === 'withdraw') {
-                document.getElementById('tabWithdraw').classList.add('active');
-                document.getElementById('tabDeposit').classList.remove('active');
-                document.getElementById('withdrawalFields').classList.remove('hidden');
-                document.getElementById('depositFormFields').classList.add('hidden');
-            } else {
-                document.getElementById('tabDeposit').classList.add('active');
-                document.getElementById('tabWithdraw').classList.remove('active');
-                document.getElementById('withdrawalFields').classList.add('hidden');
-                document.getElementById('depositFormFields').classList.remove('hidden');
-            }
-        }
-
-        function setAmt(v) { document.getElementById('depAmt').value = parseFloat(v).toFixed(2); }
-
-        async function handleFundsAction() {
-            const amt = Number(document.getElementById('depAmt').value);
-            if (isNaN(amt) || amt < 100) return alert("Minimum transaction amount is Ksh 100.00.");
-
-            if (currentFundsMode === 'withdraw') {
-                const phone = document.getElementById('withPhone').value.trim();
-                const curBal = parseFloat(userProfile.balance || 0);
-                if (amt > curBal) return alert("Insufficient available balance.");
-
-                const newBal = (curBal - amt).toFixed(2);
-                await supabaseClient
-                    .from('profiles')
-                    .update({ balance: newBal })
-                    .eq('email', userProfile.email);
-
-                await syncSupabaseState();
-                closeModal('depositModal');
-                alert(`Withdrawal processing. Your new balance is Ksh ${newBal}.`);
-            } else {
-                const phone = document.getElementById('depPhone').value.trim();
-                const name = encodeURIComponent(document.getElementById('depName').value.trim());
-                if (!phone || !name) return alert("Please fill out your name and active phone number.");
-
-                const invoiceRef = "INV-" + Math.floor(Date.now() / 1000);
-                closeModal('depositModal');
-
-                const currentUrl = window.location.origin + window.location.pathname;
-                const returnUrl = encodeURIComponent(`${currentUrl}?status=success&amount=${amt}&reference=${invoiceRef}`);
-                
-                window.location.href = `${LIPWA_LINK}?amount=${amt}&name=${name}&phone=${phone}&reference=${invoiceRef}&success_url=${returnUrl}&callback=${returnUrl}`;
-            }
-        }
-
-        function switchMainTab(v) {
-            if (v === 'feed') {
-                document.getElementById('tabFeed').classList.add('active');
-                document.getElementById('tabHist').classList.remove('active');
-                document.getElementById('mainFeedView').classList.remove('hidden');
-                document.getElementById('mainHistoryView').classList.add('hidden');
-            } else {
-                document.getElementById('tabHist').classList.add('active');
-                document.getElementById('tabFeed').classList.remove('active');
-                document.getElementById('mainHistoryView').classList.remove('hidden');
-                document.getElementById('mainFeedView').classList.add('hidden');
-                renderHistory();
-            }
-        }
-
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function logout() { 
-            if(confirm("Sign out of the current terminal?")) {
-                localStorage.removeItem('nx_user');
-                location.reload(); 
+                buttons[1].classList.add('active');
+                balanceTitle.innerText = "Your demo balance";
+                balanceDisplay.innerText = "$11,249.76";
+                mainBtn.innerText = "Start demo trading";
+                mainBtn.style.background = "linear-gradient(135deg, var(--primary-green), #056656)";
+                mainBtn.style.boxShadow = "0 4px 15px rgba(8, 153, 129, 0.3)";
             }
         }
     </script>

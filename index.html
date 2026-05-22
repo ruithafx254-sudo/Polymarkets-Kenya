@@ -241,7 +241,7 @@ button{
 .brand-box{
     width:28px;
     height:28px;
-    border-radius:9px;
+    border-radius:999px;
     background:linear-gradient(135deg,var(--primary),var(--primary2));
     display:flex;
     align-items:center;
@@ -1000,7 +1000,6 @@ window.addEventListener("load", async()=>{
     const statusParam = urlParams.get('status');
 
     if(session?.user){
-        // Pull down cached value instantly to ensure UI doesn't stutter or look blank
         const cachedBal = localStorage.getItem(`bal_${session.user.id}`);
         if(cachedBal) {
             realBalance = parseFloat(cachedBal);
@@ -1013,12 +1012,10 @@ window.addEventListener("load", async()=>{
             document.getElementById("profile-name").innerText = session.user.user_metadata.full_name;
         }
         
-        // Fetch fresh cloud values asynchronously
         fetchSupabaseBalance(session.user.id).then(() => {
             localStorage.setItem(`bal_${session.user.id}`, realBalance);
         });
         
-        // --- SMOOTH CALLBACK VERIFICATION LOGIC ---
         if (statusParam === 'success') {
             const savedInvoiceId = localStorage.getItem('last_invoice_id');
             const verifyOverlay = document.getElementById('verify-overlay');
@@ -1092,7 +1089,6 @@ async function handleAuth(){
 
     if(!email || !password){ toast("Fill all fields"); return; }
 
-    // Instant Lockout & Interactive State Feedback
     const originalText = authBtn.innerText;
     authBtn.innerText = "Authenticating... Please wait";
     authBtn.disabled = true;
@@ -1116,12 +1112,12 @@ async function handleAuth(){
             }
         }
 
-        // Optimistic UI Transition - Close screen immediately
+        // OPTIMISTIC TRANSITION: Instantly grant access using local state
         document.getElementById("profile-email").innerText = email;
         document.getElementById("auth").classList.add("hidden");
         toast("Access Granted");
 
-        // Background Data Fetch thread
+        // BACKGROUND FETCH: Run database query asynchronously so it doesn't block UI threads
         if (user) {
             const cachedBal = localStorage.getItem(`bal_${user.id}`);
             if (cachedBal) {
@@ -1135,7 +1131,6 @@ async function handleAuth(){
         }
     }catch(err){
         toast(err.message || "Authentication failed");
-        // Recoverable reset if credentials error out
         authBtn.innerText = originalText;
         authBtn.disabled = false;
         authBtn.style.opacity = "1";
@@ -1149,7 +1144,6 @@ async function logout(){
     realBalance = 0;
     updateBalance();
     
-    // Reset Auth Button State clean
     const authBtn = document.getElementById("auth-btn");
     authBtn.disabled = false;
     authBtn.style.opacity = "1";

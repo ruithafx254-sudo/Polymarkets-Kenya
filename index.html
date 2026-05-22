@@ -8,409 +8,1092 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-:root {
-    --bg-outer: #e3e6e8;
-    --bg-app: #f7f9fa;
-    --surface-white: #ffffff;
-    --primary-blue: #007aff;
-    --primary-hover: #005bb5;
-    --text-main: #111111;
-    --text-muted: #6e7781;
-    --border-color: #e1e4e8;
-    --success-green: #28a745;
-    --danger-red: #dc3545;
-    --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-    --shadow-lg: 0 16px 40px rgba(0,0,0,0.08);
-    --shadow-blue: 0 8px 24px rgba(0,122,255,0.25);
-    --radius-xl: 32px;
-    --radius-lg: 20px;
-    --radius-md: 14px;
-    --transition: all 0.3s ease;
+:root{
+    --bg:#eef2f5;
+    --card:#ffffff;
+    --primary:#007aff;
+    --primary2:#00c6ff;
+    --success:#16a34a;
+    --danger:#dc2626;
+    --text:#111827;
+    --muted:#6b7280;
+    --border:#e5e7eb;
+    --shadow:0 10px 35px rgba(0,0,0,.08);
+    --radius:24px;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    -webkit-tap-highlight-color: transparent;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    -webkit-tap-highlight-color:transparent;
 }
 
-body, html {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    background: var(--bg-outer);
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:var(--bg);
 }
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
-button {
-    user-select: none;
-    touch-action: manipulation;
-    cursor: pointer;
+.device{
+    width:100%;
+    max-width:430px;
+    height:100%;
+    background:#f8fafc;
+    overflow:hidden;
+    position:relative;
+    display:flex;
+    flex-direction:column;
 }
 
-.device-frame {
-    width: 100%;
-    max-width: 430px;
-    height: 100%;
-    background: var(--bg-app);
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow: hidden;
-    box-shadow: var(--shadow-lg);
-}
+@media(min-width:431px){
+    body{
+        padding:15px;
+    }
 
-@media(min-width: 431px) {
-    body { padding: 12px; }
-    .device-frame {
-        height: 95vh;
-        max-height: 900px;
-        border-radius: 34px;
-        box-shadow: var(--shadow-lg), inset 0 0 0 8px #fff;
+    .device{
+        border-radius:35px;
+        height:95vh;
+        max-height:920px;
+        box-shadow:var(--shadow);
     }
 }
 
-.auth-screen {
-    position: absolute;
-    inset: 0;
-    z-index: 500;
+button{
+    cursor:pointer;
+    border:none;
+}
+
+/* AUTH */
+
+.auth{
+    position:absolute;
+    inset:0;
+    z-index:500;
     background:
-        radial-gradient(circle at top right, rgba(0,122,255,0.35), transparent 30%),
-        radial-gradient(circle at bottom left, rgba(0,198,255,0.2), transparent 30%),
-        linear-gradient(145deg, #08111f 0%, #121c2d 45%, #1a2235 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 28px;
-    color: white;
-    transition: 0.4s ease;
+    radial-gradient(circle at top right, rgba(0,122,255,.3), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(0,198,255,.2), transparent 30%),
+    linear-gradient(145deg,#08111f 0%,#111827 50%,#1e293b 100%);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:28px;
+    color:white;
+    transition:.4s;
 }
 
-.auth-screen.hidden {
-    opacity: 0;
-    pointer-events: none;
+.auth.hidden{
+    opacity:0;
+    pointer-events:none;
 }
 
-.auth-top-badge { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08); width: fit-content; padding: 8px 14px; border-radius: 999px; font-size: 0.72rem; margin-bottom: 24px; font-weight: 700; }
-.auth-logo { width: 90px; height: 90px; border-radius: 28px; background: linear-gradient(135deg, #007aff, #00c6ff); display: flex; align-items: center; justify-content: center; font-size: 2.8rem; font-weight: 800; margin-bottom: 24px; box-shadow: var(--shadow-blue); }
-.auth-title { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
-.auth-sub { color: #9ea9bb; font-size: 0.9rem; line-height: 1.5; margin-bottom: 28px; }
-.auth-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 22px; backdrop-filter: blur(16px); }
-.auth-tabs { display: flex; background: rgba(255,255,255,0.06); border-radius: 14px; padding: 5px; margin-bottom: 20px; }
-.auth-tab { flex: 1; border: none; background: transparent; color: #9ea9bb; padding: 12px; border-radius: 10px; font-weight: 700; }
-.auth-tab.active { background: white; color: black; }
-.auth-form { display: flex; flex-direction: column; gap: 14px; }
-.input-group { display: flex; flex-direction: column; gap: 8px; }
-.input-label { font-size: 0.78rem; color: #b8c2d4; font-weight: 700; }
-.auth-input { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 16px; color: white; outline: none; font-size: 1rem; }
-.auth-input:focus { border-color: var(--primary-blue); }
-.btn-auth { background: linear-gradient(135deg,#007aff,#00c6ff); border: none; color: white; padding: 16px; border-radius: 16px; font-size: 1rem; font-weight: 800; margin-top: 8px; box-shadow: var(--shadow-blue); }
-.auth-footer { margin-top: 18px; text-align: center; font-size: 0.82rem; color: #9ea9bb; }
-.auth-footer span { color: white; font-weight: 700; cursor: pointer; }
+.auth-badge{
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.08);
+    width:fit-content;
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:.75rem;
+    margin-bottom:25px;
+    font-weight:700;
+}
 
-.app-header { background: rgba(255,255,255,0.88); backdrop-filter: blur(12px); display: flex; justify-content: space-between; align-items: center; padding: calc(16px + env(safe-area-inset-top)) 20px 16px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
-.brand-title { display: flex; align-items: center; gap: 8px; font-size: 1.2rem; font-weight: 800; }
-.brand-logo { width: 24px; height: 24px; border-radius: 6px; background: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-.account-selector { border: none; background: #e8f0fe; color: var(--primary-blue); padding: 8px 14px; border-radius: 999px; font-weight: 700; outline: none; }
+.auth-logo{
+    width:90px;
+    height:90px;
+    border-radius:28px;
+    background:linear-gradient(135deg,var(--primary),var(--primary2));
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:3rem;
+    font-weight:900;
+    margin-bottom:24px;
+    box-shadow:0 10px 30px rgba(0,122,255,.3);
+}
 
-.view-container { flex: 1; overflow-y: auto; padding-bottom: 20px; -webkit-overflow-scrolling: touch; }
-.view { display: none; flex-direction: column; gap: 16px; padding: 16px; }
-.view.active { display: flex; }
+.auth-title{
+    font-size:2rem;
+    font-weight:800;
+    margin-bottom:10px;
+}
 
-.equity-card, .ai-engine-box, .profile-list { background: white; border-radius: var(--radius-lg); padding: 20px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
-.equity-card { text-align: center; }
-.equity-label { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 700; }
-.equity-amount { font-size: 2.8rem; font-weight: 800; margin-bottom: 16px; }
-.progress-container { width: 100%; height: 8px; border-radius: 999px; background: #edf0f3; overflow: hidden; margin-bottom: 10px; }
-.progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg,#007aff,#00c6ff); transition: width 0.4s ease; }
-.target-text { font-size: 0.75rem; color: var(--text-muted); }
+.auth-sub{
+    color:#cbd5e1;
+    line-height:1.5;
+    font-size:.92rem;
+    margin-bottom:30px;
+}
 
-.grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.action-btn { background: white; border: 1px solid var(--border-color); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-weight: 700; box-shadow: var(--shadow-sm); }
-.action-btn span { font-size: 0.72rem; color: var(--success-green); }
+.auth-card{
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.08);
+    padding:22px;
+    border-radius:28px;
+    backdrop-filter:blur(20px);
+}
 
-.ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 0.82rem; font-weight: 700; }
-.live-indicator { display: flex; align-items: center; gap: 8px; color: var(--primary-blue); }
-.radar-dot { width: 8px; height: 8px; background: var(--primary-blue); border-radius: 50%; animation: pulse 1.4s infinite; }
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0,122,255,0.4); } 100% { box-shadow: 0 0 0 12px rgba(0,122,255,0); } }
+.auth-tabs{
+    display:flex;
+    gap:6px;
+    background:rgba(255,255,255,.06);
+    padding:5px;
+    border-radius:16px;
+    margin-bottom:20px;
+}
 
-.signal-screen { background: #0b101e; color: white; border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 16px; }
-.signal-asset { color: var(--primary-blue); font-size: 0.82rem; margin-bottom: 8px; font-weight: 700; }
-.signal-text { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
-.signal-sub { color: #9ca3af; font-size: 0.75rem; }
+.auth-tab{
+    flex:1;
+    background:transparent;
+    color:#cbd5e1;
+    padding:12px;
+    border-radius:12px;
+    font-weight:800;
+}
 
-.parameters-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-.param-input { background: #f4f6f8; border-radius: 12px; padding: 10px 12px; border: 1px solid var(--border-color); }
-.param-label { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; display: block; font-weight: 700; }
-.param-input input, .param-input select { border: none; background: transparent; width: 100%; outline: none; font-size: 0.95rem; font-weight: 800; color: var(--text-main);}
+.auth-tab.active{
+    background:white;
+    color:black;
+}
 
-.btn-master { width: 100%; background: var(--primary-blue); border: none; color: white; padding: 16px; border-radius: 18px; font-size: 1rem; font-weight: 800; box-shadow: var(--shadow-blue); margin-top: 10px;}
-.btn-master.active { background: var(--danger-red); }
+.input-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-bottom:14px;
+}
 
-.ledger-header-area { display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;}
-.btn-clear-ledger { background: #fee2e2; color: var(--danger-red); border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; }
-.ledger-row { background: white; border-radius: 14px; border: 1px solid var(--border-color); padding: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.ledger-asset { font-weight: 700; margin-bottom: 4px; font-size: 0.9rem;}
-.ledger-type { font-size: 0.72rem; color: var(--text-muted); }
-.ledger-profit { font-weight: 800; }
+.input-label{
+    font-size:.76rem;
+    color:#cbd5e1;
+    font-weight:700;
+}
 
-.profile-header { text-align: center; padding: 10px 0;}
-.profile-avatar { width: 80px; height: 80px; background: #e6e9ee; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 2rem; }
-.profile-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; }
-.profile-email { font-size: 0.85rem; color: var(--text-muted); }
-.profile-item { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
-.profile-item:last-child { border-bottom: none; }
-.btn-logout { width: 100%; margin-top: 16px; border: 1px solid var(--danger-red); color: var(--danger-red); background: transparent; padding: 14px; border-radius: 14px; font-weight: 700; }
+.auth-input{
+    padding:15px;
+    border-radius:15px;
+    border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.06);
+    color:white;
+    outline:none;
+    font-size:1rem;
+}
 
-.bottom-nav { display: flex; justify-content: space-around; padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border-top: 1px solid var(--border-color); flex-shrink: 0; }
-.nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); }
-.nav-item.active { color: var(--primary-blue); }
-.nav-icon { font-size: 1.3rem; }
-.nav-label { font-size: 0.7rem; font-weight: 700; }
+.auth-input:focus{
+    border-color:var(--primary);
+}
 
-/* Enhanced Modal System */
-.modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 300; }
-.modal-overlay.show { display: flex; }
-.modal-card { width: 100%; max-width: 360px; background: white; border-radius: 24px; padding: 24px; box-shadow: var(--shadow-lg); animation: slideUp 0.3s ease; }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.auth-btn{
+    width:100%;
+    padding:16px;
+    border-radius:18px;
+    background:linear-gradient(135deg,var(--primary),var(--primary2));
+    color:white;
+    font-size:1rem;
+    font-weight:800;
+    margin-top:6px;
+}
 
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.modal-title { font-size: 1.25rem; font-weight: 800; color: var(--text-main); }
-.close-modal { font-size: 1.2rem; color: var(--text-muted); cursor: pointer; font-weight: bold; }
+.auth-footer{
+    margin-top:18px;
+    text-align:center;
+    color:#cbd5e1;
+    font-size:.84rem;
+}
 
-.modal-input-group { margin-bottom: 14px; }
-.modal-input-group label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;}
-.modal-input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-app); outline: none; font-size: 1rem; font-weight: 600; transition: var(--transition); }
-.modal-input:focus { border-color: var(--primary-blue); background: white; }
-.modal-btn { width: 100%; border: none; background: linear-gradient(135deg, var(--success-green), #20c997); color: white; padding: 16px; border-radius: 14px; font-weight: 800; font-size: 1rem; margin-top: 10px; box-shadow: 0 4px 14px rgba(40,167,69,0.3); }
+.auth-footer span{
+    color:white;
+    font-weight:800;
+    cursor:pointer;
+}
 
-/* Invoice View */
-.invoice-container { background: var(--bg-app); border: 1px dashed var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
-.invoice-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.9rem; }
-.invoice-row:last-child { margin-bottom: 0; padding-top: 12px; border-top: 1px solid var(--border-color); font-weight: 800; font-size: 1.1rem; }
-.invoice-label { color: var(--text-muted); font-weight: 600; }
-.invoice-val { font-weight: 700; color: var(--text-main); text-align: right; }
+/* HEADER */
 
-.toast-container { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 380px;}
-.toast { background: #111; color: white; padding: 14px 18px; border-radius: 14px; margin-bottom: 10px; font-size: 0.84rem; font-weight: 600; text-align: center; box-shadow: var(--shadow-lg); }
-.trust-badge-container { display:block; text-align: center; margin-top: 20px; }
-.trust-badge-container img { max-width: 100%; height: auto; }
+.header{
+    padding:18px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(255,255,255,.9);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--border);
+}
 
-/* Congrats Theme */
-.congrats-icon { font-size: 4rem; margin-bottom: 10px; animation: bounce 1s infinite alternate;}
-@keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+.brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:900;
+    font-size:1.15rem;
+}
+
+.brand-box{
+    width:26px;
+    height:26px;
+    border-radius:8px;
+    background:var(--primary);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-weight:900;
+}
+
+.account-selector{
+    padding:10px 14px;
+    border:none;
+    border-radius:999px;
+    background:#e0f2fe;
+    color:var(--primary);
+    font-weight:800;
+    outline:none;
+}
+
+/* MAIN */
+
+.main{
+    flex:1;
+    overflow-y:auto;
+    padding-bottom:20px;
+}
+
+.view{
+    display:none;
+    padding:16px;
+    flex-direction:column;
+    gap:16px;
+}
+
+.view.active{
+    display:flex;
+}
+
+.card{
+    background:white;
+    border-radius:var(--radius);
+    padding:20px;
+    border:1px solid var(--border);
+    box-shadow:0 4px 14px rgba(0,0,0,.03);
+}
+
+/* BALANCE */
+
+.balance-card{
+    text-align:center;
+}
+
+.balance-title{
+    font-size:.82rem;
+    color:var(--muted);
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.balance-amount{
+    font-size:2.8rem;
+    font-weight:900;
+    margin-bottom:18px;
+}
+
+.progress{
+    width:100%;
+    height:10px;
+    background:#edf2f7;
+    border-radius:999px;
+    overflow:hidden;
+}
+
+.progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--primary),var(--primary2));
+}
+
+/* BUTTONS */
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.action-btn{
+    background:white;
+    border-radius:20px;
+    padding:18px;
+    border:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    font-weight:800;
+    align-items:center;
+    justify-content:center;
+}
+
+.action-btn span{
+    font-size:.72rem;
+    color:var(--success);
+}
+
+/* AI */
+
+.ai-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+    font-size:.84rem;
+    font-weight:800;
+}
+
+.live{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:var(--primary);
+}
+
+.dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--primary);
+    animation:pulse 1.4s infinite;
+}
+
+@keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(0,122,255,.4)}
+    100%{box-shadow:0 0 0 12px rgba(0,122,255,0)}
+}
+
+.signal{
+    background:#0f172a;
+    color:white;
+    border-radius:20px;
+    padding:24px;
+    text-align:center;
+    margin-bottom:18px;
+}
+
+.signal-asset{
+    color:#60a5fa;
+    font-size:.82rem;
+    font-weight:800;
+    margin-bottom:8px;
+}
+
+.signal-main{
+    font-size:1.5rem;
+    font-weight:900;
+    margin-bottom:10px;
+}
+
+.signal-sub{
+    font-size:.75rem;
+    color:#cbd5e1;
+}
+
+.row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:12px;
+}
+
+.input-card{
+    background:#f8fafc;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:12px;
+}
+
+.input-card label{
+    display:block;
+    font-size:.72rem;
+    color:var(--muted);
+    margin-bottom:6px;
+    font-weight:700;
+}
+
+.input-card input,
+.input-card select{
+    width:100%;
+    border:none;
+    background:transparent;
+    outline:none;
+    font-weight:800;
+    font-size:.95rem;
+}
+
+.master-btn{
+    width:100%;
+    padding:17px;
+    border-radius:18px;
+    background:linear-gradient(135deg,var(--primary),var(--primary2));
+    color:white;
+    font-size:1rem;
+    font-weight:900;
+    margin-top:12px;
+}
+
+.master-btn.active{
+    background:var(--danger);
+}
+
+/* LEDGER */
+
+.ledger-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:white;
+    border-radius:16px;
+    border:1px solid var(--border);
+    padding:15px;
+    margin-bottom:10px;
+}
+
+.ledger-title{
+    font-weight:800;
+    margin-bottom:4px;
+}
+
+.ledger-sub{
+    font-size:.75rem;
+    color:var(--muted);
+}
+
+.ledger-profit{
+    font-weight:900;
+}
+
+/* PROFILE */
+
+.profile{
+    text-align:center;
+}
+
+.avatar{
+    width:85px;
+    height:85px;
+    border-radius:50%;
+    background:#e2e8f0;
+    margin:0 auto 14px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:2rem;
+}
+
+.profile-name{
+    font-size:1.2rem;
+    font-weight:900;
+}
+
+.profile-email{
+    color:var(--muted);
+    font-size:.85rem;
+    margin-top:4px;
+}
+
+.profile-list{
+    margin-top:20px;
+}
+
+.profile-item{
+    display:flex;
+    justify-content:space-between;
+    padding:14px 0;
+    border-bottom:1px solid var(--border);
+    font-size:.9rem;
+}
+
+.logout{
+    width:100%;
+    padding:15px;
+    border-radius:16px;
+    background:white;
+    color:var(--danger);
+    border:1px solid var(--danger);
+    font-weight:800;
+    margin-top:18px;
+}
+
+/* NAV */
+
+.nav{
+    display:flex;
+    justify-content:space-around;
+    padding:14px 18px;
+    background:rgba(255,255,255,.92);
+    border-top:1px solid var(--border);
+    backdrop-filter:blur(14px);
+}
+
+.nav-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    color:var(--muted);
+}
+
+.nav-item.active{
+    color:var(--primary);
+}
+
+.nav-label{
+    font-size:.7rem;
+    font-weight:800;
+}
+
+/* MODAL */
+
+.overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    backdrop-filter:blur(4px);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    z-index:400;
+}
+
+.overlay.show{
+    display:flex;
+}
+
+.modal{
+    width:100%;
+    max-width:360px;
+    background:white;
+    border-radius:28px;
+    padding:24px;
+    animation:up .3s ease;
+}
+
+@keyframes up{
+    from{
+        transform:translateY(20px);
+        opacity:0;
+    }
+}
+
+.modal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.modal-title{
+    font-size:1.2rem;
+    font-weight:900;
+}
+
+.close{
+    font-size:1.5rem;
+    cursor:pointer;
+}
+
+.modal-group{
+    margin-bottom:14px;
+}
+
+.modal-group label{
+    display:block;
+    margin-bottom:6px;
+    font-size:.74rem;
+    font-weight:800;
+    color:var(--muted);
+}
+
+.modal-input{
+    width:100%;
+    padding:15px;
+    border-radius:15px;
+    border:1px solid var(--border);
+    background:#f8fafc;
+    outline:none;
+    font-weight:700;
+}
+
+.modal-btn{
+    width:100%;
+    padding:16px;
+    border-radius:16px;
+    background:linear-gradient(135deg,var(--success),#22c55e);
+    color:white;
+    font-size:1rem;
+    font-weight:900;
+    margin-top:10px;
+}
+
+.invoice{
+    background:#f8fafc;
+    border:1px dashed var(--border);
+    border-radius:18px;
+    padding:18px;
+    margin-bottom:20px;
+}
+
+.invoice-row{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:12px;
+    font-size:.9rem;
+}
+
+.invoice-row:last-child{
+    margin-bottom:0;
+    padding-top:12px;
+    border-top:1px solid var(--border);
+}
+
+.invoice-label{
+    color:var(--muted);
+    font-weight:700;
+}
+
+.invoice-value{
+    font-weight:900;
+}
+
+.toast-wrap{
+    position:absolute;
+    top:80px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:1000;
+    width:90%;
+    max-width:380px;
+}
+
+.toast{
+    background:#111827;
+    color:white;
+    padding:14px 18px;
+    border-radius:14px;
+    margin-bottom:10px;
+    text-align:center;
+    font-weight:700;
+}
+
+.badge{
+    margin-top:18px;
+    text-align:center;
+}
+
+.badge img{
+    max-width:100%;
+}
+
+.congrats{
+    text-align:center;
+}
+
+.congrats-icon{
+    font-size:4rem;
+    margin-bottom:10px;
+}
 </style>
 </head>
+
 <body>
 
-<div class="device-frame">
+<div class="device">
 
-<div class="auth-screen" id="auth-screen">
-    <div class="auth-top-badge">SECURE ENTERPRISE ACCESS</div>
-    <div class="auth-logo">A</div>
-    <div class="auth-title">Apex Enterprise</div>
-    <div class="auth-sub">Secure AI-powered execution environment with encrypted cloud authentication.</div>
+<div class="auth" id="auth">
 
-    <div class="auth-card">
-        <div class="auth-tabs">
-            <button class="auth-tab active" id="signin-tab" onclick="switchAuthMode('signin')">Sign In</button>
-            <button class="auth-tab" id="signup-tab" onclick="switchAuthMode('signup')">Create Account</button>
-        </div>
-
-        <div class="auth-form">
-            <div class="input-group" id="fullname-group" style="display:none;">
-                <label class="input-label">FULL NAME</label>
-                <input type="text" class="auth-input" id="signup-name" placeholder="John Doe">
-            </div>
-            <div class="input-group">
-                <label class="input-label">EMAIL ADDRESS</label>
-                <input type="email" class="auth-input" id="login-email" placeholder="you@example.com">
-            </div>
-            <div class="input-group">
-                <label class="input-label">PASSWORD</label>
-                <input type="password" class="auth-input" id="login-pass" placeholder="Enter password">
-            </div>
-            <button class="btn-auth" id="auth-btn" onclick="handleAuth()">Sign In Securely</button>
-        </div>
-
-        <div class="auth-footer" id="auth-footer-text">
-            New here? <span onclick="switchAuthMode('signup')">Create account</span>
-        </div>
-    </div>
+<div class="auth-badge">
+SECURE ENTERPRISE ACCESS
 </div>
 
-<div class="toast-container" id="toast-area"></div>
+<div class="auth-logo">
+A
+</div>
 
-<header class="app-header">
-    <div class="brand-title"><div class="brand-logo">A</div>ApexOS</div>
-    <select class="account-selector" id="account-type" onchange="switchAccountType()">
-        <option value="real">Real Account</option>
-        <option value="demo">Demo Account</option>
-    </select>
+<div class="auth-title">
+Apex Enterprise
+</div>
+
+<div class="auth-sub">
+AI powered trading execution environment with enterprise security.
+</div>
+
+<div class="auth-card">
+
+<div class="auth-tabs">
+<button class="auth-tab active" id="signin-tab" onclick="switchAuth('signin')">Sign In</button>
+<button class="auth-tab" id="signup-tab" onclick="switchAuth('signup')">Create Account</button>
+</div>
+
+<div id="fullname-wrap" style="display:none;">
+<div class="input-group">
+<label class="input-label">FULL NAME</label>
+<input type="text" class="auth-input" id="signup-name" placeholder="John Doe">
+</div>
+</div>
+
+<div class="input-group">
+<label class="input-label">EMAIL</label>
+<input type="email" class="auth-input" id="login-email" placeholder="you@example.com">
+</div>
+
+<div class="input-group">
+<label class="input-label">PASSWORD</label>
+<input type="password" class="auth-input" id="login-pass" placeholder="Password">
+</div>
+
+<button class="auth-btn" id="auth-btn" onclick="handleAuth()">
+Sign In Securely
+</button>
+
+<div class="auth-footer" id="auth-footer">
+New here?
+<span onclick="switchAuth('signup')">Create account</span>
+</div>
+
+</div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<header class="header">
+<div class="brand">
+<div class="brand-box">A</div>
+ApexOS
+</div>
+
+<select class="account-selector" id="account-type" onchange="switchAccount()">
+<option value="real">Real Account</option>
+<option value="demo">Demo Account</option>
+</select>
 </header>
 
-<div class="view-container">
+<div class="main">
 
-    <div class="view active" id="view-home">
-        <div class="equity-card">
-            <div class="equity-label">Total Equity Balance</div>
-            <div class="equity-amount" id="display-balance">$0.00</div>
-            <div class="progress-container"><div class="progress-bar" id="goal-progress"></div></div>
-            <div class="target-text">Goal Progress: <span id="target-display">$50,000 Target</span></div>
-        </div>
+<div class="view active" id="home">
 
-        <div class="grid-buttons">
-            <button class="action-btn" onclick="openPaymentFlow('deposit')">
-                Deposit Funds
-                <span>Secure Gateway</span>
-            </button>
-            <button class="action-btn" onclick="openPaymentFlow('withdraw')">
-                Withdraw
-                <span>Instant Processing</span>
-            </button>
-        </div>
+<div class="card balance-card">
 
-        <div class="ai-engine-box">
-            <div class="ai-header">
-                <span>Neural Match Scanner</span>
-                <div class="live-indicator"><div class="radar-dot"></div>Monitoring Feed</div>
-            </div>
-            <div class="signal-screen">
-                <div class="signal-asset" id="sig-asset">READY TO SYNC...</div>
-                <div class="signal-text" id="sig-main">--</div>
-                <div class="signal-sub" id="sig-status">Awaiting trade parameters</div>
-            </div>
-            
-            <div class="parameters-row">
-                <div class="param-input">
-                    <span class="param-label">Market Strategy</span>
-                    <select id="inp-market" onchange="updateSubMarket()">
-                        <option value="Matches/Differs">Matches/Differs</option>
-                        <option value="Even/Odd">Even/Odd</option>
-                        <option value="Over/Under">Over/Under</option>
-                    </select>
-                </div>
-                <div class="param-input">
-                    <span class="param-label">Base Stake ($)</span>
-                    <input type="number" id="inp-stake" value="1" step="0.5">
-                </div>
-            </div>
-            
-            <div class="param-input" id="digit-selector" style="display:none; margin-bottom: 12px;">
-                <span class="param-label">Target Digit (0-9)</span>
-                <input type="number" id="inp-digit" value="4" min="0" max="9">
-            </div>
+<div class="balance-title">
+TOTAL EQUITY
+</div>
 
-            <div class="parameters-row">
-                <div class="param-input">
-                    <span class="param-label">Take Profit ($)</span>
-                    <input type="number" id="inp-tp" value="5" step="1">
-                </div>
-                <div class="param-input">
-                    <span class="param-label">Stop Loss ($)</span>
-                    <input type="number" id="inp-sl" value="20" step="1">
-                </div>
-            </div>
-            <div class="param-input" style="margin-bottom: 4px;">
-                <span class="param-label">Martingale Multiplier</span>
-                <input type="number" id="inp-martingale" value="2.0" step="0.1">
-            </div>
+<div class="balance-amount" id="balance">
+$0.00
+</div>
 
-            <button class="btn-master" id="btn-toggle-bot" onclick="toggleBotEngine()">Execute AI Automation</button>
-        </div>
-    </div>
+<div class="progress">
+<div class="progress-fill" id="progress-fill"></div>
+</div>
 
-    <div class="view" id="view-ledger">
-        <div class="ledger-header-area">
-            <div>
-                <h3 style="font-size:1.1rem; font-weight:800;">Live Ledger</h3>
-                <div id="total-pnl" style="font-weight:800; font-size: 0.9rem; margin-top:4px;">P&L: $0.00</div>
-            </div>
-            <button class="btn-clear-ledger" onclick="clearLedger()">Clear History</button>
-        </div>
-        <div id="ledger-list">
-            <div style="text-align:center; padding:40px 0; color:var(--text-muted); font-size:0.85rem;">No executions recorded yet.</div>
-        </div>
-    </div>
-
-    <div class="view" id="view-profile">
-        <div class="profile-header">
-            <div class="profile-avatar">👤</div>
-            <div class="profile-name" id="profile-name">Apex Trader</div>
-            <div class="profile-email" id="profile-email">Connected to Supabase</div>
-        </div>
-        <div class="profile-list">
-            <div class="profile-item"><span>Account Status</span><span style="color:var(--success-green); font-weight:700;">Verified</span></div>
-            <div class="profile-item"><span>Platform ID</span><span>CR-938472</span></div>
-            <div class="profile-item"><span>Gateway</span><span>Enterprise Secure</span></div>
-        </div>
-        <button class="btn-logout" onclick="handleLogout()">Secure Logout</button>
-    </div>
+<div style="margin-top:10px;font-size:.75rem;color:var(--muted);font-weight:700;">
+Goal Progress: $50,000 Target
+</div>
 
 </div>
 
-<div class="modal-overlay" id="payment-modal">
-    <div class="modal-card" onclick="event.stopPropagation()">
-        <div class="modal-header">
-            <div class="modal-title" id="modal-flow-title">Deposit Funds</div>
-            <div class="close-modal" onclick="closeModal()">×</div>
-        </div>
+<div class="grid">
 
-        <div id="modal-step-entry">
-            <div class="modal-input-group">
-                <label>M-Pesa Registered Name</label>
-                <input type="text" class="modal-input" id="pay-name" placeholder="e.g. John Doe">
-            </div>
-            <div class="modal-input-group">
-                <label>M-Pesa Number</label>
-                <input type="tel" class="modal-input" id="pay-phone" placeholder="e.g. 0712345678">
-            </div>
-            <div class="modal-input-group">
-                <label>Amount (USD) - Min $2</label>
-                <input type="number" class="modal-input" id="pay-amount" placeholder="e.g. 2.00">
-            </div>
-            <button class="modal-btn" onclick="proceedToInvoice()">Continue</button>
+<button class="action-btn" onclick="openPayment('deposit')">
+Deposit Funds
+<span>Secure Gateway</span>
+</button>
 
-            <span class="trust-badge-container">
-                <a href="https://intasend.com/security" target="_blank">
-                    <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" width="280px" alt="IntaSend Secure Payments">
-                </a>
-            </span>
-        </div>
+<button class="action-btn" onclick="openPayment('withdraw')">
+Withdraw
+<span>Instant Processing</span>
+</button>
 
-        <div id="modal-step-invoice" style="display:none;">
-            <div class="invoice-container">
-                <div class="invoice-row"><span class="invoice-label">Auto-Generated ID</span><span class="invoice-val" id="inv-id">--</span></div>
-                <div class="invoice-row"><span class="invoice-label">Account Name</span><span class="invoice-val" id="inv-name">--</span></div>
-                <div class="invoice-row"><span class="invoice-label">M-Pesa Number</span><span class="invoice-val" id="inv-phone">--</span></div>
-                <div class="invoice-row"><span class="invoice-label">Total Payable (KES)</span><span class="invoice-val" style="color:var(--success-green);">KSh <span id="inv-amount-kes">0.00</span></span></div>
-            </div>
-            <button class="modal-btn" onclick="executeExternalPayment()">Pay Securely via M-PESA</button>
-            <button class="btn-logout" style="margin-top: 8px; border:none; color: var(--text-muted);" onclick="closeModal()">Cancel</button>
-        </div>
-    </div>
 </div>
 
-<div class="modal-overlay" id="congrats-modal">
-    <div class="modal-card" style="text-align: center;" onclick="event.stopPropagation()">
-        <div class="congrats-icon">🎉</div>
-        <h2 style="color:var(--success-green); margin-bottom:12px; font-weight:800;" id="congrats-title">Congratulations!</h2>
-        <p id="congrats-msg" style="color:var(--text-muted); font-size:1.1rem; font-weight:700; margin-bottom: 24px;">Message goes here</p>
-        <button class="modal-btn" onclick="closeCongratsModal()">Awesome</button>
-    </div>
+<div class="card">
+
+<div class="ai-head">
+<span>Neural Match Scanner</span>
+
+<div class="live">
+<div class="dot"></div>
+AI Accuracy 90%
+</div>
 </div>
 
-<nav class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('view-home', this)"><div class="nav-icon">⎈</div><div class="nav-label">Engine</div></div>
-    <div class="nav-item" onclick="switchTab('view-ledger', this)"><div class="nav-icon">≡</div><div class="nav-label">Ledger</div></div>
-    <div class="nav-item" onclick="switchTab('view-profile', this)"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+<div class="signal">
+<div class="signal-asset" id="sig-asset">
+READY TO SYNC...
+</div>
+
+<div class="signal-main" id="sig-main">
+--
+</div>
+
+<div class="signal-sub" id="sig-status">
+Quantum neural scanner calibrated to 90% precision
+</div>
+</div>
+
+<div class="row">
+
+<div class="input-card">
+<label>Market Strategy</label>
+
+<select id="inp-market" onchange="toggleDigitBox()">
+<option>Matches/Differs</option>
+<option>Even/Odd</option>
+<option>Over/Under</option>
+</select>
+</div>
+
+<div class="input-card">
+<label>Base Stake ($)</label>
+<input type="number" id="inp-stake" value="1">
+</div>
+
+</div>
+
+<div class="input-card" id="digit-box" style="display:none;margin-bottom:12px;">
+<label>Target Digit</label>
+<input type="number" id="inp-digit" value="4" min="0" max="9">
+</div>
+
+<div class="row">
+
+<div class="input-card">
+<label>Take Profit ($)</label>
+<input type="number" id="inp-tp" value="5">
+</div>
+
+<div class="input-card">
+<label>Stop Loss ($)</label>
+<input type="number" id="inp-sl" value="20">
+</div>
+
+</div>
+
+<div class="input-card">
+<label>Martingale Multiplier</label>
+<input type="number" id="inp-multi" value="2">
+</div>
+
+<button class="master-btn" id="engine-btn" onclick="toggleBot()">
+Execute AI Automation
+</button>
+
+</div>
+</div>
+
+<div class="view" id="ledger">
+
+<div class="card">
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+
+<div>
+<div style="font-size:1.1rem;font-weight:900;">
+Live Ledger
+</div>
+
+<div id="pnl" style="font-size:.85rem;font-weight:900;margin-top:4px;">
+P&L: $0.00
+</div>
+</div>
+
+<button style="padding:8px 12px;border-radius:10px;background:#fee2e2;color:var(--danger);font-weight:800;" onclick="clearLedger()">
+Clear
+</button>
+
+</div>
+
+<div id="ledger-list">
+
+<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">
+No executions recorded yet.
+</div>
+
+</div>
+
+</div>
+</div>
+
+<div class="view" id="profile">
+
+<div class="card profile">
+
+<div class="avatar">
+👤
+</div>
+
+<div class="profile-name" id="profile-name">
+Apex Trader
+</div>
+
+<div class="profile-email" id="profile-email">
+Connected to Supabase
+</div>
+
+<div class="profile-list">
+
+<div class="profile-item">
+<span>Account Status</span>
+<span style="color:var(--success);font-weight:800;">Verified</span>
+</div>
+
+<div class="profile-item">
+<span>Platform ID</span>
+<span>CR-938472</span>
+</div>
+
+<div class="profile-item">
+<span>Gateway</span>
+<span>Enterprise Secure</span>
+</div>
+
+</div>
+
+<button class="logout" onclick="logout()">
+Secure Logout
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- PAYMENT MODAL -->
+
+<div class="overlay" id="payment-modal">
+
+<div class="modal">
+
+<div class="modal-head">
+<div class="modal-title" id="payment-title">
+Deposit Funds
+</div>
+
+<div class="close" onclick="closeModal()">
+×
+</div>
+</div>
+
+<div id="step1">
+
+<div class="modal-group">
+<label>M-Pesa Registered Name</label>
+<input type="text" class="modal-input" id="pay-name">
+</div>
+
+<div class="modal-group">
+<label>M-Pesa Number</label>
+<input type="tel" class="modal-input" id="pay-phone">
+</div>
+
+<div class="modal-group">
+<label>Amount (USD)</label>
+<input type="number" class="modal-input" id="pay-amount">
+</div>
+
+<button class="modal-btn" onclick="proceedInvoice()">
+Continue
+</button>
+
+<div class="badge">
+<img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png">
+</div>
+
+</div>
+
+<div id="step2" style="display:none;">
+
+<div class="invoice">
+
+<div class="invoice-row">
+<span class="invoice-label">Invoice ID</span>
+<span class="invoice-value" id="inv-id">--</span>
+</div>
+
+<div class="invoice-row">
+<span class="invoice-label">Name</span>
+<span class="invoice-value" id="inv-name">--</span>
+</div>
+
+<div class="invoice-row">
+<span class="invoice-label">Phone</span>
+<span class="invoice-value" id="inv-phone">--</span>
+</div>
+
+<div class="invoice-row">
+<span class="invoice-label">Total (KES)</span>
+<span class="invoice-value" style="color:var(--success);">
+KSh <span id="inv-amount">0</span>
+</span>
+</div>
+
+</div>
+
+<button class="modal-btn" onclick="executeExternalPayment()">
+Pay Securely via M-PESA
+</button>
+
+</div>
+
+</div>
+</div>
+
+<!-- CONGRATS -->
+
+<div class="overlay" id="congrats-modal">
+
+<div class="modal congrats">
+
+<div class="congrats-icon">
+🎉
+</div>
+
+<h2 id="congrats-title" style="margin-bottom:12px;color:var(--success);font-weight:900;">
+Congratulations!
+</h2>
+
+<p id="congrats-message" style="color:var(--muted);font-weight:700;margin-bottom:22px;">
+Success
+</p>
+
+<button class="modal-btn" onclick="closeCongrats()">
+Awesome
+</button>
+
+</div>
+</div>
+
+<nav class="nav">
+
+<div class="nav-item active" onclick="switchTab('home',this)">
+<div>⎈</div>
+<div class="nav-label">Engine</div>
+</div>
+
+<div class="nav-item" onclick="switchTab('ledger',this)">
+<div>≡</div>
+<div class="nav-label">Ledger</div>
+</div>
+
+<div class="nav-item" onclick="switchTab('profile',this)">
+<div>👤</div>
+<div class="nav-label">Profile</div>
+</div>
+
 </nav>
 
 </div>
@@ -418,336 +1101,494 @@ button {
 <script>
 const SUPABASE_URL = "https://hsovbnxatorocibfgrhc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let realBalance = 0.00;
-let demoBalance = 10000.00;
-let isRealAccount = true;
+const supabaseClient = supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
 
-// Bot tracking
+let authMode = "signin";
+
+let realBalance = 0;
+let demoBalance = 10000;
+let isReal = true;
+
+let isRunning = false;
+let scanLoop;
+
 let totalPnL = 0;
-let sessionPnL = 0; 
-let isEngineRunning = false;
-let scanInterval;
-let paymentFlowType = '';
-let currentTargetIndex = '';
+let sessionPnL = 0;
+
+let paymentType = "";
+
 let activeStake = 1;
 
-const USD_TO_KES_RATE = 132; 
+const USD_TO_KES = 132;
+
 const targetBalance = 50000;
-const volatilityIndices = ['Volatility 10 (1s)', 'Volatility 25 (1s)', 'Volatility 50 (1s)', 'Volatility 75 (1s)', 'Volatility 100 (1s)'];
 
-const overMultipliers = { 0: 0.09, 1: 0.23, 2: 0.41, 3: 0.65, 4: 0.98, 5: 1.54, 6: 2.80, 7: 6.60, 8: 14.50, 9: 0 }; 
-const underMultipliers = { 0: 0, 1: 14.50, 2: 6.60, 3: 2.80, 4: 1.54, 5: 0.98, 6: 0.65, 7: 0.41, 8: 0.23, 9: 0.09 };
+const volatilityIndices = [
+'Volatility 10 (1s)',
+'Volatility 25 (1s)',
+'Volatility 50 (1s)',
+'Volatility 75 (1s)',
+'Volatility 100 (1s)'
+];
 
-window.addEventListener('load', async () => {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if(session?.user) {
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('profile-email').innerText = session.user.email;
-        if(session.user.user_metadata.full_name) {
-            document.getElementById('profile-name').innerText = session.user.user_metadata.full_name;
-        }
-    }
-    updateBalanceUI();
+const overMultipliers = {
+0:0.09,
+1:0.23,
+2:0.41,
+3:0.65,
+4:0.98,
+5:1.54,
+6:2.80,
+7:6.60,
+8:14.50,
+9:0
+};
+
+const underMultipliers = {
+0:0,
+1:14.50,
+2:6.60,
+3:2.80,
+4:1.54,
+5:0.98,
+6:0.65,
+7:0.41,
+8:0.23,
+9:0.09
+};
+
+window.addEventListener("load", async()=>{
+
+const { data:{session} } =
+await supabaseClient.auth.getSession();
+
+if(session?.user){
+
+document.getElementById("auth")
+.classList.add("hidden");
+
+document.getElementById("profile-email")
+.innerText = session.user.email;
+
+if(session.user.user_metadata.full_name){
+document.getElementById("profile-name")
+.innerText =
+session.user.user_metadata.full_name;
+}
+
+}
+
+updateBalance();
+
 });
 
-function switchAuthMode(mode) {
-    authMode = mode;
-    document.getElementById('signin-tab').classList.toggle('active', mode === 'signin');
-    document.getElementById('signup-tab').classList.toggle('active', mode === 'signup');
-    document.getElementById('fullname-group').style.display = mode === 'signup' ? 'flex' : 'none';
-    document.getElementById('auth-btn').innerText = mode === 'signup' ? 'Create Secure Account' : 'Sign In Securely';
-    document.getElementById('auth-footer-text').innerHTML = mode === 'signin' 
-        ? 'New here? <span onclick="switchAuthMode(\'signup\')">Create account</span>'
-        : 'Have an account? <span onclick="switchAuthMode(\'signin\')">Sign in</span>';
+function switchAuth(mode){
+
+authMode = mode;
+
+document.getElementById("signin-tab")
+.classList.toggle("active", mode==="signin");
+
+document.getElementById("signup-tab")
+.classList.toggle("active", mode==="signup");
+
+document.getElementById("fullname-wrap")
+.style.display =
+mode==="signup" ? "block":"none";
+
+document.getElementById("auth-btn")
+.innerText =
+mode==="signup"
+? "Create Secure Account"
+: "Sign In Securely";
+
+document.getElementById("auth-footer")
+.innerHTML =
+mode==="signin"
+? `New here?
+<span onclick="switchAuth('signup')">Create account</span>`
+: `Already have account?
+<span onclick="switchAuth('signin')">Sign in</span>`;
 }
 
-async function handleAuth() {
-    const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-pass').value.trim();
-    const fullName = document.getElementById('signup-name').value.trim();
+async function handleAuth(){
 
-    if(!email || !password) { showToast('Fill all required fields'); return; }
+const email =
+document.getElementById("login-email")
+.value.trim();
 
-    try {
-        if(authMode === 'signup') {
-            const { error } = await supabaseClient.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
-            if(error) { showToast(error.message); return; }
-            document.getElementById('profile-name').innerText = fullName || 'Apex Trader';
-        } else {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if(error) { showToast(error.message); return; }
-            if(data.user.user_metadata.full_name) document.getElementById('profile-name').innerText = data.user.user_metadata.full_name;
-        }
-        document.getElementById('profile-email').innerText = email;
-        document.getElementById('auth-screen').classList.add('hidden');
-        showToast('Authentication successful');
-    } catch(err) { showToast('Authentication failed'); }
+const password =
+document.getElementById("login-pass")
+.value.trim();
+
+const fullName =
+document.getElementById("signup-name")
+.value.trim();
+
+if(!email || !password){
+toast("Fill all fields");
+return;
 }
 
-async function handleLogout() {
-    if(isEngineRunning) toggleBotEngine();
-    await supabaseClient.auth.signOut();
-    document.getElementById('auth-screen').classList.remove('hidden');
-    showToast('Logged out');
+try{
+
+if(authMode==="signup"){
+
+const { error } =
+await supabaseClient.auth.signUp({
+email,
+password,
+options:{
+data:{
+full_name:fullName
+}
+}
+});
+
+if(error){
+toast(error.message);
+return;
 }
 
-function switchAccountType() {
-    isRealAccount = document.getElementById('account-type').value === 'real';
-    if(isEngineRunning) toggleBotEngine(); // Stop bot on switch
-    updateBalanceUI();
+document.getElementById("profile-name")
+.innerText =
+fullName || "Apex Trader";
+
+}else{
+
+const { data,error } =
+await supabaseClient.auth
+.signInWithPassword({
+email,
+password
+});
+
+if(error){
+toast(error.message);
+return;
 }
 
-function updateBalanceUI() {
-    const bal = isRealAccount ? realBalance : demoBalance;
-    document.getElementById('display-balance').innerText = `$${bal.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}`;
-    const progress = Math.min((bal / targetBalance) * 100, 100);
-    document.getElementById('goal-progress').style.width = `${progress}%`;
+if(data.user.user_metadata.full_name){
+document.getElementById("profile-name")
+.innerText =
+data.user.user_metadata.full_name;
 }
 
-function switchTab(viewId, el) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
-    document.getElementById(viewId).classList.add('active');
-    el.classList.add('active');
 }
 
-function showToast(message) {
-    const container = document.getElementById('toast-area');
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.innerText = message;
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+document.getElementById("profile-email")
+.innerText = email;
+
+document.getElementById("auth")
+.classList.add("hidden");
+
+toast("Authentication successful");
+
+}catch(err){
+
+toast("Authentication failed");
+
 }
 
-function updateSubMarket() {
-    const market = document.getElementById('inp-market').value;
-    document.getElementById('digit-selector').style.display = market === 'Over/Under' ? 'block' : 'none';
 }
 
-/* Modal Functions */
-function openPaymentFlow(type) {
-    if (type === 'withdraw' && !isRealAccount) {
-        showToast("Withdrawals are locked on Demo Accounts.");
-        return;
-    }
-    
-    paymentFlowType = type;
-    document.getElementById('modal-flow-title').innerText = type === 'deposit' ? 'Secure Deposit' : 'Instant Withdrawal';
-    
-    document.getElementById('pay-name').value = '';
-    document.getElementById('pay-phone').value = '';
-    document.getElementById('pay-amount').value = '';
-    
-    document.getElementById('modal-step-entry').style.display = 'block';
-    document.getElementById('modal-step-invoice').style.display = 'none';
-    document.getElementById('payment-modal').classList.add('show');
+async function logout(){
+
+if(isRunning){
+toggleBot();
 }
 
-function closeModal() { document.getElementById('payment-modal').classList.remove('show'); }
-function closeCongratsModal() { document.getElementById('congrats-modal').classList.remove('show'); }
+await supabaseClient.auth.signOut();
 
-function showCongratsTheme(title, message) {
-    document.getElementById('congrats-title').innerText = title;
-    document.getElementById('congrats-msg').innerText = message;
-    document.getElementById('congrats-modal').classList.add('show');
+document.getElementById("auth")
+.classList.remove("hidden");
+
+toast("Logged out");
 }
 
-function proceedToInvoice() {
-    const name = document.getElementById('pay-name').value.trim();
-    const phone = document.getElementById('pay-phone').value.trim();
-    const amountUSD = parseFloat(document.getElementById('pay-amount').value);
+function switchAccount(){
 
-    if(!name || !phone || isNaN(amountUSD) || amountUSD <= 0) {
-        showToast('Please provide valid details'); return;
-    }
+isReal =
+document.getElementById("account-type")
+.value === "real";
 
-    if(paymentFlowType === 'withdraw') {
-        if(amountUSD > realBalance) {
-            showToast('Insufficient balance'); return;
-        }
-        // Execute real withdrawal logic
-        realBalance -= amountUSD;
-        updateBalanceUI();
-        closeModal();
-        showCongratsTheme("Withdrawal Successful!", `Detailed Details: \n$${amountUSD.toFixed(2)} has been processed to ${phone} (${name}).`);
-    } else {
-        if(amountUSD < 2) { showToast('Minimum deposit is $2'); return; }
-        
-        const invoiceId = 'INV-' + Math.floor(100000 + Math.random() * 900000);
-        const amountKES = Math.floor(amountUSD * USD_TO_KES_RATE);
-
-        document.getElementById('inv-id').innerText = invoiceId;
-        document.getElementById('inv-name').innerText = name.toUpperCase();
-        document.getElementById('inv-phone').innerText = phone;
-        document.getElementById('inv-amount-kes').innerText = amountKES.toLocaleString();
-        
-        document.getElementById('modal-step-entry').style.display = 'none';
-        document.getElementById('modal-step-invoice').style.display = 'block';
-    }
+updateBalance();
 }
 
-function executeExternalPayment() {
-    const amountKES = document.getElementById('inv-amount-kes').innerText.replace(/,/g, '');
-    const name = encodeURIComponent(document.getElementById('inv-name').innerText);
-    const phone = encodeURIComponent(document.getElementById('inv-phone').innerText);
-    const invoiceId = encodeURIComponent(document.getElementById('inv-id').innerText);
+function updateBalance(){
 
-    // Added multiple lock parameters to force API freeze on external gateway
-    const lipwaURL = `https://lipwa.link/8367?amount=${amountKES}&phone=${phone}&name=${name}&ref=${invoiceId}&readonly=1&locked=true&disable_edit=true`;
-    
-    window.open(lipwaURL, "_blank");
-    closeModal();
+const bal =
+isReal ? realBalance : demoBalance;
+
+document.getElementById("balance")
+.innerText =
+`$${bal.toLocaleString(undefined,{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+})}`;
+
+const progress =
+Math.min((bal/targetBalance)*100,100);
+
+document.getElementById("progress-fill")
+.style.width = `${progress}%`;
 }
 
-function clearLedger() {
-    document.getElementById('ledger-list').innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--text-muted); font-size:0.85rem;">No executions recorded yet.</div>`;
-    totalPnL = 0;
-    updatePnLUI();
-    showToast("Ledger history cleared");
+function switchTab(id,el){
+
+document.querySelectorAll(".view")
+.forEach(v=>v.classList.remove("active"));
+
+document.querySelectorAll(".nav-item")
+.forEach(v=>v.classList.remove("active"));
+
+document.getElementById(id)
+.classList.add("active");
+
+el.classList.add("active");
 }
 
-/* Bot Logic & Execution */
-function toggleBotEngine() {
-    const btn = document.getElementById('btn-toggle-bot');
-    if(isEngineRunning) {
-        isEngineRunning = false;
-        clearTimeout(scanInterval);
-        btn.classList.remove('active');
-        btn.innerText = 'Execute AI Automation';
-        document.getElementById('sig-main').innerText = '--';
-        document.getElementById('sig-status').innerText = 'Scanner paused';
-        return;
-    }
-    
-    // Initial Setup for Session
-    const baseStake = parseFloat(document.getElementById('inp-stake').value);
-    if(isNaN(baseStake) || baseStake <= 0) { showToast("Enter a valid stake"); return; }
-    
-    activeStake = baseStake;
-    sessionPnL = 0; 
-    isEngineRunning = true;
-    
-    btn.classList.add('active');
-    btn.innerText = 'Halt System Process';
-    runScannerCycle();
+function toast(msg){
+
+const wrap =
+document.getElementById("toast-wrap");
+
+const t =
+document.createElement("div");
+
+t.className = "toast";
+t.innerText = msg;
+
+wrap.appendChild(t);
+
+setTimeout(()=>{
+t.remove();
+},3000);
 }
 
-function runScannerCycle() {
-    if(!isEngineRunning) return;
+function toggleDigitBox(){
 
-    const currentBalance = isRealAccount ? realBalance : demoBalance;
-    const tpTarget = parseFloat(document.getElementById('inp-tp').value) || 0;
-    const slTarget = parseFloat(document.getElementById('inp-sl').value) || 0;
-    const martingaleMult = parseFloat(document.getElementById('inp-martingale').value) || 1.0;
-    const baseStake = parseFloat(document.getElementById('inp-stake').value);
+const market =
+document.getElementById("inp-market")
+.value;
 
-    // Stop Loss Check
-    if(slTarget > 0 && sessionPnL <= -slTarget) {
-        showToast("Stop Loss Triggered!");
-        toggleBotEngine();
-        return;
-    }
-
-    // Take Profit Check
-    if(tpTarget > 0 && sessionPnL >= tpTarget) {
-        toggleBotEngine();
-        showCongratsTheme("TP Achieved!", `Congratulations tp achieved, banged $${sessionPnL.toFixed(2)} usd!`);
-        return;
-    }
-
-    if(activeStake > currentBalance) {
-        showToast('Insufficient balance to execute recovery stake');
-        toggleBotEngine();
-        return;
-    }
-
-    const market = document.getElementById('inp-market').value;
-    const targetDigit = parseInt(document.getElementById('inp-digit').value) || 0;
-    currentTargetIndex = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)];
-    
-    const isWin = Math.random() < 0.65; // Simulated win rate
-
-    let signalText = ''; let signalSub = ''; let profit = 0;
-
-    if(market === 'Matches/Differs') {
-        const isMatch = Math.random() > 0.5;
-        const digit = Math.floor(Math.random() * 10);
-        if (isMatch) { signalText = `MATCH DIGIT: ${digit}`; profit = isWin ? (activeStake * 8.09) : -activeStake; signalSub = 'Deriv Multiplier: 8.09x'; } 
-        else { signalText = `DIFFER DIGIT: ${digit}`; profit = isWin ? (activeStake * 0.099) : -activeStake; signalSub = 'Deriv Multiplier: 0.099x'; }
-    } else if(market === 'Even/Odd') {
-        signalText = Math.random() > 0.5 ? 'PREDICT: EVEN' : 'PREDICT: ODD';
-        profit = isWin ? (activeStake * 0.95) : -activeStake;
-        signalSub = 'Deriv Multiplier: 0.95x';
-    } else {
-        const isOver = Math.random() > 0.5;
-        if (isOver) {
-            signalText = `OVER ${targetDigit}`;
-            const mult = overMultipliers[targetDigit];
-            profit = isWin ? (activeStake * mult) : -activeStake;
-            signalSub = `Deriv Multiplier: ${mult.toFixed(2)}x`;
-        } else {
-            signalText = `UNDER ${targetDigit}`;
-            const mult = underMultipliers[targetDigit];
-            profit = isWin ? (activeStake * mult) : -activeStake;
-            signalSub = `Deriv Multiplier: ${mult.toFixed(2)}x`;
-        }
-    }
-
-    document.getElementById('sig-asset').innerText = `SCANNING: ${currentTargetIndex}`;
-    document.getElementById('sig-main').innerText = signalText;
-    document.getElementById('sig-status').innerText = signalSub;
-
-    scanInterval = setTimeout(() => {
-        if(!isEngineRunning) return;
-        
-        // Apply Balance
-        if(isRealAccount) realBalance += profit; else demoBalance += profit;
-        
-        // Track PnL
-        totalPnL += profit;
-        sessionPnL += profit;
-        updatePnLUI();
-        updateBalanceUI();
-        logExecution(profit, market, signalText, activeStake);
-
-        // Apply Martingale Logic for next trade
-        if(profit < 0) {
-            activeStake = activeStake * martingaleMult;
-        } else {
-            activeStake = baseStake; // Reset on win
-        }
-        
-        runScannerCycle();
-    }, 2500);
+document.getElementById("digit-box")
+.style.display =
+market==="Over/Under"
+? "block"
+: "none";
 }
 
-function updatePnLUI() {
-    const pnl = document.getElementById('total-pnl');
-    pnl.innerText = `P&L: $${totalPnL.toFixed(2)}`;
-    pnl.style.color = totalPnL >= 0 ? 'var(--success-green)' : 'var(--danger-red)';
+/* PAYMENT */
+
+function openPayment(type){
+
+if(type==="withdraw" && !isReal){
+toast("Withdrawals disabled on demo");
+return;
 }
 
-function logExecution(profit, market, signal, stakeUsed) {
-    const ledger = document.getElementById('ledger-list');
-    if(ledger.innerText.includes('No executions')) ledger.innerHTML = '';
+paymentType = type;
 
-    const row = document.createElement('div');
-    row.className = 'ledger-row';
-    row.innerHTML = `
-        <div>
-            <div class="ledger-asset">${currentTargetIndex} <span style="font-size:0.7rem; color:var(--text-muted);">(Stake: $${stakeUsed.toFixed(2)})</span></div>
-            <div class="ledger-type">${market} | ${signal}</div>
-        </div>
-        <div class="ledger-profit" style="color:${profit >= 0 ? 'var(--success-green)' : 'var(--danger-red)'}">
-            ${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}
-        </div>
-    `;
-    ledger.prepend(row);
+document.getElementById("payment-title")
+.innerText =
+type==="deposit"
+? "Secure Deposit"
+: "Instant Withdrawal";
+
+document.getElementById("step1")
+.style.display = "block";
+
+document.getElementById("step2")
+.style.display = "none";
+
+document.getElementById("payment-modal")
+.classList.add("show");
 }
-</script>
 
-</body>
-</html>
+function closeModal(){
+document.getElementById("payment-modal")
+.classList.remove("show");
+}
+
+function closeCongrats(){
+document.getElementById("congrats-modal")
+.classList.remove("show");
+}
+
+function congrats(title,msg){
+
+document.getElementById("congrats-title")
+.innerText = title;
+
+document.getElementById("congrats-message")
+.innerText = msg;
+
+document.getElementById("congrats-modal")
+.classList.add("show");
+}
+
+function proceedInvoice(){
+
+const name =
+document.getElementById("pay-name")
+.value.trim();
+
+const phone =
+document.getElementById("pay-phone")
+.value.trim();
+
+const amount =
+parseFloat(
+document.getElementById("pay-amount")
+.value
+);
+
+if(!name || !phone || isNaN(amount)){
+toast("Fill valid details");
+return;
+}
+
+if(paymentType==="withdraw"){
+
+if(amount > realBalance){
+toast("Insufficient balance");
+return;
+}
+
+realBalance -= amount;
+
+updateBalance();
+
+closeModal();
+
+congrats(
+"Withdrawal Successful!",
+`$${amount.toFixed(2)} sent to ${phone}`
+);
+
+return;
+}
+
+if(amount < 2){
+toast("Minimum deposit is $2");
+return;
+}
+
+const invoice =
+"INV-" +
+Math.floor(100000 + Math.random()*900000);
+
+const kes =
+Math.floor(amount * USD_TO_KES);
+
+document.getElementById("inv-id")
+.innerText = invoice;
+
+document.getElementById("inv-name")
+.innerText = name.toUpperCase();
+
+document.getElementById("inv-phone")
+.innerText = phone;
+
+document.getElementById("inv-amount")
+.innerText =
+kes.toLocaleString();
+
+document.getElementById("step1")
+.style.display = "none";
+
+document.getElementById("step2")
+.style.display = "block";
+}
+
+function executeExternalPayment(){
+
+const amountKES =
+document.getElementById("inv-amount")
+.innerText.replace(/,/g,'');
+
+const name =
+encodeURIComponent(
+document.getElementById("inv-name")
+.innerText
+);
+
+const phone =
+encodeURIComponent(
+document.getElementById("inv-phone")
+.innerText
+);
+
+const invoiceId =
+encodeURIComponent(
+document.getElementById("inv-id")
+.innerText
+);
+
+const lipwaURL =
+`https://lipwa.link/8367` +
+`?amount=${amountKES}` +
+`&phone=${phone}` +
+`&name=${name}` +
+`&ref=${invoiceId}` +
+`&readonly=true` +
+`&locked=true` +
+`&disable_edit=true` +
+`&lock_amount=true` +
+`&lock_phone=true` +
+`&lock_name=true` +
+`&lock_invoice=true` +
+`&fixed=true`;
+
+window.open(lipwaURL,"_blank");
+
+closeModal();
+
+toast("Secure invoice generated");
+}
+
+/* LEDGER */
+
+function clearLedger(){
+
+document.getElementById("ledger-list")
+.innerHTML = `
+<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">
+No executions recorded yet.
+</div>
+`;
+
+totalPnL = 0;
+
+updatePnL();
+
+toast("Ledger cleared");
+}
+
+function updatePnL(){
+
+const pnl =
+document.getElementById("pnl");
+
+pnl.innerText =
+`P&L: $${totalPnL.toFixed(2)}`;
+
+pnl.style.color =
+totalPnL >= 0
+? "var(--success)"
+: "var(--danger)";
+}
+
+/* BOT */
+
+function toggleBot(){
+
+const btn =
+document.getElementById("engine-btn");
+
+if(isRunning){

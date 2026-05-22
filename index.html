@@ -41,6 +41,10 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
+    background:
+    radial-gradient(circle at top left, rgba(0,122,255,.15), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(0,198,255,.12), transparent 30%),
+    #eef2f5;
 }
 
 .device{
@@ -236,10 +240,10 @@ button{
 }
 
 .brand-box{
-    width:26px;
-    height:26px;
-    border-radius:8px;
-    background:var(--primary);
+    width:28px;
+    height:28px;
+    border-radius:9px;
+    background:linear-gradient(135deg,var(--primary),var(--primary2));
     display:flex;
     align-items:center;
     justify-content:center;
@@ -288,11 +292,14 @@ button{
 
 .balance-card{
     text-align:center;
+    background:
+    linear-gradient(135deg,#0f172a,#111827);
+    color:white;
 }
 
 .balance-title{
     font-size:.82rem;
-    color:var(--muted);
+    color:#cbd5e1;
     font-weight:700;
     margin-bottom:8px;
 }
@@ -306,7 +313,7 @@ button{
 .progress{
     width:100%;
     height:10px;
-    background:#edf2f7;
+    background:rgba(255,255,255,.1);
     border-radius:999px;
     overflow:hidden;
 }
@@ -336,6 +343,11 @@ button{
     font-weight:800;
     align-items:center;
     justify-content:center;
+    transition:.2s;
+}
+
+.action-btn:active{
+    transform:scale(.98);
 }
 
 .action-btn span{
@@ -459,20 +471,6 @@ button{
     border:1px solid var(--border);
     padding:15px;
     margin-bottom:10px;
-}
-
-.ledger-title{
-    font-weight:800;
-    margin-bottom:4px;
-}
-
-.ledger-sub{
-    font-size:.75rem;
-    color:var(--muted);
-}
-
-.ledger-profit{
-    font-weight:900;
 }
 
 /* PROFILE */
@@ -687,6 +685,14 @@ button{
     margin-bottom:10px;
     text-align:center;
     font-weight:700;
+    animation:fade .3s ease;
+}
+
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(-10px);
+    }
 }
 
 .badge{
@@ -799,7 +805,7 @@ $0.00
 <div class="progress-fill" id="progress-fill"></div>
 </div>
 
-<div style="margin-top:10px;font-size:.75rem;color:var(--muted);font-weight:700;">
+<div style="margin-top:10px;font-size:.75rem;color:#cbd5e1;font-weight:700;">
 Goal Progress: $50,000 Target
 </div>
 
@@ -972,8 +978,6 @@ Secure Logout
 
 </div>
 
-<!-- PAYMENT MODAL -->
-
 <div class="overlay" id="payment-modal">
 
 <div class="modal">
@@ -1052,8 +1056,6 @@ Pay Securely via M-PESA
 </div>
 </div>
 
-<!-- CONGRATS -->
-
 <div class="overlay" id="congrats-modal">
 
 <div class="modal congrats">
@@ -1124,7 +1126,6 @@ let paymentType = "";
 let activeStake = 1;
 
 const USD_TO_KES = 132;
-
 const targetBalance = 50000;
 
 const volatilityIndices = [
@@ -1134,32 +1135,6 @@ const volatilityIndices = [
 'Volatility 75 (1s)',
 'Volatility 100 (1s)'
 ];
-
-const overMultipliers = {
-0:0.09,
-1:0.23,
-2:0.41,
-3:0.65,
-4:0.98,
-5:1.54,
-6:2.80,
-7:6.60,
-8:14.50,
-9:0
-};
-
-const underMultipliers = {
-0:0,
-1:14.50,
-2:6.60,
-3:2.80,
-4:1.54,
-5:0.98,
-6:0.65,
-7:0.41,
-8:0.23,
-9:0.09
-};
 
 window.addEventListener("load", async()=>{
 
@@ -1383,8 +1358,6 @@ market==="Over/Under"
 : "none";
 }
 
-/* PAYMENT */
-
 function openPayment(type){
 
 if(type==="withdraw" && !isReal){
@@ -1552,8 +1525,6 @@ closeModal();
 toast("Secure invoice generated");
 }
 
-/* LEDGER */
-
 function clearLedger(){
 
 document.getElementById("ledger-list")
@@ -1583,8 +1554,6 @@ totalPnL >= 0
 ? "var(--success)"
 : "var(--danger)";
 }
-
-/* BOT */
 
 function toggleBot(){
 
@@ -1781,8 +1750,21 @@ if(over){
 signal =
 `OVER ${targetDigit}`;
 
+const multipliers = {
+0:0.09,
+1:0.23,
+2:0.41,
+3:0.65,
+4:0.98,
+5:1.54,
+6:2.80,
+7:6.60,
+8:14.50,
+9:0
+};
+
 const mult =
-overMultipliers[targetDigit];
+multipliers[targetDigit];
 
 profit =
 isWin
@@ -1797,8 +1779,21 @@ sub =
 signal =
 `UNDER ${targetDigit}`;
 
+const multipliers = {
+0:0,
+1:14.50,
+2:6.60,
+3:2.80,
+4:1.54,
+5:0.98,
+6:0.65,
+7:0.41,
+8:0.23,
+9:0.09
+};
+
 const mult =
-underMultipliers[targetDigit];
+multipliers[targetDigit];
 
 profit =
 isWin
@@ -1873,20 +1868,19 @@ row.className = "ledger-row";
 
 row.innerHTML = `
 <div>
-<div class="ledger-title">
+<div style="font-weight:800;margin-bottom:4px;">
 ${asset}
 <span style="font-size:.7rem;color:var(--muted);">
 (Stake: $${stake.toFixed(2)})
 </span>
 </div>
 
-<div class="ledger-sub">
+<div style="font-size:.75rem;color:var(--muted);">
 ${market} | ${signal}
 </div>
 </div>
 
-<div class="ledger-profit"
-style="color:${profit>=0?'var(--success)':'var(--danger)'};">
+<div style="font-weight:900;color:${profit>=0?'var(--success)':'var(--danger)'};">
 ${profit>=0?'+':''}$${profit.toFixed(2)}
 </div>
 `;

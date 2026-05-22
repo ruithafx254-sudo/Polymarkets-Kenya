@@ -1280,8 +1280,8 @@ function congrats(title,msg){
 async function proceedInvoice(){
     const amount = parseFloat(document.getElementById("pay-amount").value);
 
-    // ENSURE ZERO MINIMUM LIMIT - Any valid positive number operates. 
-    if(isNaN(amount) || amount <= 0){ toast("Enter valid amount"); return; }
+    // MINIMUM DEPOSIT CHECK
+    if(isNaN(amount) || amount < 5){ toast("Minimum deposit is $5"); return; }
 
     if(paymentType==="withdraw"){
         if(amount > realBalance){ toast("Insufficient balance"); return; }

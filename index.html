@@ -702,7 +702,6 @@ button{
     margin-bottom:10px;
 }
 
-/* NEW: SPINNER CSS */
 .spinner {
     width: 50px;
     height: 50px;
@@ -865,10 +864,9 @@ New here? <span onclick="switchAuth('signup')">Create account</span>
 </div>
 
 <div id="step3" style="display:none; text-align:center; padding: 20px 0;">
-    <h3 style="font-weight:800; margin-bottom:10px;">Awaiting Confirmation</h3>
-    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:15px;">Please complete the transaction in the external window.</p>
+    <h3 style="font-weight:800; margin-bottom:10px;">Redirecting...</h3>
+    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:15px;">Please wait while we connect you to the secure gateway.</p>
     <div class="spinner"></div>
-    <p style="font-size:0.75rem; color:var(--primary); font-weight:700;">Engine will redirect automatically upon receipt.</p>
 </div>
 
 </div>
@@ -913,7 +911,6 @@ const USD_TO_KES = 132;
 const targetBalance = 50000;
 const volatilityIndices = ['Volatility 10 (1s)', 'Volatility 25 (1s)', 'Volatility 50 (1s)', 'Volatility 75 (1s)', 'Volatility 100 (1s)'];
 
-// Load wallet balance from Supabase Cloud Row Storage
 async function fetchSupabaseBalance(userId) {
     try {
         const { data, error } = await supabaseClient
@@ -932,7 +929,6 @@ async function fetchSupabaseBalance(userId) {
     }
 }
 
-// Push local balance states safely back up to cloud storage
 async function saveSupabaseBalance() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session?.user || !isReal) return;
@@ -947,7 +943,6 @@ async function saveSupabaseBalance() {
     }
 }
 
-// CRITICAL FIX: Realtime Listener for tracking live payments
 function subscribeToDepositUpdates(userId) {
     if (depositSubscription) {
         supabaseClient.removeChannel(depositSubscription);
@@ -965,17 +960,12 @@ function subscribeToDepositUpdates(userId) {
             },
             async (payload) => {
                 if (payload.new && payload.new.status === 'completed') {
-                    // Update frontend values (MUST BE ASYNC/AWAIT TO HAPPEN INSTANTLY)
                     await fetchSupabaseBalance(userId);
-                    
-                    // Close user checkout views immediately
                     closeModal();
                     
-                    // Force navigation back to the primary trading view interface
                     const homeTab = document.getElementById("nav-home");
                     switchTab('home', homeTab);
                     
-                    // Fire celebratory system popups
                     congrats(
                         "Deposit Realized!",
                         `$${parseFloat(payload.new.amount_usd).toFixed(2)} has been successfully credited to your main balance.`
@@ -988,6 +978,7 @@ function subscribeToDepositUpdates(userId) {
 
 window.addEventListener("load", async()=>{
     const { data:{session} } = await supabaseClient.auth.getSession();
+    
     if(session?.user){
         document.getElementById("auth").classList.add("hidden");
         document.getElementById("profile-email").innerText = session.user.email;
@@ -996,6 +987,77 @@ window.addEventListener("load", async()=>{
         }
         await fetchSupabaseBalance(session.user.id);
         subscribeToDepositUpdates(session.user.id);
+        
+        // --- NEW: URL SUCCESS REDIRECT LOGIC ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const statusParam = urlParams.get('status');
+
+        if (statusParam === 'success') {
+            const savedInvoiceId = localStorage.getItem('last_invoice_id');
+            
+            if (savedInvoiceId) {
+                toast("Verifying your payment, please wait...");
+                
+                try {
+                    const { data: deposit, error: fetchError } = await supabaseClient
+                        .from('deposits')
+                        .select('user_id, amount_usd, status')
+                        .eq('invoice_id', savedInvoiceId)
+                        .single();
+
+                    if (fetchError) throw fetchError;
+
+                    if (deposit && deposit.status === 'pending') {
+                        // Mark the deposit row as completed
+                        const { error: updateDepositError } = await supabaseClient
+                            .from('deposits')
+                            .update({ status: 'completed' })
+                            .eq('invoice_id', savedInvoiceId);
+
+                        if (updateDepositError) throw updateDepositError;
+
+                        // Update wallet balance safely
+                        const { data: wallet, error: walletError } = await supabaseClient
+                            .from('wallets')
+                            .select('real_balance')
+                            .eq('id', deposit.user_id)
+                            .single();
+
+                        if (walletError) throw walletError;
+
+                        const newBalance = parseFloat(wallet.real_balance) + parseFloat(deposit.amount_usd);
+
+                        const { error: finalError } = await supabaseClient
+                            .from('wallets')
+                            .update({ real_balance: newBalance })
+                            .eq('id', deposit.user_id);
+
+                        if (finalError) throw finalError;
+
+                        localStorage.removeItem('last_invoice_id');
+                        
+                        // Clean the URL so a manual page refresh doesn't trigger this again
+                        window.history.replaceState({}, document.title, window.location.pathname);
+
+                        congrats(
+                            "Deposit Successful!", 
+                            `$${deposit.amount_usd.toFixed(2)} has been instantly credited to your real balance.`
+                        );
+                        
+                        await fetchSupabaseBalance(deposit.user_id);
+
+                    } else if (deposit && deposit.status === 'completed') {
+                        toast("This deposit was already credited.");
+                        localStorage.removeItem('last_invoice_id');
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    }
+                } catch (err) {
+                    console.error("Verification Error: ", err.message);
+                    toast("Could not auto-verify. Contact support with ID: " + savedInvoiceId);
+                }
+            }
+        }
+        // ---------------------------------------
     }
     updateBalance();
 });
@@ -1177,20 +1239,23 @@ async function executeExternalPayment(){
 
         if (error) throw error;
 
+        // --- NEW: SUCCESS URL REDIRECT ADDED ---
         const lipwaURL =
         `https://lipwa.link/8367` +
         `?amount=${amountKES}` +
         `&phone=${encodeURIComponent(phone)}` +
         `&name=${encodeURIComponent(name)}` +
-        `&reference=${encodeURIComponent(invoiceId)}`;
+        `&reference=${encodeURIComponent(invoiceId)}` +
+        `&success_url=${encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?status=success')}`;
 
-        window.open(lipwaURL,"_blank");
+        // Save to local storage for verification when they return
+        localStorage.setItem('last_invoice_id', invoiceId);
 
-        // CRITICAL FIX: DO NOT CLOSE MODAL! Show step 3 Loading Spinner
         document.getElementById("step2").style.display = "none";
         document.getElementById("step3").style.display = "block";
         
-        toast("Awaiting payment verification...");
+        // Open the gateway in the exact SAME tab to ensure correct redirection back
+        window.location.href = lipwaURL; 
 
     } catch(err) {
         console.error(err);

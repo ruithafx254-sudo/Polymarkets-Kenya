@@ -1137,19 +1137,26 @@ async function handleAuth(){
     }
 }
 
-async function logout(){
+// OPTIMISTIC LOGOUT UPDATE: Make logout feel instantaneous
+function logout(){
     if(isRunning) toggleBot();
-    await supabaseClient.auth.signOut();
+    
+    // Instantly hide dashboard and clear local data
     document.getElementById("auth").classList.remove("hidden");
     realBalance = 0;
     updateBalance();
     
+    // Reset Auth UI state instantly
     const authBtn = document.getElementById("auth-btn");
     authBtn.disabled = false;
     authBtn.style.opacity = "1";
     authBtn.innerText = authMode === "signup" ? "Create Secure Account" : "Sign In Securely";
+    document.getElementById("login-pass").value = "";
     
     toast("Logged out securely");
+
+    // Perform actual network sign-out in background without blocking UI
+    supabaseClient.auth.signOut().catch(err => console.error("Sign out error:", err));
 }
 
 function switchAccount(){
@@ -1277,9 +1284,9 @@ async function proceedInvoice(){
         congrats("Withdrawal Successful!", `$${amount.toFixed(2)} sent to ${destination}`);
         return;
     }
-
-    if (amount < 5) { toast("Minimum deposit is $5"); return; }
     
+    // Minimum deposit check has been removed here
+
     const name = document.getElementById("pay-name").value.trim();
     const phone = document.getElementById("pay-phone").value.trim();
     if(!name || !phone){ toast("Fill valid details"); return; }

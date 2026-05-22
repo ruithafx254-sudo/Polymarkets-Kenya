@@ -1242,6 +1242,8 @@ async function proceedInvoice(){
     }
 
     // Default Deposit flow (M-Pesa Only)
+    if (amount < 5) { toast("Minimum deposit is $5"); return; }
+    
     const name = document.getElementById("pay-name").value.trim();
     const phone = document.getElementById("pay-phone").value.trim();
     if(!name || !phone){ toast("Fill valid details"); return; }

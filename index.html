@@ -905,7 +905,7 @@ New here? <span onclick="switchAuth('signup')">Create account</span>
     </div>
 
     <!-- Universal Amount Field -->
-    <div class="modal-group"><label>Amount (USD)</label><input type="number" class="modal-input" id="pay-amount" placeholder="e.g., 10"></div>
+    <div class="modal-group"><label>Amount (USD)</label><input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $5.00"></div>
     
     <button class="modal-btn" onclick="proceedInvoice()">Continue</button>
     <div class="badge" id="trust-badge"><img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png"></div>
@@ -1215,6 +1215,12 @@ async function proceedInvoice(){
     const amount = parseFloat(document.getElementById("pay-amount").value);
 
     if(isNaN(amount) || amount <= 0){ toast("Enter valid amount"); return; }
+
+    // Minimum Deposit Gatekeeper Verification
+    if(paymentType === "deposit" && amount < 5) { 
+        toast("Minimum deposit amount is $5.00"); 
+        return; 
+    }
 
     if(paymentType==="withdraw"){
         if(amount > realBalance){ toast("Insufficient balance"); return; }

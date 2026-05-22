@@ -90,7 +90,7 @@ button{
     justify-content:center;
     padding:28px;
     color:white;
-    transition:.4s;
+    transition: 0.2s ease-in-out; /* Optimized for faster UI response */
 }
 
 .auth.hidden{
@@ -203,7 +203,11 @@ button{
     font-size:1rem;
     font-weight:800;
     margin-top:6px;
-    transition: all 0.2s ease;
+    transition: all 0.1s ease;
+}
+
+.auth-btn:active{
+    transform:scale(0.98);
 }
 
 .auth-footer{
@@ -318,6 +322,7 @@ button{
     height:100%;
     width:0%;
     background:linear-gradient(90deg,var(--primary),var(--primary2));
+    transition: width 0.3s ease;
 }
 
 /* BUTTONS */
@@ -963,6 +968,7 @@ const USD_TO_KES = 132;
 const targetBalance = 50000;
 const volatilityIndices = ['Volatility 10 (1s)', 'Volatility 25 (1s)', 'Volatility 50 (1s)', 'Volatility 75 (1s)', 'Volatility 100 (1s)'];
 
+// Fetch balance accurately from cloud DB
 async function fetchSupabaseBalance(userId) {
     try {
         const { data, error } = await supabaseClient
@@ -975,12 +981,14 @@ async function fetchSupabaseBalance(userId) {
         if (data) {
             realBalance = parseFloat(data.real_balance);
             updateBalance();
+            localStorage.setItem(`bal_${userId}`, realBalance); // Backup to LocalStorage
         }
     } catch (err) {
         console.error("Error fetching balance:", err.message);
     }
 }
 
+// Save balance dynamically to Cloud DB
 async function saveSupabaseBalance() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session?.user || !isReal) return;
@@ -1012,10 +1020,10 @@ window.addEventListener("load", async()=>{
             document.getElementById("profile-name").innerText = session.user.user_metadata.full_name;
         }
         
-        fetchSupabaseBalance(session.user.id).then(() => {
-            localStorage.setItem(`bal_${session.user.id}`, realBalance);
-        });
+        // Fetch real balance independently
+        fetchSupabaseBalance(session.user.id);
         
+        // Handle payments overlay
         if (statusParam === 'success') {
             const savedInvoiceId = localStorage.getItem('last_invoice_id');
             const verifyOverlay = document.getElementById('verify-overlay');
@@ -1081,6 +1089,7 @@ function switchAuth(mode){
         : `Already have account? <span onclick="switchAuth('signin')">Sign in</span>`;
 }
 
+// FAST LOGIN FUNCTION
 async function handleAuth(){
     const email = document.getElementById("login-email").value.trim();
     const password = document.getElementById("login-pass").value.trim();
@@ -1114,21 +1123,20 @@ async function handleAuth(){
 
         // OPTIMISTIC TRANSITION: Instantly grant access using local state
         document.getElementById("profile-email").innerText = email;
-        document.getElementById("auth").classList.add("hidden");
-        toast("Access Granted");
-
-        // BACKGROUND FETCH: Run database query asynchronously so it doesn't block UI threads
+        
+        // Fetch balance concurrently for max speed
         if (user) {
             const cachedBal = localStorage.getItem(`bal_${user.id}`);
             if (cachedBal) {
                 realBalance = parseFloat(cachedBal);
                 updateBalance();
             }
-            
-            fetchSupabaseBalance(user.id).then(() => {
-                localStorage.setItem(`bal_${user.id}`, realBalance);
-            });
+            await fetchSupabaseBalance(user.id); // Wait for fresh DB balance before showing screen 
         }
+
+        document.getElementById("auth").classList.add("hidden");
+        toast("Access Granted");
+
     }catch(err){
         toast(err.message || "Authentication failed");
         authBtn.innerText = originalText;
@@ -1137,11 +1145,11 @@ async function handleAuth(){
     }
 }
 
-// OPTIMISTIC LOGOUT UPDATE: Make logout feel instantaneous
+// FAST LOGOUT FUNCTION
 function logout(){
     if(isRunning) toggleBot();
     
-    // Instantly hide dashboard and clear local data
+    // Instantly hide dashboard and clear local data visually
     document.getElementById("auth").classList.remove("hidden");
     realBalance = 0;
     updateBalance();
@@ -1247,6 +1255,7 @@ function congrats(title,msg){
 async function proceedInvoice(){
     const amount = parseFloat(document.getElementById("pay-amount").value);
 
+    // ENSURE ZERO MINIMUM LIMIT - Any valid positive number operates. 
     if(isNaN(amount) || amount <= 0){ toast("Enter valid amount"); return; }
 
     if(paymentType==="withdraw"){
@@ -1285,8 +1294,6 @@ async function proceedInvoice(){
         return;
     }
     
-    // Minimum deposit check has been removed here
-
     const name = document.getElementById("pay-name").value.trim();
     const phone = document.getElementById("pay-phone").value.trim();
     if(!name || !phone){ toast("Fill valid details"); return; }

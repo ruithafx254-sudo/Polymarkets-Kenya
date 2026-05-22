@@ -163,11 +163,6 @@
         .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary-blue), #00c6ff); width: 0.1%; transition: width 0.5s ease; }
         .target-text { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
 
-        .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .action-btn { background-color: var(--surface-white); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 700; color: var(--text-main); box-shadow: var(--shadow-sm); cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .action-btn:active { transform: scale(0.96); background-color: var(--bg-outer); }
-        .action-btn span { font-size: 0.7rem; color: var(--success-green); font-weight: 600; }
-
         /* AI Scanner */
         .ai-engine-box { background: var(--surface-white); border-radius: var(--radius-lg); border: 1px solid var(--primary-blue); padding: 24px; box-shadow: var(--shadow-blue); position: relative; overflow: hidden; }
         .ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
@@ -401,12 +396,16 @@
 
         // --- SESSION PERSISTENCE (Runs on load) ---
         window.onload = () => {
-            const savedSession = localStorage.getItem('apex_session');
-            if(savedSession) {
-                currentUser = JSON.parse(savedSession);
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('profile-email-text').innerText = currentUser.email;
-                updateBalanceUI();
+            try {
+                const savedSession = localStorage.getItem('apex_session');
+                if(savedSession) {
+                    currentUser = JSON.parse(savedSession);
+                    document.getElementById('auth-screen').classList.add('hidden');
+                    document.getElementById('profile-email-text').innerText = currentUser.email;
+                    updateBalanceUI();
+                }
+            } catch (e) {
+                console.error("Session parse error", e);
             }
         };
 
@@ -418,7 +417,7 @@
             document.getElementById('btn-auth-action').innerText = mode === 'login' ? 'Initialize Session' : 'Create Access Node';
         }
 
-        async function handleAuth() {
+        function handleAuth() {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-pass').value;
             const btn = document.getElementById('btn-auth-action');
@@ -430,23 +429,36 @@
 
             // Simulate slight network delay
             setTimeout(() => {
-                let users = JSON.parse(localStorage.getItem('apex_users')) || {};
+                let users = {};
+                
+                // Bulletproof local storage check
+                try {
+                    const stored = localStorage.getItem('apex_users');
+                    if (stored) users = JSON.parse(stored);
+                } catch (e) {
+                    console.warn("Corrupted users data found, resetting.");
+                    users = {};
+                }
+
                 let success = false;
                 let errorMsg = '';
 
                 if (authMode === 'signup') {
                     if (users[email]) {
-                        errorMsg = 'Account already exists. Please sign in.';
+                        errorMsg = 'Account already exists. Please Sign In.';
                     } else {
                         users[email] = { password: password };
                         localStorage.setItem('apex_users', JSON.stringify(users));
                         success = true;
                     }
                 } else {
-                    if (users[email] && users[email].password === password) {
-                        success = true;
+                    // LOGIN MODE
+                    if (!users[email]) {
+                        errorMsg = 'Account not found. Please click Sign Up first.';
+                    } else if (users[email].password !== password) {
+                        errorMsg = 'Invalid password. Please try again.';
                     } else {
-                        errorMsg = 'Invalid credentials. Please try again.';
+                        success = true;
                     }
                 }
 
@@ -554,14 +566,10 @@
             let signalSub = "";
             let profit = 0;
             
-            // To simulate AI accuracy, we favor a win based on normal broker probability mechanics
-            // Note: Actual win rates depend on the strategy; this simulates payouts dynamically.
             const resultDigit = Math.floor(Math.random() * 10); 
 
             if(market === "Matches/Differs") {
-                // Matches payout: ~9x (900% - 100% stake = 800% profit)
-                // Differs payout: ~1.09x (9% profit)
-                const isMatchPrediction = Math.random() < 0.1; // 10% chance to predict a match
+                const isMatchPrediction = Math.random() < 0.1; 
                 
                 if (isMatchPrediction) {
                     const isWin = resultDigit === targetDigit;
@@ -576,7 +584,6 @@
                 }
 
             } else if(market === "Even/Odd") {
-                // Payout: ~1.95x (95% profit)
                 const isEvenPrediction = Math.random() > 0.5;
                 const resultIsEven = resultDigit % 2 === 0;
                 const isWin = isEvenPrediction ? resultIsEven : !resultIsEven;
@@ -586,12 +593,9 @@
                 profit = isWin ? (stake * 0.95) : (-stake);
 
             } else if(market === "Over/Under") {
-                // Payouts scale dynamically based on probability. Broker edge is ~5%
                 const isOverPrediction = Math.random() > 0.5;
                 
                 if(isOverPrediction) {
-                    // OVER: Probability is (9 - targetDigit) / 10
-                    // Example: Over 4 covers 5,6,7,8,9 (50% prob). Payout = (1/0.5) * 0.95 = 1.90x
                     const prob = (9 - targetDigit) / 10;
                     const payoutMult = prob > 0 ? (1 / prob) * 0.95 : 0; 
                     const isWin = resultDigit > targetDigit;
@@ -600,8 +604,6 @@
                     signalSub = `Payout: ${payoutMult.toFixed(2)}x | Result: ${resultDigit}`;
                     profit = isWin ? (stake * (payoutMult - 1)) : (-stake);
                 } else {
-                    // UNDER: Probability is targetDigit / 10
-                    // Example: Under 4 covers 0,1,2,3 (40% prob). Payout = (1/0.4) * 0.95 = 2.37x
                     const prob = targetDigit / 10;
                     const payoutMult = prob > 0 ? (1 / prob) * 0.95 : 0;
                     const isWin = resultDigit < targetDigit;
@@ -618,7 +620,6 @@
             scanInterval = setTimeout(() => {
                 if (!isEngineRunning) return;
                 
-                // Edge case safety for impossible targets (like Over 9 or Under 0)
                 if(profit !== 0) {
                     if(isRealAccount) realBalance += profit; else demoBalance += profit;
                     updateBalanceUI();
@@ -627,7 +628,7 @@
                 }
                 
                 runScannerCycle();
-            }, 3000); // 3 second cycle execution
+            }, 3000); 
         }
 
         function logExecution(profit, market, signal) {

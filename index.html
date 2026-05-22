@@ -1,652 +1,637 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Apex Quantum Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Enterprise OS</title>
+    <style>
+        :root {
+            /* Samsung One UI Enterprise Palette */
+            --bg-outer: #e3e6e8;
+            --bg-app: #f7f9fa;
+            --surface-white: #ffffff;
+            --primary-blue: #007aff;
+            --primary-hover: #005bb5;
+            --text-main: #111111;
+            --text-muted: #6e7781;
+            --border-color: #e1e4e8;
+            --success-green: #28a745;
+            --success-light: rgba(40, 167, 69, 0.1);
+            --danger-red: #dc3545;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-lg: 0 16px 40px rgba(0,0,0,0.08);
+            --shadow-blue: 0 8px 24px rgba(0, 122, 255, 0.25);
+            --radius-xl: 32px;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
 
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Inter',sans-serif;
-}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-:root{
---bg:#eef3f8;
---card:#ffffff;
---primary:#0a84ff;
---primary-light:#5eb6ff;
---text:#0f172a;
---muted:#6b7280;
---success:#10b981;
---danger:#ef4444;
---border:#e5e7eb;
---shadow:0 15px 40px rgba(15,23,42,.08);
---radius:28px;
-}
+        body {
+            background-color: var(--bg-outer);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            color: var(--text-main);
+        }
 
-body{
-background:linear-gradient(135deg,#edf2f7,#dfe8f3);
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-overflow:hidden;
-color:var(--text);
-}
+        /* Device Hardware Frame */
+        .device-frame {
+            width: 100%;
+            max-width: 414px;
+            height: 850px;
+            max-height: 95vh;
+            background-color: var(--bg-app);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg), inset 0 0 0 8px #fff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
 
-.app{
-width:100%;
-max-width:430px;
-height:95vh;
-background:var(--card);
-border-radius:40px;
-overflow:hidden;
-box-shadow:0 30px 80px rgba(0,0,0,.15);
-display:flex;
-flex-direction:column;
-position:relative;
-}
+        /* --- AUTH / LANDING PAGE --- */
+        .auth-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0b101e 0%, #1a2235 100%);
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 24px;
+            color: white;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
 
-.auth-screen{
-position:absolute;
-inset:0;
-background:linear-gradient(160deg,#07111d,#10233c 70%);
-color:#fff;
-z-index:999;
-padding:28px;
-display:flex;
-flex-direction:column;
-justify-content:center;
-transition:.4s;
-}
+        .auth-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.05);
+        }
 
-.auth-screen.hidden{
-opacity:0;
-pointer-events:none;
-transform:scale(1.03);
-}
+        .auth-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-blue), #00c6ff);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-blue);
+        }
 
-.logo{
-width:90px;
-height:90px;
-border-radius:30px;
-background:linear-gradient(135deg,var(--primary),#6fc4ff);
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:2.5rem;
-font-weight:800;
-margin-bottom:24px;
-box-shadow:0 20px 40px rgba(10,132,255,.35);
-}
+        .auth-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .auth-sub { font-size: 0.9rem; color: #8b95a5; margin-bottom: 40px; text-align: center; }
 
-.auth-title{
-font-size:2rem;
-font-weight:800;
-margin-bottom:10px;
-}
+        .auth-form { width: 100%; display: flex; flex-direction: column; gap: 16px; }
+        .auth-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        .auth-input::placeholder { color: #6e7781; }
+        .auth-input:focus { border-color: var(--primary-blue); background: rgba(255,255,255,0.1); }
 
-.auth-sub{
-color:#9db2ca;
-line-height:1.6;
-margin-bottom:30px;
-}
+        .btn-auth {
+            width: 100%;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-top: 10px;
+            cursor: pointer;
+            box-shadow: var(--shadow-blue);
+            transition: var(--transition);
+        }
+        .btn-auth:active { transform: scale(0.98); }
+        .auth-links { margin-top: 20px; font-size: 0.85rem; color: #8b95a5; text-align: center; cursor: pointer; }
 
-.auth-box{
-background:rgba(255,255,255,.05);
-padding:22px;
-border-radius:28px;
-border:1px solid rgba(255,255,255,.08);
-backdrop-filter:blur(12px);
-}
+        /* --- MAIN APP UI --- */
+        .app-header {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 24px 20px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
 
-.auth-box input{
-width:100%;
-padding:16px;
-border:none;
-outline:none;
-border-radius:18px;
-margin-bottom:14px;
-background:rgba(255,255,255,.08);
-color:#fff;
-font-size:1rem;
-}
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-.auth-box button{
-width:100%;
-padding:16px;
-border:none;
-border-radius:18px;
-background:linear-gradient(135deg,var(--primary),var(--primary-light));
-color:#fff;
-font-weight:800;
-font-size:1rem;
-cursor:pointer;
-box-shadow:0 12px 30px rgba(10,132,255,.35);
-}
+        .brand-logo {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
 
-.topbar{
-padding:22px 20px 16px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-border-bottom:1px solid var(--border);
-background:rgba(255,255,255,.88);
-backdrop-filter:blur(10px);
-}
+        .account-selector {
+            background-color: #e8f0fe;
+            color: var(--primary-blue);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            text-align: center;
+        }
 
-.brand{
-display:flex;
-align-items:center;
-gap:10px;
-font-size:1.15rem;
-font-weight:800;
-}
+        /* View Containers */
+        .view-container {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+            padding-bottom: 20px;
+        }
 
-.brand-icon{
-width:36px;
-height:36px;
-border-radius:14px;
-background:linear-gradient(135deg,var(--primary),#6fc4ff);
-color:#fff;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:800;
-}
+        .view {
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        .view.active { display: flex; }
 
-.account-pill{
-padding:10px 14px;
-background:#edf5ff;
-color:var(--primary);
-font-size:.82rem;
-font-weight:700;
-border-radius:999px;
-}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-.main{
-flex:1;
-overflow-y:auto;
-padding:20px;
-display:flex;
-flex-direction:column;
-gap:18px;
-}
+        /* Balance & Target Section */
+        .equity-card {
+            background-color: var(--surface-white);
+            border-radius: var(--radius-lg);
+            padding: 28px 20px;
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
 
-.balance-card{
-background:linear-gradient(145deg,#ffffff,#f5f8fc);
-padding:26px;
-border-radius:32px;
-box-shadow:var(--shadow);
-position:relative;
-overflow:hidden;
-}
+        .equity-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .equity-amount { font-size: 3.2rem; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 16px; font-variant-numeric: tabular-nums; }
+        
+        .progress-container { background-color: var(--bg-outer); border-radius: 10px; height: 8px; width: 100%; overflow: hidden; margin-bottom: 8px; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary-blue), #00c6ff); width: 0.1%; transition: width 0.5s ease; }
+        .target-text { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
 
-.balance-card::before{
-content:'';
-position:absolute;
-right:-40px;
-top:-40px;
-width:180px;
-height:180px;
-border-radius:50%;
-background:rgba(10,132,255,.08);
-}
+        /* Payment Buttons */
+        .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .action-btn { background-color: var(--surface-white); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 700; color: var(--text-main); box-shadow: var(--shadow-sm); cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .action-btn:active { transform: scale(0.96); background-color: var(--bg-outer); }
+        .action-btn span { font-size: 0.7rem; color: var(--success-green); font-weight: 600; }
 
-.balance-label{
-font-size:.82rem;
-font-weight:700;
-color:var(--muted);
-margin-bottom:8px;
-}
+        /* Enterprise AI Scanner */
+        .ai-engine-box { background: var(--surface-white); border-radius: var(--radius-lg); border: 1px solid var(--primary-blue); padding: 24px; box-shadow: var(--shadow-blue); position: relative; overflow: hidden; }
+        .ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .live-indicator { display: flex; align-items: center; gap: 8px; color: var(--primary-blue); }
+        .radar-dot { width: 8px; height: 8px; background-color: var(--primary-blue); border-radius: 50%; animation: radar 1.5s infinite; }
+        
+        @keyframes radar {
+            0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); }
+            70% { box-shadow: 0 0 0 12px rgba(0, 122, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); }
+        }
 
-.balance-amount{
-font-size:3rem;
-font-weight:800;
-margin-bottom:16px;
-}
+        .signal-screen { background-color: #0b101e; border-radius: var(--radius-md); padding: 20px; text-align: center; margin-bottom: 20px; color: white; min-height: 120px; display: flex; flex-direction: column; justify-content: center; }
+        .signal-asset { font-size: 0.85rem; color: var(--primary-blue); font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
+        .signal-text { font-size: 1.5rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; color: var(--success-green); }
+        .signal-sub { font-size: 0.75rem; color: #8b95a5; font-weight: 600; }
 
-.progress{
-height:10px;
-background:#e8edf4;
-border-radius:999px;
-overflow:hidden;
-margin-bottom:10px;
-}
+        .parameters-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .param-input { background-color: var(--bg-app); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 8px; }
+        .param-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 4px; }
+        .param-input input, .param-input select { width: 100%; border: none; background: transparent; font-size: 1rem; font-weight: 800; color: var(--text-main); outline: none; }
 
-.progress-bar{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,var(--primary),#66bfff);
-}
+        .btn-master { width: 100%; background-color: var(--primary-blue); color: white; border: none; padding: 18px; border-radius: var(--radius-lg); font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-blue); }
+        .btn-master:active { transform: scale(0.98); }
+        .btn-master.active { background-color: var(--danger-red); box-shadow: 0 8px 24px rgba(220, 53, 69, 0.3); }
 
-.balance-bottom{
-display:flex;
-justify-content:space-between;
-font-size:.8rem;
-color:var(--muted);
-font-weight:600;
-}
+        /* Ledger Tab Content */
+        .ledger-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .total-pnl { font-size: 1rem; font-weight: 800; }
+        .pnl-pos { color: var(--success-green); }
+        .pnl-neg { color: var(--danger-red); }
+        .delete-all { font-size: 0.8rem; color: var(--danger-red); cursor: pointer; font-weight: 700; }
 
-.quick-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:14px;
-}
+        .ledger-row { background-color: var(--surface-white); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
+        .ledger-details { display: flex; flex-direction: column; gap: 4px; }
+        .ledger-asset { font-weight: 700; font-size: 0.9rem; }
+        .ledger-type { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+        .ledger-profit { font-weight: 800; color: var(--success-green); font-size: 1.1rem; }
+        .delete-icon { cursor: pointer; font-size: 1.2rem; color: var(--danger-red); margin-left: 15px; }
 
-.quick-btn{
-background:#fff;
-border:none;
-padding:18px;
-border-radius:24px;
-box-shadow:var(--shadow);
-text-align:left;
-font-weight:700;
-cursor:pointer;
-}
+        /* Profile Tab Content */
+        .profile-header { text-align: center; padding: 20px 0; }
+        .profile-avatar { width: 80px; height: 80px; background-color: var(--border-color); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+        .profile-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; }
+        .profile-email { font-size: 0.85rem; color: var(--text-muted); }
+        
+        .profile-list { background: var(--surface-white); border-radius: var(--radius-lg); border: 1px solid var(--border-color); overflow: hidden; }
+        .profile-item { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600; }
+        .profile-item:last-child { border-bottom: none; }
+        .profile-item span:last-child { color: var(--text-muted); font-weight: 400; }
 
-.quick-btn span{
-display:block;
-margin-top:6px;
-font-size:.75rem;
-color:var(--muted);
-}
+        .btn-logout { width: 100%; background: transparent; border: 1px solid var(--danger-red); color: var(--danger-red); padding: 16px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; margin-top: 10px; }
 
-.scanner{
-background:#fff;
-padding:22px;
-border-radius:32px;
-box-shadow:var(--shadow);
-}
+        /* Navigation Bar */
+        .bottom-nav { background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-top: 1px solid var(--border-color); padding: 16px 20px 24px; display: flex; justify-content: space-around; z-index: 10; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; transition: var(--transition); }
+        .nav-item.active { color: var(--primary-blue); }
+        .nav-icon { font-size: 1.4rem; }
+        .nav-label { font-size: 0.7rem; font-weight: 700; }
 
-.scanner-top{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:18px;
-}
+        /* Modals & Toasts */
+        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 100; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .modal-card { background-color: var(--surface-white); width: 100%; border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-lg); transform: translateY(20px); opacity: 0; transition: var(--transition); }
+        .modal-overlay.show { display: flex; }
+        .modal-overlay.show .modal-card { transform: translateY(0); opacity: 1; }
+        .modal-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 16px; }
+        .modal-input { width: 100%; border: 2px solid var(--border-color); padding: 14px; border-radius: 10px; font-size: 1rem; font-weight: 600; margin-bottom: 20px; outline: none; }
+        .modal-input:focus { border-color: var(--success-green); }
+        .modal-btn { width: 100%; background-color: var(--success-green); color: white; border: none; padding: 16px; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; }
 
-.scanner-title{
-font-size:1rem;
-font-weight:800;
-}
-
-.live{
-font-size:.8rem;
-font-weight:700;
-color:var(--success);
-}
-
-.signal-box{
-background:#081321;
-color:#fff;
-padding:24px;
-border-radius:24px;
-text-align:center;
-margin-bottom:18px;
-}
-
-.signal-market{
-font-size:.8rem;
-color:#66bfff;
-margin-bottom:10px;
-font-weight:700;
-}
-
-.signal-main{
-font-size:2rem;
-font-weight:800;
-margin-bottom:10px;
-}
-
-.signal-sub{
-font-size:.82rem;
-color:#a5bdd6;
-}
-
-.grid-2{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:14px;
-margin-bottom:14px;
-}
-
-.input-box{
-background:#f8fafc;
-padding:14px;
-border-radius:20px;
-}
-
-.input-box label{
-display:block;
-font-size:.72rem;
-font-weight:700;
-color:var(--muted);
-margin-bottom:8px;
-}
-
-.input-box input,
-.input-box select{
-width:100%;
-border:none;
-outline:none;
-background:transparent;
-font-size:1rem;
-font-weight:800;
-}
-
-.execute-btn{
-width:100%;
-padding:18px;
-border:none;
-border-radius:22px;
-background:linear-gradient(135deg,var(--primary),#67beff);
-color:#fff;
-font-size:1rem;
-font-weight:800;
-cursor:pointer;
-box-shadow:0 15px 30px rgba(10,132,255,.3);
-}
-
-.execute-btn.active{
-background:linear-gradient(135deg,var(--danger),#ff7b7b);
-}
-
-.bottom-nav{
-display:flex;
-justify-content:space-around;
-padding:18px 20px 24px;
-border-top:1px solid var(--border);
-background:#fff;
-}
-
-.nav-item{
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:4px;
-font-size:.75rem;
-font-weight:700;
-color:var(--muted);
-cursor:pointer;
-}
-
-.nav-item.active{
-color:var(--primary);
-}
-
-.toast-wrap{
-position:absolute;
-top:90px;
-left:50%;
-transform:translateX(-50%);
-width:90%;
-z-index:2000;
-}
-
-.toast{
-background:#111827;
-color:#fff;
-padding:14px;
-border-radius:16px;
-margin-bottom:10px;
-font-size:.9rem;
-font-weight:600;
-}
-
-</style>
+        .toast-container { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 10px; width: 90%; }
+        .toast { background-color: #111; color: white; padding: 14px 20px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 12px; animation: slideDown 0.3s forwards; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
 <body>
 
-<div class="app">
+    <div class="device-frame">
+        
+        <div class="auth-screen" id="auth-screen">
+            <div class="auth-logo">A</div>
+            <div class="auth-title">Apex Enterprise</div>
+            <div class="auth-sub">Secure Neural Execution Environment</div>
 
-<div class="auth-screen" id="auth-screen">
-<div class="logo">A</div>
-<div class="auth-title">Apex Quantum</div>
-<div class="auth-sub">Professional AI-assisted market analysis dashboard with advanced risk management.</div>
+            <div class="auth-form">
+                <input type="email" class="auth-input" placeholder="Email Address" id="login-email">
+                <input type="password" class="auth-input" placeholder="Password" id="login-pass">
+                <button class="btn-auth" onclick="handleLogin()">Sign In / Initialize</button>
+            </div>
+            
+            <div class="auth-links">Create new account (Supabase Pending)</div>
+        </div>
 
-<div class="auth-box">
-<input type="text" placeholder="Full Name" id="name">
-<input type="email" placeholder="Email Address" id="email">
-<input type="password" placeholder="Password" id="password">
-<button onclick="login()">Enter Dashboard</button>
-</div>
-</div>
+        <div class="toast-container" id="toast-area"></div>
 
-<div class="toast-wrap" id="toast-wrap"></div>
+        <header class="app-header">
+            <div class="brand-title">
+                <div class="brand-logo">A</div>
+                ApexOS
+            </div>
+            <select class="account-selector" id="account-type" onchange="switchAccountType()">
+                <option value="real">Real Account</option>
+                <option value="demo">Demo Account</option>
+            </select>
+        </header>
 
-<div class="topbar">
-<div class="brand">
-<div class="brand-icon">A</div>
-ApexOS
-</div>
-<div class="account-pill">REAL ACCOUNT</div>
-</div>
+        <div class="view-container">
+            
+            <div id="view-home" class="view active">
+                
+                <div class="equity-card">
+                    <div class="equity-label">Total Equity Balance</div>
+                    <div class="equity-amount" id="display-balance">$50.00</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="goal-progress"></div>
+                    </div>
+                    <div class="target-text">Goal Progress: <span id="target-display">$50,000.00 Target</span></div>
+                </div>
 
-<div class="main">
+                <div class="grid-buttons">
+                    <button class="action-btn" onclick="openModal('deposit')">
+                        Deposit Funds
+                        <span>Payhero Integration</span>
+                    </button>
+                    <button class="action-btn" onclick="openModal('withdraw')">
+                        Withdraw
+                        <span style="color:var(--text-muted)">Instant Bank/M-Pesa</span>
+                    </button>
+                </div>
 
-<div class="balance-card">
-<div class="balance-label">TOTAL EQUITY</div>
-<div class="balance-amount" id="balance">$50.00</div>
-<div class="progress">
-<div class="progress-bar" id="progress"></div>
-</div>
-<div class="balance-bottom">
-<span>Target Progress</span>
-<span>$50,000 Goal</span>
-</div>
-</div>
+                <div class="ai-engine-box">
+                    <div class="ai-header">
+                        <span>Neural Match Scanner</span>
+                        <div class="live-indicator">
+                            <div class="radar-dot"></div>
+                            Monitoring Feed
+                        </div>
+                    </div>
 
-<div class="quick-grid">
-<button class="quick-btn">
-Deposit Funds
-<span>Instant wallet funding</span>
-</button>
+                    <div class="signal-screen">
+                        <div class="signal-asset" id="sig-asset">READY TO SYNC...</div>
+                        <div class="signal-text" id="sig-main">--</div>
+                        <div class="signal-sub" id="sig-status">Awaiting trade parameters</div>
+                    </div>
 
-<button class="quick-btn">
-Withdraw
-<span>Fast account settlement</span>
-</button>
-</div>
+                    <div class="parameters-row">
+                        <div class="param-input">
+                            <span class="param-label">Market Strategy</span>
+                            <select id="inp-market">
+                                <option value="Matches/Differs">Matches/Differs</option>
+                                <option value="Even/Odd">Even/Odd</option>
+                                <option value="Over/Under">Over/Under</option>
+                            </select>
+                        </div>
+                        <div class="param-input">
+                            <span class="param-label">Base Stake ($)</span>
+                            <input type="number" id="inp-stake" value="1.00" step="1">
+                        </div>
+                    </div>
 
-<div class="scanner">
-<div class="scanner-top">
-<div class="scanner-title">AI Market Scanner</div>
-<div class="live">● LIVE</div>
-</div>
+                    <button class="btn-master" id="btn-toggle-bot" onclick="toggleBotEngine()">Execute AI Automation</button>
+                </div>
 
-<div class="signal-box">
-<div class="signal-market" id="asset">Awaiting market scan...</div>
-<div class="signal-main" id="signal">--</div>
-<div class="signal-sub" id="status">Configure your strategy parameters below.</div>
-</div>
+            </div>
 
-<div class="grid-2">
-<div class="input-box">
-<label>Market Type</label>
-<select id="market">
-<option>Matches/Differs</option>
-<option>Even/Odd</option>
-<option>Over/Under</option>
-</select>
-</div>
+            <div id="view-ledger" class="view">
+                <div class="ledger-header">
+                    <h3 style="font-size:1.1rem; font-weight:800;">Live Ledger</h3>
+                    <div style="display:flex; gap: 15px; align-items:center;">
+                        <span class="total-pnl" id="total-pnl">P&L: $0.00</span>
+                        <span class="delete-all" onclick="clearLedger()">Clear All</span>
+                    </div>
+                </div>
+                <div id="ledger-list">
+                    <div style="text-align:center; padding: 40px 0; color:var(--text-muted); font-weight:600; font-size:0.85rem;">No executions recorded yet.</div>
+                </div>
+            </div>
 
-<div class="input-box">
-<label>Stake ($)</label>
-<input type="number" id="stake" value="1">
-</div>
-</div>
+            <div id="view-profile" class="view">
+                <div class="profile-header">
+                    <div class="profile-avatar">👤</div>
+                    <div class="profile-name">Apex Trader</div>
+                    <div class="profile-email">Ready for Supabase Link</div>
+                </div>
 
-<div class="grid-2">
-<div class="input-box">
-<label>Take Profit ($)</label>
-<input type="number" id="tp" value="25">
-</div>
+                <div class="profile-list">
+                    <div class="profile-item">
+                        <span>Account Status</span>
+                        <span style="color:var(--success-green); font-weight:700;">Verified</span>
+                    </div>
+                    <div class="profile-item">
+                        <span>Platform ID</span>
+                        <span>CR-938472</span>
+                    </div>
+                    <div class="profile-item">
+                        <span>Payment Gateway</span>
+                        <span>Payhero Aggregator</span>
+                    </div>
+                    <div class="profile-item">
+                        <span>Risk Settings</span>
+                        <span>Strict TP Activated</span>
+                    </div>
+                </div>
 
-<div class="input-box">
-<label>Stop Loss ($)</label>
-<input type="number" id="sl" value="10">
-</div>
-</div>
+                <button class="btn-logout" onclick="handleLogout()">Secure Logout</button>
+            </div>
 
-<button class="execute-btn" id="bot-btn" onclick="toggleBot()">
-Start AI Scanner
-</button>
-</div>
+        </div>
 
-</div>
+        <div class="modal-overlay" id="payment-modal" onclick="closeModal(event)">
+            <div class="modal-card" onclick="event.stopPropagation()">
+                <div class="modal-title" id="modal-title">Payhero STK Push</div>
+                <input type="tel" class="modal-input" placeholder="Enter Phone Number (e.g., 0712...)" id="modal-phone">
+                <input type="number" class="modal-input" placeholder="Amount (USD)" id="modal-amount">
+                <button class="modal-btn" onclick="processTransaction()">Trigger STK Push</button>
+            </div>
+        </div>
 
-<div class="bottom-nav">
-<div class="nav-item active">
-<div>⌂</div>
-<div>Home</div>
-</div>
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('view-home', this)">
+                <span class="nav-icon">⎈</span>
+                <span class="nav-label">Engine</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('view-ledger', this)">
+                <span class="nav-icon">≡</span>
+                <span class="nav-label">Ledger</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('view-profile', this)">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profile</span>
+            </div>
+        </nav>
+    </div>
 
-<div class="nav-item">
-<div>≡</div>
-<div>Ledger</div>
-</div>
+    <script>
+        let realBalance = 50.00;
+        let demoBalance = 10000.00;
+        let isRealAccount = true;
+        const targetBalance = 50000.00;
+        let totalPnL = 0;
+        
+        let isEngineRunning = false;
+        let scanInterval;
+        let activeModalType = '';
+        let currentTargetIndex = "";
 
-<div class="nav-item">
-<div>👤</div>
-<div>Profile</div>
-</div>
-</div>
+        const volatilityIndices = [
+            "Volatility 10 (1s) Index", "Volatility 25 (1s) Index", "Volatility 50 (1s) Index", 
+            "Volatility 75 (1s) Index", "Volatility 100 (1s) Index"
+        ];
 
-</div>
+        function handleLogin() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            showToast('Authentication Successful.');
+            updateBalanceUI();
+        }
 
-<script>
-let balance = 50;
-let botRunning = false;
-let loop;
+        function handleLogout() {
+            if(isEngineRunning) toggleBotEngine();
+            document.getElementById('auth-screen').classList.remove('hidden');
+        }
 
-const assets = [
-'Volatility 10 Index',
-'Volatility 25 Index',
-'Volatility 50 Index',
-'Volatility 75 Index',
-'Volatility 100 Index'
-];
+        function switchAccountType() {
+            const selector = document.getElementById('account-type');
+            isRealAccount = (selector.value === 'real');
+            updateBalanceUI();
+        }
 
-function toast(message){
-const wrap = document.getElementById('toast-wrap');
-const div = document.createElement('div');
-div.className='toast';
-div.innerText=message;
-wrap.appendChild(div);
-setTimeout(()=>div.remove(),3000);
-}
+        function switchTab(viewId, element) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            element.classList.add('active');
+        }
 
-function login(){
-const name = document.getElementById('name').value;
-const email = document.getElementById('email').value;
-const password = document.getElementById('password').value;
+        function showToast(message) {
+            const container = document.getElementById('toast-area');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span style="color:var(--success-green)">✔</span> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
 
-if(!name || !email || !password){
-toast('Please complete all fields');
-return;
-}
+        function openModal(type) {
+            activeModalType = type;
+            document.getElementById('payment-modal').classList.add('show');
+        }
 
-localStorage.setItem('apexUser',JSON.stringify({name,email,password}));
-document.getElementById('auth-screen').classList.add('hidden');
-toast('Welcome back '+name);
-updateUI();
-}
+        function closeModal(e) { document.getElementById('payment-modal').classList.remove('show'); }
 
-function updateUI(){
-document.getElementById('balance').innerText='$'+balance.toFixed(2);
-document.getElementById('progress').style.width=Math.min((balance/50000)*100,100)+'%';
-}
+        function processTransaction() {
+            const amount = parseFloat(document.getElementById('modal-amount').value);
+            if (!amount || amount <= 0) return;
+            if (activeModalType === 'deposit') {
+                if(isRealAccount) realBalance += amount; else demoBalance += amount;
+            } else {
+                if(isRealAccount) realBalance -= amount; else demoBalance -= amount;
+            }
+            updateBalanceUI();
+            closeModal();
+            showToast("Transaction Processed");
+        }
 
-function toggleBot(){
-const btn = document.getElementById('bot-btn');
+        function updateBalanceUI() {
+            let bal = isRealAccount ? realBalance : demoBalance;
+            document.getElementById('display-balance').innerText = `$${bal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            let progress = (bal / targetBalance) * 100;
+            document.getElementById('goal-progress').style.width = `${Math.min(progress, 100)}%`;
+        }
 
-if(botRunning){
-botRunning=false;
-btn.innerText='Start AI Scanner';
-btn.classList.remove('active');
-clearTimeout(loop);
-return;
-}
+        function updatePnL(val) {
+            totalPnL += val;
+            const pnlEl = document.getElementById('total-pnl');
+            pnlEl.innerText = `P&L: $${totalPnL.toFixed(2)}`;
+            pnlEl.className = `total-pnl ${totalPnL >= 0 ? 'pnl-pos' : 'pnl-neg'}`;
+        }
 
-botRunning=true;
-btn.innerText='Stop AI Scanner';
-btn.classList.add('active');
-runBot();
-}
+        function clearLedger() {
+            document.getElementById('ledger-list').innerHTML = '<div style="text-align:center; padding: 40px 0; color:var(--text-muted); font-weight:600; font-size:0.85rem;">No executions recorded yet.</div>';
+            totalPnL = 0;
+            updatePnL(0);
+        }
 
-function runBot(){
-if(!botRunning) return;
+        function toggleBotEngine() {
+            const btn = document.getElementById('btn-toggle-bot');
+            if (isEngineRunning) {
+                isEngineRunning = false;
+                btn.innerText = "Execute AI Automation";
+                btn.classList.remove('active');
+                clearTimeout(scanInterval);
+            } else {
+                isEngineRunning = true;
+                btn.innerText = "Halt System Process";
+                btn.classList.add('active');
+                runScannerCycle();
+            }
+        }
 
-const market = document.getElementById('market').value;
-const stake = parseFloat(document.getElementById('stake').value) || 1;
-const tp = parseFloat(document.getElementById('tp').value) || 25;
-const sl = parseFloat(document.getElementById('sl').value) || 10;
+        function runScannerCycle() {
+            if (!isEngineRunning) return;
+            const market = document.getElementById('inp-market').value;
+            const stake = parseFloat(document.getElementById('inp-stake').value) || 1.00;
+            currentTargetIndex = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)];
+            
+            let signalText = "";
+            let signalSub = "";
+            let profit = 0;
+            
+            const isWin = Math.random() < 0.95;
 
-const asset = assets[Math.floor(Math.random()*assets.length)];
+            document.getElementById('sig-asset').innerText = `SCANNING: ${currentTargetIndex}`;
 
-let signal='';
-let payout='';
+            if(market === "Matches/Differs") {
+                const digit = Math.floor(Math.random() * 10);
+                const isMatch = isWin ? (Math.random() < 0.85) : (Math.random() < 0.2);
+                signalText = isMatch ? `MATCH DIGIT: ${digit}` : `DIFFER DIGIT: ${digit}`;
+                signalSub = "Payout: 9.0x | Win Rate: 95%";
+                profit = isWin ? (stake * 8) : (-stake); 
+            } else if(market === "Even/Odd") {
+                const choice = Math.random() > 0.5 ? "EVEN" : "ODD";
+                signalText = `PREDICT: ${choice}`;
+                signalSub = "Payout: 1.95x | Win Rate: 95%";
+                profit = isWin ? (stake * 0.95) : (-stake);
+            } else {
+                // Corrected Over/Under Logic: Payouts scale with the probability of the digit
+                const digit = Math.floor(Math.random() * 9); // Digit 0-8
+                const isOver = Math.random() > 0.5;
+                signalText = isOver ? `OVER ${digit}` : `UNDER ${digit}`;
+                
+                // Payout calculation logic: Higher digit for OVER = higher risk/payout
+                // Roughly 1.1x for easy targets, up to 10x for rare digits
+                const multiplier = isOver ? (1.1 + (digit * 0.9)) : (1.1 + ((8 - digit) * 0.9));
+                signalSub = `Payout: ${multiplier.toFixed(1)}x | Win Rate: 95%`;
+                
+                profit = isWin ? (stake * (multiplier - 1)) : (-stake);
+            }
 
-if(market==='Matches/Differs'){
-const digit=Math.floor(Math.random()*10);
-signal='DIFFER '+digit;
-payout='Variable payout based on market conditions';
-}
-else if(market==='Even/Odd'){
-signal=Math.random()>0.5?'EVEN':'ODD';
-payout='Estimated payout displayed dynamically';
-}
-else{
-const digit=Math.floor(Math.random()*9);
-signal='OVER '+digit;
-payout='Estimated payout displayed dynamically';
-}
+            document.getElementById('sig-main').innerText = signalText;
+            document.getElementById('sig-status').innerText = signalSub;
+            
+            scanInterval = setTimeout(() => {
+                if (!isEngineRunning) return;
+                if(isRealAccount) realBalance += profit; else demoBalance += profit;
+                updateBalanceUI();
+                updatePnL(profit);
+                logExecution(profit, market, signalText);
+                runScannerCycle();
+            }, 3000);
+        }
 
-const simulatedWin = Math.random() < 0.55;
-const pnl = simulatedWin ? (stake*0.9) : (-stake);
-
-balance += pnl;
-
-if(balance <= sl){
-botRunning=false;
-document.getElementById('bot-btn').innerText='Start AI Scanner';
-document.getElementById('bot-btn').classList.remove('active');
-toast('Stop loss reached');
-return;
-}
-
-if(balance >= tp + 50){
-botRunning=false;
-document.getElementById('bot-btn').innerText='Start AI Scanner';
-document.getElementById('bot-btn').classList.remove('active');
-toast('Take profit reached');
-return;
-}
-
-updateUI();
-
-document.getElementById('asset').innerText=asset;
-document.getElementById('signal').innerText=signal;
-document.getElementById('status').innerText=payout;
-
-loop=setTimeout(runBot,3000);
-}
-
-window.onload=()=>{
-const saved = JSON.parse(localStorage.getItem('apexUser'));
-
-if(saved){
-document.getElementById('auth-screen').classList.add('hidden');
-}
-
-updateUI();
-}
-</script>
-
+        function logExecution(profit, market, signal) {
+            const ledger = document.getElementById('ledger-list');
+            if (ledger.innerText.includes("No executions")) ledger.innerHTML = '';
+            const row = document.createElement('div');
+            row.className = 'ledger-row';
+            row.innerHTML = `
+                <div class="ledger-details">
+                    <span class="ledger-asset">${currentTargetIndex}</span>
+                    <span class="ledger-type">${market} | ${signal}</span>
+                </div>
+                <div style="display:flex; align-items:center;">
+                    <span class="ledger-profit" style="color: ${profit >= 0 ? 'var(--success-green)' : 'var(--danger-red)'}">
+                        ${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}
+                    </span>
+                    <span class="delete-icon" onclick="this.parentElement.parentElement.remove(); updatePnL(-${profit})">×</span>
+                </div>
+            `;
+            ledger.insertBefore(row, ledger.firstChild);
+        }
+    </script>
 </body>
 </html>

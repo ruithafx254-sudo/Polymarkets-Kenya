@@ -77,7 +77,6 @@ button{
 }
 
 /* AUTH */
-
 .auth{
     position:absolute;
     inset:0;
@@ -220,7 +219,6 @@ button{
 }
 
 /* HEADER */
-
 .header{
     padding:18px 20px;
     display:flex;
@@ -262,7 +260,6 @@ button{
 }
 
 /* MAIN */
-
 .main{
     flex:1;
     overflow-y:auto;
@@ -289,11 +286,9 @@ button{
 }
 
 /* BALANCE */
-
 .balance-card{
     text-align:center;
-    background:
-    linear-gradient(135deg,#0f172a,#111827);
+    background:linear-gradient(135deg,#0f172a,#111827);
     color:white;
 }
 
@@ -325,7 +320,6 @@ button{
 }
 
 /* BUTTONS */
-
 .grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -356,7 +350,6 @@ button{
 }
 
 /* AI */
-
 .ai-head{
     display:flex;
     justify-content:space-between;
@@ -461,7 +454,6 @@ button{
 }
 
 /* LEDGER */
-
 .ledger-row{
     display:flex;
     justify-content:space-between;
@@ -474,7 +466,6 @@ button{
 }
 
 /* PROFILE */
-
 .profile{
     text-align:center;
 }
@@ -526,7 +517,6 @@ button{
 }
 
 /* NAV */
-
 .nav{
     display:flex;
     justify-content:space-around;
@@ -554,7 +544,6 @@ button{
 }
 
 /* MODAL */
-
 .overlay{
     position:absolute;
     inset:0;
@@ -712,6 +701,21 @@ button{
     font-size:4rem;
     margin-bottom:10px;
 }
+
+/* NEW: SPINNER CSS */
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(0, 122, 255, 0.1);
+    border-top: 5px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 </style>
 </head>
 
@@ -720,25 +724,12 @@ button{
 <div class="device">
 
 <div class="auth" id="auth">
-
-<div class="auth-badge">
-SECURE ENTERPRISE ACCESS
-</div>
-
-<div class="auth-logo">
-A
-</div>
-
-<div class="auth-title">
-Apex Enterprise
-</div>
-
-<div class="auth-sub">
-AI powered trading execution environment with enterprise security.
-</div>
+<div class="auth-badge">SECURE ENTERPRISE ACCESS</div>
+<div class="auth-logo">A</div>
+<div class="auth-title">Apex Enterprise</div>
+<div class="auth-sub">AI powered trading execution environment with enterprise security.</div>
 
 <div class="auth-card">
-
 <div class="auth-tabs">
 <button class="auth-tab active" id="signin-tab" onclick="switchAuth('signin')">Sign In</button>
 <button class="auth-tab" id="signup-tab" onclick="switchAuth('signup')">Create Account</button>
@@ -761,26 +752,18 @@ AI powered trading execution environment with enterprise security.
 <input type="password" class="auth-input" id="login-pass" placeholder="Password">
 </div>
 
-<button class="auth-btn" id="auth-btn" onclick="handleAuth()">
-Sign In Securely
-</button>
+<button class="auth-btn" id="auth-btn" onclick="handleAuth()">Sign In Securely</button>
 
 <div class="auth-footer" id="auth-footer">
-New here?
-<span onclick="switchAuth('signup')">Create account</span>
+New here? <span onclick="switchAuth('signup')">Create account</span>
 </div>
-
 </div>
 </div>
 
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <header class="header">
-<div class="brand">
-<div class="brand-box">A</div>
-ApexOS
-</div>
-
+<div class="brand"><div class="brand-box">A</div>ApexOS</div>
 <select class="account-selector" id="account-type" onchange="switchAccount()">
 <option value="real">Real Account</option>
 <option value="demo">Demo Account</option>
@@ -790,312 +773,120 @@ ApexOS
 <div class="main">
 
 <div class="view active" id="home">
-
 <div class="card balance-card">
-
-<div class="balance-title">
-TOTAL EQUITY
-</div>
-
-<div class="balance-amount" id="balance">
-$0.00
-</div>
-
-<div class="progress">
-<div class="progress-fill" id="progress-fill"></div>
-</div>
-
-<div style="margin-top:10px;font-size:.75rem;color:#cbd5e1;font-weight:700;">
-Goal Progress: $50,000 Target
-</div>
-
+<div class="balance-title">TOTAL EQUITY</div>
+<div class="balance-amount" id="balance">$0.00</div>
+<div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
+<div style="margin-top:10px;font-size:.75rem;color:#cbd5e1;font-weight:700;">Goal Progress: $50,000 Target</div>
 </div>
 
 <div class="grid">
-
-<button class="action-btn" onclick="openPayment('deposit')">
-Deposit Funds
-<span>Secure Gateway</span>
-</button>
-
-<button class="action-btn" onclick="openPayment('withdraw')">
-Withdraw
-<span>Instant Processing</span>
-</button>
-
+<button class="action-btn" onclick="openPayment('deposit')">Deposit Funds<span>Secure Gateway</span></button>
+<button class="action-btn" onclick="openPayment('withdraw')">Withdraw<span>Instant Processing</span></button>
 </div>
 
 <div class="card">
-
-<div class="ai-head">
-<span>Neural Match Scanner</span>
-
-<div class="live">
-<div class="dot"></div>
-AI Accuracy 90%
-</div>
-</div>
-
+<div class="ai-head"><span>Neural Match Scanner</span><div class="live"><div class="dot"></div>AI Accuracy 90%</div></div>
 <div class="signal">
-<div class="signal-asset" id="sig-asset">
-READY TO SYNC...
-</div>
-
-<div class="signal-main" id="sig-main">
---
-</div>
-
-<div class="signal-sub" id="sig-status">
-Quantum neural scanner calibrated to 90% precision
-</div>
+<div class="signal-asset" id="sig-asset">READY TO SYNC...</div>
+<div class="signal-main" id="sig-main">--</div>
+<div class="signal-sub" id="sig-status">Quantum neural scanner calibrated to 90% precision</div>
 </div>
 
 <div class="row">
-
-<div class="input-card">
-<label>Market Strategy</label>
-
-<select id="inp-market" onchange="toggleDigitBox()">
-<option>Matches/Differs</option>
-<option>Even/Odd</option>
-<option>Over/Under</option>
-</select>
+<div class="input-card"><label>Market Strategy</label>
+<select id="inp-market" onchange="toggleDigitBox()"><option>Matches/Differs</option><option>Even/Odd</option><option>Over/Under</option></select>
 </div>
-
-<div class="input-card">
-<label>Base Stake ($)</label>
-<input type="number" id="inp-stake" value="1">
-</div>
-
+<div class="input-card"><label>Base Stake ($)</label><input type="number" id="inp-stake" value="1"></div>
 </div>
 
 <div class="input-card" id="digit-box" style="display:none;margin-bottom:12px;">
-<label>Target Digit</label>
-<input type="number" id="inp-digit" value="4" min="0" max="9">
+<label>Target Digit</label><input type="number" id="inp-digit" value="4" min="0" max="9">
 </div>
 
 <div class="row">
-
-<div class="input-card">
-<label>Take Profit ($)</label>
-<input type="number" id="inp-tp" value="5">
+<div class="input-card"><label>Take Profit ($)</label><input type="number" id="inp-tp" value="5"></div>
+<div class="input-card"><label>Stop Loss ($)</label><input type="number" id="inp-sl" value="20"></div>
 </div>
 
-<div class="input-card">
-<label>Stop Loss ($)</label>
-<input type="number" id="inp-sl" value="20">
-</div>
-
-</div>
-
-<div class="input-card">
-<label>Martingale Multiplier</label>
-<input type="number" id="inp-multi" value="2">
-</div>
-
-<button class="master-btn" id="engine-btn" onclick="toggleBot()">
-Execute AI Automation
-</button>
-
+<div class="input-card"><label>Martingale Multiplier</label><input type="number" id="inp-multi" value="2"></div>
+<button class="master-btn" id="engine-btn" onclick="toggleBot()">Execute AI Automation</button>
 </div>
 </div>
 
 <div class="view" id="ledger">
-
 <div class="card">
-
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-
-<div>
-<div style="font-size:1.1rem;font-weight:900;">
-Live Ledger
+<div><div style="font-size:1.1rem;font-weight:900;">Live Ledger</div><div id="pnl" style="font-size:.85rem;font-weight:900;margin-top:4px;">P&L: $0.00</div></div>
+<button style="padding:8px 12px;border-radius:10px;background:#fee2e2;color:var(--danger);font-weight:800;" onclick="clearLedger()">Clear</button>
 </div>
-
-<div id="pnl" style="font-size:.85rem;font-weight:900;margin-top:4px;">
-P&L: $0.00
-</div>
-</div>
-
-<button style="padding:8px 12px;border-radius:10px;background:#fee2e2;color:var(--danger);font-weight:800;" onclick="clearLedger()">
-Clear
-</button>
-
-</div>
-
-<div id="ledger-list">
-
-<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">
-No executions recorded yet.
-</div>
-
-</div>
-
+<div id="ledger-list"><div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No executions recorded yet.</div></div>
 </div>
 </div>
 
 <div class="view" id="profile">
-
 <div class="card profile">
-
-<div class="avatar">
-👤
-</div>
-
-<div class="profile-name" id="profile-name">
-Apex Trader
-</div>
-
-<div class="profile-email" id="profile-email">
-Connected to Supabase
-</div>
-
+<div class="avatar">👤</div>
+<div class="profile-name" id="profile-name">Apex Trader</div>
+<div class="profile-email" id="profile-email">Connected to Supabase</div>
 <div class="profile-list">
-
-<div class="profile-item">
-<span>Account Status</span>
-<span style="color:var(--success);font-weight:800;">Verified</span>
+<div class="profile-item"><span>Account Status</span><span style="color:var(--success);font-weight:800;">Verified</span></div>
+<div class="profile-item"><span>Platform ID</span><span>CR-938472</span></div>
+<div class="profile-item"><span>Gateway</span><span>Enterprise Secure</span></div>
 </div>
-
-<div class="profile-item">
-<span>Platform ID</span>
-<span>CR-938472</span>
+<button class="logout" onclick="logout()">Secure Logout</button>
 </div>
-
-<div class="profile-item">
-<span>Gateway</span>
-<span>Enterprise Secure</span>
-</div>
-
-</div>
-
-<button class="logout" onclick="logout()">
-Secure Logout
-</button>
-
-</div>
-
 </div>
 
 </div>
 
 <div class="overlay" id="payment-modal">
-
 <div class="modal">
-
 <div class="modal-head">
-<div class="modal-title" id="payment-title">
-Deposit Funds
-</div>
-
-<div class="close" onclick="closeModal()">
-×
-</div>
+<div class="modal-title" id="payment-title">Deposit Funds</div><div class="close" onclick="closeModal()">×</div>
 </div>
 
 <div id="step1">
-
-<div class="modal-group">
-<label>M-Pesa Registered Name</label>
-<input type="text" class="modal-input" id="pay-name" placeholder="e.g., JOHN DOE">
-</div>
-
-<div class="modal-group">
-<label>M-Pesa Number</label>
-<input type="tel" class="modal-input" id="pay-phone" placeholder="e.g., 0712345678">
-</div>
-
-<div class="modal-group">
-<label>Amount (USD)</label>
-<input type="number" class="modal-input" id="pay-amount" placeholder="e.g., 10">
-</div>
-
-<button class="modal-btn" onclick="proceedInvoice()">
-Continue
-</button>
-
-<div class="badge">
-<img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png">
-</div>
-
+<div class="modal-group"><label>M-Pesa Registered Name</label><input type="text" class="modal-input" id="pay-name" placeholder="e.g., JOHN DOE"></div>
+<div class="modal-group"><label>M-Pesa Number</label><input type="tel" class="modal-input" id="pay-phone" placeholder="e.g., 0712345678"></div>
+<div class="modal-group"><label>Amount (USD)</label><input type="number" class="modal-input" id="pay-amount" placeholder="e.g., 10"></div>
+<button class="modal-btn" onclick="proceedInvoice()">Continue</button>
+<div class="badge"><img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png"></div>
 </div>
 
 <div id="step2" style="display:none;">
-
 <div class="invoice">
-
-<div class="invoice-row">
-<span class="invoice-label">Invoice ID</span>
-<span class="invoice-value" id="inv-id">--</span>
+<div class="invoice-row"><span class="invoice-label">Invoice ID</span><span class="invoice-value" id="inv-id">--</span></div>
+<div class="invoice-row"><span class="invoice-label">Name</span><span class="invoice-value" id="inv-name">--</span></div>
+<div class="invoice-row"><span class="invoice-label">Phone</span><span class="invoice-value" id="inv-phone">--</span></div>
+<div class="invoice-row"><span class="invoice-label">Total (KES)</span><span class="invoice-value" style="color:var(--success);">KSh <span id="inv-amount">0</span></span></div>
+</div>
+<button class="modal-btn" onclick="executeExternalPayment()">Pay Securely via M-PESA</button>
 </div>
 
-<div class="invoice-row">
-<span class="invoice-label">Name</span>
-<span class="invoice-value" id="inv-name">--</span>
-</div>
-
-<div class="invoice-row">
-<span class="invoice-label">Phone</span>
-<span class="invoice-value" id="inv-phone">--</span>
-</div>
-
-<div class="invoice-row">
-<span class="invoice-label">Total (KES)</span>
-<span class="invoice-value" style="color:var(--success);">
-KSh <span id="inv-amount">0</span>
-</span>
-</div>
-
-</div>
-
-<button class="modal-btn" onclick="executeExternalPayment()">
-Pay Securely via M-PESA
-</button>
-
+<div id="step3" style="display:none; text-align:center; padding: 20px 0;">
+    <h3 style="font-weight:800; margin-bottom:10px;">Awaiting Confirmation</h3>
+    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:15px;">Please complete the transaction in the external window.</p>
+    <div class="spinner"></div>
+    <p style="font-size:0.75rem; color:var(--primary); font-weight:700;">Engine will redirect automatically upon receipt.</p>
 </div>
 
 </div>
 </div>
 
 <div class="overlay" id="congrats-modal">
-
 <div class="modal congrats">
-
-<div class="congrats-icon">
-🎉
-</div>
-
-<h2 id="congrats-title" style="margin-bottom:12px;color:var(--success);font-weight:900;">
-Congratulations!
-</h2>
-
-<p id="congrats-message" style="color:var(--muted);font-weight:700;margin-bottom:22px;">
-Success
-</p>
-
-<button class="modal-btn" onclick="closeCongrats()">
-Awesome
-</button>
-
+<div class="congrats-icon">🎉</div>
+<h2 id="congrats-title" style="margin-bottom:12px;color:var(--success);font-weight:900;">Congratulations!</h2>
+<p id="congrats-message" style="color:var(--muted);font-weight:700;margin-bottom:22px;">Success</p>
+<button class="modal-btn" onclick="closeCongrats()">Awesome</button>
 </div>
 </div>
 
 <nav class="nav">
-
-<div class="nav-item active" id="nav-home" onclick="switchTab('home',this)">
-<div>⎈</div>
-<div class="nav-label">Engine</div>
-</div>
-
-<div class="nav-item" id="nav-ledger" onclick="switchTab('ledger',this)">
-<div>≡</div>
-<div class="nav-label">Ledger</div>
-</div>
-
-<div class="nav-item" id="nav-profile" onclick="switchTab('profile',this)">
-<div>👤</div>
-<div class="nav-label">Profile</div>
-</div>
-
+<div class="nav-item active" id="nav-home" onclick="switchTab('home',this)"><div>⎈</div><div class="nav-label">Engine</div></div>
+<div class="nav-item" id="nav-ledger" onclick="switchTab('ledger',this)"><div>≡</div><div class="nav-label">Ledger</div></div>
+<div class="nav-item" id="nav-profile" onclick="switchTab('profile',this)"><div>👤</div><div class="nav-label">Profile</div></div>
 </nav>
 
 </div>
@@ -1104,38 +895,23 @@ Awesome
 const SUPABASE_URL = "https://hsovbnxatorocibfgrhc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP";
 
-const supabaseClient = supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let authMode = "signin";
-
 let realBalance = 0;
 let demoBalance = 10000;
 let isReal = true;
-
 let isRunning = false;
 let scanLoop;
-
 let totalPnL = 0;
 let sessionPnL = 0;
-
 let paymentType = "";
 let activeStake = 1;
-
 let depositSubscription = null;
 
 const USD_TO_KES = 132;
 const targetBalance = 50000;
-
-const volatilityIndices = [
-'Volatility 10 (1s)',
-'Volatility 25 (1s)',
-'Volatility 50 (1s)',
-'Volatility 75 (1s)',
-'Volatility 100 (1s)'
-];
+const volatilityIndices = ['Volatility 10 (1s)', 'Volatility 25 (1s)', 'Volatility 50 (1s)', 'Volatility 75 (1s)', 'Volatility 100 (1s)'];
 
 // Load wallet balance from Supabase Cloud Row Storage
 async function fetchSupabaseBalance(userId) {
@@ -1171,7 +947,7 @@ async function saveSupabaseBalance() {
     }
 }
 
-// Realtime Listener for tracking live payments
+// CRITICAL FIX: Realtime Listener for tracking live payments
 function subscribeToDepositUpdates(userId) {
     if (depositSubscription) {
         supabaseClient.removeChannel(depositSubscription);
@@ -1187,10 +963,10 @@ function subscribeToDepositUpdates(userId) {
                 table: 'deposits',
                 filter: `user_id=eq.${userId}`
             },
-            (payload) => {
+            async (payload) => {
                 if (payload.new && payload.new.status === 'completed') {
-                    // Update frontend values
-                    fetchSupabaseBalance(userId);
+                    // Update frontend values (MUST BE ASYNC/AWAIT TO HAPPEN INSTANTLY)
+                    await fetchSupabaseBalance(userId);
                     
                     // Close user checkout views immediately
                     closeModal();
@@ -1211,695 +987,326 @@ function subscribeToDepositUpdates(userId) {
 }
 
 window.addEventListener("load", async()=>{
-
-const { data:{session} } =
-await supabaseClient.auth.getSession();
-
-if(session?.user){
-
-document.getElementById("auth")
-.classList.add("hidden");
-
-document.getElementById("profile-email")
-.innerText = session.user.email;
-
-if(session.user.user_metadata.full_name){
-document.getElementById("profile-name")
-.innerText =
-session.user.user_metadata.full_name;
-}
-
-// Sync device balance metrics upon session structural validation
-await fetchSupabaseBalance(session.user.id);
-// Kickstart the live engine channel socket loop connection structures
-subscribeToDepositUpdates(session.user.id);
-
-}
-
-updateBalance();
-
+    const { data:{session} } = await supabaseClient.auth.getSession();
+    if(session?.user){
+        document.getElementById("auth").classList.add("hidden");
+        document.getElementById("profile-email").innerText = session.user.email;
+        if(session.user.user_metadata.full_name){
+            document.getElementById("profile-name").innerText = session.user.user_metadata.full_name;
+        }
+        await fetchSupabaseBalance(session.user.id);
+        subscribeToDepositUpdates(session.user.id);
+    }
+    updateBalance();
 });
 
 function switchAuth(mode){
-
-authMode = mode;
-
-document.getElementById("signin-tab")
-.classList.toggle("active", mode==="signin");
-
-document.getElementById("signup-tab")
-.classList.toggle("active", mode==="signup");
-
-document.getElementById("fullname-wrap")
-.style.display =
-mode==="signup" ? "block":"none";
-
-document.getElementById("auth-btn")
-.innerText =
-mode==="signup"
-? "Create Secure Account"
-: "Sign In Securely";
-
-document.getElementById("auth-footer")
-.innerHTML =
-mode==="signin"
-? `New here?
-<span onclick="switchAuth('signup')">Create account</span>`
-: `Already have account?
-<span onclick="switchAuth('signin')">Sign in</span>`;
+    authMode = mode;
+    document.getElementById("signin-tab").classList.toggle("active", mode==="signin");
+    document.getElementById("signup-tab").classList.toggle("active", mode==="signup");
+    document.getElementById("fullname-wrap").style.display = mode==="signup" ? "block":"none";
+    document.getElementById("auth-btn").innerText = mode==="signup" ? "Create Secure Account" : "Sign In Securely";
+    document.getElementById("auth-footer").innerHTML = mode==="signin"
+        ? `New here? <span onclick="switchAuth('signup')">Create account</span>`
+        : `Already have account? <span onclick="switchAuth('signin')">Sign in</span>`;
 }
 
 async function handleAuth(){
+    const email = document.getElementById("login-email").value.trim();
+    const password = document.getElementById("login-pass").value.trim();
+    const fullName = document.getElementById("signup-name").value.trim();
 
-const email =
-document.getElementById("login-email")
-.value.trim();
+    if(!email || !password){ toast("Fill all fields"); return; }
 
-const password =
-document.getElementById("login-pass")
-.value.trim();
-
-const fullName =
-document.getElementById("signup-name")
-.value.trim();
-
-if(!email || !password){
-toast("Fill all fields");
-return;
-}
-
-try{
-
-if(authMode==="signup"){
-
-const { data, error } =
-await supabaseClient.auth.signUp({
-email,
-password,
-options:{
-data:{
-full_name:fullName
-}
-}
-});
-
-if(error){
-toast(error.message);
-return;
-}
-
-document.getElementById("profile-name")
-.innerText =
-fullName || "Apex Trader";
-
-if (data?.user) {
-    await fetchSupabaseBalance(data.user.id);
-    subscribeToDepositUpdates(data.user.id);
-}
-
-}else{
-
-const { data,error } =
-await supabaseClient.auth
-.signInWithPassword({
-email,
-password
-});
-
-if(error){
-toast(error.message);
-return;
-}
-
-if(data.user.user_metadata.full_name){
-document.getElementById("profile-name")
-.innerText =
-data.user.user_metadata.full_name;
-}
-
-if (data?.user) {
-    await fetchSupabaseBalance(data.user.id);
-    subscribeToDepositUpdates(data.user.id);
-}
-
-}
-
-document.getElementById("profile-email")
-.innerText = email;
-
-document.getElementById("auth")
-.classList.add("hidden");
-
-toast("Authentication successful");
-
-}catch(err){
-
-toast("Authentication failed");
-
-}
-
+    try{
+        if(authMode==="signup"){
+            const { data, error } = await supabaseClient.auth.signUp({
+                email, password, options:{ data:{ full_name:fullName } }
+            });
+            if(error){ toast(error.message); return; }
+            document.getElementById("profile-name").innerText = fullName || "Apex Trader";
+            if (data?.user) {
+                await fetchSupabaseBalance(data.user.id);
+                subscribeToDepositUpdates(data.user.id);
+            }
+        }else{
+            const { data,error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if(error){ toast(error.message); return; }
+            if(data.user.user_metadata.full_name){
+                document.getElementById("profile-name").innerText = data.user.user_metadata.full_name;
+            }
+            if (data?.user) {
+                await fetchSupabaseBalance(data.user.id);
+                subscribeToDepositUpdates(data.user.id);
+            }
+        }
+        document.getElementById("profile-email").innerText = email;
+        document.getElementById("auth").classList.add("hidden");
+        toast("Authentication successful");
+    }catch(err){
+        toast("Authentication failed");
+    }
 }
 
 async function logout(){
-
-if(isRunning){
-toggleBot();
-}
-
-if (depositSubscription) {
-    supabaseClient.removeChannel(depositSubscription);
-    depositSubscription = null;
-}
-
-await supabaseClient.auth.signOut();
-
-document.getElementById("auth")
-.classList.remove("hidden");
-
-realBalance = 0;
-updateBalance();
-
-toast("Logged out");
+    if(isRunning) toggleBot();
+    if (depositSubscription) {
+        supabaseClient.removeChannel(depositSubscription);
+        depositSubscription = null;
+    }
+    await supabaseClient.auth.signOut();
+    document.getElementById("auth").classList.remove("hidden");
+    realBalance = 0;
+    updateBalance();
+    toast("Logged out");
 }
 
 function switchAccount(){
-
-isReal =
-document.getElementById("account-type")
-.value === "real";
-
-updateBalance();
+    isReal = document.getElementById("account-type").value === "real";
+    updateBalance();
 }
 
 function updateBalance(){
-
-const bal =
-isReal ? realBalance : demoBalance;
-
-document.getElementById("balance")
-.innerText =
-`$${bal.toLocaleString(undefined,{
-minimumFractionDigits:2,
-maximumFractionDigits:2
-})}`;
-
-const progress =
-Math.min((bal/targetBalance)*100,100);
-
-document.getElementById("progress-fill")
-.style.width = `${progress}%`;
+    const bal = isReal ? realBalance : demoBalance;
+    document.getElementById("balance").innerText = `$${bal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+    const progress = Math.min((bal/targetBalance)*100,100);
+    document.getElementById("progress-fill").style.width = `${progress}%`;
 }
 
 function switchTab(id,el){
-
-document.querySelectorAll(".view")
-.forEach(v=>v.classList.remove("active"));
-
-document.querySelectorAll(".nav-item")
-.forEach(v=>v.classList.remove("active"));
-
-document.getElementById(id)
-.classList.add("active");
-
-el.classList.add("active");
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    document.querySelectorAll(".nav-item").forEach(v=>v.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    el.classList.add("active");
 }
 
 function toast(msg){
-
-const wrap =
-document.getElementById("toast-wrap");
-
-const t =
-document.createElement("div");
-
-t.className = "toast";
-t.innerText = msg;
-
-wrap.appendChild(t);
-
-setTimeout(()=>{
-t.remove();
-},3000);
+    const wrap = document.getElementById("toast-wrap");
+    const t = document.createElement("div");
+    t.className = "toast";
+    t.innerText = msg;
+    wrap.appendChild(t);
+    setTimeout(()=>{ t.remove(); },3000);
 }
 
 function toggleDigitBox(){
-
-const market =
-document.getElementById("inp-market")
-.value;
-
-document.getElementById("digit-box")
-.style.display =
-market==="Over/Under"
-? "block"
-: "none";
+    const market = document.getElementById("inp-market").value;
+    document.getElementById("digit-box").style.display = market==="Over/Under" ? "block" : "none";
 }
 
 function openPayment(type){
-
-if(type==="withdraw" && !isReal){
-toast("Withdrawals disabled on demo");
-return;
-}
-
-paymentType = type;
-
-document.getElementById("payment-title")
-.innerText =
-type==="deposit"
-? "Secure Deposit"
-: "Instant Withdrawal";
-
-document.getElementById("step1")
-.style.display = "block";
-
-document.getElementById("step2")
-.style.display = "none";
-
-document.getElementById("pay-name").value = "";
-document.getElementById("pay-phone").value = "";
-document.getElementById("pay-amount").value = "";
-
-document.getElementById("payment-modal")
-.classList.add("show");
+    if(type==="withdraw" && !isReal){ toast("Withdrawals disabled on demo"); return; }
+    paymentType = type;
+    document.getElementById("payment-title").innerText = type==="deposit" ? "Secure Deposit" : "Instant Withdrawal";
+    document.getElementById("step1").style.display = "block";
+    document.getElementById("step2").style.display = "none";
+    document.getElementById("step3").style.display = "none";
+    document.getElementById("pay-name").value = "";
+    document.getElementById("pay-phone").value = "";
+    document.getElementById("pay-amount").value = "";
+    document.getElementById("payment-modal").classList.add("show");
 }
 
 function closeModal(){
-document.getElementById("payment-modal")
-.classList.remove("show");
+    document.getElementById("payment-modal").classList.remove("show");
 }
 
 function closeCongrats(){
-document.getElementById("congrats-modal")
-.classList.remove("show");
+    document.getElementById("congrats-modal").classList.remove("show");
 }
 
 function congrats(title,msg){
-
-document.getElementById("congrats-title")
-.innerText = title;
-
-document.getElementById("congrats-message")
-.innerText = msg;
-
-document.getElementById("congrats-modal")
-.classList.add("show");
+    document.getElementById("congrats-title").innerText = title;
+    document.getElementById("congrats-message").innerText = msg;
+    document.getElementById("congrats-modal").classList.add("show");
 }
 
 async function proceedInvoice(){
+    const name = document.getElementById("pay-name").value.trim();
+    const phone = document.getElementById("pay-phone").value.trim();
+    const amount = parseFloat(document.getElementById("pay-amount").value);
 
-const name =
-document.getElementById("pay-name")
-.value.trim();
+    if(!name || !phone || isNaN(amount) || amount <= 0){ toast("Fill valid details"); return; }
 
-const phone =
-document.getElementById("pay-phone")
-.value.trim();
+    if(paymentType==="withdraw"){
+        if(amount > realBalance){ toast("Insufficient balance"); return; }
+        realBalance -= amount;
+        updateBalance();
+        await saveSupabaseBalance();
+        closeModal();
+        congrats("Withdrawal Successful!", `$${amount.toFixed(2)} sent to ${phone}`);
+        return;
+    }
 
-const amount =
-parseFloat(
-document.getElementById("pay-amount")
-.value
-);
+    const invoice = "INV-" + Math.floor(100000 + Math.random()*900000);
+    const kes = Math.floor(amount * USD_TO_KES);
 
-if(!name || !phone || isNaN(amount) || amount <= 0){
-toast("Fill valid details");
-return;
-}
-
-if(paymentType==="withdraw"){
-
-if(amount > realBalance){
-toast("Insufficient balance");
-return;
-}
-
-realBalance -= amount;
-
-updateBalance();
-await saveSupabaseBalance();
-
-closeModal();
-
-congrats(
-"Withdrawal Successful!",
-`$${amount.toFixed(2)} sent to ${phone}`
-);
-
-return;
-}
-
-const invoice =
-"INV-" +
-Math.floor(100000 + Math.random()*900000);
-
-const kes =
-Math.floor(amount * USD_TO_KES);
-
-document.getElementById("inv-id")
-.innerText = invoice;
-
-document.getElementById("inv-name")
-.innerText = name.toUpperCase();
-
-document.getElementById("inv-phone")
-.innerText = phone;
-
-document.getElementById("inv-amount")
-.innerText =
-kes.toLocaleString();
-
-document.getElementById("step1")
-.style.display = "none";
-
-document.getElementById("step2")
-.style.display = "block";
+    document.getElementById("inv-id").innerText = invoice;
+    document.getElementById("inv-name").innerText = name.toUpperCase();
+    document.getElementById("inv-phone").innerText = phone;
+    document.getElementById("inv-amount").innerText = kes.toLocaleString();
+    document.getElementById("step1").style.display = "none";
+    document.getElementById("step2").style.display = "block";
 }
 
 async function executeExternalPayment(){
+    const amountKES = document.getElementById("inv-amount").innerText.replace(/,/g,'');
+    const name = document.getElementById("inv-name").innerText;
+    const phone = document.getElementById("inv-phone").innerText;
+    const invoiceId = document.getElementById("inv-id").innerText;
+    const amountUSD = parseFloat(document.getElementById("pay-amount").value);
 
-const amountKES = document.getElementById("inv-amount").innerText.replace(/,/g,'');
-const name = document.getElementById("inv-name").innerText;
-const phone = document.getElementById("inv-phone").innerText;
-const invoiceId = document.getElementById("inv-id").innerText;
-const amountUSD = parseFloat(document.getElementById("pay-amount").value);
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session?.user) {
+        toast("Session expired. Please log in again.");
+        return;
+    }
 
-const { data: { session } } = await supabaseClient.auth.getSession();
-if (!session?.user) {
-    toast("Session expired. Please log in again.");
-    return;
-}
+    try {
+        const { error } = await supabaseClient
+            .from('deposits')
+            .insert({
+                user_id: session.user.id,
+                invoice_id: invoiceId,
+                account_name: name,
+                phone_number: phone,
+                amount_usd: amountUSD,
+                amount_kes: parseFloat(amountKES),
+                status: 'pending'
+            });
 
-try {
-    // Record explicit logging parameters right to Cloud Ledgers
-    const { error } = await supabaseClient
-        .from('deposits')
-        .insert({
-            user_id: session.user.id,
-            invoice_id: invoiceId,
-            account_name: name,
-            phone_number: phone,
-            amount_usd: amountUSD,
-            amount_kes: parseFloat(amountKES),
-            status: 'pending'
-        });
+        if (error) throw error;
 
-    if (error) throw error;
+        const lipwaURL =
+        `https://lipwa.link/8367` +
+        `?amount=${amountKES}` +
+        `&phone=${encodeURIComponent(phone)}` +
+        `&name=${encodeURIComponent(name)}` +
+        `&reference=${encodeURIComponent(invoiceId)}`;
 
-    const lipwaURL =
-    `https://lipwa.link/8367` +
-    `?amount=${amountKES}` +
-    `&phone=${encodeURIComponent(phone)}` +
-    `&name=${encodeURIComponent(name)}` +
-    `&reference=${encodeURIComponent(invoiceId)}`;
+        window.open(lipwaURL,"_blank");
 
-    window.open(lipwaURL,"_blank");
+        // CRITICAL FIX: DO NOT CLOSE MODAL! Show step 3 Loading Spinner
+        document.getElementById("step2").style.display = "none";
+        document.getElementById("step3").style.display = "block";
+        
+        toast("Awaiting payment verification...");
 
-    closeModal();
-    toast("Invoice tracked! Awaiting confirmation...");
-
-} catch(err) {
-    console.error(err);
-    toast("Database sync failed. Try again.");
-}
+    } catch(err) {
+        console.error(err);
+        toast("Database sync failed. Try again.");
+    }
 }
 
 function clearLedger(){
-
-document.getElementById("ledger-list")
-.innerHTML = `
-<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">
-No executions recorded yet.
-</div>
-`;
-
-totalPnL = 0;
-updatePnL();
-toast("Ledger cleared");
+    document.getElementById("ledger-list").innerHTML = `
+    <div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No executions recorded yet.</div>`;
+    totalPnL = 0;
+    updatePnL();
+    toast("Ledger cleared");
 }
 
 function updatePnL(){
-
-const pnl =
-document.getElementById("pnl");
-
-pnl.innerText =
-`P&L: $${totalPnL.toFixed(2)}`;
-
-pnl.style.color =
-totalPnL >= 0
-? "var(--success)"
-: "var(--danger)";
+    const pnl = document.getElementById("pnl");
+    pnl.innerText = `P&L: $${totalPnL.toFixed(2)}`;
+    pnl.style.color = totalPnL >= 0 ? "var(--success)" : "var(--danger)";
 }
 
 function toggleBot(){
-
-const btn =
-document.getElementById("engine-btn");
-
-if(isRunning){
-    isRunning = false;
-    clearTimeout(scanLoop);
-    btn.classList.remove("active");
-    btn.innerText = "Execute AI Automation";
-    document.getElementById("sig-main").innerText = "--";
-    document.getElementById("sig-status").innerText = "Scanner paused";
-    return;
-}
-
-const stake =
-parseFloat(
-document.getElementById("inp-stake")
-.value
-);
-
-if(isNaN(stake) || stake <= 0){
-toast("Invalid stake");
-return;
-}
-
-activeStake = stake;
-sessionPnL = 0;
-isRunning = true;
-btn.classList.add("active");
-btn.innerText = "Halt System Process";
-
-runCycle();
+    const btn = document.getElementById("engine-btn");
+    if(isRunning){
+        isRunning = false;
+        clearTimeout(scanLoop);
+        btn.classList.remove("active");
+        btn.innerText = "Execute AI Automation";
+        document.getElementById("sig-main").innerText = "--";
+        document.getElementById("sig-status").innerText = "Scanner paused";
+        return;
+    }
+    const stake = parseFloat(document.getElementById("inp-stake").value);
+    if(isNaN(stake) || stake <= 0){ toast("Invalid stake"); return; }
+    activeStake = stake;
+    sessionPnL = 0;
+    isRunning = true;
+    btn.classList.add("active");
+    btn.innerText = "Halt System Process";
+    runCycle();
 }
 
 async function runCycle(){
+    if(!isRunning) return;
+    const balance = isReal ? realBalance : demoBalance;
+    const tp = parseFloat(document.getElementById("inp-tp").value) || 0;
+    const sl = parseFloat(document.getElementById("inp-sl").value) || 0;
+    const multi = parseFloat(document.getElementById("inp-multi").value) || 1;
+    const baseStake = parseFloat(document.getElementById("inp-stake").value);
 
-if(!isRunning) return;
+    if(sl > 0 && sessionPnL <= -sl){ toast("Stop loss reached"); toggleBot(); return; }
+    if(tp > 0 && sessionPnL >= tp){ toggleBot(); congrats("TP Achieved!", `You earned $${sessionPnL.toFixed(2)}`); return; }
+    if(activeStake > balance){ toast("Insufficient balance"); toggleBot(); return; }
 
-const balance =
-isReal ? realBalance : demoBalance;
+    const market = document.getElementById("inp-market").value;
+    const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
+    const asset = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)];
+    const isWin = Math.random() < 0.90;
 
-const tp =
-parseFloat(
-document.getElementById("inp-tp")
-.value
-) || 0;
+    let signal = ""; let sub = ""; let profit = 0;
 
-const sl =
-parseFloat(
-document.getElementById("inp-sl")
-.value
-) || 0;
+    if(market==="Matches/Differs"){
+        const match = Math.random() > 0.5;
+        const digit = Math.floor(Math.random()*10);
+        if(match){
+            signal = `MATCH DIGIT: ${digit}`; profit = isWin ? activeStake * 8.09 : -activeStake; sub = "Deriv Multiplier: 8.09x";
+        }else{
+            signal = `DIFFER DIGIT: ${digit}`; profit = isWin ? activeStake * 0.099 : -activeStake; sub = "Deriv Multiplier: 0.099x";
+        }
+    }else if(market==="Even/Odd"){
+        signal = Math.random() > 0.5 ? "PREDICT: EVEN" : "PREDICT: ODD"; profit = isWin ? activeStake * 0.95 : -activeStake; sub = "Deriv Multiplier: 0.95x";
+    }else{
+        const over = Math.random() > 0.5;
+        if(over){
+            signal = `OVER ${targetDigit}`;
+            const multipliers = {0:0.09, 1:0.23, 2:0.41, 3:0.65, 4:0.98, 5:1.54, 6:2.80, 7:6.60, 8:14.50, 9:0};
+            const mult = multipliers[targetDigit];
+            profit = isWin ? activeStake * mult : -activeStake; sub = `Deriv Multiplier: ${mult.toFixed(2)}x`;
+        }else{
+            signal = `UNDER ${targetDigit}`;
+            const multipliers = {0:0, 1:14.50, 2:6.60, 3:2.80, 4:1.54, 5:0.98, 6:0.65, 7:0.41, 8:0.23, 9:0.09};
+            const mult = multipliers[targetDigit];
+            profit = isWin ? activeStake * mult : -activeStake; sub = `Deriv Multiplier: ${mult.toFixed(2)}x`;
+        }
+    }
 
-const multi =
-parseFloat(
-document.getElementById("inp-multi")
-.value
-) || 1;
+    document.getElementById("sig-asset").innerText = `SCANNING: ${asset}`;
+    document.getElementById("sig-main").innerText = signal;
+    document.getElementById("sig-status").innerText = sub;
 
-const baseStake =
-parseFloat(
-document.getElementById("inp-stake")
-.value
-);
-
-if(sl > 0 && sessionPnL <= -sl){
-    toast("Stop loss reached");
-    toggleBot();
-    return;
-}
-
-if(tp > 0 && sessionPnL >= tp){
-    toggleBot();
-    congrats(
-        "TP Achieved!",
-        `You earned $${sessionPnL.toFixed(2)}`
-    );
-    return;
-}
-
-if(activeStake > balance){
-    toast("Insufficient balance");
-    toggleBot();
-    return;
-}
-
-const market =
-document.getElementById("inp-market")
-.value;
-
-const targetDigit =
-parseInt(
-document.getElementById("inp-digit")
-.value
-) || 0;
-
-const asset =
-volatilityIndices[
-Math.floor(
-Math.random() *
-volatilityIndices.length
-)
-];
-
-const isWin = Math.random() < 0.90;
-
-let signal = "";
-let sub = "";
-let profit = 0;
-
-if(market==="Matches/Differs"){
-
-const match =
-Math.random() > 0.5;
-
-const digit =
-Math.floor(Math.random()*10);
-
-if(match){
-    signal = `MATCH DIGIT: ${digit}`;
-    profit = isWin ? activeStake * 8.09 : -activeStake;
-    sub = "Deriv Multiplier: 8.09x";
-}else{
-    signal = `DIFFER DIGIT: ${digit}`;
-    profit = isWin ? activeStake * 0.099 : -activeStake;
-    sub = "Deriv Multiplier: 0.099x";
-}
-
-}else if(market==="Even/Odd"){
-
-signal =
-Math.random() > 0.5
-? "PREDICT: EVEN"
-: "PREDICT: ODD";
-
-profit =
-isWin
-? activeStake * 0.95
-: -activeStake;
-
-sub =
-"Deriv Multiplier: 0.95x";
-
-}else{
-
-const over =
-Math.random() > 0.5;
-
-if(over){
-    signal = `OVER ${targetDigit}`;
-    const multipliers = {0:0.09, 1:0.23, 2:0.41, 3:0.65, 4:0.98, 5:1.54, 6:2.80, 7:6.60, 8:14.50, 9:0};
-    const mult = multipliers[targetDigit];
-    profit = isWin ? activeStake * mult : -activeStake;
-    sub = `Deriv Multiplier: ${mult.toFixed(2)}x`;
-}else{
-    signal = `UNDER ${targetDigit}`;
-    const multipliers = {0:0, 1:14.50, 2:6.60, 3:2.80, 4:1.54, 5:0.98, 6:0.65, 7:0.41, 8:0.23, 9:0.09};
-    const mult = multipliers[targetDigit];
-    profit = isWin ? activeStake * mult : -activeStake;
-    sub = `Deriv Multiplier: ${mult.toFixed(2)}x`;
-}
-}
-
-document.getElementById("sig-asset")
-.innerText =
-`SCANNING: ${asset}`;
-
-document.getElementById("sig-main")
-.innerText = signal;
-
-document.getElementById("sig-status")
-.innerText = sub;
-
-scanLoop = setTimeout(async ()=>{
-
-if(!isRunning) return;
-
-if(isReal){
-realBalance += profit;
-}else{
-demoBalance += profit;
-}
-
-totalPnL += profit;
-sessionPnL += profit;
-
-updateBalance();
-updatePnL();
-await saveSupabaseBalance();
-
-logTrade(
-asset,
-market,
-signal,
-profit,
-activeStake
-);
-
-if(profit < 0){
-activeStake =
-activeStake * multi;
-}else{
-activeStake =
-baseStake;
-}
-
-runCycle();
-
-},2500);
+    scanLoop = setTimeout(async ()=>{
+        if(!isRunning) return;
+        if(isReal) realBalance += profit; else demoBalance += profit;
+        totalPnL += profit; sessionPnL += profit;
+        updateBalance();
+        updatePnL();
+        await saveSupabaseBalance();
+        logTrade(asset, market, signal, profit, activeStake);
+        if(profit < 0) activeStake = activeStake * multi; else activeStake = baseStake;
+        runCycle();
+    },2500);
 }
 
 function logTrade(asset,market,signal,profit,stake){
-
-const list =
-document.getElementById("ledger-list");
-
-if(list.innerText.includes("No executions")){
-list.innerHTML = "";
-}
-
-const row =
-document.createElement("div");
-
-row.className = "ledger-row";
-
-row.innerHTML = `
-<div>
-<div style="font-weight:800;margin-bottom:4px;">
-${asset}
-<span style="font-size:.7rem;color:var(--muted);">
-(Stake: $${stake.toFixed(2)})
-</span>
-</div>
-
-<div style="font-size:.75rem;color:var(--muted);">
-${market} | ${signal}
-</div>
-</div>
-
-<div style="font-weight:900;color:${profit>=0?'var(--success)':'var(--danger)'};">
-${profit>=0?'+':''}$${profit.toFixed(2)}
-</div>
-`;
-
-list.prepend(row);
+    const list = document.getElementById("ledger-list");
+    if(list.innerText.includes("No executions")) list.innerHTML = "";
+    const row = document.createElement("div");
+    row.className = "ledger-row";
+    row.innerHTML = `
+    <div>
+    <div style="font-weight:800;margin-bottom:4px;">${asset} <span style="font-size:.7rem;color:var(--muted);">(Stake: $${stake.toFixed(2)})</span></div>
+    <div style="font-size:.75rem;color:var(--muted);">${market} | ${signal}</div>
+    </div>
+    <div style="font-weight:900;color:${profit>=0?'var(--success)':'var(--danger)'};">${profit>=0?'+':''}$${profit.toFixed(2)}</div>`;
+    list.prepend(row);
 }
 </script>
-
 </body>
 </html>

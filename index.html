@@ -222,6 +222,9 @@ button {
 
 .toast-container { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 380px;}
 .toast { background: #111; color: white; padding: 14px 18px; border-radius: 14px; margin-bottom: 10px; font-size: 0.84rem; font-weight: 600; text-align: center; box-shadow: var(--shadow-lg); }
+
+.trust-badge-container { display:block; text-align: center; margin-top: 20px; }
+.trust-badge-container img { max-width: 100%; height: auto; }
 </style>
 </head>
 <body>
@@ -277,7 +280,7 @@ button {
     <div class="view active" id="view-home">
         <div class="equity-card">
             <div class="equity-label">Total Equity Balance</div>
-            <div class="equity-amount" id="display-balance">$50.00</div>
+            <div class="equity-amount" id="display-balance">$0.00</div>
             <div class="progress-container"><div class="progress-bar" id="goal-progress"></div></div>
             <div class="target-text">Goal Progress: <span id="target-display">$50,000 Target</span></div>
         </div>
@@ -370,16 +373,23 @@ button {
                 <input type="tel" class="modal-input" id="pay-phone" placeholder="e.g. 0712345678">
             </div>
             <div class="modal-input-group">
-                <label>Amount (USD)</label>
-                <input type="number" class="modal-input" id="pay-amount" placeholder="Enter amount">
+                <label>Amount (USD) - Min $2</label>
+                <input type="number" class="modal-input" id="pay-amount" placeholder="e.g. 2.00">
             </div>
             <button class="modal-btn" onclick="proceedToInvoice()">Continue</button>
+
+            <span class="trust-badge-container">
+                <a href="https://intasend.com/security" target="_blank">
+                    <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" width="280px" alt="IntaSend Secure Payments (PCI-DSS Compliant)">
+                </a>
+                <strong><a style="display: block; color: #454545; text-decoration: none; font-size: 0.8em; margin-top: 0.6em;" href="https://intasend.com/security" target="_blank">Secured by IntaSend Payments</a></strong>
+            </span>
         </div>
 
         <div id="modal-step-invoice" style="display:none;">
             <div class="invoice-container">
                 <div class="invoice-row">
-                    <span class="invoice-label">Invoice ID</span>
+                    <span class="invoice-label">Auto-Generated ID</span>
                     <span class="invoice-val" id="inv-id">--</span>
                 </div>
                 <div class="invoice-row">
@@ -391,11 +401,12 @@ button {
                     <span class="invoice-val" id="inv-phone">--</span>
                 </div>
                 <div class="invoice-row">
-                    <span class="invoice-label">Total Payable</span>
-                    <span class="invoice-val" style="color:var(--success-green);">$<span id="inv-amount">0.00</span></span>
+                    <span class="invoice-label">Total Payable (KES)</span>
+                    <span class="invoice-val" style="color:var(--success-green);">KSh <span id="inv-amount-kes">0.00</span></span>
                 </div>
             </div>
-            <button class="modal-btn" onclick="executeExternalPayment()">Pay Securely</button>
+            <button class="modal-btn" onclick="executeExternalPayment()">Pay Securely via M-PESA</button>
+            <button class="btn-logout" style="margin-top: 8px; border:none; color: var(--text-muted);" onclick="closeModal()">Cancel</button>
         </div>
 
     </div>
@@ -414,8 +425,8 @@ const SUPABASE_URL = "https://hsovbnxatorocibfgrhc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let authMode = 'signin';
-let realBalance = 50.00;
+// Adjust starting balances as requested
+let realBalance = 0.00;
 let demoBalance = 10000.00;
 let isRealAccount = true;
 let totalPnL = 0;
@@ -423,11 +434,14 @@ let isEngineRunning = false;
 let scanInterval;
 let paymentFlowType = '';
 let currentTargetIndex = '';
+
+// KES Conversion Rate (Adjust as needed or fetch via an API)
+const USD_TO_KES_RATE = 132; 
 const targetBalance = 50000;
 
 const volatilityIndices = ['Volatility 10 (1s)', 'Volatility 25 (1s)', 'Volatility 50 (1s)', 'Volatility 75 (1s)', 'Volatility 100 (1s)'];
 
-// Exact Deriv Over/Under Multipliers based on target digit (approximate logic matching platform edge)
+// Exact Deriv Over/Under Multipliers based on target digit
 const overMultipliers = { 0: 0.09, 1: 0.23, 2: 0.41, 3: 0.65, 4: 0.98, 5: 1.54, 6: 2.80, 7: 6.60, 8: 14.50, 9: 0 }; 
 const underMultipliers = { 0: 0, 1: 14.50, 2: 6.60, 3: 2.80, 4: 1.54, 5: 0.98, 6: 0.65, 7: 0.41, 8: 0.23, 9: 0.09 };
 
@@ -539,32 +553,39 @@ function closeModal() {
 function proceedToInvoice() {
     const name = document.getElementById('pay-name').value.trim();
     const phone = document.getElementById('pay-phone').value.trim();
-    const amount = parseFloat(document.getElementById('pay-amount').value);
+    const amountUSD = parseFloat(document.getElementById('pay-amount').value);
 
-    if(!name || !phone || isNaN(amount) || amount <= 0) {
+    if(!name || !phone || isNaN(amountUSD) || amountUSD <= 0) {
         showToast('Please provide valid details');
+        return;
+    }
+
+    if(paymentFlowType === 'deposit' && amountUSD < 2) {
+        showToast('Minimum deposit is $2');
         return;
     }
 
     let currentBalance = isRealAccount ? realBalance : demoBalance;
 
     if(paymentFlowType === 'withdraw') {
-        if(amount > currentBalance) {
+        if(amountUSD > currentBalance) {
             showToast('Insufficient balance for withdrawal');
             return;
         }
-        // Process withdrawal immediately without external link
-        if(isRealAccount) realBalance -= amount; else demoBalance -= amount;
+        // Process withdrawal immediately for demo purposes
+        if(isRealAccount) realBalance -= amountUSD; else demoBalance -= amountUSD;
         updateBalanceUI();
         closeModal();
-        showToast(`Withdrawal of $${amount} initiated`);
+        showToast(`Withdrawal of $${amountUSD} initiated`);
     } else {
-        // Setup Invoice for Deposit
+        // Setup Invoice for Deposit - Generate Auto ID & Convert to KES
         const invoiceId = 'INV-' + Math.floor(100000 + Math.random() * 900000);
+        const amountKES = Math.floor(amountUSD * USD_TO_KES_RATE);
+
         document.getElementById('inv-id').innerText = invoiceId;
         document.getElementById('inv-name').innerText = name.toUpperCase();
         document.getElementById('inv-phone').innerText = phone;
-        document.getElementById('inv-amount').innerText = amount.toFixed(2);
+        document.getElementById('inv-amount-kes').innerText = amountKES.toLocaleString();
         
         document.getElementById('modal-step-entry').style.display = 'none';
         document.getElementById('modal-step-invoice').style.display = 'block';
@@ -572,13 +593,17 @@ function proceedToInvoice() {
 }
 
 function executeExternalPayment() {
-    // In a real app, this confirms intent before redirect. We simulate the balance add for UX here.
-    const amount = parseFloat(document.getElementById('inv-amount').innerText);
-    if(isRealAccount) realBalance += amount; else demoBalance += amount;
-    updateBalanceUI();
+    const amountKES = document.getElementById('inv-amount-kes').innerText.replace(/,/g, '');
+    const name = encodeURIComponent(document.getElementById('inv-name').innerText);
+    const phone = encodeURIComponent(document.getElementById('inv-phone').innerText);
+    const invoiceId = encodeURIComponent(document.getElementById('inv-id').innerText);
+
+    // Passing parameters via URL query string to attempt auto-fill and lock on the frontend layer.
+    const lipwaURL = `https://lipwa.link/8367?amount=${amountKES}&phone=${phone}&name=${name}&ref=${invoiceId}&readonly=1&locked=true`;
+    
+    // Open the secure Lipwa payment page
+    window.open(lipwaURL, "_blank");
     closeModal();
-    // Redirect to requested Lipwa link
-    window.open("https://lipwa.link/8367", "_blank");
 }
 
 /* Trading Engine Core */
@@ -615,7 +640,6 @@ function runScannerCycle() {
 
     currentTargetIndex = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)];
     
-    // Win Rate updated to 95%
     const isWin = Math.random() < 0.95;
 
     let signalText = '';
@@ -623,7 +647,7 @@ function runScannerCycle() {
     let profit = 0;
 
     if(market === 'Matches/Differs') {
-        const isMatch = Math.random() > 0.5; // Simulate AI choosing Match or Differ
+        const isMatch = Math.random() > 0.5;
         const digit = Math.floor(Math.random() * 10);
         
         if (isMatch) {

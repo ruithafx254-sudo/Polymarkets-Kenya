@@ -567,6 +567,8 @@ button{
     border-radius:28px;
     padding:24px;
     animation:up .3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 @keyframes up{
@@ -613,6 +615,7 @@ button{
     background:#f8fafc;
     outline:none;
     font-weight:700;
+    font-size: .95rem;
 }
 
 .modal-btn{
@@ -867,11 +870,45 @@ New here? <span onclick="switchAuth('signup')">Create account</span>
 </div>
 
 <div id="step1">
-<div class="modal-group"><label>M-Pesa Registered Name</label><input type="text" class="modal-input" id="pay-name" placeholder="e.g., JOHN DOE"></div>
-<div class="modal-group"><label>M-Pesa Number</label><input type="tel" class="modal-input" id="pay-phone" placeholder="e.g., 0712345678"></div>
-<div class="modal-group"><label>Amount (USD)</label><input type="number" class="modal-input" id="pay-amount" placeholder="e.g., 10"></div>
-<button class="modal-btn" onclick="proceedInvoice()">Continue</button>
-<div class="badge"><img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png"></div>
+    
+    <!-- Dynamic Method Selector for Withdrawals -->
+    <div id="withdraw-method-group" class="modal-group" style="display:none;">
+        <label>Withdrawal Method</label>
+        <select class="modal-input" id="withdraw-method" onchange="switchWithdrawMethod()">
+            <option value="mpesa">M-Pesa</option>
+            <option value="usdt">USDT (Crypto)</option>
+            <option value="binance">Binance Pay</option>
+        </select>
+    </div>
+
+    <!-- M-Pesa Input Fields (Default) -->
+    <div id="form-mpesa">
+        <div class="modal-group"><label>M-Pesa Registered Name</label><input type="text" class="modal-input" id="pay-name" placeholder="e.g., JOHN DOE"></div>
+        <div class="modal-group"><label>M-Pesa Number</label><input type="tel" class="modal-input" id="pay-phone" placeholder="e.g., 0712345678"></div>
+    </div>
+
+    <!-- USDT Input Fields -->
+    <div id="form-usdt" style="display:none;">
+        <div class="modal-group"><label>USDT Network</label>
+            <select class="modal-input" id="usdt-network">
+                <option value="trc20">Tron (TRC20)</option>
+                <option value="bep20">BNB Smart Chain (BEP20)</option>
+                <option value="erc20">Ethereum (ERC20)</option>
+            </select>
+        </div>
+        <div class="modal-group"><label>USDT Wallet Address</label><input type="text" class="modal-input" id="usdt-address" placeholder="Paste your address here"></div>
+    </div>
+
+    <!-- Binance Pay Input Fields -->
+    <div id="form-binance" style="display:none;">
+        <div class="modal-group"><label>Binance Pay ID / Email</label><input type="text" class="modal-input" id="binance-id" placeholder="e.g., 123456789 or email"></div>
+    </div>
+
+    <!-- Universal Amount Field -->
+    <div class="modal-group"><label>Amount (USD)</label><input type="number" class="modal-input" id="pay-amount" placeholder="e.g., 10"></div>
+    
+    <button class="modal-btn" onclick="proceedInvoice()">Continue</button>
+    <div class="badge" id="trust-badge"><img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png"></div>
 </div>
 
 <div id="step2" style="display:none;">
@@ -1120,16 +1157,43 @@ function toggleDigitBox(){
     document.getElementById("digit-box").style.display = market==="Over/Under" ? "block" : "none";
 }
 
+function switchWithdrawMethod() {
+    const method = document.getElementById("withdraw-method").value;
+    document.getElementById("form-mpesa").style.display = method === "mpesa" ? "block" : "none";
+    document.getElementById("form-usdt").style.display = method === "usdt" ? "block" : "none";
+    document.getElementById("form-binance").style.display = method === "binance" ? "block" : "none";
+}
+
 function openPayment(type){
     if(type==="withdraw" && !isReal){ toast("Withdrawals disabled on demo"); return; }
     paymentType = type;
     document.getElementById("payment-title").innerText = type==="deposit" ? "Secure Deposit" : "Instant Withdrawal";
+    
+    // Manage dynamic fields based on deposit vs withdraw
+    if(type === "withdraw") {
+        document.getElementById("withdraw-method-group").style.display = "block";
+        document.getElementById("trust-badge").style.display = "none";
+        document.getElementById("withdraw-method").value = "mpesa";
+        switchWithdrawMethod(); // Trigger to reset views properly
+    } else {
+        document.getElementById("withdraw-method-group").style.display = "none";
+        document.getElementById("trust-badge").style.display = "block";
+        document.getElementById("form-mpesa").style.display = "block";
+        document.getElementById("form-usdt").style.display = "none";
+        document.getElementById("form-binance").style.display = "none";
+    }
+
     document.getElementById("step1").style.display = "block";
     document.getElementById("step2").style.display = "none";
     document.getElementById("step3").style.display = "none";
+    
+    // Reset all inputs
     document.getElementById("pay-name").value = "";
     document.getElementById("pay-phone").value = "";
     document.getElementById("pay-amount").value = "";
+    document.getElementById("usdt-address").value = "";
+    document.getElementById("binance-id").value = "";
+    
     document.getElementById("payment-modal").classList.add("show");
 }
 
@@ -1148,21 +1212,45 @@ function congrats(title,msg){
 }
 
 async function proceedInvoice(){
-    const name = document.getElementById("pay-name").value.trim();
-    const phone = document.getElementById("pay-phone").value.trim();
     const amount = parseFloat(document.getElementById("pay-amount").value);
 
-    if(!name || !phone || isNaN(amount) || amount <= 0){ toast("Fill valid details"); return; }
+    if(isNaN(amount) || amount <= 0){ toast("Enter valid amount"); return; }
 
     if(paymentType==="withdraw"){
         if(amount > realBalance){ toast("Insufficient balance"); return; }
+
+        const method = document.getElementById("withdraw-method").value;
+        let destination = "";
+
+        // Validate Based on Selected Method
+        if (method === "mpesa") {
+            const name = document.getElementById("pay-name").value.trim();
+            const phone = document.getElementById("pay-phone").value.trim();
+            if(!name || !phone) { toast("Fill valid M-Pesa details"); return; }
+            destination = phone;
+        } else if (method === "usdt") {
+            const address = document.getElementById("usdt-address").value.trim();
+            const network = document.getElementById("usdt-network").options[document.getElementById("usdt-network").selectedIndex].text;
+            if(!address) { toast("Provide USDT address"); return; }
+            destination = `${network} Wallet (${address.substring(0,6)}...)`;
+        } else if (method === "binance") {
+            const payId = document.getElementById("binance-id").value.trim();
+            if(!payId) { toast("Provide Binance Pay ID"); return; }
+            destination = `Binance ID: ${payId}`;
+        }
+
         realBalance -= amount;
         updateBalance();
         await saveSupabaseBalance();
         closeModal();
-        congrats("Withdrawal Successful!", `$${amount.toFixed(2)} sent to ${phone}`);
+        congrats("Withdrawal Successful!", `$${amount.toFixed(2)} sent to ${destination}`);
         return;
     }
+
+    // Default Deposit flow (M-Pesa Only)
+    const name = document.getElementById("pay-name").value.trim();
+    const phone = document.getElementById("pay-phone").value.trim();
+    if(!name || !phone){ toast("Fill valid details"); return; }
 
     const invoice = "INV-" + Math.floor(100000 + Math.random()*900000);
     const kes = Math.floor(amount * USD_TO_KES);

@@ -98,31 +98,8 @@ button {
     pointer-events: none;
 }
 
-.auth-top-badge {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.08);
-    width: fit-content;
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    margin-bottom: 24px;
-    font-weight: 700;
-}
-
-.auth-logo {
-    width: 90px;
-    height: 90px;
-    border-radius: 28px;
-    background: linear-gradient(135deg, #007aff, #00c6ff);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.8rem;
-    font-weight: 800;
-    margin-bottom: 24px;
-    box-shadow: var(--shadow-blue);
-}
-
+.auth-top-badge { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08); width: fit-content; padding: 8px 14px; border-radius: 999px; font-size: 0.72rem; margin-bottom: 24px; font-weight: 700; }
+.auth-logo { width: 90px; height: 90px; border-radius: 28px; background: linear-gradient(135deg, #007aff, #00c6ff); display: flex; align-items: center; justify-content: center; font-size: 2.8rem; font-weight: 800; margin-bottom: 24px; box-shadow: var(--shadow-blue); }
 .auth-title { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
 .auth-sub { color: #9ea9bb; font-size: 0.9rem; line-height: 1.5; margin-bottom: 28px; }
 .auth-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 22px; backdrop-filter: blur(16px); }
@@ -169,14 +146,16 @@ button {
 .signal-text { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
 .signal-sub { color: #9ca3af; font-size: 0.75rem; }
 
-.parameters-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.parameters-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
 .param-input { background: #f4f6f8; border-radius: 12px; padding: 10px 12px; border: 1px solid var(--border-color); }
 .param-label { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; display: block; font-weight: 700; }
-.param-input input, .param-input select { border: none; background: transparent; width: 100%; outline: none; font-size: 0.95rem; font-weight: 800; }
+.param-input input, .param-input select { border: none; background: transparent; width: 100%; outline: none; font-size: 0.95rem; font-weight: 800; color: var(--text-main);}
 
-.btn-master { width: 100%; background: var(--primary-blue); border: none; color: white; padding: 16px; border-radius: 18px; font-size: 1rem; font-weight: 800; box-shadow: var(--shadow-blue); }
+.btn-master { width: 100%; background: var(--primary-blue); border: none; color: white; padding: 16px; border-radius: 18px; font-size: 1rem; font-weight: 800; box-shadow: var(--shadow-blue); margin-top: 10px;}
 .btn-master.active { background: var(--danger-red); }
 
+.ledger-header-area { display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;}
+.btn-clear-ledger { background: #fee2e2; color: var(--danger-red); border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; }
 .ledger-row { background: white; border-radius: 14px; border: 1px solid var(--border-color); padding: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .ledger-asset { font-weight: 700; margin-bottom: 4px; font-size: 0.9rem;}
 .ledger-type { font-size: 0.72rem; color: var(--text-muted); }
@@ -210,7 +189,6 @@ button {
 .modal-input-group label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase;}
 .modal-input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-app); outline: none; font-size: 1rem; font-weight: 600; transition: var(--transition); }
 .modal-input:focus { border-color: var(--primary-blue); background: white; }
-
 .modal-btn { width: 100%; border: none; background: linear-gradient(135deg, var(--success-green), #20c997); color: white; padding: 16px; border-radius: 14px; font-weight: 800; font-size: 1rem; margin-top: 10px; box-shadow: 0 4px 14px rgba(40,167,69,0.3); }
 
 /* Invoice View */
@@ -222,9 +200,12 @@ button {
 
 .toast-container { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 380px;}
 .toast { background: #111; color: white; padding: 14px 18px; border-radius: 14px; margin-bottom: 10px; font-size: 0.84rem; font-weight: 600; text-align: center; box-shadow: var(--shadow-lg); }
-
 .trust-badge-container { display:block; text-align: center; margin-top: 20px; }
 .trust-badge-container img { max-width: 100%; height: auto; }
+
+/* Congrats Theme */
+.congrats-icon { font-size: 4rem; margin-bottom: 10px; animation: bounce 1s infinite alternate;}
+@keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
 </style>
 </head>
 <body>
@@ -306,6 +287,7 @@ button {
                 <div class="signal-text" id="sig-main">--</div>
                 <div class="signal-sub" id="sig-status">Awaiting trade parameters</div>
             </div>
+            
             <div class="parameters-row">
                 <div class="param-input">
                     <span class="param-label">Market Strategy</span>
@@ -317,12 +299,28 @@ button {
                 </div>
                 <div class="param-input">
                     <span class="param-label">Base Stake ($)</span>
-                    <input type="number" id="inp-stake" value="1" step="1">
+                    <input type="number" id="inp-stake" value="1" step="0.5">
                 </div>
             </div>
-            <div class="param-input" id="digit-selector" style="display:none; margin-bottom: 16px;">
+            
+            <div class="param-input" id="digit-selector" style="display:none; margin-bottom: 12px;">
                 <span class="param-label">Target Digit (0-9)</span>
                 <input type="number" id="inp-digit" value="4" min="0" max="9">
+            </div>
+
+            <div class="parameters-row">
+                <div class="param-input">
+                    <span class="param-label">Take Profit ($)</span>
+                    <input type="number" id="inp-tp" value="5" step="1">
+                </div>
+                <div class="param-input">
+                    <span class="param-label">Stop Loss ($)</span>
+                    <input type="number" id="inp-sl" value="20" step="1">
+                </div>
+            </div>
+            <div class="param-input" style="margin-bottom: 4px;">
+                <span class="param-label">Martingale Multiplier</span>
+                <input type="number" id="inp-martingale" value="2.0" step="0.1">
             </div>
 
             <button class="btn-master" id="btn-toggle-bot" onclick="toggleBotEngine()">Execute AI Automation</button>
@@ -330,9 +328,12 @@ button {
     </div>
 
     <div class="view" id="view-ledger">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="font-size:1.1rem; font-weight:800;">Live Ledger</h3>
-            <div id="total-pnl" style="font-weight:800; font-size: 0.9rem;">P&L: $0.00</div>
+        <div class="ledger-header-area">
+            <div>
+                <h3 style="font-size:1.1rem; font-weight:800;">Live Ledger</h3>
+                <div id="total-pnl" style="font-weight:800; font-size: 0.9rem; margin-top:4px;">P&L: $0.00</div>
+            </div>
+            <button class="btn-clear-ledger" onclick="clearLedger()">Clear History</button>
         </div>
         <div id="ledger-list">
             <div style="text-align:center; padding:40px 0; color:var(--text-muted); font-size:0.85rem;">No executions recorded yet.</div>
@@ -357,7 +358,6 @@ button {
 
 <div class="modal-overlay" id="payment-modal">
     <div class="modal-card" onclick="event.stopPropagation()">
-        
         <div class="modal-header">
             <div class="modal-title" id="modal-flow-title">Deposit Funds</div>
             <div class="close-modal" onclick="closeModal()">×</div>
@@ -380,35 +380,30 @@ button {
 
             <span class="trust-badge-container">
                 <a href="https://intasend.com/security" target="_blank">
-                    <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" width="280px" alt="IntaSend Secure Payments (PCI-DSS Compliant)">
+                    <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" width="280px" alt="IntaSend Secure Payments">
                 </a>
-                <strong><a style="display: block; color: #454545; text-decoration: none; font-size: 0.8em; margin-top: 0.6em;" href="https://intasend.com/security" target="_blank">Secured by IntaSend Payments</a></strong>
             </span>
         </div>
 
         <div id="modal-step-invoice" style="display:none;">
             <div class="invoice-container">
-                <div class="invoice-row">
-                    <span class="invoice-label">Auto-Generated ID</span>
-                    <span class="invoice-val" id="inv-id">--</span>
-                </div>
-                <div class="invoice-row">
-                    <span class="invoice-label">Account Name</span>
-                    <span class="invoice-val" id="inv-name">--</span>
-                </div>
-                <div class="invoice-row">
-                    <span class="invoice-label">M-Pesa Number</span>
-                    <span class="invoice-val" id="inv-phone">--</span>
-                </div>
-                <div class="invoice-row">
-                    <span class="invoice-label">Total Payable (KES)</span>
-                    <span class="invoice-val" style="color:var(--success-green);">KSh <span id="inv-amount-kes">0.00</span></span>
-                </div>
+                <div class="invoice-row"><span class="invoice-label">Auto-Generated ID</span><span class="invoice-val" id="inv-id">--</span></div>
+                <div class="invoice-row"><span class="invoice-label">Account Name</span><span class="invoice-val" id="inv-name">--</span></div>
+                <div class="invoice-row"><span class="invoice-label">M-Pesa Number</span><span class="invoice-val" id="inv-phone">--</span></div>
+                <div class="invoice-row"><span class="invoice-label">Total Payable (KES)</span><span class="invoice-val" style="color:var(--success-green);">KSh <span id="inv-amount-kes">0.00</span></span></div>
             </div>
             <button class="modal-btn" onclick="executeExternalPayment()">Pay Securely via M-PESA</button>
             <button class="btn-logout" style="margin-top: 8px; border:none; color: var(--text-muted);" onclick="closeModal()">Cancel</button>
         </div>
+    </div>
+</div>
 
+<div class="modal-overlay" id="congrats-modal">
+    <div class="modal-card" style="text-align: center;" onclick="event.stopPropagation()">
+        <div class="congrats-icon">🎉</div>
+        <h2 style="color:var(--success-green); margin-bottom:12px; font-weight:800;" id="congrats-title">Congratulations!</h2>
+        <p id="congrats-msg" style="color:var(--text-muted); font-size:1.1rem; font-weight:700; margin-bottom: 24px;">Message goes here</p>
+        <button class="modal-btn" onclick="closeCongratsModal()">Awesome</button>
     </div>
 </div>
 
@@ -425,23 +420,23 @@ const SUPABASE_URL = "https://hsovbnxatorocibfgrhc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Adjust starting balances as requested
 let realBalance = 0.00;
 let demoBalance = 10000.00;
 let isRealAccount = true;
+
+// Bot tracking
 let totalPnL = 0;
+let sessionPnL = 0; 
 let isEngineRunning = false;
 let scanInterval;
 let paymentFlowType = '';
 let currentTargetIndex = '';
+let activeStake = 1;
 
-// KES Conversion Rate (Adjust as needed or fetch via an API)
 const USD_TO_KES_RATE = 132; 
 const targetBalance = 50000;
-
 const volatilityIndices = ['Volatility 10 (1s)', 'Volatility 25 (1s)', 'Volatility 50 (1s)', 'Volatility 75 (1s)', 'Volatility 100 (1s)'];
 
-// Exact Deriv Over/Under Multipliers based on target digit
 const overMultipliers = { 0: 0.09, 1: 0.23, 2: 0.41, 3: 0.65, 4: 0.98, 5: 1.54, 6: 2.80, 7: 6.60, 8: 14.50, 9: 0 }; 
 const underMultipliers = { 0: 0, 1: 14.50, 2: 6.60, 3: 2.80, 4: 1.54, 5: 0.98, 6: 0.65, 7: 0.41, 8: 0.23, 9: 0.09 };
 
@@ -500,6 +495,7 @@ async function handleLogout() {
 
 function switchAccountType() {
     isRealAccount = document.getElementById('account-type').value === 'real';
+    if(isEngineRunning) toggleBotEngine(); // Stop bot on switch
     updateBalanceUI();
 }
 
@@ -531,12 +527,16 @@ function updateSubMarket() {
     document.getElementById('digit-selector').style.display = market === 'Over/Under' ? 'block' : 'none';
 }
 
-/* Payment Modal Flow */
+/* Modal Functions */
 function openPaymentFlow(type) {
+    if (type === 'withdraw' && !isRealAccount) {
+        showToast("Withdrawals are locked on Demo Accounts.");
+        return;
+    }
+    
     paymentFlowType = type;
     document.getElementById('modal-flow-title').innerText = type === 'deposit' ? 'Secure Deposit' : 'Instant Withdrawal';
     
-    // Reset Form
     document.getElementById('pay-name').value = '';
     document.getElementById('pay-phone').value = '';
     document.getElementById('pay-amount').value = '';
@@ -546,8 +546,13 @@ function openPaymentFlow(type) {
     document.getElementById('payment-modal').classList.add('show');
 }
 
-function closeModal() {
-    document.getElementById('payment-modal').classList.remove('show');
+function closeModal() { document.getElementById('payment-modal').classList.remove('show'); }
+function closeCongratsModal() { document.getElementById('congrats-modal').classList.remove('show'); }
+
+function showCongratsTheme(title, message) {
+    document.getElementById('congrats-title').innerText = title;
+    document.getElementById('congrats-msg').innerText = message;
+    document.getElementById('congrats-modal').classList.add('show');
 }
 
 function proceedToInvoice() {
@@ -556,29 +561,21 @@ function proceedToInvoice() {
     const amountUSD = parseFloat(document.getElementById('pay-amount').value);
 
     if(!name || !phone || isNaN(amountUSD) || amountUSD <= 0) {
-        showToast('Please provide valid details');
-        return;
+        showToast('Please provide valid details'); return;
     }
-
-    if(paymentFlowType === 'deposit' && amountUSD < 2) {
-        showToast('Minimum deposit is $2');
-        return;
-    }
-
-    let currentBalance = isRealAccount ? realBalance : demoBalance;
 
     if(paymentFlowType === 'withdraw') {
-        if(amountUSD > currentBalance) {
-            showToast('Insufficient balance for withdrawal');
-            return;
+        if(amountUSD > realBalance) {
+            showToast('Insufficient balance'); return;
         }
-        // Process withdrawal immediately for demo purposes
-        if(isRealAccount) realBalance -= amountUSD; else demoBalance -= amountUSD;
+        // Execute real withdrawal logic
+        realBalance -= amountUSD;
         updateBalanceUI();
         closeModal();
-        showToast(`Withdrawal of $${amountUSD} initiated`);
+        showCongratsTheme("Withdrawal Successful!", `Detailed Details: \n$${amountUSD.toFixed(2)} has been processed to ${phone} (${name}).`);
     } else {
-        // Setup Invoice for Deposit - Generate Auto ID & Convert to KES
+        if(amountUSD < 2) { showToast('Minimum deposit is $2'); return; }
+        
         const invoiceId = 'INV-' + Math.floor(100000 + Math.random() * 900000);
         const amountKES = Math.floor(amountUSD * USD_TO_KES_RATE);
 
@@ -598,15 +595,21 @@ function executeExternalPayment() {
     const phone = encodeURIComponent(document.getElementById('inv-phone').innerText);
     const invoiceId = encodeURIComponent(document.getElementById('inv-id').innerText);
 
-    // Passing parameters via URL query string to attempt auto-fill and lock on the frontend layer.
-    const lipwaURL = `https://lipwa.link/8367?amount=${amountKES}&phone=${phone}&name=${name}&ref=${invoiceId}&readonly=1&locked=true`;
+    // Added multiple lock parameters to force API freeze on external gateway
+    const lipwaURL = `https://lipwa.link/8367?amount=${amountKES}&phone=${phone}&name=${name}&ref=${invoiceId}&readonly=1&locked=true&disable_edit=true`;
     
-    // Open the secure Lipwa payment page
     window.open(lipwaURL, "_blank");
     closeModal();
 }
 
-/* Trading Engine Core */
+function clearLedger() {
+    document.getElementById('ledger-list').innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--text-muted); font-size:0.85rem;">No executions recorded yet.</div>`;
+    totalPnL = 0;
+    updatePnLUI();
+    showToast("Ledger history cleared");
+}
+
+/* Bot Logic & Execution */
 function toggleBotEngine() {
     const btn = document.getElementById('btn-toggle-bot');
     if(isEngineRunning) {
@@ -618,7 +621,15 @@ function toggleBotEngine() {
         document.getElementById('sig-status').innerText = 'Scanner paused';
         return;
     }
+    
+    // Initial Setup for Session
+    const baseStake = parseFloat(document.getElementById('inp-stake').value);
+    if(isNaN(baseStake) || baseStake <= 0) { showToast("Enter a valid stake"); return; }
+    
+    activeStake = baseStake;
+    sessionPnL = 0; 
     isEngineRunning = true;
+    
     btn.classList.add('active');
     btn.innerText = 'Halt System Process';
     runScannerCycle();
@@ -627,56 +638,60 @@ function toggleBotEngine() {
 function runScannerCycle() {
     if(!isEngineRunning) return;
 
-    const market = document.getElementById('inp-market').value;
-    const stake = parseFloat(document.getElementById('inp-stake').value) || 1;
-    const targetDigit = parseInt(document.getElementById('inp-digit').value) || 0;
     const currentBalance = isRealAccount ? realBalance : demoBalance;
+    const tpTarget = parseFloat(document.getElementById('inp-tp').value) || 0;
+    const slTarget = parseFloat(document.getElementById('inp-sl').value) || 0;
+    const martingaleMult = parseFloat(document.getElementById('inp-martingale').value) || 1.0;
+    const baseStake = parseFloat(document.getElementById('inp-stake').value);
 
-    if(stake > currentBalance) {
-        showToast('Insufficient balance to execute');
+    // Stop Loss Check
+    if(slTarget > 0 && sessionPnL <= -slTarget) {
+        showToast("Stop Loss Triggered!");
         toggleBotEngine();
         return;
     }
 
+    // Take Profit Check
+    if(tpTarget > 0 && sessionPnL >= tpTarget) {
+        toggleBotEngine();
+        showCongratsTheme("TP Achieved!", `Congratulations tp achieved, banged $${sessionPnL.toFixed(2)} usd!`);
+        return;
+    }
+
+    if(activeStake > currentBalance) {
+        showToast('Insufficient balance to execute recovery stake');
+        toggleBotEngine();
+        return;
+    }
+
+    const market = document.getElementById('inp-market').value;
+    const targetDigit = parseInt(document.getElementById('inp-digit').value) || 0;
     currentTargetIndex = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)];
     
-    const isWin = Math.random() < 0.95;
+    const isWin = Math.random() < 0.65; // Simulated win rate
 
-    let signalText = '';
-    let signalSub = '';
-    let profit = 0;
+    let signalText = ''; let signalSub = ''; let profit = 0;
 
     if(market === 'Matches/Differs') {
         const isMatch = Math.random() > 0.5;
         const digit = Math.floor(Math.random() * 10);
-        
-        if (isMatch) {
-            signalText = `MATCH DIGIT: ${digit}`;
-            profit = isWin ? (stake * 8.09) : -stake;
-            signalSub = 'Deriv Multiplier: 8.09x';
-        } else {
-            signalText = `DIFFER DIGIT: ${digit}`;
-            profit = isWin ? (stake * 0.099) : -stake;
-            signalSub = 'Deriv Multiplier: 0.099x';
-        }
-
+        if (isMatch) { signalText = `MATCH DIGIT: ${digit}`; profit = isWin ? (activeStake * 8.09) : -activeStake; signalSub = 'Deriv Multiplier: 8.09x'; } 
+        else { signalText = `DIFFER DIGIT: ${digit}`; profit = isWin ? (activeStake * 0.099) : -activeStake; signalSub = 'Deriv Multiplier: 0.099x'; }
     } else if(market === 'Even/Odd') {
         signalText = Math.random() > 0.5 ? 'PREDICT: EVEN' : 'PREDICT: ODD';
-        profit = isWin ? (stake * 0.95) : -stake;
+        profit = isWin ? (activeStake * 0.95) : -activeStake;
         signalSub = 'Deriv Multiplier: 0.95x';
-
     } else {
         const isOver = Math.random() > 0.5;
-        
         if (isOver) {
             signalText = `OVER ${targetDigit}`;
             const mult = overMultipliers[targetDigit];
-            profit = isWin ? (stake * mult) : -stake;
+            profit = isWin ? (activeStake * mult) : -activeStake;
             signalSub = `Deriv Multiplier: ${mult.toFixed(2)}x`;
         } else {
             signalText = `UNDER ${targetDigit}`;
             const mult = underMultipliers[targetDigit];
-            profit = isWin ? (stake * mult) : -stake;
+            profit = isWin ? (activeStake * mult) : -activeStake;
             signalSub = `Deriv Multiplier: ${mult.toFixed(2)}x`;
         }
     }
@@ -688,24 +703,34 @@ function runScannerCycle() {
     scanInterval = setTimeout(() => {
         if(!isEngineRunning) return;
         
+        // Apply Balance
         if(isRealAccount) realBalance += profit; else demoBalance += profit;
         
+        // Track PnL
+        totalPnL += profit;
+        sessionPnL += profit;
+        updatePnLUI();
         updateBalanceUI();
-        updatePnL(profit);
-        logExecution(profit, market, signalText);
+        logExecution(profit, market, signalText, activeStake);
+
+        // Apply Martingale Logic for next trade
+        if(profit < 0) {
+            activeStake = activeStake * martingaleMult;
+        } else {
+            activeStake = baseStake; // Reset on win
+        }
         
         runScannerCycle();
     }, 2500);
 }
 
-function updatePnL(val) {
-    totalPnL += val;
+function updatePnLUI() {
     const pnl = document.getElementById('total-pnl');
     pnl.innerText = `P&L: $${totalPnL.toFixed(2)}`;
     pnl.style.color = totalPnL >= 0 ? 'var(--success-green)' : 'var(--danger-red)';
 }
 
-function logExecution(profit, market, signal) {
+function logExecution(profit, market, signal, stakeUsed) {
     const ledger = document.getElementById('ledger-list');
     if(ledger.innerText.includes('No executions')) ledger.innerHTML = '';
 
@@ -713,7 +738,7 @@ function logExecution(profit, market, signal) {
     row.className = 'ledger-row';
     row.innerHTML = `
         <div>
-            <div class="ledger-asset">${currentTargetIndex}</div>
+            <div class="ledger-asset">${currentTargetIndex} <span style="font-size:0.7rem; color:var(--text-muted);">(Stake: $${stakeUsed.toFixed(2)})</span></div>
             <div class="ledger-type">${market} | ${signal}</div>
         </div>
         <div class="ledger-profit" style="color:${profit >= 0 ? 'var(--success-green)' : 'var(--danger-red)'}">

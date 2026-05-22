@@ -1,663 +1,1139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Apex Enterprise OS</title>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
-        :root {
-            /* Samsung One UI Enterprise Palette */
-            --bg-outer: #e3e6e8;
-            --bg-app: #f7f9fa;
-            --surface-white: #ffffff;
-            --primary-blue: #007aff;
-            --primary-hover: #005bb5;
-            --text-main: #111111;
-            --text-muted: #6e7781;
-            --border-color: #e1e4e8;
-            --success-green: #28a745;
-            --success-light: rgba(40, 167, 69, 0.1);
-            --danger-red: #dc3545;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-            --shadow-lg: 0 16px 40px rgba(0,0,0,0.08);
-            --shadow-blue: 0 8px 24px rgba(0, 122, 255, 0.25);
-            --radius-xl: 32px;
-            --radius-lg: 20px;
-            --radius-md: 12px;
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        :root{
+            --bg-outer:#e3e6e8;
+            --bg-app:#f7f9fa;
+            --surface-white:#ffffff;
+            --primary-blue:#007aff;
+            --primary-hover:#005bb5;
+            --text-main:#111111;
+            --text-muted:#6e7781;
+            --border-color:#e1e4e8;
+            --success-green:#28a745;
+            --danger-red:#dc3545;
+            --shadow-sm:0 2px 8px rgba(0,0,0,0.04);
+            --shadow-lg:0 16px 40px rgba(0,0,0,0.08);
+            --shadow-blue:0 8px 24px rgba(0,122,255,0.25);
+            --radius-xl:32px;
+            --radius-lg:20px;
+            --radius-md:12px;
+            --transition:all .3s cubic-bezier(.25,.8,.25,1);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
+        *{
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+            font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+            -webkit-tap-highlight-color:transparent;
         }
 
-        body {
-            background-color: var(--bg-outer);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            color: var(--text-main);
+        body{
+            background:var(--bg-outer);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+            overflow:hidden;
+            color:var(--text-main);
         }
 
-        /* Device Hardware Frame */
-        .device-frame {
-            width: 100%;
-            max-width: 414px;
-            height: 850px;
-            max-height: 95vh;
-            background-color: var(--bg-app);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-lg), inset 0 0 0 8px #fff;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
+        .device-frame{
+            width:100%;
+            max-width:414px;
+            height:850px;
+            max-height:95vh;
+            background:var(--bg-app);
+            border-radius:var(--radius-xl);
+            box-shadow:var(--shadow-lg), inset 0 0 0 8px #fff;
+            display:flex;
+            flex-direction:column;
+            position:relative;
+            overflow:hidden;
         }
 
-        /* --- AUTH / LANDING PAGE --- */
-        .auth-screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #0b101e 0%, #1a2235 100%);
-            z-index: 500;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 24px;
-            color: white;
-            transition: opacity 0.5s ease, transform 0.5s ease;
+        /* AUTH */
+
+        .auth-screen{
+            position:absolute;
+            inset:0;
+            background:linear-gradient(135deg,#0b101e 0%,#1a2235 100%);
+            z-index:500;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            padding:40px 24px;
+            color:white;
+            transition:opacity .5s ease, transform .5s ease;
         }
 
-        .auth-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(1.05);
+        .auth-screen.hidden{
+            opacity:0;
+            pointer-events:none;
+            transform:scale(1.05);
         }
 
-        .auth-logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--primary-blue), #00c6ff);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow-blue);
+        .auth-logo{
+            width:80px;
+            height:80px;
+            background:linear-gradient(135deg,var(--primary-blue),#00c6ff);
+            border-radius:20px;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-size:2.5rem;
+            font-weight:800;
+            margin-bottom:24px;
+            box-shadow:var(--shadow-blue);
         }
 
-        .auth-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
-        .auth-sub { font-size: 0.9rem; color: #8b95a5; margin-bottom: 40px; text-align: center; }
-
-        .auth-form { width: 100%; display: flex; flex-direction: column; gap: 16px; }
-        .auth-input {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 16px;
-            border-radius: var(--radius-md);
-            color: white;
-            font-size: 1rem;
-            outline: none;
-        }
-        .auth-input::placeholder { color: #6e7781; }
-        .auth-input:focus { border-color: var(--primary-blue); background: rgba(255,255,255,0.1); }
-
-        .btn-auth {
-            width: 100%;
-            background: var(--primary-blue);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: var(--radius-md);
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin-top: 10px;
-            cursor: pointer;
-            box-shadow: var(--shadow-blue);
-            transition: var(--transition);
-        }
-        .btn-auth:active { transform: scale(0.98); }
-        .auth-links { margin-top: 20px; font-size: 0.85rem; color: #8b95a5; text-align: center; cursor: pointer; }
-
-        /* --- MAIN APP UI --- */
-        .app-header {
-            background-color: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            padding: 24px 20px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            z-index: 10;
+        .auth-title{
+            font-size:1.8rem;
+            font-weight:800;
+            margin-bottom:8px;
         }
 
-        .brand-title {
-            font-size: 1.25rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .auth-sub{
+            font-size:.9rem;
+            color:#8b95a5;
+            margin-bottom:40px;
+            text-align:center;
         }
 
-        .brand-logo {
-            width: 24px;
-            height: 24px;
-            background: var(--primary-blue);
-            color: white;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
+        .auth-form{
+            width:100%;
+            display:flex;
+            flex-direction:column;
+            gap:16px;
         }
 
-        .account-selector {
-            background-color: #e8f0fe;
-            color: var(--primary-blue);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
-            text-align: center;
+        .auth-input{
+            width:100%;
+            background:rgba(255,255,255,.05);
+            border:1px solid rgba(255,255,255,.1);
+            padding:16px;
+            border-radius:var(--radius-md);
+            color:white;
+            font-size:1rem;
+            outline:none;
         }
 
-        /* View Containers */
-        .view-container {
-            flex: 1;
-            overflow-y: auto;
-            position: relative;
-            padding-bottom: 20px;
+        .auth-input::placeholder{
+            color:#6e7781;
         }
 
-        .view {
-            display: none;
-            flex-direction: column;
-            padding: 20px;
-            gap: 20px;
-            animation: fadeIn 0.3s ease;
-        }
-        .view.active { display: flex; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .auth-input:focus{
+            border-color:var(--primary-blue);
+            background:rgba(255,255,255,.08);
         }
 
-        /* Balance & Target Section */
-        .equity-card {
-            background-color: var(--surface-white);
-            border-radius: var(--radius-lg);
-            padding: 28px 20px;
-            box-shadow: var(--shadow-sm);
-            text-align: center;
-            border: 1px solid var(--border-color);
+        .btn-auth{
+            width:100%;
+            background:var(--primary-blue);
+            color:white;
+            border:none;
+            padding:16px;
+            border-radius:var(--radius-md);
+            font-size:1rem;
+            font-weight:700;
+            cursor:pointer;
+            transition:var(--transition);
+            box-shadow:var(--shadow-blue);
         }
 
-        .equity-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-        .equity-amount { font-size: 3.2rem; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 16px; font-variant-numeric: tabular-nums; }
-        
-        .progress-container { background-color: var(--bg-outer); border-radius: 10px; height: 8px; width: 100%; overflow: hidden; margin-bottom: 8px; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary-blue), #00c6ff); width: 0.1%; transition: width 0.5s ease; }
-        .target-text { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
-
-        /* Payment Buttons */
-        .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .action-btn { background-color: var(--surface-white); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 700; color: var(--text-main); box-shadow: var(--shadow-sm); cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .action-btn:active { transform: scale(0.96); background-color: var(--bg-outer); }
-        .action-btn span { font-size: 0.7rem; color: var(--success-green); font-weight: 600; }
-
-        /* Enterprise AI Scanner */
-        .ai-engine-box { background: var(--surface-white); border-radius: var(--radius-lg); border: 1px solid var(--primary-blue); padding: 24px; box-shadow: var(--shadow-blue); position: relative; overflow: hidden; }
-        .ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        .live-indicator { display: flex; align-items: center; gap: 8px; color: var(--primary-blue); }
-        .radar-dot { width: 8px; height: 8px; background-color: var(--primary-blue); border-radius: 50%; animation: radar 1.5s infinite; }
-        
-        @keyframes radar {
-            0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); }
-            70% { box-shadow: 0 0 0 12px rgba(0, 122, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); }
+        .btn-auth:active{
+            transform:scale(.98);
         }
 
-        .signal-screen { background-color: #0b101e; border-radius: var(--radius-md); padding: 20px; text-align: center; margin-bottom: 20px; color: white; min-height: 120px; display: flex; flex-direction: column; justify-content: center; }
-        .signal-asset { font-size: 0.85rem; color: var(--primary-blue); font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
-        .signal-text { font-size: 1.5rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 8px; color: var(--success-green); }
-        .signal-sub { font-size: 0.75rem; color: #8b95a5; font-weight: 600; }
+        .auth-links{
+            margin-top:20px;
+            color:#8b95a5;
+            font-size:.85rem;
+            cursor:pointer;
+        }
 
-        .parameters-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .param-input { background-color: var(--bg-app); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 8px; }
-        .param-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 4px; }
-        .param-input input, .param-input select { width: 100%; border: none; background: transparent; font-size: 1rem; font-weight: 800; color: var(--text-main); outline: none; }
+        /* HEADER */
 
-        .btn-master { width: 100%; background-color: var(--primary-blue); color: white; border: none; padding: 18px; border-radius: var(--radius-lg); font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-blue); }
-        .btn-master:active { transform: scale(0.98); }
-        .btn-master.active { background-color: var(--danger-red); box-shadow: 0 8px 24px rgba(220, 53, 69, 0.3); }
+        .app-header{
+            background:rgba(255,255,255,.85);
+            backdrop-filter:blur(12px);
+            padding:24px 20px 16px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            border-bottom:1px solid var(--border-color);
+        }
 
-        /* Ledger Tab Content */
-        .ledger-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .total-pnl { font-size: 1rem; font-weight: 800; }
-        .pnl-pos { color: var(--success-green); }
-        .pnl-neg { color: var(--danger-red); }
-        .delete-all { font-size: 0.8rem; color: var(--danger-red); cursor: pointer; font-weight: 700; }
+        .brand-title{
+            font-size:1.2rem;
+            font-weight:800;
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
 
-        .ledger-row { background-color: var(--surface-white); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
-        .ledger-details { display: flex; flex-direction: column; gap: 4px; }
-        .ledger-asset { font-weight: 700; font-size: 0.9rem; }
-        .ledger-type { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
-        .ledger-profit { font-weight: 800; color: var(--success-green); font-size: 1.1rem; }
-        .delete-icon { cursor: pointer; font-size: 1.2rem; color: var(--danger-red); margin-left: 15px; }
+        .brand-logo{
+            width:24px;
+            height:24px;
+            background:var(--primary-blue);
+            color:white;
+            border-radius:6px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:.8rem;
+        }
 
-        /* Profile Tab Content */
-        .profile-header { text-align: center; padding: 20px 0; }
-        .profile-avatar { width: 80px; height: 80px; background-color: var(--border-color); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
-        .profile-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; }
-        .profile-email { font-size: 0.85rem; color: var(--text-muted); }
-        
-        .profile-list { background: var(--surface-white); border-radius: var(--radius-lg); border: 1px solid var(--border-color); overflow: hidden; }
-        .profile-item { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600; }
-        .profile-item:last-child { border-bottom: none; }
-        .profile-item span:last-child { color: var(--text-muted); font-weight: 400; }
+        .account-selector{
+            background:#e8f0fe;
+            color:var(--primary-blue);
+            border:none;
+            border-radius:20px;
+            padding:6px 12px;
+            font-weight:700;
+            outline:none;
+        }
 
-        .btn-logout { width: 100%; background: transparent; border: 1px solid var(--danger-red); color: var(--danger-red); padding: 16px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; margin-top: 10px; }
+        /* VIEWS */
 
-        /* Navigation Bar */
-        .bottom-nav { background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-top: 1px solid var(--border-color); padding: 16px 20px 24px; display: flex; justify-content: space-around; z-index: 10; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); cursor: pointer; transition: var(--transition); }
-        .nav-item.active { color: var(--primary-blue); }
-        .nav-icon { font-size: 1.4rem; }
-        .nav-label { font-size: 0.7rem; font-weight: 700; }
+        .view-container{
+            flex:1;
+            overflow-y:auto;
+            padding-bottom:20px;
+        }
 
-        /* Modals & Toasts */
-        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 100; display: none; justify-content: center; align-items: center; padding: 20px; }
-        .modal-card { background-color: var(--surface-white); width: 100%; border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-lg); transform: translateY(20px); opacity: 0; transition: var(--transition); }
-        .modal-overlay.show { display: flex; }
-        .modal-overlay.show .modal-card { transform: translateY(0); opacity: 1; }
-        .modal-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 16px; }
-        .modal-input { width: 100%; border: 2px solid var(--border-color); padding: 14px; border-radius: 10px; font-size: 1rem; font-weight: 600; margin-bottom: 20px; outline: none; }
-        .modal-input:focus { border-color: var(--success-green); }
-        .modal-btn { width: 100%; background-color: var(--success-green); color: white; border: none; padding: 16px; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; }
+        .view{
+            display:none;
+            flex-direction:column;
+            gap:20px;
+            padding:20px;
+        }
 
-        .toast-container { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 10px; width: 90%; }
-        .toast { background-color: #111; color: white; padding: 14px 20px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 12px; animation: slideDown 0.3s forwards; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .view.active{
+            display:flex;
+        }
+
+        .equity-card{
+            background:white;
+            border-radius:var(--radius-lg);
+            padding:28px 20px;
+            text-align:center;
+            box-shadow:var(--shadow-sm);
+        }
+
+        .equity-label{
+            font-size:.8rem;
+            color:var(--text-muted);
+            margin-bottom:8px;
+            font-weight:700;
+        }
+
+        .equity-amount{
+            font-size:3rem;
+            font-weight:800;
+            margin-bottom:16px;
+        }
+
+        .progress-container{
+            width:100%;
+            height:8px;
+            background:#dfe3e6;
+            border-radius:10px;
+            overflow:hidden;
+            margin-bottom:8px;
+        }
+
+        .progress-bar{
+            height:100%;
+            width:0%;
+            background:linear-gradient(90deg,var(--primary-blue),#00c6ff);
+            transition:.4s;
+        }
+
+        .target-text{
+            font-size:.75rem;
+            color:var(--text-muted);
+        }
+
+        /* BUTTONS */
+
+        .grid-buttons{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:12px;
+        }
+
+        .action-btn{
+            background:white;
+            border:1px solid var(--border-color);
+            padding:16px;
+            border-radius:var(--radius-md);
+            font-weight:700;
+            cursor:pointer;
+            box-shadow:var(--shadow-sm);
+        }
+
+        .action-btn span{
+            display:block;
+            margin-top:4px;
+            font-size:.7rem;
+            color:var(--success-green);
+        }
+
+        /* AI BOX */
+
+        .ai-engine-box{
+            background:white;
+            border-radius:var(--radius-lg);
+            padding:24px;
+            border:1px solid var(--primary-blue);
+            box-shadow:var(--shadow-blue);
+        }
+
+        .ai-header{
+            display:flex;
+            justify-content:space-between;
+            margin-bottom:20px;
+            font-size:.85rem;
+            font-weight:700;
+        }
+
+        .live-indicator{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            color:var(--primary-blue);
+        }
+
+        .radar-dot{
+            width:8px;
+            height:8px;
+            border-radius:50%;
+            background:var(--primary-blue);
+            animation:radar 1.5s infinite;
+        }
+
+        @keyframes radar{
+            0%{box-shadow:0 0 0 0 rgba(0,122,255,.4);}
+            70%{box-shadow:0 0 0 12px rgba(0,122,255,0);}
+            100%{box-shadow:0 0 0 0 rgba(0,122,255,0);}
+        }
+
+        .signal-screen{
+            background:#0b101e;
+            border-radius:var(--radius-md);
+            padding:20px;
+            text-align:center;
+            color:white;
+            margin-bottom:20px;
+        }
+
+        .signal-asset{
+            color:var(--primary-blue);
+            font-size:.8rem;
+            margin-bottom:8px;
+            font-weight:700;
+        }
+
+        .signal-text{
+            font-size:1.5rem;
+            font-weight:800;
+            color:var(--success-green);
+            margin-bottom:8px;
+        }
+
+        .signal-sub{
+            color:#8b95a5;
+            font-size:.75rem;
+        }
+
+        .parameters-row{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:12px;
+            margin-bottom:20px;
+        }
+
+        .param-input{
+            background:#f5f6f7;
+            border:1px solid var(--border-color);
+            border-radius:8px;
+            padding:10px 14px;
+        }
+
+        .param-label{
+            display:block;
+            font-size:.7rem;
+            margin-bottom:4px;
+            color:var(--text-muted);
+            font-weight:700;
+        }
+
+        .param-input input,
+        .param-input select{
+            width:100%;
+            border:none;
+            background:transparent;
+            font-weight:800;
+            outline:none;
+        }
+
+        .btn-master{
+            width:100%;
+            border:none;
+            background:var(--primary-blue);
+            color:white;
+            padding:18px;
+            border-radius:var(--radius-lg);
+            font-size:1rem;
+            font-weight:800;
+            cursor:pointer;
+            box-shadow:var(--shadow-blue);
+        }
+
+        .btn-master.active{
+            background:var(--danger-red);
+        }
+
+        /* PROFILE */
+
+        .profile-header{
+            text-align:center;
+            padding:20px 0;
+        }
+
+        .profile-avatar{
+            width:80px;
+            height:80px;
+            border-radius:50%;
+            background:#dfe3e6;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            margin:auto auto 12px;
+            font-size:2rem;
+        }
+
+        .profile-name{
+            font-size:1.2rem;
+            font-weight:800;
+        }
+
+        .profile-email{
+            color:var(--text-muted);
+            margin-top:4px;
+        }
+
+        .btn-logout{
+            width:100%;
+            background:transparent;
+            border:1px solid var(--danger-red);
+            color:var(--danger-red);
+            padding:16px;
+            border-radius:var(--radius-md);
+            font-weight:700;
+            cursor:pointer;
+        }
+
+        /* NAV */
+
+        .bottom-nav{
+            background:rgba(255,255,255,.9);
+            backdrop-filter:blur(12px);
+            border-top:1px solid var(--border-color);
+            padding:16px 20px 24px;
+            display:flex;
+            justify-content:space-around;
+        }
+
+        .nav-item{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            color:var(--text-muted);
+            cursor:pointer;
+        }
+
+        .nav-item.active{
+            color:var(--primary-blue);
+        }
+
+        .nav-label{
+            font-size:.7rem;
+            font-weight:700;
+        }
+
+        /* TOAST */
+
+        .toast-container{
+            position:absolute;
+            top:80px;
+            left:50%;
+            transform:translateX(-50%);
+            width:90%;
+            z-index:999;
+        }
+
+        .toast{
+            background:#111;
+            color:white;
+            padding:14px 20px;
+            border-radius:12px;
+            margin-bottom:10px;
+            font-size:.85rem;
+        }
     </style>
 </head>
 <body>
 
-    <div class="device-frame">
-        
-        <div class="auth-screen" id="auth-screen">
-            <div class="auth-logo">A</div>
-            <div class="auth-title" id="auth-mode-title">Sign In</div>
-            <div class="auth-sub" id="auth-mode-sub">Secure Neural Execution Environment</div>
+<div class="device-frame">
 
-            <div class="auth-form">
-                <input type="email" class="auth-input" placeholder="Email Address" id="login-email">
-                <input type="password" class="auth-input" placeholder="Password" id="login-pass">
-                <button class="btn-auth" id="btn-auth" onclick="handleAuth()">Sign In</button>
-            </div>
-            
-            <div class="auth-links" id="auth-toggle" onclick="toggleAuthMode()">Create new account</div>
+    <!-- AUTH -->
+
+    <div class="auth-screen" id="auth-screen">
+
+        <div class="auth-logo">A</div>
+
+        <div class="auth-title" id="auth-mode-title">
+            Sign In
         </div>
 
-        <div class="toast-container" id="toast-area"></div>
+        <div class="auth-sub">
+            Secure Neural Execution Environment
+        </div>
 
-        <header class="app-header">
-            <div class="brand-title">
-                <div class="brand-logo">A</div>
-                ApexOS
-            </div>
-            <select class="account-selector" id="account-type" onchange="switchAccountType()">
-                <option value="real">Real Account</option>
-                <option value="demo">Demo Account</option>
-            </select>
-        </header>
+        <div class="auth-form">
 
-        <div class="view-container">
-            
-            <div id="view-home" class="view active">
-                
-                <div class="equity-card">
-                    <div class="equity-label">Total Equity Balance</div>
-                    <div class="equity-amount" id="display-balance">$50.00</div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="goal-progress"></div>
-                    </div>
-                    <div class="target-text">Goal Progress: <span id="target-display">$50,000.00 Target</span></div>
-                </div>
+            <input
+                type="email"
+                class="auth-input"
+                placeholder="Email Address"
+                id="login-email"
+            >
 
-                <div class="grid-buttons">
-                    <button class="action-btn" onclick="openModal('deposit')">
-                        Deposit Funds
-                        <span>Payhero Integration</span>
-                    </button>
-                    <button class="action-btn" onclick="openModal('withdraw')">
-                        Withdraw
-                        <span style="color:var(--text-muted)">Instant Bank/M-Pesa</span>
-                    </button>
-                </div>
+            <input
+                type="password"
+                class="auth-input"
+                placeholder="Password"
+                id="login-pass"
+            >
 
-                <div class="ai-engine-box">
-                    <div class="ai-header">
-                        <span>Neural Match Scanner</span>
-                        <div class="live-indicator">
-                            <div class="radar-dot"></div>
-                            Monitoring Feed
-                        </div>
-                    </div>
-
-                    <div class="signal-screen">
-                        <div class="signal-asset" id="sig-asset">READY TO SYNC...</div>
-                        <div class="signal-text" id="sig-main">--</div>
-                        <div class="signal-sub" id="sig-status">Awaiting trade parameters</div>
-                    </div>
-
-                    <div class="parameters-row">
-                        <div class="param-input">
-                            <span class="param-label">Market Strategy</span>
-                            <select id="inp-market">
-                                <option value="Matches/Differs">Matches/Differs</option>
-                                <option value="Even/Odd">Even/Odd</option>
-                                <option value="Over/Under">Over/Under</option>
-                            </select>
-                        </div>
-                        <div class="param-input">
-                            <span class="param-label">Base Stake ($)</span>
-                            <input type="number" id="inp-stake" value="1.00" step="1">
-                        </div>
-                    </div>
-
-                    <button class="btn-master" id="btn-toggle-bot" onclick="toggleBotEngine()">Execute AI Automation</button>
-                </div>
-
-            </div>
-
-            <div id="view-ledger" class="view">
-                <div class="ledger-header">
-                    <h3 style="font-size:1.1rem; font-weight:800;">Live Ledger</h3>
-                    <div style="display:flex; gap: 15px; align-items:center;">
-                        <span class="total-pnl" id="total-pnl">P&L: $0.00</span>
-                        <span class="delete-all" onclick="clearLedger()">Clear All</span>
-                    </div>
-                </div>
-                <div id="ledger-list">
-                    <div style="text-align:center; padding: 40px 0; color:var(--text-muted); font-weight:600; font-size:0.85rem;">No executions recorded yet.</div>
-                </div>
-            </div>
-
-            <div id="view-profile" class="view">
-                <div class="profile-header">
-                    <div class="profile-avatar">👤</div>
-                    <div class="profile-name">Apex Trader</div>
-                    <div class="profile-email" id="user-email-display">Not Signed In</div>
-                </div>
-
-                <div class="profile-list">
-                    <div class="profile-item">
-                        <span>Account Status</span>
-                        <span style="color:var(--success-green); font-weight:700;">Verified</span>
-                    </div>
-                    <div class="profile-item">
-                        <span>Platform ID</span>
-                        <span>CR-938472</span>
-                    </div>
-                    <div class="profile-item">
-                        <span>Payment Gateway</span>
-                        <span>Payhero Aggregator</span>
-                    </div>
-                    <div class="profile-item">
-                        <span>Risk Settings</span>
-                        <span>Strict TP Activated</span>
-                    </div>
-                </div>
-
-                <button class="btn-logout" onclick="handleLogout()">Secure Logout</button>
-            </div>
+            <button
+                class="btn-auth"
+                id="btn-auth"
+                onclick="handleAuth()"
+            >
+                Sign In
+            </button>
 
         </div>
 
-        <div class="modal-overlay" id="payment-modal" onclick="closeModal(event)">
-            <div class="modal-card" onclick="event.stopPropagation()">
-                <div class="modal-title" id="modal-title">Payhero STK Push</div>
-                <input type="tel" class="modal-input" placeholder="Enter Phone Number (e.g., 0712...)" id="modal-phone">
-                <input type="number" class="modal-input" placeholder="Amount (USD)" id="modal-amount">
-                <button class="modal-btn" onclick="processTransaction()">Trigger STK Push</button>
-            </div>
+        <div
+            class="auth-links"
+            id="auth-toggle"
+            onclick="toggleAuthMode()"
+        >
+            Create new account
         </div>
 
-        <nav class="bottom-nav">
-            <div class="nav-item active" onclick="switchTab('view-home', this)">
-                <span class="nav-icon">⎈</span>
-                <span class="nav-label">Engine</span>
-            </div>
-            <div class="nav-item" onclick="switchTab('view-ledger', this)">
-                <span class="nav-icon">≡</span>
-                <span class="nav-label">Ledger</span>
-            </div>
-            <div class="nav-item" onclick="switchTab('view-profile', this)">
-                <span class="nav-icon">👤</span>
-                <span class="nav-label">Profile</span>
-            </div>
-        </nav>
     </div>
 
-    <script>
-        // Supabase Initialization
-        // FIXED: Using window.supabase to ensure the library is correctly accessed
-        const supabase = window.supabase.createClient(
-            'https://hsovbnxatorocibfgrhc.supabase.co',
-            'sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP'
-        );
+    <!-- TOAST -->
 
-        let isLoginMode = true;
-        let realBalance = 50.00;
-        let demoBalance = 10000.00;
-        let isRealAccount = true;
-        const targetBalance = 50000.00;
-        let totalPnL = 0;
-        
-        let isEngineRunning = false;
-        let scanInterval;
-        let activeModalType = '';
-        let currentTargetIndex = "";
+    <div class="toast-container" id="toast-area"></div>
 
-        const volatilityIndices = [
-            "Volatility 10 (1s) Index", "Volatility 25 (1s) Index", "Volatility 50 (1s) Index", 
-            "Volatility 75 (1s) Index", "Volatility 100 (1s) Index"
-        ];
+    <!-- HEADER -->
 
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('auth-mode-title').innerText = isLoginMode ? "Sign In" : "Create Account";
-            document.getElementById('btn-auth').innerText = isLoginMode ? "Sign In" : "Sign Up";
-            document.getElementById('auth-toggle').innerText = isLoginMode ? "Create new account" : "Back to Sign In";
+    <header class="app-header">
+
+        <div class="brand-title">
+            <div class="brand-logo">A</div>
+            ApexOS
+        </div>
+
+        <select
+            class="account-selector"
+            id="account-type"
+            onchange="switchAccountType()"
+        >
+            <option value="real">Real Account</option>
+            <option value="demo">Demo Account</option>
+        </select>
+
+    </header>
+
+    <!-- MAIN -->
+
+    <div class="view-container">
+
+        <!-- HOME -->
+
+        <div id="view-home" class="view active">
+
+            <div class="equity-card">
+
+                <div class="equity-label">
+                    Total Equity Balance
+                </div>
+
+                <div class="equity-amount" id="display-balance">
+                    $50.00
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-bar" id="goal-progress"></div>
+                </div>
+
+                <div class="target-text">
+                    Goal Progress:
+                    <span>$50,000 Target</span>
+                </div>
+
+            </div>
+
+            <div class="grid-buttons">
+
+                <button class="action-btn">
+                    Deposit Funds
+                    <span>Payhero Integration</span>
+                </button>
+
+                <button class="action-btn">
+                    Withdraw
+                    <span>Instant Bank/M-Pesa</span>
+                </button>
+
+            </div>
+
+            <div class="ai-engine-box">
+
+                <div class="ai-header">
+
+                    <span>Neural Match Scanner</span>
+
+                    <div class="live-indicator">
+                        <div class="radar-dot"></div>
+                        Monitoring Feed
+                    </div>
+
+                </div>
+
+                <div class="signal-screen">
+
+                    <div class="signal-asset" id="sig-asset">
+                        READY TO SYNC...
+                    </div>
+
+                    <div class="signal-text" id="sig-main">
+                        --
+                    </div>
+
+                    <div class="signal-sub" id="sig-status">
+                        Awaiting trade parameters
+                    </div>
+
+                </div>
+
+                <div class="parameters-row">
+
+                    <div class="param-input">
+
+                        <span class="param-label">
+                            Market Strategy
+                        </span>
+
+                        <select id="inp-market">
+                            <option>Matches/Differs</option>
+                            <option>Even/Odd</option>
+                            <option>Over/Under</option>
+                        </select>
+
+                    </div>
+
+                    <div class="param-input">
+
+                        <span class="param-label">
+                            Base Stake ($)
+                        </span>
+
+                        <input
+                            type="number"
+                            id="inp-stake"
+                            value="1"
+                        >
+
+                    </div>
+
+                </div>
+
+                <button
+                    class="btn-master"
+                    id="btn-toggle-bot"
+                    onclick="toggleBotEngine()"
+                >
+                    Execute AI Automation
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- PROFILE -->
+
+        <div id="view-profile" class="view">
+
+            <div class="profile-header">
+
+                <div class="profile-avatar">
+                    👤
+                </div>
+
+                <div class="profile-name">
+                    Apex Trader
+                </div>
+
+                <div class="profile-email" id="user-email-display">
+                    Not Signed In
+                </div>
+
+            </div>
+
+            <button
+                class="btn-logout"
+                onclick="handleLogout()"
+            >
+                Secure Logout
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- NAV -->
+
+    <nav class="bottom-nav">
+
+        <div
+            class="nav-item active"
+            onclick="switchTab('view-home', this)"
+        >
+            <span>⎈</span>
+            <span class="nav-label">Engine</span>
+        </div>
+
+        <div
+            class="nav-item"
+            onclick="switchTab('view-profile', this)"
+        >
+            <span>👤</span>
+            <span class="nav-label">Profile</span>
+        </div>
+
+    </nav>
+
+</div>
+
+<script>
+
+    // =============================
+    // SUPABASE
+    // =============================
+
+    const supabase = window.supabase.createClient(
+        'https://hsovbnxatorocibfgrhc.supabase.co',
+        'sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP'
+    );
+
+    // =============================
+    // VARIABLES
+    // =============================
+
+    let isLoginMode = true;
+
+    let realBalance = 50;
+    let demoBalance = 10000;
+
+    let isRealAccount = true;
+
+    const targetBalance = 50000;
+
+    let isEngineRunning = false;
+
+    let scanInterval;
+
+    const volatilityIndices = [
+        "Volatility 10 (1s) Index",
+        "Volatility 25 (1s) Index",
+        "Volatility 50 (1s) Index",
+        "Volatility 75 (1s) Index",
+        "Volatility 100 (1s) Index"
+    ];
+
+    // =============================
+    // REFRESH SESSION
+    // =============================
+
+    window.addEventListener("load", async () => {
+
+        updateBalanceUI();
+
+        const {
+            data: { session }
+        } = await supabase.auth.getSession();
+
+        if (session) {
+
+            document
+                .getElementById('auth-screen')
+                .classList.add('hidden');
+
+            document
+                .getElementById('user-email-display')
+                .innerText = session.user.email;
+
+            showToast("Session restored");
         }
 
-        async function handleAuth() {
-            // FIXED: Added .trim() to ensure input data is clean
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-pass').value.trim();
+    });
 
-            if(isLoginMode) {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                if(error) { showToast("Error: " + error.message); }
-                else { 
-                    document.getElementById('auth-screen').classList.add('hidden');
-                    document.getElementById('user-email-display').innerText = email;
-                    showToast('Authentication Successful.');
+    // =============================
+    // AUTH MODE
+    // =============================
+
+    function toggleAuthMode() {
+
+        isLoginMode = !isLoginMode;
+
+        document.getElementById('auth-mode-title').innerText =
+            isLoginMode ? "Sign In" : "Create Account";
+
+        document.getElementById('btn-auth').innerText =
+            isLoginMode ? "Sign In" : "Sign Up";
+
+        document.getElementById('auth-toggle').innerText =
+            isLoginMode
+            ? "Create new account"
+            : "Back to Sign In";
+    }
+
+    // =============================
+    // AUTH
+    // =============================
+
+    async function handleAuth() {
+
+        const btn =
+            document.getElementById('btn-auth');
+
+        const email =
+            document.getElementById('login-email')
+            .value
+            .trim();
+
+        const password =
+            document.getElementById('login-pass')
+            .value
+            .trim();
+
+        if (!email || !password) {
+            showToast("Please fill all fields");
+            return;
+        }
+
+        if (password.length < 6) {
+            showToast("Password must be 6+ characters");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        try {
+
+            // LOGIN
+
+            if (isLoginMode) {
+
+                const { data, error } =
+                    await supabase.auth.signInWithPassword({
+                        email,
+                        password
+                    });
+
+                if (error) {
+
+                    showToast(error.message);
+
+                } else {
+
+                    document
+                        .getElementById('auth-screen')
+                        .classList.add('hidden');
+
+                    document
+                        .getElementById('user-email-display')
+                        .innerText = email;
+
+                    showToast("Login successful");
                 }
-            } else {
-                const { data, error } = await supabase.auth.signUp({ email, password });
-                if(error) { showToast("Error: " + error.message); }
-                else { showToast('Account created! Please check your email.'); }
+
             }
+
+            // SIGNUP
+
+            else {
+
+                const { data, error } =
+                    await supabase.auth.signUp({
+                        email,
+                        password
+                    });
+
+                if (error) {
+
+                    showToast(error.message);
+
+                } else {
+
+                    // AUTO LOGIN
+
+                    const loginRes =
+                        await supabase.auth.signInWithPassword({
+                            email,
+                            password
+                        });
+
+                    if (loginRes.error) {
+
+                        showToast("Account created. Verify email.");
+
+                    } else {
+
+                        document
+                            .getElementById('auth-screen')
+                            .classList.add('hidden');
+
+                        document
+                            .getElementById('user-email-display')
+                            .innerText = email;
+
+                        showToast("Signup successful");
+                    }
+                }
+            }
+
+        } catch (err) {
+
+            console.log(err);
+
+            showToast("Something went wrong");
+
+        } finally {
+
+            btn.disabled = false;
+
+            btn.innerText =
+                isLoginMode ? "Sign In" : "Sign Up";
+        }
+    }
+
+    // =============================
+    // LOGOUT
+    // =============================
+
+    async function handleLogout() {
+
+        await supabase.auth.signOut();
+
+        document
+            .getElementById('auth-screen')
+            .classList.remove('hidden');
+
+        showToast("Logged out");
+    }
+
+    // =============================
+    // BALANCE
+    // =============================
+
+    function switchAccountType() {
+
+        isRealAccount =
+            document.getElementById('account-type').value === 'real';
+
+        updateBalanceUI();
+    }
+
+    function updateBalanceUI() {
+
+        let bal =
+            isRealAccount
+            ? realBalance
+            : demoBalance;
+
+        document.getElementById('display-balance').innerText =
+            `$${bal.toLocaleString(undefined,{
+                minimumFractionDigits:2
+            })}`;
+
+        const progress =
+            (bal / targetBalance) * 100;
+
+        document.getElementById('goal-progress').style.width =
+            `${Math.min(progress,100)}%`;
+    }
+
+    // =============================
+    // TABS
+    // =============================
+
+    function switchTab(viewId, element) {
+
+        document.querySelectorAll('.view')
+            .forEach(v => v.classList.remove('active'));
+
+        document.querySelectorAll('.nav-item')
+            .forEach(v => v.classList.remove('active'));
+
+        document.getElementById(viewId)
+            .classList.add('active');
+
+        element.classList.add('active');
+    }
+
+    // =============================
+    // TOAST
+    // =============================
+
+    function showToast(message) {
+
+        const container =
+            document.getElementById('toast-area');
+
+        const toast =
+            document.createElement('div');
+
+        toast.className = "toast";
+
+        toast.innerHTML = message;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    // =============================
+    // BOT
+    // =============================
+
+    function toggleBotEngine() {
+
+        const btn =
+            document.getElementById('btn-toggle-bot');
+
+        if (isEngineRunning) {
+
+            isEngineRunning = false;
+
+            btn.innerText =
+                "Execute AI Automation";
+
+            btn.classList.remove('active');
+
+            clearTimeout(scanInterval);
+
+            return;
         }
 
-        async function handleLogout() {
-            if(isEngineRunning) toggleBotEngine();
-            await supabase.auth.signOut();
-            document.getElementById('auth-screen').classList.remove('hidden');
-            showToast('Logged out.');
+        isEngineRunning = true;
+
+        btn.innerText =
+            "Halt System Process";
+
+        btn.classList.add('active');
+
+        runScannerCycle();
+    }
+
+    function runScannerCycle() {
+
+        if (!isEngineRunning) return;
+
+        const market =
+            document.getElementById('inp-market').value;
+
+        const stake =
+            parseFloat(document.getElementById('inp-stake').value) || 1;
+
+        const currentIndex =
+            volatilityIndices[
+                Math.floor(Math.random() * volatilityIndices.length)
+            ];
+
+        let signalText = "";
+
+        if (market === "Matches/Differs") {
+
+            signalText =
+                Math.random() > 0.5
+                ? "MATCH DIGIT: 7"
+                : "DIFFER DIGIT: 4";
+
+        } else if (market === "Even/Odd") {
+
+            signalText =
+                Math.random() > 0.5
+                ? "PREDICT: EVEN"
+                : "PREDICT: ODD";
+
+        } else {
+
+            signalText =
+                Math.random() > 0.5
+                ? "OVER 6"
+                : "UNDER 3";
         }
 
-        function switchAccountType() {
-            const selector = document.getElementById('account-type');
-            isRealAccount = (selector.value === 'real');
+        document.getElementById('sig-asset').innerText =
+            `SCANNING: ${currentIndex}`;
+
+        document.getElementById('sig-main').innerText =
+            signalText;
+
+        document.getElementById('sig-status').innerText =
+            "AI Confidence: 95%";
+
+        const profit =
+            Math.random() < 0.9
+            ? stake * 2
+            : -stake;
+
+        scanInterval = setTimeout(() => {
+
+            if (isRealAccount)
+                realBalance += profit;
+            else
+                demoBalance += profit;
+
             updateBalanceUI();
-        }
 
-        function switchTab(viewId, element) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            element.classList.add('active');
-        }
+            runScannerCycle();
 
-        function showToast(message) {
-            const container = document.getElementById('toast-area');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<span style="color:var(--success-green)">✔</span> ${message}`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
+        }, 3000);
+    }
 
-        function openModal(type) {
-            activeModalType = type;
-            document.getElementById('payment-modal').classList.add('show');
-        }
+</script>
 
-        function closeModal(e) { document.getElementById('payment-modal').classList.remove('show'); }
-
-        function processTransaction() {
-            const amount = parseFloat(document.getElementById('modal-amount').value);
-            if (!amount || amount <= 0) return;
-            if (activeModalType === 'deposit') {
-                if(isRealAccount) realBalance += amount; else demoBalance += amount;
-            } else {
-                if(isRealAccount) realBalance -= amount; else demoBalance -= amount;
-            }
-            updateBalanceUI();
-            closeModal();
-            showToast("Transaction Processed");
-        }
-
-        function updateBalanceUI() {
-            let bal = isRealAccount ? realBalance : demoBalance;
-            document.getElementById('display-balance').innerText = `$${bal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            let progress = (bal / targetBalance) * 100;
-            document.getElementById('goal-progress').style.width = `${Math.min(progress, 100)}%`;
-        }
-
-        function updatePnL(val) {
-            totalPnL += val;
-            const pnlEl = document.getElementById('total-pnl');
-            pnlEl.innerText = `P&L: $${totalPnL.toFixed(2)}`;
-            pnlEl.className = `total-pnl ${totalPnL >= 0 ? 'pnl-pos' : 'pnl-neg'}`;
-        }
-
-        function clearLedger() {
-            document.getElementById('ledger-list').innerHTML = '<div style="text-align:center; padding: 40px 0; color:var(--text-muted); font-weight:600; font-size:0.85rem;">No executions recorded yet.</div>';
-            totalPnL = 0;
-            updatePnL(0);
-        }
-
-        function toggleBotEngine() {
-            const btn = document.getElementById('btn-toggle-bot');
-            if (isEngineRunning) {
-                isEngineRunning = false;
-                btn.innerText = "Execute AI Automation";
-                btn.classList.remove('active');
-                clearTimeout(scanInterval);
-            } else {
-                isEngineRunning = true;
-                btn.innerText = "Halt System Process";
-                btn.classList.add('active');
-                runScannerCycle();
-            }
-        }
-
-        function runScannerCycle() {
-            if (!isEngineRunning) return;
-            const market = document.getElementById('inp-market').value;
-            const stake = parseFloat(document.getElementById('inp-stake').value) || 1.00;
-            currentTargetIndex = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)];
-            
-            let signalText = "";
-            let signalSub = "";
-            let profit = 0;
-            const isWin = Math.random() < 0.95;
-
-            document.getElementById('sig-asset').innerText = `SCANNING: ${currentTargetIndex}`;
-
-            if(market === "Matches/Differs") {
-                const digit = Math.floor(Math.random() * 10);
-                const isMatch = isWin ? (Math.random() < 0.85) : (Math.random() < 0.2);
-                signalText = isMatch ? `MATCH DIGIT: ${digit}` : `DIFFER DIGIT: ${digit}`;
-                signalSub = "Payout: 9.0x | Win Rate: 95%";
-                profit = isWin ? (stake * 8) : (-stake); 
-            } else if(market === "Even/Odd") {
-                const choice = Math.random() > 0.5 ? "EVEN" : "ODD";
-                signalText = `PREDICT: ${choice}`;
-                signalSub = "Payout: 1.95x | Win Rate: 95%";
-                profit = isWin ? (stake * 0.95) : (-stake);
-            } else {
-                const digit = Math.floor(Math.random() * 9);
-                const isOver = Math.random() > 0.5;
-                signalText = isOver ? `OVER ${digit}` : `UNDER ${digit}`;
-                const multiplier = isOver ? (1.1 + (digit * 0.9)) : (1.1 + ((8 - digit) * 0.9));
-                signalSub = `Payout: ${multiplier.toFixed(1)}x | Win Rate: 95%`;
-                profit = isWin ? (stake * (multiplier - 1)) : (-stake);
-            }
-
-            document.getElementById('sig-main').innerText = signalText;
-            document.getElementById('sig-status').innerText = signalSub;
-            
-            scanInterval = setTimeout(() => {
-                if (!isEngineRunning) return;
-                if(isRealAccount) realBalance += profit; else demoBalance += profit;
-                updateBalanceUI();
-                updatePnL(profit);
-                logExecution(profit, market, signalText);
-                runScannerCycle();
-            }, 3000);
-        }
-
-        function logExecution(profit, market, signal) {
-            const ledger = document.getElementById('ledger-list');
-            if (ledger.innerText.includes("No executions")) ledger.innerHTML = '';
-            const row = document.createElement('div');
-            row.className = 'ledger-row';
-            row.innerHTML = `
-                <div class="ledger-details">
-                    <span class="ledger-asset">${currentTargetIndex}</span>
-                    <span class="ledger-type">${market} | ${signal}</span>
-                </div>
-                <div style="display:flex; align-items:center;">
-                    <span class="ledger-profit" style="color: ${profit >= 0 ? 'var(--success-green)' : 'var(--danger-red)'}">
-                        ${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}
-                    </span>
-                    <span class="delete-icon" onclick="this.parentElement.parentElement.remove(); updatePnL(-${profit})">×</span>
-                </div>
-            `;
-            ledger.insertBefore(row, ledger.firstChild);
-        }
-    </script>
 </body>
 </html>

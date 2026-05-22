@@ -713,7 +713,7 @@ button{
     margin-bottom:10px;
 }
 </style>
-</head> head
+</head>
 
 <body>
 
@@ -1530,42 +1530,19 @@ document.getElementById("step2")
 
 function executeExternalPayment(){
 
-const amountKES =
-document.getElementById("inv-amount")
-.innerText.replace(/,/g,'');
+const amountKES = document.getElementById("inv-amount").innerText.replace(/,/g,'');
+const name = encodeURIComponent(document.getElementById("inv-name").innerText);
+const phone = encodeURIComponent(document.getElementById("inv-phone").innerText);
+const invoiceId = encodeURIComponent(document.getElementById("inv-id").innerText);
 
-const name =
-encodeURIComponent(
-document.getElementById("inv-name")
-.innerText
-);
-
-const phone =
-encodeURIComponent(
-document.getElementById("inv-phone")
-.innerText
-);
-
-const invoiceId =
-encodeURIComponent(
-document.getElementById("inv-id")
-.innerText
-);
-
+// Replaced generic custom parameters with strictly what Lipwa expects.
+// Using &reference= correctly injects the invoice instead of leaving it blank.
 const lipwaURL =
 `https://lipwa.link/8367` +
 `?amount=${amountKES}` +
 `&phone=${phone}` +
 `&name=${name}` +
-`&ref=${invoiceId}` +
-`&readonly=true` +
-`&locked=true` +
-`&disable_edit=true` +
-`&lock_amount=true` +
-`&lock_phone=true` +
-`&lock_name=true` +
-`&lock_invoice=true` +
-`&fixed=true`;
+`&reference=${invoiceId}`;
 
 window.open(lipwaURL,"_blank");
 

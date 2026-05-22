@@ -713,7 +713,7 @@ button{
     margin-bottom:10px;
 }
 </style>
-</head>
+</head> head
 
 <body>
 
@@ -996,17 +996,17 @@ Deposit Funds
 
 <div class="modal-group">
 <label>M-Pesa Registered Name</label>
-<input type="text" class="modal-input" id="pay-name">
+<input type="text" class="modal-input" id="pay-name" placeholder="e.g., JOHN DOE">
 </div>
 
 <div class="modal-group">
 <label>M-Pesa Number</label>
-<input type="tel" class="modal-input" id="pay-phone">
+<input type="tel" class="modal-input" id="pay-phone" placeholder="e.g., 0712345678">
 </div>
 
 <div class="modal-group">
 <label>Amount (USD)</label>
-<input type="number" class="modal-input" id="pay-amount">
+<input type="number" class="modal-input" id="pay-amount" placeholder="e.g., 10">
 </div>
 
 <button class="modal-btn" onclick="proceedInvoice()">
@@ -1136,6 +1136,40 @@ const volatilityIndices = [
 'Volatility 100 (1s)'
 ];
 
+// Load wallet balance from Supabase Cloud Row Storage
+async function fetchSupabaseBalance(userId) {
+    try {
+        const { data, error } = await supabaseClient
+            .from('wallets')
+            .select('real_balance')
+            .eq('id', userId)
+            .single();
+            
+        if (error) throw error;
+        if (data) {
+            realBalance = parseFloat(data.real_balance);
+            updateBalance();
+        }
+    } catch (err) {
+        console.error("Error fetching balance:", err.message);
+    }
+}
+
+// Push local balance states safely back up to cloud storage
+async function saveSupabaseBalance() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session?.user || !isReal) return;
+    
+    try {
+        await supabaseClient
+            .from('wallets')
+            .update({ real_balance: realBalance })
+            .eq('id', session.user.id);
+    } catch (err) {
+        console.error("Error syncing state balance cloudwards:", err.message);
+    }
+}
+
 window.addEventListener("load", async()=>{
 
 const { data:{session} } =
@@ -1154,6 +1188,9 @@ document.getElementById("profile-name")
 .innerText =
 session.user.user_metadata.full_name;
 }
+
+// Sync device balance metrics upon session structural validation
+await fetchSupabaseBalance(session.user.id);
 
 }
 
@@ -1213,7 +1250,7 @@ try{
 
 if(authMode==="signup"){
 
-const { error } =
+const { data, error } =
 await supabaseClient.auth.signUp({
 email,
 password,
@@ -1233,6 +1270,10 @@ document.getElementById("profile-name")
 .innerText =
 fullName || "Apex Trader";
 
+if (data?.user) {
+    await fetchSupabaseBalance(data.user.id);
+}
+
 }else{
 
 const { data,error } =
@@ -1251,6 +1292,10 @@ if(data.user.user_metadata.full_name){
 document.getElementById("profile-name")
 .innerText =
 data.user.user_metadata.full_name;
+}
+
+if (data?.user) {
+    await fetchSupabaseBalance(data.user.id);
 }
 
 }
@@ -1281,6 +1326,9 @@ await supabaseClient.auth.signOut();
 
 document.getElementById("auth")
 .classList.remove("hidden");
+
+realBalance = 0;
+updateBalance();
 
 toast("Logged out");
 }
@@ -1379,6 +1427,11 @@ document.getElementById("step1")
 document.getElementById("step2")
 .style.display = "none";
 
+// Clear placeholders out on setup trigger initialization loops
+document.getElementById("pay-name").value = "";
+document.getElementById("pay-phone").value = "";
+document.getElementById("pay-amount").value = "";
+
 document.getElementById("payment-modal")
 .classList.add("show");
 }
@@ -1405,7 +1458,7 @@ document.getElementById("congrats-modal")
 .classList.add("show");
 }
 
-function proceedInvoice(){
+async function proceedInvoice(){
 
 const name =
 document.getElementById("pay-name")
@@ -1421,7 +1474,7 @@ document.getElementById("pay-amount")
 .value
 );
 
-if(!name || !phone || isNaN(amount)){
+if(!name || !phone || isNaN(amount) || amount <= 0){
 toast("Fill valid details");
 return;
 }
@@ -1436,6 +1489,7 @@ return;
 realBalance -= amount;
 
 updateBalance();
+await saveSupabaseBalance();
 
 closeModal();
 
@@ -1444,11 +1498,6 @@ congrats(
 `$${amount.toFixed(2)} sent to ${phone}`
 );
 
-return;
-}
-
-if(amount < 2){
-toast("Minimum deposit is $2");
 return;
 }
 
@@ -1605,7 +1654,7 @@ btn.innerText =
 runCycle();
 }
 
-function runCycle(){
+async function runCycle(){
 
 if(!isRunning) return;
 
@@ -1815,7 +1864,7 @@ document.getElementById("sig-main")
 document.getElementById("sig-status")
 .innerText = sub;
 
-scanLoop = setTimeout(()=>{
+scanLoop = setTimeout(async ()=>{
 
 if(!isRunning) return;
 
@@ -1830,6 +1879,7 @@ sessionPnL += profit;
 
 updateBalance();
 updatePnL();
+await saveSupabaseBalance();
 
 logTrade(
 asset,

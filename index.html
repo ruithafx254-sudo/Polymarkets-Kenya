@@ -1429,4 +1429,93 @@
 
             signalSub = "Payout: 1.95x | Win Rate: 95%";
 
-            profit = isWin ? (stake *
+            profit = isWin ? (stake * 0.95) : (-stake);
+
+        } else {
+
+            const digit = Math.floor(Math.random() * 9);
+
+            const isOver = Math.random() > 0.5;
+
+            signalText =
+                isOver ? `OVER ${digit}` : `UNDER ${digit}`;
+
+            const multiplier =
+                isOver
+                    ? (1.1 + (digit * 0.9))
+                    : (1.1 + ((8 - digit) * 0.9));
+
+            signalSub =
+                `Payout: ${multiplier.toFixed(1)}x | Win Rate: 95%`;
+
+            profit =
+                isWin
+                    ? (stake * (multiplier - 1))
+                    : (-stake);
+        }
+
+        document.getElementById('sig-main').innerText = signalText;
+
+        document.getElementById('sig-status').innerText = signalSub;
+
+        scanInterval = setTimeout(() => {
+
+            if (!isEngineRunning) return;
+
+            if(isRealAccount)
+                realBalance += profit;
+            else
+                demoBalance += profit;
+
+            updateBalanceUI();
+
+            updatePnL(profit);
+
+            logExecution(profit, market, signalText);
+
+            runScannerCycle();
+
+        }, 3000);
+    }
+
+    function logExecution(profit, market, signal) {
+
+        const ledger =
+            document.getElementById('ledger-list');
+
+        if (ledger.innerText.includes("No executions"))
+            ledger.innerHTML = '';
+
+        const row = document.createElement('div');
+
+        row.className = 'ledger-row';
+
+        row.innerHTML = `
+            <div class="ledger-details">
+                <span class="ledger-asset">${currentTargetIndex}</span>
+                <span class="ledger-type">${market} | ${signal}</span>
+            </div>
+
+            <div style="display:flex; align-items:center;">
+                <span class="ledger-profit"
+                      style="color: ${profit >= 0
+                        ? 'var(--success-green)'
+                        : 'var(--danger-red)'}">
+
+                    ${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}
+                </span>
+
+                <span class="delete-icon"
+                      onclick="this.parentElement.parentElement.remove(); updatePnL(-${profit})">
+                    ×
+                </span>
+            </div>
+        `;
+
+        ledger.insertBefore(row, ledger.firstChild);
+    }
+
+</script>
+
+</body>
+</html>

@@ -6,8 +6,7 @@
     <title>Apex Enterprise OS</title>
     <style>
         :root {
-            /* Samsung One UI Enterprise Palette */
-            --bg-outer: #e3e6e8;
+            var(--bg-outer): #e3e6e8;
             --bg-app: #f7f9fa;
             --surface-white: #ffffff;
             --primary-blue: #007aff;
@@ -35,7 +34,7 @@
         }
 
         body {
-            background-color: var(--bg-outer);
+            background-color: #e3e6e8;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -59,79 +58,6 @@
             overflow: hidden;
         }
 
-        /* --- AUTH / LANDING PAGE --- */
-        .auth-screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #0b101e 0%, #1a2235 100%);
-            z-index: 500;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 24px;
-            color: white;
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-
-        .auth-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(1.05);
-        }
-
-        .auth-logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--primary-blue), #00c6ff);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow-blue);
-        }
-
-        .auth-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
-        .auth-sub { font-size: 0.9rem; color: #8b95a5; margin-bottom: 30px; text-align: center; }
-
-        .auth-toggle { display: flex; width: 100%; background: rgba(255,255,255,0.05); border-radius: var(--radius-md); margin-bottom: 20px; overflow: hidden; }
-        .auth-tab { flex: 1; padding: 12px; text-align: center; font-size: 0.9rem; font-weight: 700; color: #8b95a5; cursor: pointer; transition: var(--transition); }
-        .auth-tab.active { background: var(--primary-blue); color: white; }
-
-        .auth-form { width: 100%; display: flex; flex-direction: column; gap: 16px; }
-        .auth-input {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 16px;
-            border-radius: var(--radius-md);
-            color: white;
-            font-size: 1rem;
-            outline: none;
-        }
-        .auth-input::placeholder { color: #6e7781; }
-        .auth-input:focus { border-color: var(--primary-blue); background: rgba(255,255,255,0.1); }
-
-        .btn-auth {
-            width: 100%;
-            background: var(--primary-blue);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: var(--radius-md);
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin-top: 10px;
-            cursor: pointer;
-            box-shadow: var(--shadow-blue);
-            transition: var(--transition);
-        }
-        .btn-auth:active { transform: scale(0.98); }
-        .btn-auth:disabled { opacity: 0.7; cursor: not-allowed; }
-
         /* --- MAIN APP UI --- */
         .app-header {
             background-color: rgba(255, 255, 255, 0.85);
@@ -147,7 +73,7 @@
         .brand-title { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
         .brand-logo { width: 24px; height: 24px; background: var(--primary-blue); color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
         
-        .account-selector { background-color: #e8f0fe; color: var(--primary-blue); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: none; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; text-align: center; }
+        .account-selector { background-color: #e8f0fe; color: var(--primary-blue); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: none; outline: none; cursor: pointer; appearance: none; text-align: center; }
 
         .view-container { flex: 1; overflow-y: auto; position: relative; padding-bottom: 20px; }
         .view { display: none; flex-direction: column; padding: 20px; gap: 20px; animation: fadeIn 0.3s ease; }
@@ -155,13 +81,20 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Balance Section */
-        .equity-card { background-color: var(--surface-white); border-radius: var(--radius-lg); padding: 28px 20px; box-shadow: var(--shadow-sm); text-align: center; border: 1px solid var(--border-color); }
+        /* Balance & Funding Section */
+        .equity-card { background-color: var(--surface-white); border-radius: var(--radius-lg); padding: 24px 20px; box-shadow: var(--shadow-sm); text-align: center; border: 1px solid var(--border-color); }
         .equity-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-        .equity-amount { font-size: 3.2rem; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 16px; font-variant-numeric: tabular-nums; }
-        .progress-container { background-color: var(--bg-outer); border-radius: 10px; height: 8px; width: 100%; overflow: hidden; margin-bottom: 8px; }
+        .equity-amount { font-size: 3rem; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 16px; font-variant-numeric: tabular-nums; }
+        .progress-container { background-color: #e3e6e8; border-radius: 10px; height: 8px; width: 100%; overflow: hidden; margin-bottom: 8px; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary-blue), #00c6ff); width: 0.1%; transition: width 0.5s ease; }
-        .target-text { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+        .target-text { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 16px; }
+        
+        .funding-row { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-fund { flex: 1; padding: 12px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.9rem; cursor: pointer; border: none; transition: var(--transition); }
+        .btn-fund.deposit { background-color: rgba(40, 167, 69, 0.1); color: var(--success-green); }
+        .btn-fund.deposit:active { background-color: rgba(40, 167, 69, 0.2); }
+        .btn-fund.withdraw { background-color: rgba(220, 53, 69, 0.1); color: var(--danger-red); }
+        .btn-fund.withdraw:active { background-color: rgba(220, 53, 69, 0.2); }
 
         /* AI Scanner */
         .ai-engine-box { background: var(--surface-white); border-radius: var(--radius-lg); border: 1px solid var(--primary-blue); padding: 24px; box-shadow: var(--shadow-blue); position: relative; overflow: hidden; }
@@ -185,7 +118,7 @@
         .btn-master:active { transform: scale(0.98); }
         .btn-master.active { background-color: var(--danger-red); box-shadow: 0 8px 24px rgba(220, 53, 69, 0.3); }
 
-        /* Ledger & Profile */
+        /* Ledger */
         .ledger-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .total-pnl { font-size: 1rem; font-weight: 800; }
         .pnl-pos { color: var(--success-green); }
@@ -197,19 +130,6 @@
         .ledger-asset { font-weight: 700; font-size: 0.9rem; }
         .ledger-type { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
         .ledger-profit { font-weight: 800; color: var(--success-green); font-size: 1.1rem; }
-        .delete-icon { cursor: pointer; font-size: 1.2rem; color: var(--danger-red); margin-left: 15px; }
-
-        .profile-header { text-align: center; padding: 20px 0; }
-        .profile-avatar { width: 80px; height: 80px; background-color: var(--border-color); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
-        .profile-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; }
-        .profile-email { font-size: 0.85rem; color: var(--text-muted); }
-        
-        .profile-list { background: var(--surface-white); border-radius: var(--radius-lg); border: 1px solid var(--border-color); overflow: hidden; }
-        .profile-item { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600; }
-        .profile-item:last-child { border-bottom: none; }
-        .profile-item span:last-child { color: var(--text-muted); font-weight: 400; }
-
-        .btn-logout { width: 100%; background: transparent; border: 1px solid var(--danger-red); color: var(--danger-red); padding: 16px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; margin-top: 10px; }
 
         /* Navigation Bar */
         .bottom-nav { background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-top: 1px solid var(--border-color); padding: 16px 20px 24px; display: flex; justify-content: space-around; z-index: 10; }
@@ -217,36 +137,12 @@
         .nav-item.active { color: var(--primary-blue); }
         .nav-icon { font-size: 1.4rem; }
         .nav-label { font-size: 0.7rem; font-weight: 700; }
-
-        /* Toast */
-        .toast-container { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; pointer-events: none; }
-        .toast { background-color: #111; color: white; padding: 14px 20px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 12px; animation: slideDown 0.3s forwards; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="device-frame">
         
-        <div class="auth-screen" id="auth-screen">
-            <div class="auth-logo">A</div>
-            <div class="auth-title">Apex Enterprise</div>
-            <div class="auth-sub">Secure Neural Execution Environment</div>
-
-            <div class="auth-toggle">
-                <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign In</div>
-                <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</div>
-            </div>
-
-            <div class="auth-form">
-                <input type="email" class="auth-input" placeholder="Email Address" id="auth-email">
-                <input type="password" class="auth-input" placeholder="Secure Password" id="auth-pass">
-                <button class="btn-auth" id="btn-auth-action" onclick="handleAuth()">Initialize Session</button>
-            </div>
-        </div>
-
-        <div class="toast-container" id="toast-area"></div>
-
         <header class="app-header">
             <div class="brand-title">
                 <div class="brand-logo">A</div>
@@ -268,6 +164,11 @@
                         <div class="progress-bar" id="goal-progress"></div>
                     </div>
                     <div class="target-text">Goal Progress: <span id="target-display">$50,000.00 Target</span></div>
+                    
+                    <div class="funding-row">
+                        <button class="btn-fund deposit" onclick="handleFunding('deposit')">↓ Deposit</button>
+                        <button class="btn-fund withdraw" onclick="handleFunding('withdraw')">↑ Withdraw</button>
+                    </div>
                 </div>
 
                 <div class="ai-engine-box">
@@ -332,31 +233,6 @@
                 </div>
             </div>
 
-            <div id="view-profile" class="view">
-                <div class="profile-header">
-                    <div class="profile-avatar">👤</div>
-                    <div class="profile-name">Apex Trader</div>
-                    <div class="profile-email" id="profile-email-text">Unlinked</div>
-                </div>
-
-                <div class="profile-list">
-                    <div class="profile-item">
-                        <span>Account Status</span>
-                        <span style="color:var(--success-green); font-weight:700;">Verified Active</span>
-                    </div>
-                    <div class="profile-item">
-                        <span>Database Node</span>
-                        <span style="color:var(--primary-blue); font-weight:700;">Local Storage Connected</span>
-                    </div>
-                    <div class="profile-item">
-                        <span>Risk Settings</span>
-                        <span>Strict TP Activated</span>
-                    </div>
-                </div>
-
-                <button class="btn-logout" onclick="handleLogout()">Secure Logout</button>
-            </div>
-
         </div>
 
         <nav class="bottom-nav">
@@ -368,17 +244,10 @@
                 <span class="nav-icon">≡</span>
                 <span class="nav-label">Ledger</span>
             </div>
-            <div class="nav-item" onclick="switchTab('view-profile', this)">
-                <span class="nav-icon">👤</span>
-                <span class="nav-label">Profile</span>
-            </div>
         </nav>
     </div>
 
     <script>
-        let authMode = 'login'; 
-        let currentUser = null;
-
         let realBalance = 50.00;
         let demoBalance = 10000.00;
         let isRealAccount = true;
@@ -387,108 +256,21 @@
         
         let isEngineRunning = false;
         let scanInterval;
-        let currentTargetIndex = "";
+
+        // Shift Toggles
+        let currentShiftMatch = true; 
+        let currentShiftEven = true;
+        let currentShiftOver = true;
 
         const volatilityIndices = [
             "Volatility 10 (1s) Index", "Volatility 25 (1s) Index", "Volatility 50 (1s) Index", 
             "Volatility 75 (1s) Index", "Volatility 100 (1s) Index"
         ];
 
-        // --- SESSION PERSISTENCE (Runs on load) ---
         window.onload = () => {
-            try {
-                const savedSession = localStorage.getItem('apex_session');
-                if(savedSession) {
-                    currentUser = JSON.parse(savedSession);
-                    document.getElementById('auth-screen').classList.add('hidden');
-                    document.getElementById('profile-email-text').innerText = currentUser.email;
-                    updateBalanceUI();
-                }
-            } catch (e) {
-                console.error("Session parse error", e);
-            }
+            updateBalanceUI();
         };
 
-        // --- AUTH LOGIC (Local Storage) ---
-        function switchAuthTab(mode) {
-            authMode = mode;
-            document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-            document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
-            document.getElementById('btn-auth-action').innerText = mode === 'login' ? 'Initialize Session' : 'Create Access Node';
-        }
-
-        function handleAuth() {
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-pass').value;
-            const btn = document.getElementById('btn-auth-action');
-
-            if(!email || !password) return showToast('Please fill all fields', 'error');
-
-            btn.disabled = true;
-            btn.innerText = 'Processing...';
-
-            // Simulate slight network delay
-            setTimeout(() => {
-                let users = {};
-                
-                // Bulletproof local storage check
-                try {
-                    const stored = localStorage.getItem('apex_users');
-                    if (stored) users = JSON.parse(stored);
-                } catch (e) {
-                    console.warn("Corrupted users data found, resetting.");
-                    users = {};
-                }
-
-                let success = false;
-                let errorMsg = '';
-
-                if (authMode === 'signup') {
-                    if (users[email]) {
-                        errorMsg = 'Account already exists. Please Sign In.';
-                    } else {
-                        users[email] = { password: password };
-                        localStorage.setItem('apex_users', JSON.stringify(users));
-                        success = true;
-                    }
-                } else {
-                    // LOGIN MODE
-                    if (!users[email]) {
-                        errorMsg = 'Account not found. Please click Sign Up first.';
-                    } else if (users[email].password !== password) {
-                        errorMsg = 'Invalid password. Please try again.';
-                    } else {
-                        success = true;
-                    }
-                }
-
-                btn.disabled = false;
-                btn.innerText = authMode === 'login' ? 'Initialize Session' : 'Create Access Node';
-
-                if (!success) {
-                    showToast(errorMsg, 'error');
-                } else {
-                    currentUser = { email: email };
-                    localStorage.setItem('apex_session', JSON.stringify(currentUser));
-                    
-                    document.getElementById('auth-screen').classList.add('hidden');
-                    document.getElementById('profile-email-text').innerText = currentUser.email;
-                    showToast(authMode === 'login' ? 'Authentication Successful' : 'Account Created Successfully');
-                    updateBalanceUI();
-                }
-            }, 600);
-        }
-
-        function handleLogout() {
-            if(isEngineRunning) toggleBotEngine();
-            currentUser = null;
-            localStorage.removeItem('apex_session');
-            document.getElementById('auth-screen').classList.remove('hidden');
-            document.getElementById('auth-pass').value = '';
-            showToast('Session Terminated');
-        }
-
-        // --- UI LOGIC ---
         function switchAccountType() {
             isRealAccount = (document.getElementById('account-type').value === 'real');
             updateBalanceUI();
@@ -506,14 +288,28 @@
             document.getElementById('digit-selector-box').style.display = market === 'Over/Under' ? 'block' : 'none';
         }
 
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-area');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            const icon = type === 'success' ? '<span style="color:var(--success-green)">✔</span>' : '<span style="color:var(--danger-red)">✖</span>';
-            toast.innerHTML = `${icon} ${message}`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3500);
+        // --- DEPOSIT / WITHDRAW LOGIC ---
+        function handleFunding(action) {
+            const amountStr = prompt(`Enter amount to ${action} ($):`);
+            if(!amountStr) return;
+            
+            const amount = parseFloat(amountStr);
+            if(isNaN(amount) || amount <= 0) {
+                alert("Please enter a valid positive number.");
+                return;
+            }
+
+            if(action === 'withdraw') {
+                const currentBal = isRealAccount ? realBalance : demoBalance;
+                if(amount > currentBal) {
+                    alert("Insufficient funds for withdrawal.");
+                    return;
+                }
+                if(isRealAccount) realBalance -= amount; else demoBalance -= amount;
+            } else {
+                if(isRealAccount) realBalance += amount; else demoBalance += amount;
+            }
+            updateBalanceUI();
         }
 
         function updateBalanceUI() {
@@ -536,7 +332,6 @@
             updatePnL(0);
         }
 
-        // --- TRADING ENGINE ALGORITHMS ---
         function toggleBotEngine() {
             const btn = document.getElementById('btn-toggle-bot');
             if (isEngineRunning) {
@@ -552,100 +347,121 @@
             }
         }
 
+        // --- TRADING ENGINE (95% WIN RATE + SHIFTING) ---
         function runScannerCycle() {
             if (!isEngineRunning) return;
             
             const market = document.getElementById('inp-market').value;
             const stake = parseFloat(document.getElementById('inp-stake').value) || 1.00;
-            const targetDigit = parseInt(document.getElementById('inp-digit').value);
+            let targetDigit = parseInt(document.getElementById('inp-digit').value);
+            if(isNaN(targetDigit)) targetDigit = 5;
             
-            currentTargetIndex = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)];
-            document.getElementById('sig-asset').innerText = `SCANNING: ${currentTargetIndex}`;
+            const currentAsset = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)];
+            document.getElementById('sig-asset').innerText = `SCANNING: ${currentAsset}`;
 
+            // 95% Win Rate Logic
+            const isWin = Math.random() < 0.95; 
+            
             let signalText = "";
             let signalSub = "";
             let profit = 0;
-            
-            const resultDigit = Math.floor(Math.random() * 10); 
+            let finalDigit = 0;
 
             if(market === "Matches/Differs") {
-                const isMatchPrediction = Math.random() < 0.1; 
+                // Shift Market Strategy
+                currentShiftMatch = !currentShiftMatch; 
                 
-                if (isMatchPrediction) {
-                    const isWin = resultDigit === targetDigit;
-                    signalText = `MATCH DIGIT: ${targetDigit}`;
-                    signalSub = `Payout: 9.09x | Result: ${resultDigit}`;
+                if (currentShiftMatch) {
+                    // Prediciting MATCH
+                    finalDigit = isWin ? targetDigit : ((targetDigit + 1) % 10);
                     profit = isWin ? (stake * 8.09) : (-stake);
+                    signalText = `MATCH: ${targetDigit}`;
+                    signalSub = `Payout: 9.09x | Result: ${finalDigit}`;
                 } else {
-                    const isWin = resultDigit !== targetDigit;
-                    signalText = `DIFFER DIGIT: ${targetDigit}`;
-                    signalSub = `Payout: 1.09x | Result: ${resultDigit}`;
+                    // Predicting DIFFER
+                    finalDigit = isWin ? ((targetDigit + 1) % 10) : targetDigit;
                     profit = isWin ? (stake * 0.09) : (-stake);
+                    signalText = `DIFFER: ${targetDigit}`;
+                    signalSub = `Payout: 1.09x | Result: ${finalDigit}`;
                 }
 
             } else if(market === "Even/Odd") {
-                const isEvenPrediction = Math.random() > 0.5;
-                const resultIsEven = resultDigit % 2 === 0;
-                const isWin = isEvenPrediction ? resultIsEven : !resultIsEven;
+                // Shift Market Strategy
+                currentShiftEven = !currentShiftEven;
                 
-                signalText = isEvenPrediction ? "PREDICT: EVEN" : "PREDICT: ODD";
-                signalSub = `Payout: 1.95x | Result: ${resultDigit}`;
-                profit = isWin ? (stake * 0.95) : (-stake);
+                if(currentShiftEven) {
+                    // Predicting EVEN
+                    finalDigit = isWin ? 2 : 1; 
+                    profit = isWin ? (stake * 0.95) : (-stake);
+                    signalText = "PREDICT: EVEN";
+                    signalSub = `Payout: 1.95x | Result: ${finalDigit}`;
+                } else {
+                    // Predicting ODD
+                    finalDigit = isWin ? 1 : 2;
+                    profit = isWin ? (stake * 0.95) : (-stake);
+                    signalText = "PREDICT: ODD";
+                    signalSub = `Payout: 1.95x | Result: ${finalDigit}`;
+                }
 
             } else if(market === "Over/Under") {
-                const isOverPrediction = Math.random() > 0.5;
+                // Shift Market Strategy
+                currentShiftOver = !currentShiftOver;
                 
-                if(isOverPrediction) {
-                    const prob = (9 - targetDigit) / 10;
-                    const payoutMult = prob > 0 ? (1 / prob) * 0.95 : 0; 
-                    const isWin = resultDigit > targetDigit;
+                if(currentShiftOver) {
+                    // Predicting OVER
+                    // Make sure targetDigit isn't 9, otherwise Over is impossible. Fallback to 8 if so.
+                    let safeTarget = targetDigit >= 9 ? 8 : targetDigit;
+                    finalDigit = isWin ? 9 : 0; 
+                    let prob = (9 - safeTarget) / 10;
+                    let mult = prob > 0 ? (1 / prob) * 0.95 : 0; 
+                    profit = isWin ? (stake * (mult - 1)) : (-stake);
                     
-                    signalText = `OVER ${targetDigit}`;
-                    signalSub = `Payout: ${payoutMult.toFixed(2)}x | Result: ${resultDigit}`;
-                    profit = isWin ? (stake * (payoutMult - 1)) : (-stake);
+                    signalText = `OVER: ${safeTarget}`;
+                    signalSub = `Payout: ${mult.toFixed(2)}x | Result: ${finalDigit}`;
                 } else {
-                    const prob = targetDigit / 10;
-                    const payoutMult = prob > 0 ? (1 / prob) * 0.95 : 0;
-                    const isWin = resultDigit < targetDigit;
+                    // Predicting UNDER
+                    // Make sure targetDigit isn't 0, otherwise Under is impossible. Fallback to 1 if so.
+                    let safeTarget = targetDigit <= 0 ? 1 : targetDigit;
+                    finalDigit = isWin ? 0 : 9;
+                    let prob = safeTarget / 10;
+                    let mult = prob > 0 ? (1 / prob) * 0.95 : 0;
+                    profit = isWin ? (stake * (mult - 1)) : (-stake);
                     
-                    signalText = `UNDER ${targetDigit}`;
-                    signalSub = `Payout: ${payoutMult.toFixed(2)}x | Result: ${resultDigit}`;
-                    profit = isWin ? (stake * (payoutMult - 1)) : (-stake);
+                    signalText = `UNDER: ${safeTarget}`;
+                    signalSub = `Payout: ${mult.toFixed(2)}x | Result: ${finalDigit}`;
                 }
             }
 
             document.getElementById('sig-main').innerText = signalText;
+            document.getElementById('sig-main').style.color = isWin ? "var(--success-green)" : "var(--danger-red)";
             document.getElementById('sig-status').innerText = signalSub;
             
             scanInterval = setTimeout(() => {
                 if (!isEngineRunning) return;
                 
-                if(profit !== 0) {
-                    if(isRealAccount) realBalance += profit; else demoBalance += profit;
-                    updateBalanceUI();
-                    updatePnL(profit);
-                    logExecution(profit, market, signalText);
-                }
+                if(isRealAccount) realBalance += profit; else demoBalance += profit;
+                updateBalanceUI();
+                updatePnL(profit);
+                logExecution(profit, market, signalText, finalDigit);
                 
                 runScannerCycle();
-            }, 3000); 
+            }, 2500); 
         }
 
-        function logExecution(profit, market, signal) {
+        function logExecution(profit, market, signal, resultDigit) {
             const ledger = document.getElementById('ledger-list');
             if (ledger.innerText.includes("No executions")) ledger.innerHTML = '';
             const row = document.createElement('div');
             row.className = 'ledger-row';
             row.innerHTML = `
                 <div class="ledger-details">
-                    <span class="ledger-asset">${currentTargetIndex}</span>
-                    <span class="ledger-type">${market} | ${signal}</span>
+                    <span class="ledger-asset">${signal}</span>
+                    <span class="ledger-type">${market} | Result: ${resultDigit}</span>
                 </div>
                 <div style="display:flex; align-items:center;">
                     <span class="ledger-profit" style="color: ${profit >= 0 ? 'var(--success-green)' : 'var(--danger-red)'}">
                         ${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}
                     </span>
-                    <span class="delete-icon" onclick="this.parentElement.parentElement.remove(); updatePnL(-${profit})">×</span>
                 </div>
             `;
             ledger.insertBefore(row, ledger.firstChild);

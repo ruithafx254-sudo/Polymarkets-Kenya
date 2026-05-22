@@ -980,6 +980,7 @@ async function fetchSupabaseBalance(userId) {
     }
 }
 
+// CHANGED TO UPSERT to guarantee that the row persists securely
 async function saveSupabaseBalance() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session?.user || !isReal) return;
@@ -987,8 +988,7 @@ async function saveSupabaseBalance() {
     try {
         await supabaseClient
             .from('wallets')
-            .update({ real_balance: realBalance })
-            .eq('id', session.user.id);
+            .upsert({ id: session.user.id, real_balance: realBalance });
     } catch (err) {
         console.error("Error syncing state balance cloudwards:", err.message);
     }

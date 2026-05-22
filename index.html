@@ -1592,3 +1592,308 @@ const btn =
 document.getElementById("engine-btn");
 
 if(isRunning){
+
+isRunning = false;
+
+clearTimeout(scanLoop);
+
+btn.classList.remove("active");
+
+btn.innerText =
+"Execute AI Automation";
+
+document.getElementById("sig-main")
+.innerText = "--";
+
+document.getElementById("sig-status")
+.innerText = "Scanner paused";
+
+return;
+}
+
+const stake =
+parseFloat(
+document.getElementById("inp-stake")
+.value
+);
+
+if(isNaN(stake) || stake <= 0){
+toast("Invalid stake");
+return;
+}
+
+activeStake = stake;
+
+sessionPnL = 0;
+
+isRunning = true;
+
+btn.classList.add("active");
+
+btn.innerText =
+"Halt System Process";
+
+runCycle();
+}
+
+function runCycle(){
+
+if(!isRunning) return;
+
+const balance =
+isReal ? realBalance : demoBalance;
+
+const tp =
+parseFloat(
+document.getElementById("inp-tp")
+.value
+) || 0;
+
+const sl =
+parseFloat(
+document.getElementById("inp-sl")
+.value
+) || 0;
+
+const multi =
+parseFloat(
+document.getElementById("inp-multi")
+.value
+) || 1;
+
+const baseStake =
+parseFloat(
+document.getElementById("inp-stake")
+.value
+);
+
+if(sl > 0 && sessionPnL <= -sl){
+
+toast("Stop loss reached");
+
+toggleBot();
+
+return;
+}
+
+if(tp > 0 && sessionPnL >= tp){
+
+toggleBot();
+
+congrats(
+"TP Achieved!",
+`You earned $${sessionPnL.toFixed(2)}`
+);
+
+return;
+}
+
+if(activeStake > balance){
+
+toast("Insufficient balance");
+
+toggleBot();
+
+return;
+}
+
+const market =
+document.getElementById("inp-market")
+.value;
+
+const targetDigit =
+parseInt(
+document.getElementById("inp-digit")
+.value
+) || 0;
+
+const asset =
+volatilityIndices[
+Math.floor(
+Math.random() *
+volatilityIndices.length
+)
+];
+
+const isWin = Math.random() < 0.90;
+
+let signal = "";
+let sub = "";
+let profit = 0;
+
+if(market==="Matches/Differs"){
+
+const match =
+Math.random() > 0.5;
+
+const digit =
+Math.floor(Math.random()*10);
+
+if(match){
+
+signal =
+`MATCH DIGIT: ${digit}`;
+
+profit =
+isWin
+? activeStake * 8.09
+: -activeStake;
+
+sub =
+"Deriv Multiplier: 8.09x";
+
+}else{
+
+signal =
+`DIFFER DIGIT: ${digit}`;
+
+profit =
+isWin
+? activeStake * 0.099
+: -activeStake;
+
+sub =
+"Deriv Multiplier: 0.099x";
+}
+
+}else if(market==="Even/Odd"){
+
+signal =
+Math.random() > 0.5
+? "PREDICT: EVEN"
+: "PREDICT: ODD";
+
+profit =
+isWin
+? activeStake * 0.95
+: -activeStake;
+
+sub =
+"Deriv Multiplier: 0.95x";
+
+}else{
+
+const over =
+Math.random() > 0.5;
+
+if(over){
+
+signal =
+`OVER ${targetDigit}`;
+
+const mult =
+overMultipliers[targetDigit];
+
+profit =
+isWin
+? activeStake * mult
+: -activeStake;
+
+sub =
+`Deriv Multiplier: ${mult.toFixed(2)}x`;
+
+}else{
+
+signal =
+`UNDER ${targetDigit}`;
+
+const mult =
+underMultipliers[targetDigit];
+
+profit =
+isWin
+? activeStake * mult
+: -activeStake;
+
+sub =
+`Deriv Multiplier: ${mult.toFixed(2)}x`;
+}
+}
+
+document.getElementById("sig-asset")
+.innerText =
+`SCANNING: ${asset}`;
+
+document.getElementById("sig-main")
+.innerText = signal;
+
+document.getElementById("sig-status")
+.innerText = sub;
+
+scanLoop = setTimeout(()=>{
+
+if(!isRunning) return;
+
+if(isReal){
+realBalance += profit;
+}else{
+demoBalance += profit;
+}
+
+totalPnL += profit;
+sessionPnL += profit;
+
+updateBalance();
+updatePnL();
+
+logTrade(
+asset,
+market,
+signal,
+profit,
+activeStake
+);
+
+if(profit < 0){
+activeStake =
+activeStake * multi;
+}else{
+activeStake =
+baseStake;
+}
+
+runCycle();
+
+},2500);
+}
+
+function logTrade(asset,market,signal,profit,stake){
+
+const list =
+document.getElementById("ledger-list");
+
+if(list.innerText.includes("No executions")){
+list.innerHTML = "";
+}
+
+const row =
+document.createElement("div");
+
+row.className = "ledger-row";
+
+row.innerHTML = `
+<div>
+<div class="ledger-title">
+${asset}
+<span style="font-size:.7rem;color:var(--muted);">
+(Stake: $${stake.toFixed(2)})
+</span>
+</div>
+
+<div class="ledger-sub">
+${market} | ${signal}
+</div>
+</div>
+
+<div class="ledger-profit"
+style="color:${profit>=0?'var(--success)':'var(--danger)'};">
+${profit>=0?'+':''}$${profit.toFixed(2)}
+</div>
+`;
+
+list.prepend(row);
+}
+</script>
+
+</body>
+</html>

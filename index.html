@@ -739,7 +739,6 @@ button{
 
 <div class="device">
 
-<!-- VERIFICATION SCREEN (Triggers on redirect return) -->
 <div class="verify-overlay" id="verify-overlay">
     <div class="spinner"></div>
     <h2 style="font-weight:900; color:var(--text); margin-top:20px;">Verifying Payment...</h2>
@@ -871,7 +870,6 @@ New here? <span onclick="switchAuth('signup')">Create account</span>
 
 <div id="step1">
     
-    <!-- Dynamic Method Selector for Withdrawals -->
     <div id="withdraw-method-group" class="modal-group" style="display:none;">
         <label>Withdrawal Method</label>
         <select class="modal-input" id="withdraw-method" onchange="switchWithdrawMethod()">
@@ -881,13 +879,11 @@ New here? <span onclick="switchAuth('signup')">Create account</span>
         </select>
     </div>
 
-    <!-- M-Pesa Input Fields (Default) -->
     <div id="form-mpesa">
         <div class="modal-group"><label>M-Pesa Registered Name</label><input type="text" class="modal-input" id="pay-name" placeholder="e.g., JOHN DOE"></div>
         <div class="modal-group"><label>M-Pesa Number</label><input type="tel" class="modal-input" id="pay-phone" placeholder="e.g., 0712345678"></div>
     </div>
 
-    <!-- USDT Input Fields -->
     <div id="form-usdt" style="display:none;">
         <div class="modal-group"><label>USDT Network</label>
             <select class="modal-input" id="usdt-network">
@@ -899,13 +895,11 @@ New here? <span onclick="switchAuth('signup')">Create account</span>
         <div class="modal-group"><label>USDT Wallet Address</label><input type="text" class="modal-input" id="usdt-address" placeholder="Paste your address here"></div>
     </div>
 
-    <!-- Binance Pay Input Fields -->
     <div id="form-binance" style="display:none;">
         <div class="modal-group"><label>Binance Pay ID / Email</label><input type="text" class="modal-input" id="binance-id" placeholder="e.g., 123456789 or email"></div>
     </div>
 
-    <!-- Universal Amount Field -->
-    <div class="modal-group"><label>Amount (USD)</label><input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $5.00"></div>
+    <div class="modal-group"><label>Amount (USD)</label><input type="number" class="modal-input" id="pay-amount" placeholder="Enter amount"></div>
     
     <button class="modal-btn" onclick="proceedInvoice()">Continue</button>
     <div class="badge" id="trust-badge"><img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png"></div>
@@ -1215,12 +1209,6 @@ async function proceedInvoice(){
     const amount = parseFloat(document.getElementById("pay-amount").value);
 
     if(isNaN(amount) || amount <= 0){ toast("Enter valid amount"); return; }
-
-    // Minimum Deposit Gatekeeper Verification
-    if(paymentType === "deposit" && amount < 5) { 
-        toast("Minimum deposit amount is $5.00"); 
-        return; 
-    }
 
     if(paymentType==="withdraw"){
         if(amount > realBalance){ toast("Insufficient balance"); return; }

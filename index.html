@@ -90,7 +90,7 @@ button{
     justify-content:center;
     padding:28px;
     color:white;
-    transition: 0.2s ease-in-out; /* Optimized for faster UI response */
+    transition: 0.2s ease-in-out;
 }
 
 .auth.hidden{
@@ -375,6 +375,27 @@ button{
 .action-btn span{
     font-size:.72rem;
     color:var(--success);
+}
+
+.history-bar-btn {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(0,0,0,.02);
+    transition: .2s;
+}
+
+.history-bar-btn:active {
+    transform: scale(.98);
 }
 
 /* AI */
@@ -856,7 +877,12 @@ New here? <span onclick="switchAuth('signup')">Create account</span>
 <button class="action-btn" onclick="openPayment('withdraw')">Withdraw<span>Instant Processing</span></button>
 </div>
 
-<div class="card">
+<button class="history-bar-btn" onclick="openHistory()">
+    <span style="display:flex;align-items:center;gap:8px;">⏱️ Transaction History</span>
+    <span style="color:var(--muted);font-size:1.2rem;line-height:1;">›</span>
+</button>
+
+<div class="card" style="margin-top:16px;">
 <div class="ai-head"><span>Neural Match Scanner</span><div class="live"><div class="dot"></div>AI Accuracy 90%</div></div>
 <div class="signal">
 <div class="signal-asset" id="sig-asset">READY TO SYNC...</div>
@@ -893,14 +919,6 @@ New here? <span onclick="switchAuth('signup')">Create account</span>
 </div>
 <div id="ledger-list"><div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No executions recorded yet.</div></div>
 </div>
-
-<div class="card" style="margin-top:16px;">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-<div><div style="font-size:1.1rem;font-weight:900;">Transaction History</div><div style="font-size:.85rem;color:var(--muted);margin-top:4px;">Deposits & Withdrawals</div></div>
-<button style="padding:8px 12px;border-radius:10px;background:#fee2e2;color:var(--danger);font-weight:800;" onclick="clearTransactions()">Clear</button>
-</div>
-<div id="transaction-list"><div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No transactions recorded yet.</div></div>
-</div>
 </div>
 
 <div class="view" id="profile">
@@ -917,6 +935,19 @@ New here? <span onclick="switchAuth('signup')">Create account</span>
 </div>
 </div>
 
+</div>
+
+<div class="overlay" id="history-modal">
+<div class="modal">
+<div class="modal-head">
+<div class="modal-title">Transaction History</div><div class="close" onclick="closeHistory()">×</div>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+<div style="font-size:.85rem;color:var(--muted);">Deposits & Withdrawals</div>
+<button style="padding:6px 12px;border-radius:10px;background:#fee2e2;color:var(--danger);font-size:0.8rem;font-weight:800;border:none;" onclick="clearTransactions()">Clear All</button>
+</div>
+<div id="transaction-list"><div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No transactions recorded yet.</div></div>
+</div>
 </div>
 
 <div class="overlay" id="payment-modal">
@@ -1348,6 +1379,14 @@ function openPayment(type){
 
 function closeModal(){
     document.getElementById("payment-modal").classList.remove("show");
+}
+
+function openHistory(){
+    document.getElementById("history-modal").classList.add("show");
+}
+
+function closeHistory(){
+    document.getElementById("history-modal").classList.remove("show");
 }
 
 function closeCongrats(){

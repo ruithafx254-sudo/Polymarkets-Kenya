@@ -963,32 +963,28 @@ button:active {
                     <input type="number" id="inp-stake" value="10">
                 </div>
 
-                <div id="manual-controls-group" style="display:none;">
-                    <div class="input-card" style="margin-bottom:12px;">
-                        <label>Strategy</label>
-                        <select id="inp-market" onchange="toggleDigitBox()">
-                            <option>Matches / Differs</option>
-                            <option>Even / Odd</option>
-                            <option>Over / Under</option>
-                        </select>
-                    </div>
-
-                    <div class="input-card" id="digit-box" style="margin-bottom:12px;">
-                        <label>Target Digit</label>
-                        <input type="number" id="inp-digit" value="4" min="0" max="9">
-                    </div>
+                <div class="input-card" style="margin-bottom:12px;">
+                    <label>Strategy</label>
+                    <select id="inp-market" onchange="toggleDigitBox()">
+                        <option>Matches / Differs</option>
+                        <option>Even / Odd</option>
+                        <option>Over / Under</option>
+                    </select>
                 </div>
 
-                <div id="ai-controls-group">
-                    <div class="ai-inputs-grid">
-                        <div class="input-card"><label>Take Profit ($)</label><input type="number" id="inp-tp" value="50"></div>
-                        <div class="input-card"><label>Stop Loss ($)</label><input type="number" id="inp-sl" value="100"></div>
-                    </div>
+                <div class="input-card" id="digit-box" style="margin-bottom:12px;">
+                    <label>Target Digit</label>
+                    <input type="number" id="inp-digit" value="4" min="0" max="9">
+                </div>
 
-                    <div class="input-card" style="margin-bottom: 12px;">
-                        <label>Martingale Multiplier</label>
-                        <input type="number" id="inp-multi" value="2.1" step="0.1">
-                    </div>
+                <div class="ai-inputs-grid">
+                    <div class="input-card"><label>Take Profit ($)</label><input type="number" id="inp-tp" value="50"></div>
+                    <div class="input-card"><label>Stop Loss ($)</label><input type="number" id="inp-sl" value="100"></div>
+                </div>
+
+                <div class="input-card" style="margin-bottom: 12px;" id="martingale-box">
+                    <label>Martingale Multiplier</label>
+                    <input type="number" id="inp-multi" value="2.1" step="0.1">
                 </div>
                 
                 <button class="master-btn" id="engine-btn" onclick="toggleBot()">Start Trading Bot</button>
@@ -1174,12 +1170,10 @@ let activeGraphAsset = 'Volatility 10 Index';
 let chartEngineInstance = null;
 let graphTickerPulseLoop = null;
 
-/* CENTRALIZED RE-ENGINEERED NOTIFICATION BAR DISPATCHER (STRICTLY TP, SL, DEPOSIT, WITHDRAW) */
 function notify({ variant = 'tp', title = 'Notification', message = '' }) {
     const wrap = document.getElementById("toast-wrap");
     if (!wrap) return;
 
-    // Reject non-official variants to keep it strictly TP/SL/Deposit/Withdraw
     if (!['tp', 'sl', 'deposit', 'withdraw'].includes(variant)) return;
 
     const toast = document.createElement("div");
@@ -1201,7 +1195,6 @@ function notify({ variant = 'tp', title = 'Notification', message = '' }) {
 
     wrap.appendChild(toast);
 
-    // Smooth exit sequencing
     setTimeout(() => {
         toast.classList.add('toast-exit');
         setTimeout(() => toast.remove(), 300);
@@ -1641,8 +1634,7 @@ function switchTradeMode(mode) {
     document.getElementById('mode-manual-tab').classList.toggle('active', mode === 'manual');
 
     if (mode === 'ai') {
-        document.getElementById('ai-controls-group').style.display = 'block';
-        document.getElementById('manual-controls-group').style.display = 'none';
+        document.getElementById('martingale-box').style.display = 'block';
         document.getElementById('engine-btn').style.display = 'block';
         document.getElementById('manual-btn').style.display = 'none';
         document.getElementById('live-indicator').style.display = 'flex';
@@ -1650,8 +1642,7 @@ function switchTradeMode(mode) {
         document.getElementById('sig-main').innerText = '--';
     } else {
         if (isRunning) toggleBot();
-        document.getElementById('ai-controls-group').style.display = 'none';
-        document.getElementById('manual-controls-group').style.display = 'block';
+        document.getElementById('martingale-box').style.display = 'none';
         document.getElementById('engine-btn').style.display = 'none';
         document.getElementById('manual-btn').style.display = 'block';
         document.getElementById('live-indicator').style.display = 'none';
@@ -1904,7 +1895,7 @@ async function placeManualTrade() {
     const market = document.getElementById("inp-market").value;
     const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
     
-    // Explicitly captures Volatility selected from the bar directly above
+    // Manual Trade uses explicitly chosen Volatility from the scrolling UI bar
     const asset = activeGraphAsset; 
     
     const { signal, profit, sub } = calculateTradeResult(market, targetDigit, stake);
@@ -1962,13 +1953,12 @@ async function runCycle(){
     
     if(activeStake > balance){ alert('Martingale variance exceeded balance.'); toggleBot(); return; }
 
-    // AI AUTONOMY: Randomizes strategy and digits automatically in AI mode
-    const marketsArray = ["Matches / Differs", "Even / Odd", "Over / Under"];
-    const randomMarket = marketsArray[Math.floor(Math.random() * marketsArray.length)];
-    const randomDigit = Math.floor(Math.random() * 10);
-    const asset = activeGraphAsset; 
+    // AI AUTONOMY: Uses selected Strategy & Digit, but randomizes the Volatility
+    const market = document.getElementById("inp-market").value;
+    const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
+    const asset = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)]; 
 
-    const { signal, profit, sub } = calculateTradeResult(randomMarket, randomDigit, activeStake);
+    const { signal, profit, sub } = calculateTradeResult(market, targetDigit, activeStake);
 
     document.getElementById("sig-asset").innerText = asset;
     document.getElementById("sig-main").innerText = signal;
@@ -1987,10 +1977,7 @@ async function runCycle(){
             localStorage.setItem(`bal_${session.user.id}`, realBalance);
         }
         
-        logTrade(asset, randomMarket, signal, profit, activeStake);
-        
-        // Spammy mini-trade notifications intentionally removed here as requested.
-        // It will only notify on overall SL or TP hit.
+        logTrade(asset, market, signal, profit, activeStake);
 
         if(profit < 0) activeStake = activeStake * multi; else activeStake = baseStake;
         runCycle();

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -1297,7 +1297,9 @@ function toggleTheme() {
 }
 
 // Ensure theme mounts on load before page renders visually
-if(localStorage.getItem('theme') === 'light') {
+if(localStorage.getItem('theme') === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+} else {
     document.documentElement.setAttribute('data-theme', 'light');
 }
 // --- THEME TOGGLE ENGINE END ---

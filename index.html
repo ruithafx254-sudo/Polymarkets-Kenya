@@ -1484,7 +1484,6 @@ function startGlobalGraphPumpLoop() {
 
         const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
         
-        // BUG FIX HERE: Changed 'datasets.data' to 'datasets[0].data' 
         let dataPoints = chartEngineInstance.data.datasets[0].data;
         
         let referencePrice = parseFloat(dataPoints[dataPoints.length - 1]);
@@ -1515,17 +1514,29 @@ function refreshDigitMetrics() {
         let idx2 = Math.floor(Math.random() * 10);
         if (idx1 !== idx2) {
             let shift = Math.random() * 0.8; 
-            if (currentDigitValues[idx1] + shift <= 22.0 && currentDigitValues[idx2] - shift >= 1.0) { 
+            // Capped at 13.0, floored at 1.0 to ensure a dynamic spread while strictly adhering to rules
+            if (currentDigitValues[idx1] + shift <= 13.0 && currentDigitValues[idx2] - shift >= 1.0) { 
                 currentDigitValues[idx1] += shift;
                 currentDigitValues[idx2] -= shift;
             }
         }
     }
 
+    // Fix tiny floating point precision issues maintaining exact 100% sum
     let sum = currentDigitValues.reduce((a,b) => a+b, 0);
     let diff = 100.0 - sum;
-    if (Math.abs(diff) > 0.01) {
-        currentDigitValues[0] += diff; // Normalize ensuring 100% total
+    
+    // Safely distribute the residual difference across the digits without breaking the 13.0% cap
+    if (Math.abs(diff) > 0.0001) {
+        for(let i = 0; i < 10; i++) {
+            if (diff > 0 && currentDigitValues[i] + diff <= 13.0) {
+                currentDigitValues[i] += diff;
+                break;
+            } else if (diff < 0 && currentDigitValues[i] + diff >= 1.0) {
+                currentDigitValues[i] += diff;
+                break;
+            }
+        }
     }
 
     let maxVal = Math.max(...currentDigitValues);

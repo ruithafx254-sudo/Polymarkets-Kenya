@@ -827,14 +827,19 @@ button:active {
             </div>
 
             <div class="card">
-                <div class="asset-selector-title">Last Digit Stats (1 - 9)</div>
+                <div class="asset-selector-title">Last Digit Stats (0 - 9)</div>
                 <div class="digit-grid" id="digit-grid-nodes"></div>
             </div>
 
             <div class="card floating-ai">
                 <div class="ai-head">
-                    <div class="ai-title">Auto Trading Bot</div>
-                    <div class="live-badge"><div class="dot"></div>Live</div>
+                    <div class="ai-title" id="trade-panel-title">Trading Engine</div>
+                    <div class="live-badge" id="live-indicator"><div class="dot"></div>Live</div>
+                </div>
+
+                <div class="auth-tabs" style="margin-bottom: 20px; padding: 4px; border: 1px solid var(--card-border);">
+                    <button class="auth-tab active" id="mode-ai-tab" onclick="switchTradeMode('ai')">AI Bot</button>
+                    <button class="auth-tab" id="mode-manual-tab" onclick="switchTradeMode('manual')">Manual</button>
                 </div>
                 
                 <div class="signal-box">
@@ -858,22 +863,25 @@ button:active {
                     </div>
                 </div>
 
-                <div class="input-card" id="digit-box" style="display:none; margin-bottom:12px;">
+                <div class="input-card" id="digit-box" style="margin-bottom:12px;">
                     <label>Target Digit</label>
                     <input type="number" id="inp-digit" value="4" min="0" max="9">
                 </div>
 
-                <div class="ai-inputs-grid">
-                    <div class="input-card"><label>Take Profit ($)</label><input type="number" id="inp-tp" value="50"></div>
-                    <div class="input-card"><label>Stop Loss ($)</label><input type="number" id="inp-sl" value="100"></div>
-                </div>
+                <div id="ai-controls-group">
+                    <div class="ai-inputs-grid">
+                        <div class="input-card"><label>Take Profit ($)</label><input type="number" id="inp-tp" value="50"></div>
+                        <div class="input-card"><label>Stop Loss ($)</label><input type="number" id="inp-sl" value="100"></div>
+                    </div>
 
-                <div class="input-card" style="margin-bottom: 12px;">
-                    <label>Martingale Multiplier</label>
-                    <input type="number" id="inp-multi" value="2.1" step="0.1">
+                    <div class="input-card" style="margin-bottom: 12px;">
+                        <label>Martingale Multiplier</label>
+                        <input type="number" id="inp-multi" value="2.1" step="0.1">
+                    </div>
                 </div>
                 
                 <button class="master-btn" id="engine-btn" onclick="toggleBot()">Start Trading Bot</button>
+                <button class="master-btn" id="manual-btn" style="display:none;" onclick="placeManualTrade()">Place Trade</button>
             </div>
         </div>
 
@@ -1017,6 +1025,7 @@ const SUPABASE_KEY = "sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let authMode = "signin";
+let tradeMode = "ai"; // ai or manual
 let realBalance = 0;
 let demoBalance = 10000;
 let isReal = true;
@@ -1068,7 +1077,7 @@ function buildMarketDashboardComponents() {
 
     const grid = document.getElementById("digit-grid-nodes");
     grid.innerHTML = "";
-    for(let d=1; d<=9; d++) {
+    for(let d=0; d<=9; d++) {
         const card = document.createElement("div");
         card.className = "digit-circle-card";
         card.id = `digit-card-${d}`;
@@ -1173,42 +1182,53 @@ function startGlobalGraphPumpLoop() {
 }
 
 function refreshDigitMetrics() {
-    let remainder = 100;
-    let partitions = 9;
-    let distributionSlice = [];
-
-    // Generate random percentages
-    for (let i = 0; i < partitions - 1; i++) {
-        let ceiling = (remainder / (partitions - i)) * 1.35;
-        let value = Math.random() * (ceiling - 3) + 3;
-        value = Math.round(value * 10) / 10;
-        distributionSlice.push(value);
-        remainder -= value;
+    // Generate base flat distribution
+    let values = Array(10).fill(10.0);
+    
+    // Simulate variance bounded between 0% and 13%
+    for (let i = 0; i < 60; i++) {
+        let idx1 = Math.floor(Math.random() * 10);
+        let idx2 = Math.floor(Math.random() * 10);
+        if (idx1 !== idx2) {
+            let shift = Math.random() * 2.0;
+            // Ensure no value exceeds 13.0 or drops below 1.0 during shifts
+            if (values[idx1] + shift <= 13.0 && values[idx2] - shift >= 1.0) { 
+                values[idx1] += shift;
+                values[idx2] -= shift;
+            }
+        }
     }
-    distributionSlice.push(Math.round(remainder * 10) / 10);
 
-    // Find the highest and lowest percentages
-    let maxVal = Math.max(...distributionSlice);
-    let minVal = Math.min(...distributionSlice);
+    // Force strict 1 decimal place format to prevent float errors
+    values = values.map(v => Math.round(v * 10) / 10);
+    let sum = Math.round(values.reduce((a,b) => a+b, 0) * 10) / 10;
+    let diff = Math.round((100.0 - sum) * 10) / 10;
+    
+    // Smooth out floating remainder to enforce exactly 100.0% sum
+    if (diff !== 0) {
+        for(let i=0; i<10; i++){
+            if(values[i] + diff <= 13.0 && values[i] + diff >= 0){
+                values[i] = Math.round((values[i] + diff) * 10) / 10;
+                break;
+            }
+        }
+    }
+
+    let maxVal = Math.max(...values);
+    let minVal = Math.min(...values);
 
     // Update the UI
-    for (let d = 1; d <= 9; d++) {
+    for (let d = 0; d <= 9; d++) {
         const cardNode = document.getElementById(`digit-card-${d}`);
         const percentageNode = document.getElementById(`pct-node-${d}`);
-        const value = distributionSlice[d-1];
+        const value = values[d];
 
         if(percentageNode && cardNode) {
             percentageNode.innerText = `${value.toFixed(1)}%`;
             
-            // Remove previous highlight classes
             cardNode.classList.remove('highest', 'lowest');
-            
-            // Add new highlight class if it matches min or max
-            if (value === maxVal) {
-                cardNode.classList.add('highest');
-            } else if (value === minVal) {
-                cardNode.classList.add('lowest');
-            }
+            if (value === maxVal) cardNode.classList.add('highest');
+            else if (value === minVal) cardNode.classList.add('lowest');
         }
     }
 }
@@ -1290,6 +1310,7 @@ window.addEventListener("load", async () => {
     buildMarketDashboardComponents();
     initializeChartContext();
     startGlobalGraphPumpLoop();
+    toggleDigitBox();
 
     const { data:{session} } = await supabaseClient.auth.getSession();
     const urlParams = new URLSearchParams(window.location.search);
@@ -1483,9 +1504,32 @@ function toast(msg){
     setTimeout(() => { t.remove(); }, 3000);
 }
 
+function switchTradeMode(mode) {
+    tradeMode = mode;
+    document.getElementById('mode-ai-tab').classList.toggle('active', mode === 'ai');
+    document.getElementById('mode-manual-tab').classList.toggle('active', mode === 'manual');
+
+    if (mode === 'ai') {
+        document.getElementById('ai-controls-group').style.display = 'block';
+        document.getElementById('engine-btn').style.display = 'block';
+        document.getElementById('manual-btn').style.display = 'none';
+        document.getElementById('live-indicator').style.display = 'flex';
+        document.getElementById('sig-status').innerText = 'Set your strategy below to start';
+        document.getElementById('sig-main').innerText = '--';
+    } else {
+        if (isRunning) toggleBot();
+        document.getElementById('ai-controls-group').style.display = 'none';
+        document.getElementById('engine-btn').style.display = 'none';
+        document.getElementById('manual-btn').style.display = 'block';
+        document.getElementById('live-indicator').style.display = 'none';
+        document.getElementById('sig-status').innerText = 'Manual trading active';
+        document.getElementById('sig-main').innerText = 'MANUAL';
+    }
+}
+
 function toggleDigitBox(){
     const market = document.getElementById("inp-market").value;
-    document.getElementById("digit-box").style.display = market.includes("Over") ? "block" : "none";
+    document.getElementById("digit-box").style.display = (market.includes("Over") || market.includes("Matches")) ? "block" : "none";
 }
 
 function switchWithdrawMethod() {
@@ -1658,6 +1702,36 @@ function updatePnL(){
     pnl.style.color = totalPnL >= 0 ? "var(--success)" : "var(--danger)";
 }
 
+function calculateTradeResult(market, targetDigit, stake) {
+    const isWin = Math.random() < 0.88;
+    let signal = ""; let sub = ""; let profit = 0;
+
+    if(market.includes("Matches")){
+        const match = Math.random() > 0.85;
+        if(match){
+            signal = `MATCH ${targetDigit}`; profit = isWin ? stake * 8.15 : -stake; sub = "Payout: 8.15x";
+        } else {
+            signal = `DIFFER ${targetDigit}`; profit = isWin ? stake * 0.098 : -stake; sub = "Payout: 0.098x";
+        }
+    } else if(market.includes("Even")){
+        signal = Math.random() > 0.5 ? "EVEN" : "ODD"; profit = isWin ? stake * 0.96 : -stake; sub = "Payout: 0.96x";
+    } else {
+        const over = Math.random() > 0.5;
+        if(over){
+            signal = `OVER ${targetDigit}`;
+            const multipliers = {0:0.09, 1:0.23, 2:0.41, 3:0.65, 4:0.98, 5:1.54, 6:2.80, 7:6.60, 8:14.50, 9:0};
+            const mult = multipliers[targetDigit] || 0;
+            profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
+        } else {
+            signal = `UNDER ${targetDigit}`;
+            const multipliers = {0:0, 1:14.50, 2:6.60, 3:2.80, 4:1.54, 5:0.98, 6:0.65, 7:0.41, 8:0.23, 9:0.09};
+            const mult = multipliers[targetDigit] || 0;
+            profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
+        }
+    }
+    return { signal, profit, sub };
+}
+
 function toggleBot(){
     const btn = document.getElementById("engine-btn");
     if(isRunning){
@@ -1679,6 +1753,49 @@ function toggleBot(){
     runCycle();
 }
 
+async function placeManualTrade() {
+    const balance = isReal ? realBalance : demoBalance;
+    const stake = parseFloat(document.getElementById("inp-stake").value);
+    
+    if(isNaN(stake) || stake <= 0){ toast("Invalid stake amount."); return; }
+    if(stake > balance){ toast("Not enough balance."); return; }
+
+    const btn = document.getElementById("manual-btn");
+    btn.disabled = true;
+    btn.innerText = "Processing...";
+
+    const market = document.getElementById("inp-market").value;
+    const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
+    const asset = activeGraphAsset; 
+    
+    const { signal, profit, sub } = calculateTradeResult(market, targetDigit, stake);
+
+    document.getElementById("sig-asset").innerText = asset;
+    document.getElementById("sig-main").innerText = signal;
+    document.getElementById("sig-status").innerText = sub;
+
+    setTimeout(async () => {
+        if(isReal) realBalance += profit; else demoBalance += profit;
+        totalPnL += profit;
+        updateBalance();
+        updatePnL();
+        await saveSupabaseBalance();
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if(session?.user && isReal) {
+            localStorage.setItem(`bal_${session.user.id}`, realBalance);
+        }
+        
+        logTrade(asset, market, signal, profit, stake);
+
+        if (profit >= 0) toast(`Trade Won: +$${profit.toFixed(2)}`);
+        else toast(`Trade Lost: -$${Math.abs(profit).toFixed(2)}`);
+
+        btn.disabled = false;
+        btn.innerText = "Place Trade";
+    }, 1500);
+}
+
 async function runCycle(){
     if(!isRunning) return;
     const balance = isReal ? realBalance : demoBalance;
@@ -1694,34 +1811,8 @@ async function runCycle(){
     const market = document.getElementById("inp-market").value;
     const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
     const asset = activeGraphAsset; 
-    
-    const isWin = Math.random() < 0.88;
-    let signal = ""; let sub = ""; let profit = 0;
 
-    if(market.includes("Matches")){
-        const match = Math.random() > 0.85;
-        const digit = Math.floor(Math.random()*10);
-        if(match){
-            signal = `MATCH ${digit}`; profit = isWin ? activeStake * 8.15 : -activeStake; sub = "Payout: 8.15x";
-        } else {
-            signal = `DIFFER ${digit}`; profit = isWin ? activeStake * 0.098 : -activeStake; sub = "Payout: 0.098x";
-        }
-    } else if(market.includes("Even")){
-        signal = Math.random() > 0.5 ? "EVEN" : "ODD"; profit = isWin ? activeStake * 0.96 : -activeStake; sub = "Payout: 0.96x";
-    } else {
-        const over = Math.random() > 0.5;
-        if(over){
-            signal = `OVER ${targetDigit}`;
-            const multipliers = {0:0.09, 1:0.23, 2:0.41, 3:0.65, 4:0.98, 5:1.54, 6:2.80, 7:6.60, 8:14.50, 9:0};
-            const mult = multipliers[targetDigit] || 0;
-            profit = isWin ? activeStake * mult : -activeStake; sub = `Payout: ${mult.toFixed(2)}x`;
-        } else {
-            signal = `UNDER ${targetDigit}`;
-            const multipliers = {0:0, 1:14.50, 2:6.60, 3:2.80, 4:1.54, 5:0.98, 6:0.65, 7:0.41, 8:0.23, 9:0.09};
-            const mult = multipliers[targetDigit] || 0;
-            profit = isWin ? activeStake * mult : -activeStake; sub = `Payout: ${mult.toFixed(2)}x`;
-        }
-    }
+    const { signal, profit, sub } = calculateTradeResult(market, targetDigit, activeStake);
 
     document.getElementById("sig-asset").innerText = asset;
     document.getElementById("sig-main").innerText = signal;

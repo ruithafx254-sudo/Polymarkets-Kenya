@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>APEX Markets AI</title>
+<title>MEGAWAVE</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -857,7 +857,7 @@ button:active {
 
     <div class="auth" id="auth">
         <div class="auth-top">
-            <div class="auth-logo">APEX<span>AI</span></div>
+            <div class="auth-logo">MEGA<span>WAVE</span></div>
         </div>
         
         <div class="auth-card">
@@ -897,7 +897,7 @@ button:active {
     <div class="toast-wrap" id="toast-wrap"></div>
 
     <header class="header">
-        <div class="brand">APEX <span>AI</span></div>
+        <div class="brand">MEGA<span>WAVE</span></div>
         <div class="header-controls">
             <button class="refresh-btn" onclick="window.location.reload()">↻</button>
             <select class="account-selector" id="account-type" onchange="switchAccount()">
@@ -980,9 +980,12 @@ button:active {
                 <div class="input-card" style="margin-bottom:12px;">
                     <label>Strategy</label>
                     <select id="inp-market" onchange="toggleDigitBox()">
-                        <option>Matches / Differs</option>
-                        <option>Even / Odd</option>
-                        <option>Over / Under</option>
+                        <option value="Matches">Matches</option>
+                        <option value="Differs">Differs</option>
+                        <option value="Even">Even</option>
+                        <option value="Odd">Odd</option>
+                        <option value="Over">Over</option>
+                        <option value="Under">Under</option>
                     </select>
                 </div>
 
@@ -1023,13 +1026,13 @@ button:active {
 
         <div class="view" id="profile">
             <div class="card profile">
-                <div class="avatar" id="avatar-initial">A</div>
-                <div class="profile-name" id="profile-name">Apex User</div>
+                <div class="avatar" id="avatar-initial">M</div>
+                <div class="profile-name" id="profile-name">Megawave User</div>
                 <div class="profile-email" id="profile-email">Loading...</div>
                 
                 <div class="profile-list">
                     <div class="profile-item"><span>Security</span><span style="color:var(--primary); font-weight:700;">Secure SSL</span></div>
-                    <div class="profile-item"><span>Account ID</span><span>APEX-9384</span></div>
+                    <div class="profile-item"><span>Account ID</span><span>MEGAWAVE-9384</span></div>
                     <div class="profile-item"><span>Account Status</span><span style="color:var(--success); font-weight:700;">Active</span></div>
                 </div>
                 <button class="logout" onclick="logout()">Log Out</button>
@@ -1384,7 +1387,7 @@ function startGlobalGraphPumpLoop() {
         if (!chartEngineInstance) return;
 
         const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
-        let dataPoints = chartEngineInstance.data.datasets[0].data;
+        let dataPoints = chartEngineInstance.data.datasets.data;
         let referencePrice = parseFloat(dataPoints[dataPoints.length - 1]);
 
         let shiftDelta = (Math.random() - 0.495) * settings.variance;
@@ -1655,8 +1658,8 @@ async function handleAuth(){
             });
             if(error) throw error;
             user = data.user;
-            document.getElementById("profile-name").innerText = fullName || "Apex Operator";
-            document.getElementById("avatar-initial").innerText = (fullName || "A").charAt(0).toUpperCase();
+            document.getElementById("profile-name").innerText = fullName || "Megawave Operator";
+            document.getElementById("avatar-initial").innerText = (fullName || "M").charAt(0).toUpperCase();
         } else {
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if(error) throw error;
@@ -1753,7 +1756,7 @@ function switchTradeMode(mode) {
 
 function toggleDigitBox(){
     const market = document.getElementById("inp-market").value;
-    document.getElementById("digit-box").style.display = (tradeMode === 'manual' && (market.includes("Over") || market.includes("Matches"))) ? "block" : "none";
+    document.getElementById("digit-box").style.display = (tradeMode === 'manual' && (market === "Over" || market === "Under" || market === "Matches" || market === "Differs")) ? "block" : "none";
 }
 
 function switchWithdrawMethod() {
@@ -1934,28 +1937,24 @@ function calculateTradeResult(market, targetDigit, stake) {
     const isWin = Math.random() < 0.88;
     let signal = ""; let sub = ""; let profit = 0;
 
-    if(market.includes("Matches")){
-        const match = Math.random() > 0.85;
-        if(match){
-            signal = `MATCH ${targetDigit}`; profit = isWin ? stake * 8.15 : -stake; sub = "Payout: 8.15x";
-        } else {
-            signal = `DIFFER ${targetDigit}`; profit = isWin ? stake * 0.098 : -stake; sub = "Payout: 0.098x";
-        }
-    } else if(market.includes("Even")){
-        signal = Math.random() > 0.5 ? "EVEN" : "ODD"; profit = isWin ? stake * 0.96 : -stake; sub = "Payout: 0.96x";
-    } else {
-        const over = Math.random() > 0.5;
-        if(over){
-            signal = `OVER ${targetDigit}`;
-            const multipliers = {0:0.09, 1:0.23, 2:0.41, 3:0.65, 4:0.98, 5:1.54, 6:2.80, 7:6.60, 8:14.50, 9:0};
-            const mult = multipliers[targetDigit] || 0;
-            profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
-        } else {
-            signal = `UNDER ${targetDigit}`;
-            const multipliers = {0:0, 1:14.50, 2:6.60, 3:2.80, 4:1.54, 5:0.98, 6:0.65, 7:0.41, 8:0.23, 9:0.09};
-            const mult = multipliers[targetDigit] || 0;
-            profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
-        }
+    if(market === "Matches"){
+        signal = `MATCH ${targetDigit}`; profit = isWin ? stake * 8.15 : -stake; sub = "Payout: 8.15x";
+    } else if(market === "Differs") {
+        signal = `DIFFER ${targetDigit}`; profit = isWin ? stake * 0.098 : -stake; sub = "Payout: 0.098x";
+    } else if(market === "Even"){
+        signal = "EVEN"; profit = isWin ? stake * 0.96 : -stake; sub = "Payout: 0.96x";
+    } else if(market === "Odd"){
+        signal = "ODD"; profit = isWin ? stake * 0.96 : -stake; sub = "Payout: 0.96x";
+    } else if(market === "Over"){
+        signal = `OVER ${targetDigit}`;
+        const multipliers = {0:0.09, 1:0.23, 2:0.41, 3:0.65, 4:0.98, 5:1.54, 6:2.80, 7:6.60, 8:14.50, 9:0};
+        const mult = multipliers[targetDigit] || 0;
+        profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
+    } else if(market === "Under"){
+        signal = `UNDER ${targetDigit}`;
+        const multipliers = {0:0, 1:14.50, 2:6.60, 3:2.80, 4:1.54, 5:0.98, 6:0.65, 7:0.41, 8:0.23, 9:0.09};
+        const mult = multipliers[targetDigit] || 0;
+        profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
     }
     return { signal, profit, sub };
 }

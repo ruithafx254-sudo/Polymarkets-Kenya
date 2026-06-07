@@ -1041,13 +1041,7 @@ button:active {
                 <div class="input-card" style="margin-bottom:12px;">
                     <label>Strategy</label>
                     <select id="inp-market" onchange="toggleDigitBox()">
-                        <option value="Matches">Matches</option>
-                        <option value="Differs">Differs</option>
-                        <option value="Even">Even</option>
-                        <option value="Odd">Odd</option>
-                        <option value="Over">Over</option>
-                        <option value="Under">Under</option>
-                    </select>
+                        </select>
                 </div>
 
                 <div class="input-card" id="digit-box" style="margin-bottom:12px;">
@@ -1629,11 +1623,33 @@ async function clearTransactions() {
     }
 }
 
+function updateMarketOptions(mode) {
+    const marketSelect = document.getElementById("inp-market");
+    marketSelect.innerHTML = "";
+    if (mode === 'ai') {
+        marketSelect.innerHTML = `
+            <option value="Matches/Differs">Matches / Differs</option>
+            <option value="Even/Odd">Even / Odd</option>
+            <option value="Over/Under">Over / Under</option>
+        `;
+    } else {
+        marketSelect.innerHTML = `
+            <option value="Matches">Matches</option>
+            <option value="Differs">Differs</option>
+            <option value="Even">Even</option>
+            <option value="Odd">Odd</option>
+            <option value="Over">Over</option>
+            <option value="Under">Under</option>
+        `;
+    }
+    toggleDigitBox();
+}
+
 window.addEventListener("load", async () => {
     buildMarketDashboardComponents();
     initializeChartContext();
     startGlobalGraphPumpLoop();
-    toggleDigitBox();
+    updateMarketOptions('ai'); // Initialize with AI mode settings
 
     const urlParams = new URLSearchParams(window.location.search);
     const derivAuthCode = urlParams.get('code');
@@ -1843,6 +1859,8 @@ function switchTradeMode(mode) {
     document.getElementById('mode-ai-tab').classList.toggle('active', mode === 'ai');
     document.getElementById('mode-manual-tab').classList.toggle('active', mode === 'manual');
 
+    updateMarketOptions(mode);
+
     if (mode === 'ai') {
         document.getElementById('martingale-box').style.display = 'block';
         document.getElementById('engine-btn').style.display = 'block';
@@ -1859,7 +1877,6 @@ function switchTradeMode(mode) {
         document.getElementById('sig-status').innerText = 'Manual trading active';
         document.getElementById('sig-main').innerText = 'MANUAL';
     }
-    toggleDigitBox();
 }
 
 function toggleDigitBox(){
@@ -2160,11 +2177,19 @@ async function runCycle(){
     
     if(activeStake > balance){ alert('Martingale variance exceeded balance.'); toggleBot(); return; }
 
-    const market = document.getElementById("inp-market").value;
+    const marketInput = document.getElementById("inp-market").value;
+    
+    // Logic specifically added for AI grouped market selections
+    let actualMarket = marketInput;
+    if (tradeMode === 'ai' && marketInput.includes('/')) {
+        const splitMarkets = marketInput.split('/');
+        actualMarket = splitMarkets[Math.floor(Math.random() * splitMarkets.length)];
+    }
+
     const targetDigit = tradeMode === 'ai' ? Math.floor(Math.random() * 10) : (parseInt(document.getElementById("inp-digit").value) || 0);
     const asset = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)]; 
 
-    const { signal, profit, sub } = calculateTradeResult(market, targetDigit, activeStake);
+    const { signal, profit, sub } = calculateTradeResult(actualMarket, targetDigit, activeStake);
 
     document.getElementById("sig-asset").innerText = asset;
     document.getElementById("sig-main").innerText = signal;
@@ -2183,7 +2208,7 @@ async function runCycle(){
             localStorage.setItem(`bal_${session.user.id}`, realBalance);
         }
         
-        logTrade(asset, market, signal, profit, activeStake);
+        logTrade(asset, actualMarket, signal, profit, activeStake);
 
         if(profit < 0) activeStake = activeStake * multi; else activeStake = baseStake;
         runCycle();

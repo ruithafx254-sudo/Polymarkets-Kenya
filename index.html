@@ -21,10 +21,35 @@
     --warning: #f59e0b;
     --info: #3b82f6;
     --text: #f4f4f5;                
-    --muted: #808086;               
+    --muted: #808086;
+    --overlay-bg: rgba(0,0,0,0.75);
+    --toast-bg: rgba(24, 24, 28, 0.92);
+    --nav-bg: rgba(9, 9, 11, 0.85);
+    --input-bg: rgba(255,255,255,0.03);
+    --alpha-1: rgba(255,255,255,0.01);
+    --alpha-2: rgba(255,255,255,0.02);
+    --alpha-4: rgba(255,255,255,0.04);
+    --alpha-6: rgba(255,255,255,0.06);             
     --radius-ios: 14px;             
     --radius-large: 24px;           
     --glow-primary: rgba(148, 184, 87, 0.15);
+}
+
+[data-theme="light"] {
+    --bg: #f4f4f5;                  
+    --card: #ffffff;                
+    --card-elevated: #e4e4e7;       
+    --card-border: rgba(0, 0, 0, 0.1); 
+    --text: #09090b;                
+    --muted: #52525b;
+    --overlay-bg: rgba(255,255,255,0.75);
+    --toast-bg: rgba(255, 255, 255, 0.92);
+    --nav-bg: rgba(244, 244, 245, 0.85);
+    --input-bg: rgba(0,0,0,0.03);
+    --alpha-1: rgba(0,0,0,0.02);
+    --alpha-2: rgba(0,0,0,0.04);
+    --alpha-4: rgba(0,0,0,0.06);
+    --alpha-6: rgba(0,0,0,0.1);
 }
 
 * {
@@ -60,6 +85,7 @@ body {
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 100px rgba(0,0,0,0.8);
+    transition: background 0.3s;
 }
 
 @media(min-width: 431px) {
@@ -88,6 +114,33 @@ button:active {
     transform: scale(0.96);
 }
 
+/* THEME TOGGLE */
+.theme-bar {
+    width: 44px;
+    height: 22px;
+    background: var(--card-elevated);
+    border-radius: 11px;
+    border: 1px solid var(--card-border);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.theme-indicator {
+    width: 16px;
+    height: 16px;
+    background: var(--text);
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: left 0.3s, background 0.3s;
+}
+
+[data-theme="light"] .theme-indicator {
+    left: 24px;
+}
+
 /* AUTHENTICATION */
 .auth {
     position: absolute;
@@ -103,7 +156,9 @@ button:active {
 .auth.hidden { opacity: 0; pointer-events: none; transform: scale(1.03); }
 
 .auth-top {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 20px;
 }
 
@@ -138,7 +193,7 @@ button:active {
 
 .auth-tabs {
     display: flex;
-    background: rgba(255,255,255,0.04);
+    background: var(--alpha-4);
     padding: 4px;
     border-radius: 12px;
     margin-bottom: 24px;
@@ -156,7 +211,7 @@ button:active {
 
 .auth-tab.active {
     background: var(--card-elevated);
-    color: white;
+    color: var(--text);
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
@@ -178,14 +233,14 @@ button:active {
 .auth-input {
     padding: 15px;
     border-radius: var(--radius-ios);
-    background: rgba(255,255,255,0.03);
-    color: white;
+    background: var(--input-bg);
+    color: var(--text);
     font-size: 1rem;
     border: 1px solid var(--card-border);
     transition: all 0.2s;
 }
 
-.auth-input:focus { border-color: var(--primary); background: rgba(255,255,255,0.05); }
+.auth-input:focus { border-color: var(--primary); background: var(--alpha-6); }
 
 .auth-btn {
     width: 100%;
@@ -228,7 +283,7 @@ button:active {
 .refresh-btn {
     background: var(--card);
     border: 1px solid var(--card-border);
-    color: white;
+    color: var(--text);
     width: 38px;
     height: 38px;
     border-radius: 50%;
@@ -243,7 +298,7 @@ button:active {
     border: 1px solid var(--card-border);
     border-radius: 10px;
     background: var(--card);
-    color: white;
+    color: var(--text);
     font-size: 0.85rem;
     font-weight: 700;
 }
@@ -297,18 +352,18 @@ button:active {
 .balance-amount {
     font-size: 2.4rem;
     font-weight: 900;
-    color: white;
+    color: var(--text);
     letter-spacing: -0.02em;
 }
 
 .deposit-top-btn {
-    background: white;
-    color: black;
+    background: var(--text);
+    color: var(--bg);
     padding: 12px 22px;
     border-radius: 24px;
     font-weight: 800;
     font-size: 0.9rem;
-    box-shadow: 0 8px 20px rgba(255,255,255,0.15);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 /* ACTIONS */
@@ -325,7 +380,7 @@ button:active {
     text-align: left;
 }
 
-.action-btn .btn-title { font-size: 1.05rem; font-weight: 800; color: white; }
+.action-btn .btn-title { font-size: 1.05rem; font-weight: 800; color: var(--text); }
 .action-btn span { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
 
 .history-bar-btn {
@@ -338,7 +393,7 @@ button:active {
     justify-content: space-between;
     align-items: center;
     font-weight: 700;
-    color: white;
+    color: var(--text);
     font-size: 0.95rem;
 }
 
@@ -362,7 +417,7 @@ button:active {
 .asset-bar::-webkit-scrollbar { display: none; }
 
 .asset-btn-item {
-    background: rgba(255,255,255,0.02);
+    background: var(--alpha-2);
     border: 1px solid var(--card-border);
     color: var(--muted);
     padding: 10px 18px;
@@ -373,10 +428,10 @@ button:active {
 }
 
 .asset-btn-item.active {
-    background: white;
-    color: black;
-    border-color: white;
-    box-shadow: 0 6px 15px rgba(255,255,255,0.1);
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
 }
 
 /* CHART */
@@ -387,7 +442,7 @@ button:active {
     margin-bottom: 16px;
 }
 
-.graph-asset-name { font-size: 1.05rem; font-weight: 800; color: white; }
+.graph-asset-name { font-size: 1.05rem; font-weight: 800; color: var(--text); }
 .graph-live-ticker { font-size: 1.3rem; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; }
 .canvas-wrapper { width: 100%; height: 170px; position: relative; }
 
@@ -403,7 +458,7 @@ button:active {
     width: 58px;
     height: 58px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.01);
+    background: var(--alpha-1);
     border: 1px solid var(--card-border);
     display: flex;
     flex-direction: column;
@@ -415,7 +470,7 @@ button:active {
 .digit-node {
     font-size: 1.1rem;
     font-weight: 900;
-    color: white;
+    color: var(--text);
     line-height: 1;
 }
 
@@ -450,7 +505,7 @@ button:active {
     margin-bottom: 18px;
 }
 
-.ai-title { font-size: 1.2rem; font-weight: 800; color: white; }
+.ai-title { font-size: 1.2rem; font-weight: 800; color: var(--text); }
 
 .live-badge {
     display: flex;
@@ -479,7 +534,7 @@ button:active {
 }
 
 .signal-box {
-    background: #000;
+    background: var(--card-elevated);
     border: 1px solid var(--card-border);
     border-radius: var(--radius-ios);
     padding: 22px;
@@ -495,7 +550,7 @@ button:active {
     margin-bottom: 8px;
 }
 
-.signal-main { font-size: 1.8rem; font-weight: 900; color: white; letter-spacing: -0.02em; }
+.signal-main { font-size: 1.8rem; font-weight: 900; color: var(--text); letter-spacing: -0.02em; }
 .signal-sub { font-size: 0.85rem; color: var(--primary); margin-top: 6px; font-weight: 600; }
 
 .ai-inputs-grid {
@@ -506,7 +561,7 @@ button:active {
 }
 
 .input-card {
-    background: rgba(255,255,255,0.02);
+    background: var(--alpha-2);
     border: 1px solid var(--card-border);
     border-radius: 14px;
     padding: 14px;
@@ -526,19 +581,19 @@ button:active {
     width: 100%;
     border: none;
     background: transparent;
-    color: white;
+    color: var(--text);
     font-weight: 800;
     font-size: 1.05rem;
 }
 
-.input-card select option { background: #18181c; color: white; }
+.input-card select option { background: var(--card); color: var(--text); }
 
 .master-btn {
     width: 100%;
     padding: 16px;
     border-radius: var(--radius-ios);
     background: var(--primary);
-    color: black;
+    color: #000;
     font-size: 1.05rem;
     font-weight: 800;
     margin-top: 10px;
@@ -557,7 +612,7 @@ button:active {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(255,255,255,0.01);
+    background: var(--alpha-1);
     border-radius: 14px;
     border: 1px solid var(--card-border);
     padding: 16px;
@@ -590,13 +645,13 @@ button:active {
     font-weight: 900;
     border: 1px solid var(--card-border);
 }
-.profile-name { font-size: 1.4rem; font-weight: 900; }
+.profile-name { font-size: 1.4rem; font-weight: 900; color: var(--text); }
 .profile-email { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
 
 .profile-list {
     margin-top: 28px;
     text-align: left;
-    background: rgba(255,255,255,0.01);
+    background: var(--alpha-1);
     border-radius: var(--radius-ios);
     border: 1px solid var(--card-border);
 }
@@ -629,7 +684,7 @@ button:active {
     display: flex;
     justify-content: space-around;
     padding: 14px 10px 28px;
-    background: rgba(9, 9, 11, 0.85);
+    background: var(--nav-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid var(--card-border);
@@ -655,7 +710,7 @@ button:active {
 .overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.75);
+    background: var(--overlay-bg);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     display: none;
@@ -688,7 +743,7 @@ button:active {
     margin-bottom: 24px;
 }
 
-.modal-title { font-size: 1.3rem; font-weight: 900; }
+.modal-title { font-size: 1.3rem; font-weight: 900; color: var(--text); }
 .close { font-size: 1.8rem; color: var(--muted); cursor: pointer; line-height: 1; }
 
 .modal-group { margin-bottom: 18px; }
@@ -698,8 +753,8 @@ button:active {
     padding: 15px;
     border-radius: 12px;
     border: 1px solid var(--card-border);
-    background: rgba(255,255,255,0.02);
-    color: white;
+    background: var(--alpha-2);
+    color: var(--text);
     font-size: 1rem;
 }
 
@@ -707,15 +762,15 @@ button:active {
     width: 100%;
     padding: 16px;
     border-radius: var(--radius-ios);
-    background: white;
-    color: black;
+    background: var(--text);
+    color: var(--bg);
     font-size: 1rem;
     font-weight: 800;
     margin-top: 10px;
 }
 
 .invoice {
-    background: rgba(0,0,0,0.4);
+    background: var(--alpha-4);
     border: 1px solid var(--card-border);
     border-radius: 14px;
     padding: 18px;
@@ -725,7 +780,7 @@ button:active {
 .invoice-row { display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 0.95rem; }
 .invoice-row:last-child { margin-bottom: 0; padding-top: 14px; border-top: 1px solid var(--card-border); }
 .invoice-label { color: var(--muted); font-weight: 500; }
-.invoice-value { font-weight: 700; color: white; }
+.invoice-value { font-weight: 700; color: var(--text); }
 
 /* RE-ENGINEERED NOTIFICATION BAR SYSTEM (TOASTS) */
 .toast-wrap {
@@ -741,11 +796,11 @@ button:active {
 }
 
 .toast {
-    background: rgba(24, 24, 28, 0.92);
+    background: var(--toast-bg);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    border: 1px solid var(--card-border);
     padding: 14px 18px;
     border-radius: 16px;
     box-shadow: 0 15px 35px rgba(0,0,0,0.6);
@@ -785,7 +840,7 @@ button:active {
 .toast-title {
     font-size: 0.9rem;
     font-weight: 800;
-    color: white;
+    color: var(--text);
     margin-bottom: 2px;
 }
 
@@ -833,7 +888,7 @@ button:active {
 .spinner {
     width: 42px;
     height: 42px;
-    border: 4px solid rgba(255,255,255,0.06);
+    border: 4px solid var(--alpha-6);
     border-top: 4px solid var(--primary);
     border-radius: 50%;
     animation: spin 0.85s linear infinite;
@@ -850,7 +905,7 @@ button:active {
     <div class="overlay" id="verify-overlay" style="z-index: 10000; align-items: center;">
         <div style="text-align: center;">
             <div class="spinner" style="margin: 0 auto;"></div>
-            <h3 style="font-weight:800; color:white; margin-top:20px;">Verifying Payment</h3>
+            <h3 style="font-weight:800; color:var(--text); margin-top:20px;">Verifying Payment</h3>
             <p style="color:var(--muted); font-size:0.9rem; margin-top:8px;">Checking transaction status...</p>
         </div>
     </div>
@@ -858,10 +913,13 @@ button:active {
     <div class="auth" id="auth">
         <div class="auth-top">
             <div class="auth-logo">MEGA<span>WAVE</span></div>
+            <div class="theme-bar" onclick="toggleTheme()">
+                <div class="theme-indicator"></div>
+            </div>
         </div>
         
         <div class="auth-card">
-            <div class="auth-title">Trading Console</div>
+            <div class="auth-title" style="color: var(--text);">Trading Console</div>
             <div class="auth-sub">Log in to access automated trading.</div>
             
             <div class="auth-tabs">
@@ -899,6 +957,9 @@ button:active {
     <header class="header">
         <div class="brand">MEGA<span>WAVE</span></div>
         <div class="header-controls">
+            <div class="theme-bar" onclick="toggleTheme()" style="margin-right: 6px;">
+                <div class="theme-indicator"></div>
+            </div>
             <button class="refresh-btn" onclick="window.location.reload()">↻</button>
             <select class="account-selector" id="account-type" onchange="switchAccount()">
                 <option value="real">Real Account</option>
@@ -1013,7 +1074,7 @@ button:active {
             <div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <div>
-                        <div style="font-size:1.2rem; font-weight:800;">Trading History</div>
+                        <div style="font-size:1.2rem; font-weight:800; color:var(--text);">Trading History</div>
                         <div id="pnl" style="font-size:0.9rem; color:var(--muted); margin-top:4px; font-weight: 700;">Total Profit: $0.00</div>
                     </div>
                     <button style="padding:8px 14px; border-radius:10px; background:rgba(244,63,94,0.12); color:var(--danger); font-size:0.85rem; font-weight:700;" onclick="clearLedger()">Clear Logs</button>
@@ -1031,9 +1092,9 @@ button:active {
                 <div class="profile-email" id="profile-email">Loading...</div>
                 
                 <div class="profile-list">
-                    <div class="profile-item"><span>Security</span><span style="color:var(--primary); font-weight:700;">Secure SSL</span></div>
-                    <div class="profile-item"><span>Account ID</span><span>MEGAWAVE-9384</span></div>
-                    <div class="profile-item"><span>Account Status</span><span style="color:var(--success); font-weight:700;">Active</span></div>
+                    <div class="profile-item"><span style="color:var(--text);">Security</span><span style="color:var(--primary); font-weight:700;">Secure SSL</span></div>
+                    <div class="profile-item"><span style="color:var(--text);">Account ID</span><span style="color:var(--text);">MEGAWAVE-9384</span></div>
+                    <div class="profile-item"><span style="color:var(--text);">Account Status</span><span style="color:var(--success); font-weight:700;">Active</span></div>
                 </div>
                 <button class="logout" onclick="logout()">Log Out</button>
             </div>
@@ -1124,7 +1185,7 @@ button:active {
             </div>
 
             <div id="step3" style="display:none; text-align:center; padding: 30px 0;">
-                <h4 style="margin-bottom:8px; color:white; font-size:1.2rem;">Connecting to Gateway...</h4>
+                <h4 style="margin-bottom:8px; color:var(--text); font-size:1.2rem;">Connecting to Gateway...</h4>
                 <p style="font-size:0.9rem; color:var(--muted); margin-bottom:20px;">Please wait while we process your request.</p>
                 <div class="spinner" style="margin: 0 auto;"></div>
             </div>
@@ -1134,7 +1195,7 @@ button:active {
     <div class="overlay" id="congrats-modal" onclick="if(event.target===this)closeCongrats()">
         <div class="modal congrats">
             <div class="congrats-icon">✅</div>
-            <h2 id="congrats-title" style="margin-bottom:8px; color:white; font-weight:800;">Success</h2>
+            <h2 id="congrats-title" style="margin-bottom:8px; color:var(--text); font-weight:800;">Success</h2>
             <p id="congrats-message" style="color:var(--muted); font-size:1rem; margin-bottom:24px;">Action completed successfully.</p>
             <button class="modal-btn" onclick="closeCongrats()">Close</button>
         </div>
@@ -1214,6 +1275,23 @@ async function exchangeDerivCodeForToken(code, verifier) {
 }
 // --- DERIV CONFIGURATION END ---
 
+// --- THEME TOGGLE ENGINE START ---
+function toggleTheme() {
+    const doc = document.documentElement;
+    if (doc.getAttribute('data-theme') === 'light') {
+        doc.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+    } else {
+        doc.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+// Ensure theme mounts on load before page renders visually
+if(localStorage.getItem('theme') === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+}
+// --- THEME TOGGLE ENGINE END ---
 
 const SUPABASE_URL = "https://hsovbnxatorocibfgrhc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP";
@@ -1507,11 +1585,11 @@ function renderTransactions(userId) {
         row.className = "ledger-row";
         row.innerHTML = `
         <div>
-            <div style="font-weight:800;margin-bottom:4px; font-size:0.95rem;">${tx.type.toUpperCase()} - ${tx.method}</div>
+            <div style="font-weight:800;margin-bottom:4px; font-size:0.95rem; color:var(--text);">${tx.type.toUpperCase()} - ${tx.method}</div>
             <div style="font-size:0.75rem;color:var(--muted); font-weight:600;">${tx.date}</div>
         </div>
         <div style="text-align:right;">
-            <div style="font-weight:800; font-size:1.05rem; color:${tx.type==='deposit'?'var(--success)':'white'}; margin-bottom:6px;">${tx.type==='deposit'?'+':'-'}$${parseFloat(tx.amount).toFixed(2)}</div>
+            <div style="font-weight:800; font-size:1.05rem; color:${tx.type==='deposit'?'var(--success)':'var(--text)'}; margin-bottom:6px;">${tx.type==='deposit'?'+':'-'}$${parseFloat(tx.amount).toFixed(2)}</div>
             <span class="tx-badge ${tx.status}">${tx.status}</span>
         </div>`;
         list.appendChild(row);
@@ -1934,7 +2012,10 @@ function updatePnL(){
 }
 
 function calculateTradeResult(market, targetDigit, stake) {
-    const isWin = Math.random() < 0.88;
+    // 85% Accuracy for AI Bot mode, 50% Accuracy for Manual mode
+    const winRate = tradeMode === 'ai' ? 0.85 : 0.50;
+    const isWin = Math.random() < winRate;
+    
     let signal = ""; let sub = ""; let profit = 0;
 
     if(market === "Matches"){
@@ -2086,10 +2167,10 @@ function logTrade(asset, market, signal, profit, stake){
     row.className = "ledger-row";
     row.innerHTML = `
     <div>
-        <div style="font-weight:800; font-size:0.95rem; margin-bottom:4px;">${asset}</div>
+        <div style="font-weight:800; font-size:0.95rem; margin-bottom:4px; color:var(--text);">${asset}</div>
         <div style="font-size:0.8rem; color:var(--muted); font-weight:600;">${market} | ${signal} | Stake: $${stake.toFixed(2)}</div>
     </div>
-    <div style="font-weight:900; font-size:1.05rem; color:${profit>=0?'var(--success)':'white'};">${profit>=0?'+':''}$${profit.toFixed(2)}</div>`;
+    <div style="font-weight:900; font-size:1.05rem; color:${profit>=0?'var(--success)':'var(--text)'};">${profit>=0?'+':''}$${profit.toFixed(2)}</div>`;
     list.prepend(row);
 }
 </script>

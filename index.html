@@ -1649,11 +1649,12 @@ function switchTradeMode(mode) {
         document.getElementById('sig-status').innerText = 'Manual trading active';
         document.getElementById('sig-main').innerText = 'MANUAL';
     }
+    toggleDigitBox();
 }
 
 function toggleDigitBox(){
     const market = document.getElementById("inp-market").value;
-    document.getElementById("digit-box").style.display = (market.includes("Over") || market.includes("Matches")) ? "block" : "none";
+    document.getElementById("digit-box").style.display = (tradeMode === 'manual' && (market.includes("Over") || market.includes("Matches"))) ? "block" : "none";
 }
 
 function switchWithdrawMethod() {
@@ -1953,9 +1954,9 @@ async function runCycle(){
     
     if(activeStake > balance){ alert('Martingale variance exceeded balance.'); toggleBot(); return; }
 
-    // AI AUTONOMY: Uses selected Strategy & Digit, but randomizes the Volatility
+    // AI AUTONOMY: Uses selected Strategy & randomizes the Volatility and Digit
     const market = document.getElementById("inp-market").value;
-    const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
+    const targetDigit = tradeMode === 'ai' ? Math.floor(Math.random() * 10) : (parseInt(document.getElementById("inp-digit").value) || 0);
     const asset = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)]; 
 
     const { signal, profit, sub } = calculateTradeResult(market, targetDigit, activeStake);

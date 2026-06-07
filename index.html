@@ -9,301 +9,303 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-:root{
-    --bg: #121410;          /* Deep dark olive/charcoal */
-    --card: #1a1e16;        /* Slightly lighter olive for cards */
-    --card-border: #2c3324; /* Subtle border for cards */
-    --primary: #94b857;     /* The signature lime/olive green */
-    --primary-hover: #a5cc63;
-    --success: #16a34a;
-    --danger: #ef4444;
-    --text: #ffffff;
-    --muted: #a1a1aa;
-    --shadow: 0 10px 35px rgba(0,0,0,.3);
-    --radius: 16px;         
+:root {
+    --bg: #000000;                  /* True iOS Pure Black Canvas */
+    --card: #1C1C1E;                /* iOS Secondary Elevation Plate */
+    --card-elevated: #2C2C2E;       /* iOS Tertiary Elevated Surface */
+    --card-border: rgba(255,255,255,0.08); /* Crisp Native Hairline Border */
+    --primary: #94b857;             /* Iconic Apex Brand Key Light */
+    --primary-rgb: 148, 184, 87;
+    --success: #30D158;             /* System Apple Green Pop */
+    --danger: #FF453A;              /* System Apple Red Pop */
+    --text: #FFFFFF;                /* Primary Label text color */
+    --muted: #8E8E93;               /* Secondary Apple System Grey */
+    --radius-ios: 14px;             /* Standard iOS Container Curve radius */
+    --radius-large: 22px;           /* Large iOS Sheets Panel radius */
 }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    -webkit-tap-highlight-color:transparent;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, SF Pro Text, SF Pro Display, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    letter-spacing: -0.24px;
 }
 
-html,body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:var(--bg);
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #09090b;
     color: var(--text);
 }
 
-body{
-    display:flex;
-    justify-content:center;
-    align-items:center;
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.device{
-    width:100%;
-    max-width:430px;
-    height:100%;
-    background:var(--bg);
-    overflow:hidden;
-    position:relative;
-    display:flex;
-    flex-direction:column;
+/* Device Shell Framework - Mimicking iPhone Container Proportions */
+.device {
+    width: 100%;
+    max-width: 430px;
+    height: 100%;
+    background: var(--bg);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
-@media(min-width:431px){
-    body{
-        padding:15px;
-        background: #000;
+@media(min-width: 431px) {
+    body {
+        padding: 20px;
+        background: #000000;
     }
-
-    .device{
-        border-radius:35px;
-        height:95vh;
-        max-height:920px;
-        box-shadow:var(--shadow);
-        border: 8px solid #222;
+    .device {
+        border-radius: 44px;
+        height: 92vh;
+        max-height: 880px;
+        border: 10px solid #2C2C2E;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.8);
     }
 }
 
-button{
-    cursor:pointer;
-    border:none;
+button, input, select {
+    outline: none;
+    border: none;
+    font-family: inherit;
 }
 
-/* AUTHENTICATION OVERLAY */
-.auth{
-    position:absolute;
-    inset:0;
-    z-index:500;
-    background:var(--bg);
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    padding:28px;
-    color:white;
-    transition: 0.3s ease-in-out;
+button {
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.auth.hidden{
-    opacity:0;
-    pointer-events:none;
+button:active {
+    opacity: 0.7;
+    transform: scale(0.98);
 }
 
-.auth-logo-box {
+/* AUTHENTICATION SHEET */
+.auth {
+    position: absolute;
+    inset: 0;
+    z-index: 500;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 40px 24px;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.auth-top {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.auth-logo {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--text);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 40px;
+    gap: 8px;
 }
-.auth-logo-icon {
-    background: #2a3123;
+
+.auth-logo span {
     color: var(--primary);
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
 }
-.auth-logo-text {
-    font-size: 1.5rem;
+
+.auth-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    padding: 24px;
+    border-radius: var(--radius-large);
+    margin-bottom: auto;
+    margin-top: 40px;
+}
+
+.auth-title {
+    font-size: 1.4rem;
     font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
 }
 
-.auth-card{
-    background:var(--card);
-    border:1px solid var(--card-border);
-    padding:28px 24px;
-    border-radius:var(--radius);
+.auth-sub {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 24px;
 }
 
-.auth-title{
-    font-size:1.5rem;
-    font-weight:700;
-    margin-bottom:8px;
-    text-align: left;
+.auth-tabs {
+    display: flex;
+    background: rgba(255,255,255,0.06);
+    padding: 2px;
+    border-radius: 9px;
+    margin-bottom: 24px;
 }
 
-.auth-sub{
-    color:var(--muted);
-    font-size:.9rem;
-    margin-bottom:30px;
-    text-align: left;
+.auth-tab {
+    flex: 1;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 8px 0;
+    border-radius: 7px;
 }
 
-.auth-tabs{
-    display:flex;
-    gap:10px;
-    margin-bottom:20px;
-    border-bottom: 1px solid var(--card-border);
-    padding-bottom: 10px;
+.auth-tab.active {
+    background: var(--card-elevated);
+    color: white;
 }
 
-.auth-tab{
-    background:transparent;
-    color:var(--muted);
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.input-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding-left: 4px;
+}
+
+.auth-input {
+    padding: 14px 16px;
+    border-radius: var(--radius-ios);
+    background: rgba(255,255,255,0.05);
+    color: white;
+    font-size: 0.95rem;
+    border: 1px solid transparent;
+    transition: 0.2s ease;
+}
+
+.auth-input:focus {
+    background: rgba(255,255,255,0.08);
+    border-color: var(--primary);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius-ios);
+    background: var(--primary);
+    color: #000;
     font-size: 1rem;
-    font-weight:600;
-    padding-bottom: 5px;
+    font-weight: 600;
+    margin-top: 12px;
 }
 
-.auth-tab.active{
-    color:white;
-    border-bottom: 2px solid var(--primary);
-}
-
-.input-group{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    margin-bottom:16px;
-}
-
-.input-label{
-    font-size:.85rem;
-    color:var(--muted);
-}
-
-.auth-input{
-    padding:14px;
-    border-radius:12px;
-    border:1px solid var(--card-border);
-    background:#121410;
-    color:white;
-    outline:none;
-    font-size:1rem;
-    transition: 0.2s;
-}
-
-.auth-input:focus{
-    border-color:var(--primary);
-}
-
-.auth-btn{
-    width:100%;
-    padding:16px;
-    border-radius:12px;
-    background:var(--primary);
-    color:#121410;
-    font-size:1.05rem;
-    font-weight:700;
-    margin-top:10px;
-    transition: all 0.1s ease;
-}
-
-.auth-btn:active{
-    transform:scale(0.98);
-}
-
-.auth-footer{
-    margin-top:20px;
-    text-align:center;
-    color:var(--muted);
-    font-size:.85rem;
-}
-
-.auth-footer span{
-    color:var(--primary);
-    font-weight:600;
-    cursor:pointer;
-}
-
-/* HEADER */
-.header{
-    padding:16px 20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:var(--bg);
-    border-bottom:1px solid var(--card-border);
+/* APPLICATION iOS HEADER */
+.header {
+    padding: 18px 20px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg);
+    border-bottom: 0.5px solid var(--card-border);
     z-index: 10;
 }
 
-.brand{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-weight:700;
-    font-size:1.1rem;
+.brand {
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: -0.5px;
+    color: white;
+}
+
+.brand span {
     color: var(--primary);
 }
 
 .header-controls {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .refresh-btn {
-    background: transparent;
-    color: var(--muted);
-    font-size: 1.2rem;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: 0.2s ease;
+    font-size: 0.9rem;
 }
 
-.refresh-btn:active {
-    color: var(--primary);
+.account-selector {
+    padding: 6px 12px;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    background: var(--card);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
-.account-selector{
-    padding:6px 12px;
-    border:1px solid var(--card-border);
-    border-radius:8px;
-    background:var(--card);
-    color:white;
-    font-size: 0.85rem;
-    font-weight:600;
-    outline:none;
-}
-
-/* MAIN CONTENT */
-.main{
-    flex:1;
-    overflow-y:auto;
+/* MAIN PANEL LAYOUT */
+.main {
+    flex: 1;
+    overflow-y: auto;
     padding: 16px;
-    padding-bottom: 80px; 
+    padding-bottom: 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-.view{
-    display:none;
-    flex-direction:column;
-    gap:16px;
+.main::-webkit-scrollbar { display: none; }
+
+.view {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
 }
 
-.view.active{
-    display:flex;
-    animation: fadeIn 0.3s ease;
+.view.active {
+    display: flex;
+    animation: iosFade 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+@keyframes iosFade {
+    from { opacity: 0; transform: scale(0.98) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-.card{
-    background:var(--card);
-    border-radius:var(--radius);
-    padding:20px;
-    border:1px solid var(--card-border);
+.card {
+    background: var(--card);
+    border-radius: var(--radius-large);
+    padding: 20px;
+    border: 1px solid var(--card-border);
 }
 
-/* BALANCE SECTION */
-.balance-card{
+/* WALLET STATUS MODULE */
+.balance-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px 20px;
+    padding: 22px 20px;
 }
 
 .balance-info {
@@ -311,66 +313,66 @@ button{
     flex-direction: column;
 }
 
-.balance-title{
-    font-size:.85rem;
-    color:var(--muted);
-    font-weight:500;
-    margin-bottom:4px;
+.balance-title {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
 }
 
-.balance-amount{
-    font-size:2.2rem;
-    font-weight:700;
+.balance-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
     color: white;
 }
 
 .deposit-top-btn {
-    background: var(--primary);
-    color: #121410;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 0.9rem;
+    background: white;
+    color: black;
+    padding: 10px 18px;
+    border-radius: 18px;
+    font-weight: 600;
+    font-size: 0.85rem;
 }
 
-/* ACTION BUTTONS */
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
+/* ACTION MODULE PLATFORM CHIPS */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
 }
 
-.action-btn{
-    background:var(--bg);
-    border-radius:12px;
-    padding:16px;
-    border:1px solid var(--card-border);
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-    font-weight:600;
+.action-btn {
+    background: var(--card);
+    border-radius: var(--radius-ios);
+    padding: 16px;
+    border: 1px solid var(--card-border);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: left;
+    align-items: flex-start;
+}
+
+.action-btn .btn-title {
+    font-size: 0.95rem;
+    font-weight: 600;
     color: white;
-    align-items:center;
-    justify-content:center;
-    transition:.2s;
 }
 
-.action-btn:active{
-    background: var(--card-border);
-}
-
-.action-btn span{
-    font-size:.7rem;
-    color:var(--muted);
+.action-btn span {
+    font-size: 0.75rem;
+    color: var(--muted);
 }
 
 .history-bar-btn {
     width: 100%;
     background: var(--card);
     border: 1px solid var(--card-border);
-    border-radius: 12px;
+    border-radius: var(--radius-ios);
     padding: 14px 18px;
     display: flex;
     justify-content: space-between;
@@ -378,206 +380,199 @@ button{
     font-weight: 600;
     font-size: 0.9rem;
     color: white;
-    transition: .2s;
 }
 
-/* VOLATILITY SELECTOR BAR */
+/* ASSET SYSTEM CHIP SLIDER */
 .asset-selector-wrap {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-top: 8px;
+    gap: 8px;
 }
+
 .asset-selector-title {
     font-size: 0.75rem;
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    font-weight: 600;
+    font-weight: 700;
+    padding-left: 4px;
 }
+
 .asset-bar {
     display: flex;
     gap: 8px;
     overflow-x: auto;
     padding-bottom: 4px;
 }
-.asset-bar::-webkit-scrollbar {
-    display: none;
-}
-.asset-bar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
+
+.asset-bar::-webkit-scrollbar { display: none; }
+.asset-bar { -ms-overflow-style: none; scrollbar-width: none; }
+
 .asset-btn-item {
     background: var(--card);
     border: 1px solid var(--card-border);
-    color: var(--muted);
-    padding: 8px 14px;
-    border-radius: 10px;
+    color: #E5E5EA;
+    padding: 8px 16px;
+    border-radius: 16px;
     font-size: 0.8rem;
     font-weight: 600;
     white-space: nowrap;
-    transition: 0.2s ease;
-}
-.asset-btn-item.active {
-    background: var(--primary);
-    color: #121410;
-    border-color: var(--primary);
 }
 
-/* REAL-TIME TICK GRAPH */
+.asset-btn-item.active {
+    background: white;
+    color: black;
+    border-color: white;
+}
+
+/* CHART CONTAINER */
 .graph-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
+
 .graph-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
+
 .graph-asset-name {
-    font-size: 0.95rem;
-    font-weight: 700;
+    font-size: 0.9rem;
+    font-weight: 600;
     color: white;
 }
+
 .graph-live-ticker {
-    font-family: monospace;
-    font-size: 1.1rem;
+    font-family: -apple-system-font, monospace;
+    font-size: 1.15rem;
     font-weight: 700;
     color: var(--primary);
 }
+
 .canvas-wrapper {
     width: 100%;
-    height: 150px;
+    height: 140px;
     position: relative;
 }
 
-/* DIGIT CIRLCES PANEL (1 to 9) */
+/* STATISTICAL DIGIT BOX SYSTEM */
 .digit-panel {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
+
 .digit-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
+    gap: 6px;
 }
-@media (max-width: 360px) {
-    .digit-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
+
 .digit-circle-card {
-    background: var(--bg);
+    background: rgba(255,255,255,0.03);
     border: 1px solid var(--card-border);
-    border-radius: 12px;
+    border-radius: 10px;
     padding: 8px 4px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
 }
+
 .digit-node {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    border: 1.5px solid var(--primary);
+    background: rgba(255,255,255,0.05);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.85rem;
-    font-weight: 700;
+    font-size: 0.8rem;
+    font-weight: 600;
     color: white;
 }
+
 .digit-percentage {
     font-family: monospace;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--muted);
 }
 
-/* FLOATING AI TRADER */
+/* NEURAL QUANTUM ENGINE MODULE */
 .floating-ai {
+    background: var(--card);
+    border: 1px solid var(--card-border);
     position: relative;
-    background: linear-gradient(180deg, #1f241a 0%, var(--card) 100%);
-    border: 1px solid #364228;
-    box-shadow: 0 8px 30px rgba(148, 184, 87, 0.1);
-    overflow: hidden;
 }
 
-.floating-ai::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+.ai-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
 }
 
-.ai-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-}
 .ai-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 700;
     color: white;
 }
 
-.live-badge{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    background: rgba(148, 184, 87, 0.1);
-    color:var(--primary);
+.live-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(148, 184, 87, 0.12);
+    color: var(--primary);
     padding: 4px 10px;
-    border-radius: 99px;
-    font-size: 0.75rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
     font-weight: 600;
 }
 
-.dot{
-    width:6px;
-    height:6px;
-    border-radius:50%;
-    background:var(--primary);
-    animation:pulse 1.4s infinite;
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    animation: pulse 1.5s infinite;
 }
 
-@keyframes pulse{
-    0%{box-shadow:0 0 0 0 rgba(148,184,87,.4)}
-    100%{box-shadow:0 0 0 8px rgba(148,184,87,0)}
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(148,184,87,0.5); }
+    100% { box-shadow: 0 0 0 6px rgba(148,184,87,0); }
 }
 
-.signal-box{
-    background:#121410;
-    border: 1px solid #22271c;
-    border-radius:12px;
-    padding:20px;
-    text-align:center;
-    margin-bottom:20px;
+.signal-box {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-ios);
+    padding: 16px;
+    text-align: center;
+    margin-bottom: 16px;
 }
 
-.signal-asset{
-    color:var(--muted);
-    font-size:.8rem;
+.signal-asset {
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom:8px;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
 }
 
-.signal-main{
-    font-size:1.6rem;
-    font-weight:700;
+.signal-main {
+    font-size: 1.5rem;
+    font-weight: 700;
     color: white;
-    margin-bottom:4px;
 }
 
-.signal-sub{
-    font-size:.8rem;
-    color:var(--primary);
+.signal-sub {
+    font-size: 0.8rem;
+    color: var(--primary);
+    margin-top: 2px;
 }
 
 .ai-inputs-grid {
@@ -587,324 +582,257 @@ button{
     margin-bottom: 10px;
 }
 
-.input-card{
-    background:#121410;
-    border:1px solid var(--card-border);
-    border-radius:8px;
-    padding:10px 12px;
+.input-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 10px 12px;
 }
 
-.input-card label{
-    display:block;
-    font-size:.75rem;
-    color:var(--muted);
-    margin-bottom:4px;
+.input-card label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 2px;
 }
 
-.input-card input,
-.input-card select{
-    width:100%;
-    border:none;
-    background:transparent;
+.input-card input, .input-card select {
+    width: 100%;
+    border: none;
+    background: transparent;
     color: white;
-    outline:none;
-    font-weight:600;
-    font-size:1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
 }
+
 .input-card select option {
-    background: var(--bg);
+    background: #1C1C1E;
     color: white;
 }
 
-.master-btn{
-    width:100%;
-    padding:16px;
-    border-radius:12px;
-    background:var(--primary);
-    color:#121410;
-    font-size:1.05rem;
-    font-weight:700;
-    margin-top:10px;
-    transition: 0.2s;
+.master-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius-ios);
+    background: var(--primary);
+    color: black;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 8px;
 }
 
-.master-btn.active{
-    background:transparent;
+.master-btn.active {
+    background: transparent;
     color: var(--danger);
     border: 1px solid var(--danger);
 }
 
-/* LEDGER */
-.ledger-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:#121410;
-    border-radius:12px;
-    border:1px solid var(--card-border);
-    padding:14px 16px;
-    margin-bottom:8px;
+/* TRANSACTION LAYOUT LISTS */
+.ledger-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.02);
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    padding: 12px 14px;
+    margin-bottom: 8px;
 }
 
 .tx-badge {
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.65rem;
+    padding: 3px 6px;
+    border-radius: 5px;
+    font-size: 0.6rem;
     font-weight: 700;
     text-transform: uppercase;
-    display: inline-block;
 }
-.tx-badge.completed {
-    background: rgba(22, 163, 74, 0.1);
-    color: var(--success);
-}
-.tx-badge.pending {
-    background: rgba(234, 179, 8, 0.1);
-    color: #eab308;
-}
+.tx-badge.completed { background: rgba(48, 209, 88, 0.15); color: var(--success); }
+.tx-badge.pending { background: rgba(255, 214, 10, 0.15); color: #ffd60a; }
 
-/* PROFILE */
-.profile{
-    text-align:center;
-}
+/* ACCOUNT PROFILE LAYOUT */
+.profile { text-align: center; }
 
-.avatar{
-    width:70px;
-    height:70px;
-    border-radius:50%;
-    background:#2a3123;
+.avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--card-elevated);
     color: var(--primary);
-    margin:0 auto 16px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:1.8rem;
-    font-weight: bold;
+    margin: 0 auto 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 700;
 }
 
-.profile-name{
-    font-size:1.2rem;
-    font-weight:700;
-}
+.profile-name { font-size: 1.2rem; font-weight: 700; }
+.profile-email { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
 
-.profile-email{
-    color:var(--muted);
-    font-size:.85rem;
-    margin-top:4px;
-}
-
-.profile-list{
-    margin-top:24px;
+.profile-list {
+    margin-top: 24px;
     text-align: left;
-    background: #121410;
-    border-radius: 12px;
+    background: rgba(255,255,255,0.02);
+    border-radius: var(--radius-ios);
     border: 1px solid var(--card-border);
 }
 
-.profile-item{
-    display:flex;
-    justify-content:space-between;
-    padding:16px;
-    border-bottom:1px solid var(--card-border);
-    font-size:.9rem;
+.profile-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 0.5px solid var(--card-border);
+    font-size: 0.9rem;
 }
 .profile-item:last-child { border-bottom: none; }
 
-.logout{
-    width:100%;
-    padding:16px;
-    border-radius:12px;
-    background:transparent;
-    color:var(--danger);
-    border:1px solid var(--danger);
-    font-weight:600;
-    margin-top:20px;
+.logout {
+    width: 100%;
+    padding: 14px;
+    border-radius: var(--radius-ios);
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid rgba(255,69,58,0.3);
+    font-weight: 600;
+    margin-top: 24px;
 }
 
-/* BOTTOM NAVIGATION */
-.nav{
+/* APPLE FLAT SYSTEM NAVIGATION LAYER */
+.nav {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display:flex;
-    justify-content:space-around;
-    padding:12px 10px 24px 10px; 
-    background:var(--card);
-    border-top:1px solid var(--card-border);
+    bottom: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 10px 28px;
+    background: rgba(28, 28, 30, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 0.5px solid var(--card-border);
     z-index: 100;
 }
 
-.nav-item{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:4px;
-    color:var(--muted);
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: var(--muted);
     flex: 1;
-    cursor: pointer;
 }
 
-.nav-item.active{
-    color:var(--primary);
-}
-.nav-icon {
-    font-size: 1.2rem;
-    margin-bottom: 2px;
-}
-.nav-label{
-    font-size:.7rem;
-    font-weight:600;
+.nav-item.active { color: var(--primary); }
+.nav-icon { font-size: 1.25rem; }
+.nav-label { font-size: 0.65rem; font-weight: 500; }
+
+/* MODAL SYSTEM OVERLAYS */
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: none;
+    justify-content: center;
+    align-items: flex-end;
+    z-index: 400;
 }
 
-/* MODALS */
-.overlay{
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,.8);
-    backdrop-filter:blur(5px);
-    display:none;
-    justify-content:center;
-    align-items:flex-end; 
-    z-index:400;
-}
+.overlay.show { display: flex; }
 
-.overlay.show{
-    display:flex;
-}
-
-.modal{
-    width:100%;
-    background:var(--card);
-    border-radius: 24px 24px 0 0;
-    padding:24px;
-    animation:slideUp .3s ease;
-    max-height: 85vh;
+.modal {
+    width: 100%;
+    background: #1C1C1E;
+    border-radius: var(--radius-large) var(--radius-large) 0 0;
+    padding: 24px;
+    max-height: 80vh;
     overflow-y: auto;
     border-top: 1px solid var(--card-border);
+    animation: iosSheetUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes slideUp{
-    from{ transform:translateY(100%); }
-    to{ transform:translateY(0); }
+@keyframes iosSheetUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
 }
 
-.modal-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:24px;
+.modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-.modal-title{
-    font-size:1.2rem;
-    font-weight:700;
-}
+.modal-title { font-size: 1.15rem; font-weight: 700; }
+.close { font-size: 1.4rem; color: var(--muted); }
 
-.close{
-    font-size:1.5rem;
-    color: var(--muted);
-    cursor:pointer;
-}
-
-.modal-group{
-    margin-bottom:16px;
-}
-
-.modal-group label{
-    display:block;
-    margin-bottom:8px;
-    font-size:.8rem;
-    color:var(--muted);
-}
-
-.modal-input{
-    width:100%;
-    padding:14px;
-    border-radius:10px;
-    border:1px solid var(--card-border);
-    background:#121410;
+.modal-group { margin-bottom: 14px; }
+.modal-group label { display: block; margin-bottom: 6px; font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+.modal-input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: rgba(255,255,255,0.05);
     color: white;
-    outline:none;
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
 
-.modal-btn{
-    width:100%;
-    padding:16px;
-    border-radius:10px;
-    background:var(--primary);
-    color:#121410;
-    font-size:1rem;
-    font-weight:700;
-    margin-top:10px;
+.modal-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius-ios);
+    background: white;
+    color: black;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-top: 10px;
 }
 
-.invoice{
-    background:#121410;
-    border:1px solid var(--card-border);
-    border-radius:12px;
-    padding:16px;
-    margin-bottom:20px;
+.invoice {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
 }
 
-.invoice-row{
-    display:flex;
-    justify-content:space-between;
-    margin-bottom:12px;
-    font-size:.9rem;
+.invoice-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.85rem; }
+.invoice-row:last-child { margin-bottom: 0; padding-top: 10px; border-top: 0.5px solid var(--card-border); }
+.invoice-label { color: var(--muted); }
+.invoice-value { font-weight: 600; }
+
+/* TOAST OVERLAYS */
+.toast-wrap {
+    position: absolute;
+    top: 50px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 90%;
 }
 
-.invoice-row:last-child{
-    margin-bottom:0;
-    padding-top:12px;
-    border-top:1px solid var(--card-border);
+.toast {
+    background: #2C2C2E;
+    color: white;
+    border: 1px solid var(--card-border);
+    padding: 12px 16px;
+    border-radius: 14px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.invoice-label{
-    color:var(--muted);
+@keyframes toastIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.invoice-value{
-    font-weight:600;
-}
-
-.toast-wrap{
-    position:absolute;
-    top:20px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:1000;
-    width:90%;
-    max-width:380px;
-}
-
-.toast{
-    background:var(--primary);
-    color:#121410;
-    padding:14px 18px;
-    border-radius:8px;
-    margin-bottom:10px;
-    text-align:center;
-    font-weight:600;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    animation:fade .3s ease;
-}
-
-@keyframes fade{
-    from{ opacity:0; transform:translateY(-10px); }
-    to{ opacity:1; transform:translateY(0); }
-}
-
-.congrats{
-    text-align:center;
-    padding-bottom: 20px;
-}
-
-.congrats-icon{
-    font-size:3.5rem;
-    margin-bottom:166px;
-}
+.congrats { text-align: center; padding: 20px 0; }
+.congrats-icon { font-size: 3rem; margin-bottom: 16px; }
 
 .verify-overlay {
     position: absolute;
@@ -915,23 +843,19 @@ button{
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    text-align: center;
     padding: 20px;
 }
 
 .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid #222;
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(255,255,255,0.1);
     border-top: 3px solid var(--primary);
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 20px auto;
+    animation: spin 0.8s linear infinite;
 }
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
 </head>
 
@@ -939,284 +863,287 @@ button{
 
 <div class="device">
 
-<div class="verify-overlay" id="verify-overlay">
-    <div class="spinner"></div>
-    <h2 style="font-weight:700; color:white; margin-top:20px;">Verifying Payment...</h2>
-    <p style="color:var(--muted); font-size:0.9rem; margin-top:10px;">Securely communicating with gateway</p>
-</div>
-
-<div class="auth" id="auth">
-    <div class="auth-logo-box">
-        <div class="auth-logo-icon">↗</div>
-        <div class="auth-logo-text">APEX Markets AI</div>
+    <div class="verify-overlay" id="verify-overlay">
+        <div class="spinner"></div>
+        <h3 style="font-weight:700; color:white; margin-top:20px; letter-spacing: -0.5px;">Verifying Secure Payment</h3>
+        <p style="color:var(--muted); font-size:0.85rem; margin-top:6px;">Syncing cluster logs with network gateway...</p>
     </div>
-    
-    <div class="auth-card">
-        <div class="auth-title">Welcome back</div>
-        <div class="auth-sub">Log in to continue trading.</div>
-        
-        <div class="auth-tabs">
-            <button class="auth-tab active" id="signin-tab" onclick="switchAuth('signin')">Log in</button>
-            <button class="auth-tab" id="signup-tab" onclick="switchAuth('signup')">Create account</button>
-        </div>
 
-        <div id="fullname-wrap" style="display:none;">
+    <div class="auth" id="auth">
+        <div class="auth-top">
+            <div class="auth-logo">↗ APEX<span>AI</span></div>
+        </div>
+        
+        <div class="auth-card">
+            <div class="auth-title">Neural Trading Console</div>
+            <div class="auth-sub">Access automated execution nodes.</div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="signin-tab" onclick="switchAuth('signin')">Sign In</button>
+                <button class="auth-tab" id="signup-tab" onclick="switchAuth('signup')">Register</button>
+            </div>
+
+            <div id="fullname-wrap" style="display:none;">
+                <div class="input-group">
+                    <label class="input-label">Identity Label</label>
+                    <input type="text" class="auth-input" id="signup-name" placeholder="Name or Alias">
+                </div>
+            </div>
+
             <div class="input-group">
-                <label class="input-label">Display name</label>
-                <input type="text" class="auth-input" id="signup-name" placeholder="Optional">
+                <label class="input-label">Secure Mail Address</label>
+                <input type="email" class="auth-input" id="login-email" placeholder="name@domain.com">
             </div>
-        </div>
 
-        <div class="input-group">
-            <label class="input-label">Email</label>
-            <input type="email" class="auth-input" id="login-email" placeholder="you@example.com">
-        </div>
+            <div class="input-group">
+                <label class="input-label">Pass Token</label>
+                <input type="password" class="auth-input" id="login-pass" placeholder="••••••••">
+            </div>
 
-        <div class="input-group">
-            <label class="input-label">Password</label>
-            <input type="password" class="auth-input" id="login-pass" placeholder="At least 8 characters">
+            <button class="auth-btn" id="auth-btn" onclick="handleAuth()">Authenticate Connection</button>
         </div>
-
-        <button class="auth-btn" id="auth-btn" onclick="handleAuth()">Log in</button>
     </div>
-</div>
 
-<div class="toast-wrap" id="toast-wrap"></div>
+    <div class="toast-wrap" id="toast-wrap"></div>
 
-<header class="header">
-    <div class="brand">↗ APEX Markets AI</div>
-    <div class="header-controls">
-        <button class="refresh-btn" onclick="window.location.reload()">↻</button>
-        <select class="account-selector" id="account-type" onchange="switchAccount()">
-            <option value="real">Real Account</option>
-            <option value="demo">Demo Account</option>
-        </select>
-    </div>
-</header>
-
-<div class="main">
-
-    <div class="view active" id="home">
-        
-        <div class="card balance-card">
-            <div class="balance-info">
-                <div class="balance-title">Available Balance</div>
-                <div class="balance-amount" id="balance">$0.00</div>
-            </div>
-            <button class="deposit-top-btn" onclick="openPayment('deposit')">Deposit</button>
+    <header class="header">
+        <div class="brand">↗ APEX <span>AI</span></div>
+        <div class="header-controls">
+            <button class="refresh-btn" onclick="window.location.reload()">↻</button>
+            <select class="account-selector" id="account-type" onchange="switchAccount()">
+                <option value="real">Real Account</option>
+                <option value="demo">Demo Node</option>
+            </select>
         </div>
+    </header>
 
-        <div class="grid">
-            <button class="action-btn" onclick="openPayment('deposit')">Deposit<span>From $10</span></button>
-            <button class="action-btn" onclick="openPayment('withdraw')">Withdraw<span>Zero fees</span></button>
-        </div>
+    <div class="main">
 
-        <button class="history-bar-btn" onclick="openHistory()" style="margin-top: 4px;">
-            <span>Transaction History</span>
-            <span style="color:var(--muted); font-size:1.2rem;">›</span>
-        </button>
-
-        <div class="asset-selector-wrap">
-            <div class="asset-selector-title">Volatility Deriv Indices</div>
-            <div class="asset-bar" id="volatility-bar">
-                </div>
-        </div>
-
-        <div class="card graph-container">
-            <div class="graph-header">
-                <div class="graph-asset-name" id="selected-asset-label">Volatility 10 (1s)</div>
-                <div class="graph-live-ticker" id="graph-ticker-price">--</div>
-            </div>
-            <div class="canvas-wrapper">
-                <canvas id="liveTickChart"></canvas>
-            </div>
-        </div>
-
-        <div class="card digit-panel">
-            <div class="asset-selector-title">Last Digit Distribution (1 - 9)</div>
-            <div class="digit-grid" id="digit-grid-nodes">
-                </div>
-        </div>
-
-        <div class="card floating-ai">
-            <div class="ai-head">
-                <div class="ai-title">Neural Engine</div>
-                <div class="live-badge"><div class="dot"></div>Live Sync</div>
-            </div>
+        <div class="view active" id="home">
             
-            <div class="signal-box">
-                <div class="signal-asset" id="sig-asset">AWAITING CONNECTION...</div>
-                <div class="signal-main" id="sig-main">--</div>
-                <div class="signal-sub" id="sig-status">Select strategy to begin</div>
+            <div class="card balance-card">
+                <div class="balance-info">
+                    <div class="balance-title">Liquid Capital Balance</div>
+                    <div class="balance-amount" id="balance">$0.00</div>
+                </div>
+                <button class="deposit-top-btn" onclick="openPayment('deposit')">Deposit</button>
             </div>
 
-            <div class="ai-inputs-grid">
-                <div class="input-card">
-                    <label>Strategy</label>
-                    <select id="inp-market" onchange="toggleDigitBox()">
-                        <option>Matches/Differs</option>
-                        <option>Even/Odd</option>
-                        <option>Over/Under</option>
+            <div class="grid">
+                <button class="action-btn" onclick="openPayment('deposit')">
+                    <span class="btn-title">Deposit Cash</span>
+                    <span>Instant MPesa / Crypto</span>
+                </button>
+                <button class="action-btn" onclick="openPayment('withdraw')">
+                    <span class="btn-title">Withdrawal</span>
+                    <span>Zero Network Slippage</span>
+                </button>
+            </div>
+
+            <button class="history-bar-btn" onclick="openHistory()">
+                <span>Transaction Receipts</span>
+                <span style="color:var(--muted);">›</span>
+            </button>
+
+            <div class="asset-selector-wrap">
+                <div class="asset-selector-title">Deriv Continuous Risk Indexes</div>
+                <div class="asset-bar" id="volatility-bar"></div>
+            </div>
+
+            <div class="card graph-container">
+                <div class="graph-header">
+                    <div class="graph-asset-name" id="selected-asset-label">Volatility 10 Index</div>
+                    <div class="graph-live-ticker" id="graph-ticker-price">--</div>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="liveTickChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card digit-panel">
+                <div class="asset-selector-title">Dynamic Core Last Digit Pulse (1 - 9)</div>
+                <div class="digit-grid" id="digit-grid-nodes"></div>
+            </div>
+
+            <div class="card floating-ai">
+                <div class="ai-head">
+                    <div class="ai-title">Neural Synthesis Engine</div>
+                    <div class="live-badge"><div class="dot"></div>Live Feedback</div>
+                </div>
+                
+                <div class="signal-box">
+                    <div class="signal-asset" id="sig-asset">AWAITING SYSTEM LINK...</div>
+                    <div class="signal-main" id="sig-main">--</div>
+                    <div class="signal-sub" id="sig-status">Deploy operational parameters below</div>
+                </div>
+
+                <div class="ai-inputs-grid">
+                    <div class="input-card">
+                        <label>Matrix Strategy</label>
+                        <select id="inp-market" onchange="toggleDigitBox()">
+                            <option>Matches/Differs</option>
+                            <option>Even/Odd</option>
+                            <option>Over/Under</option>
+                        </select>
+                    </div>
+                    <div class="input-card">
+                        <label>Execution Stake ($)</label>
+                        <input type="number" id="inp-stake" value="10">
+                    </div>
+                </div>
+
+                <div class="input-card" id="digit-box" style="display:none; margin-bottom:10px;">
+                    <label>Target Threshold Digit</label>
+                    <input type="number" id="inp-digit" value="4" min="0" max="9">
+                </div>
+
+                <div class="ai-inputs-grid">
+                    <div class="input-card"><label>Take Profit Target ($)</label><input type="number" id="inp-tp" value="50"></div>
+                    <div class="input-card"><label>Stop Loss Boundary ($)</label><input type="number" id="inp-sl" value="100"></div>
+                </div>
+
+                <div class="input-card" style="margin-bottom: 10px;">
+                    <label>Martingale Factor Ratio</label>
+                    <input type="number" id="inp-multi" value="2.1" step="0.1">
+                </div>
+                
+                <button class="master-btn" id="engine-btn" onclick="toggleBot()">Initialize Execution Matrix</button>
+            </div>
+        </div>
+
+        <div class="view" id="ledger">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <div>
+                        <div style="font-size:1.1rem; font-weight:700;">Ledger Trade Log</div>
+                        <div id="pnl" style="font-size:.85rem; color:var(--muted); margin-top:4px;">Cumulative Yield: $0.00</div>
+                    </div>
+                    <button style="padding:6px 12px; border-radius:8px; background:rgba(255,69,58,0.15); color:var(--danger); font-size:0.75rem; font-weight:600;" onclick="clearLedger()">Flush Logs</button>
+                </div>
+                <div id="ledger-list">
+                    <div style="text-align:center; padding:40px 0; color:var(--muted); font-size:.85rem;">No algorithmic records initialized.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="view" id="profile">
+            <div class="card profile">
+                <div class="avatar" id="avatar-initial">A</div>
+                <div class="profile-name" id="profile-name">Apex Neural Core</div>
+                <div class="profile-email" id="profile-email">Synchronizing Cloud Link...</div>
+                
+                <div class="profile-list">
+                    <div class="profile-item"><span>Encryption Context</span><span style="color:var(--primary); font-weight:600;">256-Bit SSL Secured</span></div>
+                    <div class="profile-item"><span>Platform ID Routing</span><span>APEX-NODE-9384</span></div>
+                    <div class="profile-item"><span>Account Validation</span><span style="color:var(--success); font-weight:600;">Operational</span></div>
+                </div>
+                <button class="logout" onclick="logout()">Terminate Session Instance</button>
+            </div>
+        </div>
+
+    </div>
+
+    <nav class="nav">
+        <div class="nav-item active" id="nav-home" onclick="switchTab('home',this)">
+            <div class="nav-icon">⏣</div>
+            <div class="nav-label">Terminal</div>
+        </div>
+        <div class="nav-item" id="nav-ledger" onclick="switchTab('ledger',this)">
+            <div class="nav-icon">📊</div>
+            <div class="nav-label">Ledger</div>
+        </div>
+        <div class="nav-item" id="nav-profile" onclick="switchTab('profile',this)">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">Identity</div>
+        </div>
+    </nav>
+
+    <div class="overlay" id="history-modal" onclick="if(event.target===this)closeHistory()">
+        <div class="modal">
+            <div class="modal-head">
+                <div class="modal-title">Capital Adjustments Ledger</div>
+                <div class="close" onclick="closeHistory()">×</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <div style="font-size:.8rem; color:var(--muted);">Fulfillment Status Streams</div>
+                <button style="padding:6px 10px; border-radius:8px; background:rgba(255,69,58,0.12); color:var(--danger); font-size:0.75rem; font-weight:600;" onclick="clearTransactions()">Purge Matrix Cache</button>
+            </div>
+            <div id="transaction-list">
+                <div style="text-align:center; padding:40px 0; color:var(--muted); font-size:.85rem;">No historical network paths mapped.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="payment-modal" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <div class="modal-head">
+                <div class="modal-title" id="payment-title">Inject Liquidity Protocol</div>
+                <div class="close" onclick="closeModal()">×</div>
+            </div>
+
+            <div id="step1">
+                <div id="withdraw-method-group" class="modal-group" style="display:none;">
+                    <label>Fulfillment Target Asset Channel</label>
+                    <select class="modal-input" id="withdraw-method" onchange="switchWithdrawMethod()">
+                        <option value="mpesa">Safaricom M-Pesa Rails</option>
+                        <option value="usdt">Tether Stablecoin Protocol (USDT)</option>
+                        <option value="binance">Binance Pay Ledger</option>
                     </select>
                 </div>
-                <div class="input-card">
-                    <label>Stake ($)</label>
-                    <input type="number" id="inp-stake" value="10">
+
+                <div id="form-mpesa">
+                    <div class="modal-group"><label>Safaricom Legal Name Registration</label><input type="text" class="modal-input" id="pay-name" placeholder="e.g. ELON MUSK"></div>
+                    <div class="modal-group"><label>M-Pesa Express Terminal Number</label><input type="tel" class="modal-input" id="pay-phone" placeholder="e.g. 0712345678"></div>
+                </div>
+
+                <div id="form-usdt" style="display:none;">
+                    <div class="modal-group"><label>Cryptographic Smart Chain Network</label>
+                        <select class="modal-input" id="usdt-network">
+                            <option value="trc20">Tron Protocol Layer (TRC20)</option>
+                            <option value="bep20">Binance Smart Chain (BEP20)</option>
+                        </select>
+                    </div>
+                    <div class="modal-group"><label>Target Inbound/Outbound Wallet Hash</label><input type="text" class="modal-input" id="usdt-address" placeholder="0x... or T..."></div>
+                </div>
+
+                <div id="form-binance" style="display:none;">
+                    <div class="modal-group"><label>Binance Pay Identification Payload Token</label><input type="text" class="modal-input" id="binance-id" placeholder="Merchant ID or Mail Context"></div>
+                </div>
+
+                <div class="modal-group"><label>Fiat/Crypto Absolute Value Limit (USD)</label><input type="number" class="modal-input" id="pay-amount" placeholder="Minimum threshold value $10"></div>
+                
+                <button class="modal-btn" style="background:var(--primary); color:black;" onclick="proceedInvoice()">Generate Asset Pipeline</button>
+                <div id="trust-badge" style="text-align:center; margin-top:20px; display:none;">
+                    <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" style="max-width:100%; opacity:0.3; filter: grayscale(100%);">
                 </div>
             </div>
 
-            <div class="input-card" id="digit-box" style="display:none; margin-bottom:10px;">
-                <label>Target Digit</label>
-                <input type="number" id="inp-digit" value="4" min="0" max="9">
-            </div>
-
-            <div class="ai-inputs-grid">
-                <div class="input-card"><label>Take Profit</label><input type="number" id="inp-tp" value="50"></div>
-                <div class="input-card"><label>Stop Loss</label><input type="number" id="inp-sl" value="100"></div>
-            </div>
-
-            <div class="input-card" style="margin-bottom: 10px;">
-                <label>Martingale Factor</label>
-                <input type="number" id="inp-multi" value="2.1" step="0.1">
-            </div>
-            
-            <button class="master-btn" id="engine-btn" onclick="toggleBot()">Start AI Trading</button>
-        </div>
-    </div>
-
-    <div class="view" id="ledger">
-        <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <div>
-                    <div style="font-size:1.1rem; font-weight:700;">Trade History</div>
-                    <div id="pnl" style="font-size:.85rem; color:var(--muted); margin-top:4px;">P&L: $0.00</div>
+            <div id="step2" style="display:none;">
+                <div class="invoice">
+                    <div class="invoice-row"><span class="invoice-label">Inbound Invoice Reference</span><span class="invoice-value" id="inv-id">--</span></div>
+                    <div class="invoice-row"><span class="invoice-label">Target Registration Entity</span><span class="invoice-value" id="inv-name">--</span></div>
+                    <div class="invoice-row"><span class="invoice-label">Device Protocol Route</span><span class="invoice-value" id="inv-phone">--</span></div>
+                    <div class="invoice-row"><span class="invoice-label">Localized Net Remittance</span><span class="invoice-value" style="color:var(--success);">KSh <span id="inv-amount">0</span></span></div>
                 </div>
-                <button style="padding:6px 12px; border-radius:6px; background:rgba(239, 68, 68, 0.1); color:var(--danger); font-size:0.8rem;" onclick="clearLedger()">Clear</button>
+                <button class="modal-btn" style="background:var(--success); color:black;" onclick="executeExternalPayment()">Fulfill Secure Handshake</button>
             </div>
-            <div id="ledger-list">
-                <div style="text-align:center; padding:40px 0; color:var(--muted); font-size:.85rem;">No trades executed yet.</div>
+
+            <div id="step3" style="display:none; text-align:center; padding: 30px 0;">
+                <h4 style="margin-bottom:8px; color:white;">Configuring Network Route...</h4>
+                <p style="font-size:0.8rem; color:var(--muted); margin-bottom:20px;">Awaiting verification frame clearance.</p>
+                <div class="spinner" style="margin: 0 auto;"></div>
             </div>
         </div>
     </div>
 
-    <div class="view" id="profile">
-        <div class="card profile">
-            <div class="avatar" id="avatar-initial">A</div>
-            <div class="profile-name" id="profile-name">Apex Trader</div>
-            <div class="profile-email" id="profile-email">Connecting...</div>
-            
-            <div class="profile-list">
-                <div class="profile-item"><span>Status</span><span style="color:var(--primary);">Verified</span></div>
-                <div class="profile-item"><span>Platform ID</span><span>APEX-9384</span></div>
-                <div class="profile-item"><span>Encryption</span><span>256-bit SSL</span></div>
-            </div>
-            <button class="logout" onclick="logout()">Log out</button>
+    <div class="overlay" id="congrats-modal" onclick="if(event.target===this)closeCongrats()">
+        <div class="modal congrats">
+            <div class="congrats-icon">⚡️</div>
+            <h2 id="congrats-title" style="margin-bottom:8px; color:white; letter-spacing:-0.5px;">State Sync Correct</h2>
+            <p id="congrats-message" style="color:var(--muted); font-size:0.9rem; margin-bottom:24px;">Data node synchronized perfectly.</p>
+            <button class="modal-btn" onclick="closeCongrats()">Terminate Modal Frame</button>
         </div>
     </div>
-
-</div>
-
-<nav class="nav">
-    <div class="nav-item active" id="nav-home" onclick="switchTab('home',this)">
-        <div class="nav-icon">⏣</div>
-        <div class="nav-label">Trade</div>
-    </div>
-    <div class="nav-item" id="nav-ledger" onclick="switchTab('ledger',this)">
-        <div class="nav-icon">≡</div>
-        <div class="nav-label">History</div>
-    </div>
-    <div class="nav-item" id="nav-profile" onclick="switchTab('profile',this)">
-        <div class="nav-icon">👤</div>
-        <div class="nav-label">Account</div>
-    </div>
-</nav>
-
-<div class="overlay" id="history-modal" onclick="if(event.target===this)closeHistory()">
-    <div class="modal">
-        <div class="modal-head">
-            <div class="modal-title">Transactions</div>
-            <div class="close" onclick="closeHistory()">×</div>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-            <div style="font-size:.85rem; color:var(--muted);">Deposits & Withdrawals</div>
-            <button style="padding:4px 10px; border-radius:6px; background:rgba(239, 68, 68, 0.1); color:var(--danger); font-size:0.75rem;" onclick="clearTransactions()">Clear</button>
-        </div>
-        <div id="transaction-list">
-            <div style="text-align:center; padding:40px 0; color:var(--muted); font-size:.85rem;">No transactions yet.</div>
-        </div>
-    </div>
-</div>
-
-<div class="overlay" id="payment-modal" onclick="if(event.target===this)closeModal()">
-    <div class="modal">
-        <div class="modal-head">
-            <div class="modal-title" id="payment-title">Deposit Funds</div>
-            <div class="close" onclick="closeModal()">×</div>
-        </div>
-
-        <div id="step1">
-            <div id="withdraw-method-group" class="modal-group" style="display:none;">
-                <label>Method</label>
-                <select class="modal-input" id="withdraw-method" onchange="switchWithdrawMethod()">
-                    <option value="mpesa">M-Pesa</option>
-                    <option value="usdt">USDT (Crypto)</option>
-                    <option value="binance">Binance Pay</option>
-                </select>
-            </div>
-
-            <div id="form-mpesa">
-                <div class="modal-group"><label>M-Pesa Name</label><input type="text" class="modal-input" id="pay-name" placeholder="e.g., JOHN DOE"></div>
-                <div class="modal-group"><label>M-Pesa Number</label><input type="tel" class="modal-input" id="pay-phone" placeholder="e.g., 0712345678"></div>
-            </div>
-
-            <div id="form-usdt" style="display:none;">
-                <div class="modal-group"><label>Network</label>
-                    <select class="modal-input" id="usdt-network">
-                        <option value="trc20">Tron (TRC20)</option>
-                        <option value="bep20">BNB Smart Chain (BEP20)</option>
-                    </select>
-                </div>
-                <div class="modal-group"><label>Wallet Address</label><input type="text" class="modal-input" id="usdt-address" placeholder="Paste address"></div>
-            </div>
-
-            <div id="form-binance" style="display:none;">
-                <div class="modal-group"><label>Binance ID</label><input type="text" class="modal-input" id="binance-id" placeholder="ID or Email"></div>
-            </div>
-
-            <div class="modal-group"><label>Amount (USD)</label><input type="number" class="modal-input" id="pay-amount" placeholder="Min $10"></div>
-            
-            <button class="modal-btn" onclick="proceedInvoice()">Continue</button>
-            <div id="trust-badge" style="text-align:center; margin-top:15px; display:none;">
-                <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" style="max-width:100%; opacity:0.5;">
-            </div>
-        </div>
-
-        <div id="step2" style="display:none;">
-            <div class="invoice">
-                <div class="invoice-row"><span class="invoice-label">Invoice ID</span><span class="invoice-value" id="inv-id">--</span></div>
-                <div class="invoice-row"><span class="invoice-label">Name</span><span class="invoice-value" id="inv-name">--</span></div>
-                <div class="invoice-row"><span class="invoice-label">Phone</span><span class="invoice-value" id="inv-phone">--</span></div>
-                <div class="invoice-row"><span class="invoice-label">Total KES</span><span class="invoice-value" style="color:var(--primary);">KSh <span id="inv-amount">0</span></span></div>
-            </div>
-            <button class="modal-btn" onclick="executeExternalPayment()">Pay Securely</button>
-        </div>
-
-        <div id="step3" style="display:none; text-align:center; padding: 20px 0;">
-            <h3 style="margin-bottom:10px;">Redirecting...</h3>
-            <p style="font-size:0.85rem; color:var(--muted);">Connecting to secure gateway.</p>
-            <div class="spinner"></div>
-        </div>
-    </div>
-</div>
-
-<div class="overlay" id="congrats-modal" onclick="if(event.target===this)closeCongrats()">
-    <div class="modal congrats">
-        <div class="congrats-icon">✨</div>
-        <h2 id="congrats-title" style="margin-bottom:12px; color:var(--primary);">Success!</h2>
-        <p id="congrats-message" style="color:var(--muted); margin-bottom:24px;">Action completed.</p>
-        <button class="modal-btn" onclick="closeCongrats()">Done</button>
-    </div>
-</div>
 
 </div> 
 
@@ -1238,37 +1165,46 @@ let paymentType = "";
 let activeStake = 10;
 
 const USD_TO_KES = 132;
-const targetBalance = 50000;
-const volatilityIndices = ['Volatility 10 (1s)', 'Volatility 25 (1s)', 'Volatility 50 (1s)', 'Volatility 75 (1s)', 'Volatility 100 (1s)'];
 
-// Volatility specific config behaviors
+// ALL 10 continuous plain and (1s) continuous Volatility Indices array
+const volatilityIndices = [
+    'Volatility 10 Index', 'Volatility 10 (1s)', 
+    'Volatility 25 Index', 'Volatility 25 (1s)', 
+    'Volatility 50 Index', 'Volatility 50 (1s)', 
+    'Volatility 75 Index', 'Volatility 75 (1s)', 
+    'Volatility 100 Index', 'Volatility 100 (1s)'
+];
+
+// Configuration behaviors corresponding exactly with all 10 assets
 const assetChartSettings = {
+    'Volatility 10 Index': { base: 8740.50, variance: 0.35 },
     'Volatility 10 (1s)': { base: 125.40, variance: 0.65 },
+    'Volatility 25 Index': { base: 2610.85, variance: 1.10 },
     'Volatility 25 (1s)': { base: 340.15, variance: 1.80 },
+    'Volatility 50 Index': { base: 41250.30, variance: 2.90 },
     'Volatility 50 (1s)': { base: 1105.80, variance: 4.50 },
+    'Volatility 75 Index': { base: 284950.40, variance: 9.80 },
     'Volatility 75 (1s)': { base: 5460.20, variance: 18.20 },
+    'Volatility 100 Index': { base: 791450.90, variance: 25.40 },
     'Volatility 100 (1s)': { base: 12890.50, variance: 45.00 }
 };
 
-let activeGraphAsset = 'Volatility 10 (1s)';
+let activeGraphAsset = 'Volatility 10 Index';
 let chartEngineInstance = null;
 let graphTickerPulseLoop = null;
 
-// Initialize the Volatility Selectors and Digit Layout components
 function buildMarketDashboardComponents() {
-    // Render asset bar items
     const bar = document.getElementById("volatility-bar");
     bar.innerHTML = "";
     volatilityIndices.forEach((indexName, i) => {
         const btn = document.createElement("button");
-        btn.className = `asset-btn-item ${i === 0 ? 'active' : ''}`;
+        btn.className = `asset-btn-item ${indexName === activeGraphAsset ? 'active' : ''}`;
         btn.id = `v-btn-${i}`;
         btn.innerText = indexName;
         btn.onclick = () => selectActiveAssetWorkspace(indexName, i);
         bar.appendChild(btn);
     });
 
-    // Render 1 through 9 Digit nodes
     const grid = document.getElementById("digit-grid-nodes");
     grid.innerHTML = "";
     for(let d=1; d<=9; d++) {
@@ -1283,17 +1219,14 @@ function buildMarketDashboardComponents() {
     refreshDigitMetrics();
 }
 
-// Handler to move clean graph context between synthetic assets
 function selectActiveAssetWorkspace(assetName, indexId) {
     activeGraphAsset = assetName;
     document.getElementById("selected-asset-label").innerText = assetName;
     
-    // Toggle active styles 
     document.querySelectorAll(".asset-btn-item").forEach(btn => btn.classList.remove("active"));
     const targetBtn = document.getElementById(`v-btn-${indexId}`);
     if(targetBtn) targetBtn.classList.add("active");
 
-    // Rebuild graph sequence smoothly
     initializeChartContext();
     refreshDigitMetrics();
 }
@@ -1307,13 +1240,13 @@ function initializeChartContext() {
         chartEngineInstance.destroy();
     }
 
-    const settings = assetChartSettings[activeGraphAsset];
+    const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
     let historicalTicks = [];
     let labels = [];
     let seedPrice = settings.base;
 
-    for (let i = 0; i < 20; i++) {
-        seedPrice += (Math.random() - 0.49) * settings.variance;
+    for (let i = 0; i < 22; i++) {
+        seedPrice += (Math.random() - 0.495) * settings.variance;
         historicalTicks.push(seedPrice);
         labels.push('');
     }
@@ -1329,8 +1262,8 @@ function initializeChartContext() {
                 borderColor: '#94b857',
                 borderWidth: 2,
                 pointRadius: 0,
-                pointHoverRadius: 2,
-                tension: 0.25,
+                pointHoverRadius: 0,
+                tension: 0.3,
                 fill: false
             }]
         },
@@ -1341,15 +1274,16 @@ function initializeChartContext() {
             scales: {
                 x: { display: false },
                 y: {
-                    grid: { color: 'rgba(44, 51, 36, 0.3)' },
+                    grid: { color: 'rgba(255, 255, 255, 0.04)', drawTicks: false },
+                    border: { display: false },
                     ticks: {
-                        color: '#a1a1aa',
-                        font: { size: 9 },
+                        color: '#8E8E93',
+                        font: { size: 9, family: 'monospace' },
                         maxTicksLimit: 4
                     }
                 }
             },
-            animation: { duration: 200 }
+            animation: { duration: 150 }
         }
     });
 }
@@ -1360,11 +1294,11 @@ function startGlobalGraphPumpLoop() {
     graphTickerPulseLoop = setInterval(() => {
         if (!chartEngineInstance) return;
 
-        const settings = assetChartSettings[activeGraphAsset];
+        const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
         let dataPoints = chartEngineInstance.data.datasets[0].data;
         let referencePrice = parseFloat(dataPoints[dataPoints.length - 1]);
 
-        let shiftDelta = (Math.random() - 0.49) * settings.variance;
+        let shiftDelta = (Math.random() - 0.495) * settings.variance;
         let currentTickValue = referencePrice + shiftDelta;
         if(currentTickValue < 1) currentTickValue = 5;
 
@@ -1378,7 +1312,7 @@ function startGlobalGraphPumpLoop() {
             labelTickerNode.style.color = shiftDelta >= 0 ? "var(--success)" : "var(--danger)";
         }
 
-        if(Math.random() > 0.75) {
+        if(Math.random() > 0.7) {
             refreshDigitMetrics();
         }
     }, 1000);
@@ -1390,8 +1324,8 @@ function refreshDigitMetrics() {
     let distributionSlice = [];
 
     for (let i = 0; i < partitions - 1; i++) {
-        let ceiling = (remainder / (partitions - i)) * 1.4;
-        let value = Math.random() * (ceiling - 4) + 4;
+        let ceiling = (remainder / (partitions - i)) * 1.35;
+        let value = Math.random() * (ceiling - 3) + 3;
         value = Math.round(value * 10) / 10;
         distributionSlice.push(value);
         remainder -= value;
@@ -1421,7 +1355,7 @@ async function fetchSupabaseBalance(userId) {
             localStorage.setItem(`bal_${userId}`, realBalance);
         }
     } catch (err) {
-        console.error("Error fetching balance:", err.message);
+        console.error("Balance retrieval exception:", err.message);
     }
 }
 
@@ -1434,7 +1368,7 @@ async function saveSupabaseBalance() {
             .from('wallets')
             .upsert({ id: session.user.id, real_balance: realBalance });
     } catch (err) {
-        console.error("Error syncing state balance cloudwards:", err.message);
+        console.error("Cloud synchronization mapping drop:", err.message);
     }
 }
 
@@ -1450,7 +1384,7 @@ function renderTransactions(userId) {
     if (!list) return;
     let txs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
     if(txs.length === 0) {
-        list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No transactions recorded yet.</div>`;
+        list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No transaction receipts allocated.</div>`;
         return;
     }
     list.innerHTML = "";
@@ -1459,12 +1393,12 @@ function renderTransactions(userId) {
         row.className = "ledger-row";
         row.innerHTML = `
         <div>
-        <div style="font-weight:600;margin-bottom:4px; font-size:0.9rem;">${tx.type.toUpperCase()} via ${tx.method}</div>
-        <div style="font-size:.7rem;color:var(--muted);">${tx.date}</div>
+            <div style="font-weight:600;margin-bottom:2px; font-size:0.85rem;">${tx.type.toUpperCase()} :: ${tx.method}</div>
+            <div style="font-size:.7rem;color:var(--muted);">${tx.date}</div>
         </div>
         <div style="text-align:right;">
-        <div style="font-weight:700; font-size:1rem; color:${tx.type==='deposit'?'var(--success)':'white'}; margin-bottom:4px;">${tx.type==='deposit'?'+':'-'}$${parseFloat(tx.amount).toFixed(2)}</div>
-        <span class="tx-badge ${tx.status}">${tx.status}</span>
+            <div style="font-weight:700; font-size:0.95rem; color:${tx.type==='deposit'?'var(--success)':'white'}; margin-bottom:2px;">${tx.type==='deposit'?'+':'-'}$${parseFloat(tx.amount).toFixed(2)}</div>
+            <span class="tx-badge ${tx.status}">${tx.status}</span>
         </div>`;
         list.appendChild(row);
     });
@@ -1475,11 +1409,11 @@ async function clearTransactions() {
     if(session?.user) {
         localStorage.removeItem(`txs_${session.user.id}`);
         renderTransactions(session.user.id);
-        toast("History cleared");
+        toast("Cache purge transaction complete.");
     }
 }
 
-window.addEventListener("load", async()=>{
+window.addEventListener("load", async () => {
     buildMarketDashboardComponents();
     initializeChartContext();
     startGlobalGraphPumpLoop();
@@ -1488,7 +1422,7 @@ window.addEventListener("load", async()=>{
     const urlParams = new URLSearchParams(window.location.search);
     const statusParam = urlParams.get('status');
 
-    if(session?.user){
+    if(session?.user) {
         const cachedBal = localStorage.getItem(`bal_${session.user.id}`);
         if(cachedBal) {
             realBalance = parseFloat(cachedBal);
@@ -1542,20 +1476,19 @@ window.addEventListener("load", async()=>{
                         });
 
                         localStorage.removeItem('last_invoice_id');
-                        
                         window.history.replaceState({}, document.title, window.location.pathname);
                         verifyOverlay.style.display = 'none';
-                        congrats("Deposit Successful!", `$${deposit.amount_usd.toFixed(2)} added to balance.`);
+                        congrats("State Matrix Balanced", `Capitalized node execution with +$${deposit.amount_usd.toFixed(2)}`);
 
                     } else {
                         verifyOverlay.style.display = 'none';
-                        toast("This deposit was already credited.");
+                        toast("Invoice already processed.");
                         localStorage.removeItem('last_invoice_id');
                         window.history.replaceState({}, document.title, window.location.pathname);
                     }
                 } catch (err) {
                     verifyOverlay.style.display = 'none';
-                    toast("Verification failed. Contact support.");
+                    toast("Verification loop failed.");
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             } else {
@@ -1573,8 +1506,8 @@ function switchAuth(mode){
     authMode = mode;
     document.getElementById("signin-tab").classList.toggle("active", mode==="signin");
     document.getElementById("signup-tab").classList.toggle("active", mode==="signup");
-    document.getElementById("fullname-wrap").style.display = mode==="signup" ? "block":"none";
-    document.getElementById("auth-btn").innerText = mode==="signup" ? "Create account" : "Log in";
+    document.getElementById("fullname-wrap").style.display = mode==="signup" ? "block" : "none";
+    document.getElementById("auth-btn").innerText = mode==="signup" ? "Initialize Account Stack" : "Authorize Connection Instance";
 }
 
 async function handleAuth(){
@@ -1583,14 +1516,14 @@ async function handleAuth(){
     const fullName = document.getElementById("signup-name").value.trim();
     const authBtn = document.getElementById("auth-btn");
 
-    if(!email || !password){ toast("Fill all fields"); return; }
+    if(!email || !password){ toast("Inputs cannot be null."); return; }
 
     const originalText = authBtn.innerText;
-    authBtn.innerText = "Please wait...";
+    authBtn.innerText = "Processing Security Parameters...";
     authBtn.disabled = true;
-    authBtn.style.opacity = "0.7";
+    authBtn.style.opacity = "0.6";
 
-    try{
+    try {
         let user;
         if(authMode==="signup"){
             const { data, error } = await supabaseClient.auth.signUp({
@@ -1598,9 +1531,9 @@ async function handleAuth(){
             });
             if(error) throw error;
             user = data.user;
-            document.getElementById("profile-name").innerText = fullName || "Apex Trader";
+            document.getElementById("profile-name").innerText = fullName || "Apex Operator";
             document.getElementById("avatar-initial").innerText = (fullName || "A").charAt(0).toUpperCase();
-        }else{
+        } else {
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if(error) throw error;
             user = data.user;
@@ -1624,10 +1557,10 @@ async function handleAuth(){
         }
 
         document.getElementById("auth").classList.add("hidden");
-        toast("Login successful");
+        toast("Handshake Authorized.");
 
-    }catch(err){
-        toast(err.message || "Authentication failed");
+    } catch(err) {
+        toast(err.message || "Encryption error response.");
         authBtn.innerText = originalText;
         authBtn.disabled = false;
         authBtn.style.opacity = "1";
@@ -1644,11 +1577,11 @@ function logout(){
     const authBtn = document.getElementById("auth-btn");
     authBtn.disabled = false;
     authBtn.style.opacity = "1";
-    authBtn.innerText = authMode === "signup" ? "Create account" : "Log in";
+    authBtn.innerText = authMode === "signup" ? "Initialize Account Stack" : "Authorize Connection Instance";
     document.getElementById("login-pass").value = "";
-    document.getElementById("transaction-list").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No transactions recorded yet.</div>`;
+    document.getElementById("transaction-list").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No historical network paths mapped.</div>`;
     
-    supabaseClient.auth.signOut().catch(err => console.error("Sign out error:", err));
+    supabaseClient.auth.signOut().catch(err => console.error("Identity unlink dropped:", err));
 }
 
 function switchAccount(){
@@ -1661,7 +1594,7 @@ function updateBalance(){
     document.getElementById("balance").innerText = `$${bal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
 }
 
-function switchTab(id,el){
+function switchTab(id, el){
     document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
     document.querySelectorAll(".nav-item").forEach(v=>v.classList.remove("active"));
     document.getElementById(id).classList.add("active");
@@ -1674,7 +1607,7 @@ function toast(msg){
     t.className = "toast";
     t.innerText = msg;
     wrap.appendChild(t);
-    setTimeout(()=>{ t.remove(); },3000);
+    setTimeout(() => { t.remove(); }, 3000);
 }
 
 function toggleDigitBox(){
@@ -1690,9 +1623,9 @@ function switchWithdrawMethod() {
 }
 
 function openPayment(type){
-    if(type==="withdraw" && !isReal){ toast("Withdrawals disabled on demo"); return; }
+    if(type==="withdraw" && !isReal){ toast("Fulfillment dropped on non-real entities."); return; }
     paymentType = type;
-    document.getElementById("payment-title").innerText = type==="deposit" ? "Deposit Funds" : "Withdraw Funds";
+    document.getElementById("payment-title").innerText = type==="deposit" ? "Inject Asset Fluidity" : "Drain Local Liquidity";
     
     if(type === "withdraw") {
         document.getElementById("withdraw-method-group").style.display = "block";
@@ -1720,23 +1653,12 @@ function openPayment(type){
     document.getElementById("payment-modal").classList.add("show");
 }
 
-function closeModal(){
-    document.getElementById("payment-modal").classList.remove("show");
-}
+function closeModal(){ document.getElementById("payment-modal").classList.remove("show"); }
+function openHistory(){ document.getElementById("history-modal").classList.add("show"); }
+function closeHistory(){ document.getElementById("history-modal").classList.remove("show"); }
+function closeCongrats(){ document.getElementById("congrats-modal").classList.remove("show"); }
 
-function openHistory(){
-    document.getElementById("history-modal").classList.add("show");
-}
-
-function closeHistory(){
-    document.getElementById("history-modal").classList.remove("show");
-}
-
-function closeCongrats(){
-    document.getElementById("congrats-modal").classList.remove("show");
-}
-
-function congrats(title,msg){
+function congrats(title, msg){
     document.getElementById("congrats-title").innerText = title;
     document.getElementById("congrats-message").innerText = msg;
     document.getElementById("congrats-modal").classList.add("show");
@@ -1745,10 +1667,10 @@ function congrats(title,msg){
 async function proceedInvoice(){
     const amount = parseFloat(document.getElementById("pay-amount").value);
 
-    if(isNaN(amount) || amount < 10){ toast("Minimum is $10"); return; }
+    if(isNaN(amount) || amount < 10){ toast("Volume lower bound limit is $10."); return; }
 
     if(paymentType==="withdraw"){
-        if(amount > realBalance){ toast("Insufficient balance"); return; }
+        if(amount > realBalance){ toast("Remittance exceeds execution capacity."); return; }
 
         const method = document.getElementById("withdraw-method").value;
         let destination = "";
@@ -1756,16 +1678,16 @@ async function proceedInvoice(){
         if (method === "mpesa") {
             const name = document.getElementById("pay-name").value.trim();
             const phone = document.getElementById("pay-phone").value.trim();
-            if(!name || !phone) { toast("Fill valid details"); return; }
+            if(!name || !phone) { toast("Receiver data invalid."); return; }
             destination = phone;
         } else if (method === "usdt") {
             const address = document.getElementById("usdt-address").value.trim();
             const network = document.getElementById("usdt-network").options[document.getElementById("usdt-network").selectedIndex].text;
-            if(!address) { toast("Provide USDT address"); return; }
+            if(!address) { toast("Hash cannot be dead."); return; }
             destination = `${network} (${address.substring(0,6)}...)`;
         } else if (method === "binance") {
             const payId = document.getElementById("binance-id").value.trim();
-            if(!payId) { toast("Provide Binance Pay ID"); return; }
+            if(!payId) { toast("Binance identity structural gap."); return; }
             destination = `Binance: ${payId}`;
         }
 
@@ -1790,13 +1712,13 @@ async function proceedInvoice(){
         }
         
         closeModal();
-        congrats("Withdrawal Request", `$${amount.toFixed(2)} via ${method.toUpperCase()}`);
+        congrats("Drain Request Cast", `Processing $${amount.toFixed(2)} along channel [${method.toUpperCase()}]`);
         return;
     }
     
     const name = document.getElementById("pay-name").value.trim();
     const phone = document.getElementById("pay-phone").value.trim();
-    if(!name || !phone){ toast("Fill valid details"); return; }
+    if(!name || !phone){ toast("Identity attributes unverified."); return; }
 
     const invoice = "INV-" + Math.floor(100000 + Math.random()*900000);
     const kes = Math.floor(amount * USD_TO_KES);
@@ -1817,10 +1739,7 @@ async function executeExternalPayment(){
     const amountUSD = parseFloat(document.getElementById("pay-amount").value);
 
     const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session?.user) {
-        toast("Session expired.");
-        return;
-    }
+    if (!session?.user) { toast("Authorization instance expired."); return; }
 
     try {
         const { error } = await supabaseClient
@@ -1856,21 +1775,21 @@ async function executeExternalPayment(){
 
     } catch(err) {
         console.error(err);
-        toast("Error initiating payment.");
+        toast("Gateway connection exception.");
     }
 }
 
 function clearLedger(){
     document.getElementById("ledger-list").innerHTML = `
-    <div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No trades executed yet.</div>`;
+    <div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No algorithmic records initialized.</div>`;
     totalPnL = 0;
     updatePnL();
-    toast("Ledger cleared");
+    toast("Runtime tracking buffer cleared.");
 }
 
 function updatePnL(){
     const pnl = document.getElementById("pnl");
-    pnl.innerText = `P&L: $${totalPnL.toFixed(2)}`;
+    pnl.innerText = `Cumulative Yield: $${totalPnL.toFixed(2)}`;
     pnl.style.color = totalPnL >= 0 ? "var(--primary)" : "var(--danger)";
 }
 
@@ -1880,18 +1799,18 @@ function toggleBot(){
         isRunning = false;
         clearTimeout(scanLoop);
         btn.classList.remove("active");
-        btn.innerText = "Start AI Trading";
+        btn.innerText = "Initialize Execution Matrix";
         document.getElementById("sig-main").innerText = "--";
-        document.getElementById("sig-status").innerText = "Scanner paused";
+        document.getElementById("sig-status").innerText = "Execution loop severed.";
         return;
     }
     const stake = parseFloat(document.getElementById("inp-stake").value);
-    if(isNaN(stake) || stake <= 0){ toast("Invalid stake"); return; }
+    if(isNaN(stake) || stake <= 0){ toast("Stake format invalid."); return; }
     activeStake = stake;
     sessionPnL = 0;
     isRunning = true;
     btn.classList.add("active");
-    btn.innerText = "Stop System";
+    btn.innerText = "Kill Autonomous Thread";
     runCycle();
 }
 
@@ -1903,42 +1822,39 @@ async function runCycle(){
     const multi = parseFloat(document.getElementById("inp-multi").value) || 1;
     const baseStake = parseFloat(document.getElementById("inp-stake").value);
 
-    if(sl > 0 && sessionPnL <= -sl){ toast("Stop loss hit"); toggleBot(); return; }
-    if(tp > 0 && sessionPnL >= tp){ toggleBot(); congrats("Target Hit!", `Profit: $${sessionPnL.toFixed(2)}`); return; }
-    if(activeStake > balance){ toast("Balance too low"); toggleBot(); return; }
+    if(sl > 0 && sessionPnL <= -sl){ toast("Stop loss condition hit."); toggleBot(); return; }
+    if(tp > 0 && sessionPnL >= tp){ toggleBot(); congrats("Target Framework Cleared", `Generated Yield: +$${sessionPnL.toFixed(2)}`); return; }
+    if(activeStake > balance){ toast("Resource depth insufficient."); toggleBot(); return; }
 
     const market = document.getElementById("inp-market").value;
     const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
-    
-    // Engine automatically syncs target parameter tracking directly with active graph selection asset context
     const asset = activeGraphAsset; 
     
-    const isWin = Math.random() < 0.90;
-
+    const isWin = Math.random() < 0.88;
     let signal = ""; let sub = ""; let profit = 0;
 
     if(market==="Matches/Differs"){
-        const match = Math.random() > 0.5;
+        const match = Math.random() > 0.85;
         const digit = Math.floor(Math.random()*10);
         if(match){
-            signal = `MATCH ${digit}`; profit = isWin ? activeStake * 8.09 : -activeStake; sub = "Payout: 8.09x";
-        }else{
-            signal = `DIFFER ${digit}`; profit = isWin ? activeStake * 0.099 : -activeStake; sub = "Payout: 0.099x";
+            signal = `MATCH ${digit}`; profit = isWin ? activeStake * 8.15 : -activeStake; sub = "Yield Factor: 8.15x";
+        } else {
+            signal = `DIFFER ${digit}`; profit = isWin ? activeStake * 0.098 : -activeStake; sub = "Yield Factor: 0.098x";
         }
-    }else if(market==="Even/Odd"){
-        signal = Math.random() > 0.5 ? "EVEN" : "ODD"; profit = isWin ? activeStake * 0.95 : -activeStake; sub = "Payout: 0.95x";
-    }else{
+    } else if(market==="Even/Odd"){
+        signal = Math.random() > 0.5 ? "PRIME EVEN" : "PRIME ODD"; profit = isWin ? activeStake * 0.96 : -activeStake; sub = "Yield Factor: 0.96x";
+    } else {
         const over = Math.random() > 0.5;
         if(over){
             signal = `OVER ${targetDigit}`;
             const multipliers = {0:0.09, 1:0.23, 2:0.41, 3:0.65, 4:0.98, 5:1.54, 6:2.80, 7:6.60, 8:14.50, 9:0};
-            const mult = multipliers[targetDigit];
-            profit = isWin ? activeStake * mult : -activeStake; sub = `Payout: ${mult.toFixed(2)}x`;
-        }else{
+            const mult = multipliers[targetDigit] || 0;
+            profit = isWin ? activeStake * mult : -activeStake; sub = `Yield Factor: ${mult.toFixed(2)}x`;
+        } else {
             signal = `UNDER ${targetDigit}`;
             const multipliers = {0:0, 1:14.50, 2:6.60, 3:2.80, 4:1.54, 5:0.98, 6:0.65, 7:0.41, 8:0.23, 9:0.09};
-            const mult = multipliers[targetDigit];
-            profit = isWin ? activeStake * mult : -activeStake; sub = `Payout: ${mult.toFixed(2)}x`;
+            const mult = multipliers[targetDigit] || 0;
+            profit = isWin ? activeStake * mult : -activeStake; sub = `Yield Factor: ${mult.toFixed(2)}x`;
         }
     }
 
@@ -1946,7 +1862,7 @@ async function runCycle(){
     document.getElementById("sig-main").innerText = signal;
     document.getElementById("sig-status").innerText = sub;
 
-    scanLoop = setTimeout(async ()=>{
+    scanLoop = setTimeout(async () => {
         if(!isRunning) return;
         if(isReal) realBalance += profit; else demoBalance += profit;
         totalPnL += profit; sessionPnL += profit;
@@ -1962,20 +1878,20 @@ async function runCycle(){
         logTrade(asset, market, signal, profit, activeStake);
         if(profit < 0) activeStake = activeStake * multi; else activeStake = baseStake;
         runCycle();
-    }, 2500);
+    }, 2200);
 }
 
-function logTrade(asset,market,signal,profit,stake){
+function logTrade(asset, market, signal, profit, stake){
     const list = document.getElementById("ledger-list");
-    if(list.innerText.includes("No trades")) list.innerHTML = "";
+    if(list.innerText.includes("No algorithmic records")) list.innerHTML = "";
     const row = document.createElement("div");
     row.className = "ledger-row";
     row.innerHTML = `
     <div>
-    <div style="font-weight:600; font-size:0.9rem; margin-bottom:4px;">${asset}</div>
-    <div style="font-size:.7rem; color:var(--muted);">${market} | ${signal} | Stake: $${stake.toFixed(2)}</div>
+        <div style="font-weight:600; font-size:0.85rem; margin-bottom:2px;">${asset}</div>
+        <div style="font-size:.7rem; color:var(--muted);">${market} | ${signal} | Allocated: $${stake.toFixed(2)}</div>
     </div>
-    <div style="font-weight:700; color:${profit>=0?'var(--success)':'white'};">${profit>=0?'+':''}$${profit.toFixed(2)}</div>`;
+    <div style="font-weight:700; font-size:0.95rem; color:${profit>=0?'var(--success)':'white'};">${profit>=0?'+':''}$${profit.toFixed(2)}</div>`;
     list.prepend(row);
 }
 </script>

@@ -10,35 +10,34 @@
 
 <style>
 :root {
-    --bg: #000000;                  /* True iOS Pure Black Canvas */
-    --card: #1C1C1E;                /* iOS Secondary Elevation Plate */
-    --card-elevated: #2C2C2E;       /* iOS Tertiary Elevated Surface */
-    --card-border: rgba(255,255,255,0.08); /* Crisp Native Hairline Border */
-    --primary: #94b857;             /* Iconic Apex Brand Key Light */
-    --primary-rgb: 148, 184, 87;
-    --success: #30D158;             /* System Apple Green Pop */
-    --danger: #FF453A;              /* System Apple Red Pop */
-    --text: #FFFFFF;                /* Primary Label text color */
-    --muted: #8E8E93;               /* Secondary Apple System Grey */
-    --radius-ios: 14px;             /* Standard iOS Container Curve radius */
-    --radius-large: 22px;           /* Large iOS Sheets Panel radius */
+    --bg: #09090b;                  
+    --card: #18181b;                
+    --card-elevated: #27272a;       
+    --card-border: rgba(255, 255, 255, 0.08); 
+    --primary: #94b857;             
+    --primary-hover: #a3cc60;
+    --success: #10b981;             
+    --danger: #ef4444;              
+    --text: #f4f4f5;                
+    --muted: #a1a1aa;               
+    --radius-ios: 12px;             
+    --radius-large: 20px;           
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: -apple-system, SF Pro Text, SF Pro Display, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -webkit-tap-highlight-color: transparent;
-    letter-spacing: -0.24px;
 }
 
 html, body {
     width: 100%;
     height: 100%;
-    overflow: hidden;
-    background: #09090b;
+    background: #000;
     color: var(--text);
+    overflow: hidden;
 }
 
 body {
@@ -47,7 +46,6 @@ body {
     align-items: center;
 }
 
-/* Device Shell Framework - Mimicking iPhone Container Proportions */
 .device {
     width: 100%;
     max-width: 430px;
@@ -60,16 +58,13 @@ body {
 }
 
 @media(min-width: 431px) {
-    body {
-        padding: 20px;
-        background: #000000;
-    }
+    body { padding: 20px; }
     .device {
-        border-radius: 44px;
+        border-radius: 40px;
         height: 92vh;
-        max-height: 880px;
-        border: 10px solid #2C2C2E;
-        box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+        max-height: 850px;
+        border: 8px solid #27272a;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.8);
     }
 }
 
@@ -81,15 +76,14 @@ button, input, select {
 
 button {
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.2s ease;
 }
 
 button:active {
-    opacity: 0.7;
-    transform: scale(0.98);
+    transform: scale(0.97);
 }
 
-/* AUTHENTICATION SHEET */
+/* AUTHENTICATION */
 .auth {
     position: absolute;
     inset: 0;
@@ -97,74 +91,59 @@ button:active {
     background: var(--bg);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     padding: 40px 24px;
-    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.3s ease;
 }
 
-.auth.hidden {
-    opacity: 0;
-    pointer-events: none;
-}
+.auth.hidden { opacity: 0; pointer-events: none; }
 
 .auth-top {
     text-align: center;
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
 .auth-logo {
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 800;
-    letter-spacing: -1px;
     color: var(--text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
 }
-
-.auth-logo span {
-    color: var(--primary);
-}
+.auth-logo span { color: var(--primary); }
 
 .auth-card {
     background: var(--card);
     border: 1px solid var(--card-border);
     padding: 24px;
     border-radius: var(--radius-large);
-    margin-bottom: auto;
     margin-top: 40px;
 }
 
 .auth-title {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 700;
-    letter-spacing: -0.5px;
     margin-bottom: 4px;
 }
 
 .auth-sub {
     color: var(--muted);
     font-size: 0.9rem;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .auth-tabs {
     display: flex;
-    background: rgba(255,255,255,0.06);
-    padding: 2px;
-    border-radius: 9px;
-    margin-bottom: 24px;
+    background: rgba(255,255,255,0.05);
+    padding: 4px;
+    border-radius: 10px;
+    margin-bottom: 20px;
 }
 
 .auth-tab {
     flex: 1;
     background: transparent;
     color: var(--muted);
-    font-size: 0.85rem;
     font-weight: 600;
-    padding: 8px 0;
-    border-radius: 7px;
+    padding: 10px 0;
+    border-radius: 8px;
 }
 
 .auth-tab.active {
@@ -175,101 +154,80 @@ button:active {
 .input-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
     margin-bottom: 16px;
 }
 
 .input-label {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--muted);
-    text-transform: uppercase;
-    padding-left: 4px;
 }
 
 .auth-input {
-    padding: 14px 16px;
+    padding: 14px;
     border-radius: var(--radius-ios);
     background: rgba(255,255,255,0.05);
     color: white;
-    font-size: 0.95rem;
-    border: 1px solid transparent;
-    transition: 0.2s ease;
+    font-size: 1rem;
+    border: 1px solid var(--card-border);
 }
 
-.auth-input:focus {
-    background: rgba(255,255,255,0.08);
-    border-color: var(--primary);
-}
+.auth-input:focus { border-color: var(--primary); }
 
 .auth-btn {
     width: 100%;
-    padding: 16px;
+    padding: 14px;
     border-radius: var(--radius-ios);
     background: var(--primary);
     color: #000;
     font-size: 1rem;
-    font-weight: 600;
-    margin-top: 12px;
+    font-weight: 700;
+    margin-top: 10px;
 }
 
-/* APPLICATION iOS HEADER */
+/* HEADER */
 .header {
-    padding: 18px 20px 12px;
+    padding: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: var(--bg);
-    border-bottom: 0.5px solid var(--card-border);
+    border-bottom: 1px solid var(--card-border);
     z-index: 10;
 }
 
-.brand {
-    font-weight: 700;
-    font-size: 1.15rem;
-    letter-spacing: -0.5px;
-    color: white;
-}
+.brand { font-weight: 800; font-size: 1.2rem; }
+.brand span { color: var(--primary); }
 
-.brand span {
-    color: var(--primary);
-}
-
-.header-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+.header-controls { display: flex; align-items: center; gap: 12px; }
 
 .refresh-btn {
     background: var(--card);
     border: 1px solid var(--card-border);
     color: white;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 .account-selector {
-    padding: 6px 12px;
+    padding: 8px 12px;
     border: 1px solid var(--card-border);
-    border-radius: 12px;
+    border-radius: 8px;
     background: var(--card);
     color: white;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 600;
 }
 
-/* MAIN PANEL LAYOUT */
+/* MAIN */
 .main {
     flex: 1;
     overflow-y: auto;
     padding: 16px;
-    padding-bottom: 96px;
+    padding-bottom: 100px;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -277,20 +235,12 @@ button:active {
 
 .main::-webkit-scrollbar { display: none; }
 
-.view {
-    display: none;
-    flex-direction: column;
-    gap: 16px;
-}
+.view { display: none; flex-direction: column; gap: 16px; }
+.view.active { display: flex; animation: fadeIn 0.3s ease; }
 
-.view.active {
-    display: flex;
-    animation: iosFade 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes iosFade {
-    from { opacity: 0; transform: scale(0.98) translateY(8px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .card {
@@ -300,50 +250,37 @@ button:active {
     border: 1px solid var(--card-border);
 }
 
-/* WALLET STATUS MODULE */
+/* BALANCE */
 .balance-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 22px 20px;
-}
-
-.balance-info {
-    display: flex;
-    flex-direction: column;
 }
 
 .balance-title {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: var(--muted);
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
 }
 
 .balance-amount {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 700;
-    letter-spacing: -0.5px;
     color: white;
 }
 
 .deposit-top-btn {
     background: white;
     color: black;
-    padding: 10px 18px;
-    border-radius: 18px;
-    font-weight: 600;
-    font-size: 0.85rem;
+    padding: 12px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
 }
 
-/* ACTION MODULE PLATFORM CHIPS */
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
+/* ACTIONS */
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
 .action-btn {
     background: var(--card);
@@ -352,69 +289,49 @@ button:active {
     border: 1px solid var(--card-border);
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 6px;
     text-align: left;
-    align-items: flex-start;
 }
 
-.action-btn .btn-title {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: white;
-}
-
-.action-btn span {
-    font-size: 0.75rem;
-    color: var(--muted);
-}
+.action-btn .btn-title { font-size: 1rem; font-weight: 700; color: white; }
+.action-btn span { font-size: 0.8rem; color: var(--muted); }
 
 .history-bar-btn {
     width: 100%;
     background: var(--card);
     border: 1px solid var(--card-border);
     border-radius: var(--radius-ios);
-    padding: 14px 18px;
+    padding: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-weight: 600;
-    font-size: 0.9rem;
     color: white;
 }
 
-/* ASSET SYSTEM CHIP SLIDER */
-.asset-selector-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
+/* ASSETS */
 .asset-selector-title {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
     font-weight: 700;
-    padding-left: 4px;
+    margin-bottom: 8px;
 }
 
 .asset-bar {
     display: flex;
     gap: 8px;
     overflow-x: auto;
-    padding-bottom: 4px;
+    padding-bottom: 8px;
 }
-
 .asset-bar::-webkit-scrollbar { display: none; }
-.asset-bar { -ms-overflow-style: none; scrollbar-width: none; }
 
 .asset-btn-item {
-    background: var(--card);
+    background: transparent;
     border: 1px solid var(--card-border);
-    color: #E5E5EA;
+    color: var(--muted);
     padding: 8px 16px;
-    border-radius: 16px;
-    font-size: 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
     font-weight: 600;
     white-space: nowrap;
 }
@@ -425,87 +342,68 @@ button:active {
     border-color: white;
 }
 
-/* CHART CONTAINER */
-.graph-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
+/* CHART */
 .graph-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 12px;
 }
 
-.graph-asset-name {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: white;
-}
+.graph-asset-name { font-size: 1rem; font-weight: 700; color: white; }
+.graph-live-ticker { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+.canvas-wrapper { width: 100%; height: 160px; position: relative; }
 
-.graph-live-ticker {
-    font-family: -apple-system-font, monospace;
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--primary);
-}
-
-.canvas-wrapper {
-    width: 100%;
-    height: 140px;
-    position: relative;
-}
-
-/* STATISTICAL DIGIT BOX SYSTEM */
-.digit-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
+/* CIRCULAR DIGIT SYSTEM */
 .digit-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
+    gap: 12px;
+    justify-items: center;
 }
 
 .digit-circle-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
-    padding: 8px 4px;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.02);
+    border: 2px solid var(--card-border);
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-    gap: 4px;
+    transition: all 0.3s ease;
 }
 
 .digit-node {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.05);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 800;
     color: white;
+    line-height: 1;
 }
 
 .digit-percentage {
-    font-family: monospace;
     font-size: 0.7rem;
     color: var(--muted);
+    font-weight: 600;
+    margin-top: 4px;
 }
 
-/* NEURAL QUANTUM ENGINE MODULE */
-.floating-ai {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    position: relative;
+/* Highlights for highest/lowest */
+.digit-circle-card.highest {
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.1);
 }
+.digit-circle-card.highest .digit-percentage { color: var(--success); }
+
+.digit-circle-card.lowest {
+    border-color: var(--danger);
+    background: rgba(239, 68, 68, 0.1);
+}
+.digit-circle-card.lowest .digit-percentage { color: var(--danger); }
+
+/* AI ENGINE */
+.floating-ai { position: relative; }
 
 .ai-head {
     display: flex;
@@ -514,27 +412,23 @@ button:active {
     margin-bottom: 16px;
 }
 
-.ai-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: white;
-}
+.ai-title { font-size: 1.1rem; font-weight: 700; color: white; }
 
 .live-badge {
     display: flex;
     align-items: center;
-    gap: 5px;
-    background: rgba(148, 184, 87, 0.12);
+    gap: 6px;
+    background: rgba(148, 184, 87, 0.15);
     color: var(--primary);
     padding: 4px 10px;
     border-radius: 12px;
-    font-size: 0.7rem;
-    font-weight: 600;
+    font-size: 0.75rem;
+    font-weight: 700;
 }
 
 .dot {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--primary);
     animation: pulse 1.5s infinite;
@@ -542,60 +436,48 @@ button:active {
 
 @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(148,184,87,0.5); }
-    100% { box-shadow: 0 0 0 6px rgba(148,184,87,0); }
+    100% { box-shadow: 0 0 0 8px rgba(148,184,87,0); }
 }
 
 .signal-box {
-    background: rgba(0,0,0,0.3);
+    background: #000;
     border: 1px solid var(--card-border);
     border-radius: var(--radius-ios);
-    padding: 16px;
+    padding: 20px;
     text-align: center;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .signal-asset {
     color: var(--muted);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-}
-
-.signal-main {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: white;
-}
-
-.signal-sub {
     font-size: 0.8rem;
-    color: var(--primary);
-    margin-top: 2px;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
+
+.signal-main { font-size: 1.6rem; font-weight: 800; color: white; }
+.signal-sub { font-size: 0.85rem; color: var(--primary); margin-top: 4px; }
 
 .ai-inputs-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 12px;
+    margin-bottom: 12px;
 }
 
 .input-card {
-    background: rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.03);
     border: 1px solid var(--card-border);
-    border-radius: 10px;
-    padding: 10px 12px;
+    border-radius: 12px;
+    padding: 12px;
 }
 
 .input-card label {
     display: block;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: var(--muted);
     font-weight: 600;
-    text-transform: uppercase;
-    margin-bottom: 2px;
+    margin-bottom: 6px;
 }
 
 .input-card input, .input-card select {
@@ -603,14 +485,11 @@ button:active {
     border: none;
     background: transparent;
     color: white;
-    font-weight: 600;
-    font-size: 0.95rem;
+    font-weight: 700;
+    font-size: 1rem;
 }
 
-.input-card select option {
-    background: #1C1C1E;
-    color: white;
-}
+.input-card select option { background: #1C1C1E; color: white; }
 
 .master-btn {
     width: 100%;
@@ -618,18 +497,18 @@ button:active {
     border-radius: var(--radius-ios);
     background: var(--primary);
     color: black;
-    font-size: 1rem;
-    font-weight: 600;
-    margin-top: 8px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin-top: 10px;
 }
 
 .master-btn.active {
     background: transparent;
     color: var(--danger);
-    border: 1px solid var(--danger);
+    border: 2px solid var(--danger);
 }
 
-/* TRANSACTION LAYOUT LISTS */
+/* LEDGER & PROFILE */
 .ledger-row {
     display: flex;
     justify-content: space-between;
@@ -637,39 +516,36 @@ button:active {
     background: rgba(255,255,255,0.02);
     border-radius: 12px;
     border: 1px solid var(--card-border);
-    padding: 12px 14px;
-    margin-bottom: 8px;
+    padding: 14px;
+    margin-bottom: 10px;
 }
 
 .tx-badge {
-    padding: 3px 6px;
-    border-radius: 5px;
-    font-size: 0.6rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
 }
-.tx-badge.completed { background: rgba(48, 209, 88, 0.15); color: var(--success); }
-.tx-badge.pending { background: rgba(255, 214, 10, 0.15); color: #ffd60a; }
+.tx-badge.completed { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+.tx-badge.pending { background: rgba(234, 179, 8, 0.15); color: #eab308; }
 
-/* ACCOUNT PROFILE LAYOUT */
 .profile { text-align: center; }
-
 .avatar {
-    width: 64px;
-    height: 64px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     background: var(--card-elevated);
     color: var(--primary);
-    margin: 0 auto 12px;
+    margin: 0 auto 16px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.8rem;
+    font-weight: 800;
 }
-
-.profile-name { font-size: 1.2rem; font-weight: 700; }
-.profile-email { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
+.profile-name { font-size: 1.3rem; font-weight: 800; }
+.profile-email { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
 
 .profile-list {
     margin-top: 24px;
@@ -682,34 +558,33 @@ button:active {
 .profile-item {
     display: flex;
     justify-content: space-between;
-    padding: 14px 16px;
-    border-bottom: 0.5px solid var(--card-border);
-    font-size: 0.9rem;
+    padding: 16px;
+    border-bottom: 1px solid var(--card-border);
+    font-size: 0.95rem;
 }
 .profile-item:last-child { border-bottom: none; }
 
 .logout {
     width: 100%;
-    padding: 14px;
+    padding: 16px;
     border-radius: var(--radius-ios);
     background: transparent;
     color: var(--danger);
-    border: 1px solid rgba(255,69,58,0.3);
-    font-weight: 600;
+    border: 1px solid var(--danger);
+    font-weight: 700;
     margin-top: 24px;
 }
 
-/* APPLE FLAT SYSTEM NAVIGATION LAYER */
+/* NAV */
 .nav {
     position: absolute;
     bottom: 0; left: 0; right: 0;
     display: flex;
     justify-content: space-around;
-    padding: 10px 10px 28px;
-    background: rgba(28, 28, 30, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 0.5px solid var(--card-border);
+    padding: 12px 10px 24px;
+    background: rgba(9, 9, 11, 0.9);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--card-border);
     z-index: 100;
 }
 
@@ -717,42 +592,41 @@ button:active {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
     color: var(--muted);
     flex: 1;
+    cursor: pointer;
 }
 
 .nav-item.active { color: var(--primary); }
-.nav-icon { font-size: 1.25rem; }
-.nav-label { font-size: 0.65rem; font-weight: 500; }
+.nav-icon { font-size: 1.3rem; }
+.nav-label { font-size: 0.75rem; font-weight: 600; }
 
-/* MODAL SYSTEM OVERLAYS */
+/* MODALS */
 .overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
     display: none;
     justify-content: center;
     align-items: flex-end;
     z-index: 400;
 }
-
 .overlay.show { display: flex; }
 
 .modal {
     width: 100%;
-    background: #1C1C1E;
+    background: var(--card);
     border-radius: var(--radius-large) var(--radius-large) 0 0;
     padding: 24px;
-    max-height: 80vh;
+    max-height: 85vh;
     overflow-y: auto;
     border-top: 1px solid var(--card-border);
-    animation: iosSheetUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: slideUp 0.3s ease;
 }
 
-@keyframes iosSheetUp {
+@keyframes slideUp {
     from { transform: translateY(100%); }
     to { transform: translateY(0); }
 }
@@ -761,22 +635,22 @@ button:active {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
-.modal-title { font-size: 1.15rem; font-weight: 700; }
-.close { font-size: 1.4rem; color: var(--muted); }
+.modal-title { font-size: 1.2rem; font-weight: 800; }
+.close { font-size: 1.6rem; color: var(--muted); cursor: pointer; }
 
-.modal-group { margin-bottom: 14px; }
-.modal-group label { display: block; margin-bottom: 6px; font-size: 0.75rem; color: var(--muted); font-weight: 600; }
+.modal-group { margin-bottom: 16px; }
+.modal-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--muted); font-weight: 600; }
 .modal-input {
     width: 100%;
     padding: 14px;
     border-radius: 10px;
     border: 1px solid var(--card-border);
-    background: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.03);
     color: white;
-    font-size: 0.95rem;
+    font-size: 1rem;
 }
 
 .modal-btn {
@@ -785,45 +659,47 @@ button:active {
     border-radius: var(--radius-ios);
     background: white;
     color: black;
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 700;
     margin-top: 10px;
 }
 
 .invoice {
-    background: rgba(0,0,0,0.2);
+    background: rgba(0,0,0,0.3);
     border: 1px solid var(--card-border);
     border-radius: 12px;
     padding: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
-.invoice-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.85rem; }
-.invoice-row:last-child { margin-bottom: 0; padding-top: 10px; border-top: 0.5px solid var(--card-border); }
+.invoice-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.9rem; }
+.invoice-row:last-child { margin-bottom: 0; padding-top: 12px; border-top: 1px solid var(--card-border); }
 .invoice-label { color: var(--muted); }
-.invoice-value { font-weight: 600; }
+.invoice-value { font-weight: 700; }
 
-/* TOAST OVERLAYS */
+/* TOASTS */
 .toast-wrap {
     position: absolute;
-    top: 50px; left: 50%;
+    top: 20px; left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
     width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .toast {
-    background: #2C2C2E;
+    background: var(--card-elevated);
     color: white;
     border: 1px solid var(--card-border);
-    padding: 12px 16px;
-    border-radius: 14px;
-    margin-bottom: 8px;
+    padding: 14px 20px;
+    border-radius: 12px;
     text-align: center;
-    font-size: 0.85rem;
-    font-weight: 500;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    animation: toastIn 0.3s ease;
 }
 
 @keyframes toastIn {
@@ -831,28 +707,16 @@ button:active {
     to { opacity: 1; transform: translateY(0); }
 }
 
-.congrats { text-align: center; padding: 20px 0; }
-.congrats-icon { font-size: 3rem; margin-bottom: 16px; }
-
-.verify-overlay {
-    position: absolute;
-    inset: 0;
-    background: var(--bg);
-    z-index: 10000;
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
+.congrats { text-align: center; padding: 30px 0; }
+.congrats-icon { font-size: 3.5rem; margin-bottom: 20px; }
 
 .spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid rgba(255,255,255,0.1);
-    border-top: 3px solid var(--primary);
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255,255,255,0.1);
+    border-top: 4px solid var(--primary);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -863,56 +727,58 @@ button:active {
 
 <div class="device">
 
-    <div class="verify-overlay" id="verify-overlay">
-        <div class="spinner"></div>
-        <h3 style="font-weight:700; color:white; margin-top:20px; letter-spacing: -0.5px;">Verifying Secure Payment</h3>
-        <p style="color:var(--muted); font-size:0.85rem; margin-top:6px;">Syncing cluster logs with network gateway...</p>
+    <div class="overlay" id="verify-overlay" style="z-index: 10000; align-items: center;">
+        <div style="text-align: center;">
+            <div class="spinner" style="margin: 0 auto;"></div>
+            <h3 style="font-weight:800; color:white; margin-top:20px;">Verifying Payment</h3>
+            <p style="color:var(--muted); font-size:0.9rem; margin-top:8px;">Checking transaction status...</p>
+        </div>
     </div>
 
     <div class="auth" id="auth">
         <div class="auth-top">
-            <div class="auth-logo">↗ APEX<span>AI</span></div>
+            <div class="auth-logo">APEX<span>AI</span></div>
         </div>
         
         <div class="auth-card">
-            <div class="auth-title">Neural Trading Console</div>
-            <div class="auth-sub">Access automated execution nodes.</div>
+            <div class="auth-title">Trading Console</div>
+            <div class="auth-sub">Log in to access automated trading.</div>
             
             <div class="auth-tabs">
-                <button class="auth-tab active" id="signin-tab" onclick="switchAuth('signin')">Sign In</button>
+                <button class="auth-tab active" id="signin-tab" onclick="switchAuth('signin')">Log In</button>
                 <button class="auth-tab" id="signup-tab" onclick="switchAuth('signup')">Register</button>
             </div>
 
             <div id="fullname-wrap" style="display:none;">
                 <div class="input-group">
-                    <label class="input-label">Identity Label</label>
-                    <input type="text" class="auth-input" id="signup-name" placeholder="Name or Alias">
+                    <label class="input-label">Full Name</label>
+                    <input type="text" class="auth-input" id="signup-name" placeholder="John Doe">
                 </div>
             </div>
 
             <div class="input-group">
-                <label class="input-label">Secure Mail Address</label>
-                <input type="email" class="auth-input" id="login-email" placeholder="name@domain.com">
+                <label class="input-label">Email Address</label>
+                <input type="email" class="auth-input" id="login-email" placeholder="name@email.com">
             </div>
 
             <div class="input-group">
-                <label class="input-label">Pass Token</label>
+                <label class="input-label">Password</label>
                 <input type="password" class="auth-input" id="login-pass" placeholder="••••••••">
             </div>
 
-            <button class="auth-btn" id="auth-btn" onclick="handleAuth()">Authenticate Connection</button>
+            <button class="auth-btn" id="auth-btn" onclick="handleAuth()">Log In</button>
         </div>
     </div>
 
     <div class="toast-wrap" id="toast-wrap"></div>
 
     <header class="header">
-        <div class="brand">↗ APEX <span>AI</span></div>
+        <div class="brand">APEX <span>AI</span></div>
         <div class="header-controls">
             <button class="refresh-btn" onclick="window.location.reload()">↻</button>
             <select class="account-selector" id="account-type" onchange="switchAccount()">
                 <option value="real">Real Account</option>
-                <option value="demo">Demo Node</option>
+                <option value="demo">Demo Account</option>
             </select>
         </div>
     </header>
@@ -922,8 +788,8 @@ button:active {
         <div class="view active" id="home">
             
             <div class="card balance-card">
-                <div class="balance-info">
-                    <div class="balance-title">Liquid Capital Balance</div>
+                <div>
+                    <div class="balance-title">Account Balance</div>
                     <div class="balance-amount" id="balance">$0.00</div>
                 </div>
                 <button class="deposit-top-btn" onclick="openPayment('deposit')">Deposit</button>
@@ -931,26 +797,26 @@ button:active {
 
             <div class="grid">
                 <button class="action-btn" onclick="openPayment('deposit')">
-                    <span class="btn-title">Deposit Cash</span>
-                    <span>Instant MPesa / Crypto</span>
+                    <span class="btn-title">Deposit Funds</span>
+                    <span>M-Pesa / Crypto</span>
                 </button>
                 <button class="action-btn" onclick="openPayment('withdraw')">
-                    <span class="btn-title">Withdrawal</span>
-                    <span>Zero Network Slippage</span>
+                    <span class="btn-title">Withdraw Funds</span>
+                    <span>Fast Processing</span>
                 </button>
             </div>
 
             <button class="history-bar-btn" onclick="openHistory()">
-                <span>Transaction Receipts</span>
+                <span>Transaction History</span>
                 <span style="color:var(--muted);">›</span>
             </button>
 
-            <div class="asset-selector-wrap">
-                <div class="asset-selector-title">Deriv Continuous Risk Indexes</div>
+            <div>
+                <div class="asset-selector-title">Deriv Volatility Indices</div>
                 <div class="asset-bar" id="volatility-bar"></div>
             </div>
 
-            <div class="card graph-container">
+            <div class="card">
                 <div class="graph-header">
                     <div class="graph-asset-name" id="selected-asset-label">Volatility 10 Index</div>
                     <div class="graph-live-ticker" id="graph-ticker-price">--</div>
@@ -960,54 +826,54 @@ button:active {
                 </div>
             </div>
 
-            <div class="card digit-panel">
-                <div class="asset-selector-title">Dynamic Core Last Digit Pulse (1 - 9)</div>
+            <div class="card">
+                <div class="asset-selector-title">Last Digit Stats (1 - 9)</div>
                 <div class="digit-grid" id="digit-grid-nodes"></div>
             </div>
 
             <div class="card floating-ai">
                 <div class="ai-head">
-                    <div class="ai-title">Neural Synthesis Engine</div>
-                    <div class="live-badge"><div class="dot"></div>Live Feedback</div>
+                    <div class="ai-title">Auto Trading Bot</div>
+                    <div class="live-badge"><div class="dot"></div>Live</div>
                 </div>
                 
                 <div class="signal-box">
-                    <div class="signal-asset" id="sig-asset">AWAITING SYSTEM LINK...</div>
+                    <div class="signal-asset" id="sig-asset">WAITING FOR CONNECTION...</div>
                     <div class="signal-main" id="sig-main">--</div>
-                    <div class="signal-sub" id="sig-status">Deploy operational parameters below</div>
+                    <div class="signal-sub" id="sig-status">Set your strategy below to start</div>
                 </div>
 
                 <div class="ai-inputs-grid">
                     <div class="input-card">
-                        <label>Matrix Strategy</label>
+                        <label>Strategy</label>
                         <select id="inp-market" onchange="toggleDigitBox()">
-                            <option>Matches/Differs</option>
-                            <option>Even/Odd</option>
-                            <option>Over/Under</option>
+                            <option>Matches / Differs</option>
+                            <option>Even / Odd</option>
+                            <option>Over / Under</option>
                         </select>
                     </div>
                     <div class="input-card">
-                        <label>Execution Stake ($)</label>
+                        <label>Stake ($)</label>
                         <input type="number" id="inp-stake" value="10">
                     </div>
                 </div>
 
-                <div class="input-card" id="digit-box" style="display:none; margin-bottom:10px;">
-                    <label>Target Threshold Digit</label>
+                <div class="input-card" id="digit-box" style="display:none; margin-bottom:12px;">
+                    <label>Target Digit</label>
                     <input type="number" id="inp-digit" value="4" min="0" max="9">
                 </div>
 
                 <div class="ai-inputs-grid">
-                    <div class="input-card"><label>Take Profit Target ($)</label><input type="number" id="inp-tp" value="50"></div>
-                    <div class="input-card"><label>Stop Loss Boundary ($)</label><input type="number" id="inp-sl" value="100"></div>
+                    <div class="input-card"><label>Take Profit ($)</label><input type="number" id="inp-tp" value="50"></div>
+                    <div class="input-card"><label>Stop Loss ($)</label><input type="number" id="inp-sl" value="100"></div>
                 </div>
 
-                <div class="input-card" style="margin-bottom: 10px;">
-                    <label>Martingale Factor Ratio</label>
+                <div class="input-card" style="margin-bottom: 12px;">
+                    <label>Martingale Multiplier</label>
                     <input type="number" id="inp-multi" value="2.1" step="0.1">
                 </div>
                 
-                <button class="master-btn" id="engine-btn" onclick="toggleBot()">Initialize Execution Matrix</button>
+                <button class="master-btn" id="engine-btn" onclick="toggleBot()">Start Trading Bot</button>
             </div>
         </div>
 
@@ -1015,13 +881,13 @@ button:active {
             <div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                     <div>
-                        <div style="font-size:1.1rem; font-weight:700;">Ledger Trade Log</div>
-                        <div id="pnl" style="font-size:.85rem; color:var(--muted); margin-top:4px;">Cumulative Yield: $0.00</div>
+                        <div style="font-size:1.2rem; font-weight:800;">Trading History</div>
+                        <div id="pnl" style="font-size:0.9rem; color:var(--muted); margin-top:4px;">Total Profit: $0.00</div>
                     </div>
-                    <button style="padding:6px 12px; border-radius:8px; background:rgba(255,69,58,0.15); color:var(--danger); font-size:0.75rem; font-weight:600;" onclick="clearLedger()">Flush Logs</button>
+                    <button style="padding:8px 14px; border-radius:10px; background:rgba(239,68,68,0.15); color:var(--danger); font-size:0.85rem; font-weight:700;" onclick="clearLedger()">Clear Logs</button>
                 </div>
                 <div id="ledger-list">
-                    <div style="text-align:center; padding:40px 0; color:var(--muted); font-size:.85rem;">No algorithmic records initialized.</div>
+                    <div style="text-align:center; padding:40px 0; color:var(--muted); font-size:0.9rem;">No trades taken yet.</div>
                 </div>
             </div>
         </div>
@@ -1029,15 +895,15 @@ button:active {
         <div class="view" id="profile">
             <div class="card profile">
                 <div class="avatar" id="avatar-initial">A</div>
-                <div class="profile-name" id="profile-name">Apex Neural Core</div>
-                <div class="profile-email" id="profile-email">Synchronizing Cloud Link...</div>
+                <div class="profile-name" id="profile-name">Apex User</div>
+                <div class="profile-email" id="profile-email">Loading...</div>
                 
                 <div class="profile-list">
-                    <div class="profile-item"><span>Encryption Context</span><span style="color:var(--primary); font-weight:600;">256-Bit SSL Secured</span></div>
-                    <div class="profile-item"><span>Platform ID Routing</span><span>APEX-NODE-9384</span></div>
-                    <div class="profile-item"><span>Account Validation</span><span style="color:var(--success); font-weight:600;">Operational</span></div>
+                    <div class="profile-item"><span>Security</span><span style="color:var(--primary); font-weight:700;">Secure SSL</span></div>
+                    <div class="profile-item"><span>Account ID</span><span>APEX-9384</span></div>
+                    <div class="profile-item"><span>Account Status</span><span style="color:var(--success); font-weight:700;">Active</span></div>
                 </div>
-                <button class="logout" onclick="logout()">Terminate Session Instance</button>
+                <button class="logout" onclick="logout()">Log Out</button>
             </div>
         </div>
 
@@ -1046,30 +912,30 @@ button:active {
     <nav class="nav">
         <div class="nav-item active" id="nav-home" onclick="switchTab('home',this)">
             <div class="nav-icon">⏣</div>
-            <div class="nav-label">Terminal</div>
+            <div class="nav-label">Trade</div>
         </div>
         <div class="nav-item" id="nav-ledger" onclick="switchTab('ledger',this)">
             <div class="nav-icon">📊</div>
-            <div class="nav-label">Ledger</div>
+            <div class="nav-label">History</div>
         </div>
         <div class="nav-item" id="nav-profile" onclick="switchTab('profile',this)">
             <div class="nav-icon">👤</div>
-            <div class="nav-label">Identity</div>
+            <div class="nav-label">Profile</div>
         </div>
     </nav>
 
     <div class="overlay" id="history-modal" onclick="if(event.target===this)closeHistory()">
         <div class="modal">
             <div class="modal-head">
-                <div class="modal-title">Capital Adjustments Ledger</div>
+                <div class="modal-title">Deposit / Withdrawal History</div>
                 <div class="close" onclick="closeHistory()">×</div>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                <div style="font-size:.8rem; color:var(--muted);">Fulfillment Status Streams</div>
-                <button style="padding:6px 10px; border-radius:8px; background:rgba(255,69,58,0.12); color:var(--danger); font-size:0.75rem; font-weight:600;" onclick="clearTransactions()">Purge Matrix Cache</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <div style="font-size:0.9rem; color:var(--muted);">Your Transactions</div>
+                <button style="padding:8px 14px; border-radius:10px; background:rgba(239,68,68,0.15); color:var(--danger); font-size:0.85rem; font-weight:700;" onclick="clearTransactions()">Clear History</button>
             </div>
             <div id="transaction-list">
-                <div style="text-align:center; padding:40px 0; color:var(--muted); font-size:.85rem;">No historical network paths mapped.</div>
+                <div style="text-align:center; padding:40px 0; color:var(--muted); font-size:0.9rem;">No transactions found.</div>
             </div>
         </div>
     </div>
@@ -1077,60 +943,57 @@ button:active {
     <div class="overlay" id="payment-modal" onclick="if(event.target===this)closeModal()">
         <div class="modal">
             <div class="modal-head">
-                <div class="modal-title" id="payment-title">Inject Liquidity Protocol</div>
+                <div class="modal-title" id="payment-title">Deposit Funds</div>
                 <div class="close" onclick="closeModal()">×</div>
             </div>
 
             <div id="step1">
                 <div id="withdraw-method-group" class="modal-group" style="display:none;">
-                    <label>Fulfillment Target Asset Channel</label>
+                    <label>Withdrawal Method</label>
                     <select class="modal-input" id="withdraw-method" onchange="switchWithdrawMethod()">
-                        <option value="mpesa">Safaricom M-Pesa Rails</option>
-                        <option value="usdt">Tether Stablecoin Protocol (USDT)</option>
-                        <option value="binance">Binance Pay Ledger</option>
+                        <option value="mpesa">Safaricom M-Pesa</option>
+                        <option value="usdt">Crypto (USDT)</option>
+                        <option value="binance">Binance Pay</option>
                     </select>
                 </div>
 
                 <div id="form-mpesa">
-                    <div class="modal-group"><label>Safaricom Legal Name Registration</label><input type="text" class="modal-input" id="pay-name" placeholder="e.g. ELON MUSK"></div>
-                    <div class="modal-group"><label>M-Pesa Express Terminal Number</label><input type="tel" class="modal-input" id="pay-phone" placeholder="e.g. 0712345678"></div>
+                    <div class="modal-group"><label>M-Pesa Registered Name</label><input type="text" class="modal-input" id="pay-name" placeholder="John Doe"></div>
+                    <div class="modal-group"><label>M-Pesa Phone Number</label><input type="tel" class="modal-input" id="pay-phone" placeholder="0712345678"></div>
                 </div>
 
                 <div id="form-usdt" style="display:none;">
-                    <div class="modal-group"><label>Cryptographic Smart Chain Network</label>
+                    <div class="modal-group"><label>Crypto Network</label>
                         <select class="modal-input" id="usdt-network">
-                            <option value="trc20">Tron Protocol Layer (TRC20)</option>
+                            <option value="trc20">Tron (TRC20)</option>
                             <option value="bep20">Binance Smart Chain (BEP20)</option>
                         </select>
                     </div>
-                    <div class="modal-group"><label>Target Inbound/Outbound Wallet Hash</label><input type="text" class="modal-input" id="usdt-address" placeholder="0x... or T..."></div>
+                    <div class="modal-group"><label>Wallet Address</label><input type="text" class="modal-input" id="usdt-address" placeholder="Paste your address here"></div>
                 </div>
 
                 <div id="form-binance" style="display:none;">
-                    <div class="modal-group"><label>Binance Pay Identification Payload Token</label><input type="text" class="modal-input" id="binance-id" placeholder="Merchant ID or Mail Context"></div>
+                    <div class="modal-group"><label>Binance Pay ID / Email</label><input type="text" class="modal-input" id="binance-id" placeholder="Your Binance ID"></div>
                 </div>
 
-                <div class="modal-group"><label>Fiat/Crypto Absolute Value Limit (USD)</label><input type="number" class="modal-input" id="pay-amount" placeholder="Minimum threshold value $10"></div>
+                <div class="modal-group"><label>Amount (USD)</label><input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $10"></div>
                 
-                <button class="modal-btn" style="background:var(--primary); color:black;" onclick="proceedInvoice()">Generate Asset Pipeline</button>
-                <div id="trust-badge" style="text-align:center; margin-top:20px; display:none;">
-                    <img src="https://intasend-prod-static.s3.amazonaws.com/img/trust-badges/intasend-trust-badge-with-mpesa-hr-light.png" style="max-width:100%; opacity:0.3; filter: grayscale(100%);">
-                </div>
+                <button class="modal-btn" style="background:var(--primary); color:black;" onclick="proceedInvoice()">Continue</button>
             </div>
 
             <div id="step2" style="display:none;">
                 <div class="invoice">
-                    <div class="invoice-row"><span class="invoice-label">Inbound Invoice Reference</span><span class="invoice-value" id="inv-id">--</span></div>
-                    <div class="invoice-row"><span class="invoice-label">Target Registration Entity</span><span class="invoice-value" id="inv-name">--</span></div>
-                    <div class="invoice-row"><span class="invoice-label">Device Protocol Route</span><span class="invoice-value" id="inv-phone">--</span></div>
-                    <div class="invoice-row"><span class="invoice-label">Localized Net Remittance</span><span class="invoice-value" style="color:var(--success);">KSh <span id="inv-amount">0</span></span></div>
+                    <div class="invoice-row"><span class="invoice-label">Invoice ID</span><span class="invoice-value" id="inv-id">--</span></div>
+                    <div class="invoice-row"><span class="invoice-label">Name</span><span class="invoice-value" id="inv-name">--</span></div>
+                    <div class="invoice-row"><span class="invoice-label">Phone</span><span class="invoice-value" id="inv-phone">--</span></div>
+                    <div class="invoice-row"><span class="invoice-label">Amount to Pay</span><span class="invoice-value" style="color:var(--success);">KSh <span id="inv-amount">0</span></span></div>
                 </div>
-                <button class="modal-btn" style="background:var(--success); color:black;" onclick="executeExternalPayment()">Fulfill Secure Handshake</button>
+                <button class="modal-btn" style="background:var(--success); color:white;" onclick="executeExternalPayment()">Pay Now</button>
             </div>
 
             <div id="step3" style="display:none; text-align:center; padding: 30px 0;">
-                <h4 style="margin-bottom:8px; color:white;">Configuring Network Route...</h4>
-                <p style="font-size:0.8rem; color:var(--muted); margin-bottom:20px;">Awaiting verification frame clearance.</p>
+                <h4 style="margin-bottom:8px; color:white; font-size:1.2rem;">Connecting to Gateway...</h4>
+                <p style="font-size:0.9rem; color:var(--muted); margin-bottom:20px;">Please wait while we process your request.</p>
                 <div class="spinner" style="margin: 0 auto;"></div>
             </div>
         </div>
@@ -1138,10 +1001,10 @@ button:active {
 
     <div class="overlay" id="congrats-modal" onclick="if(event.target===this)closeCongrats()">
         <div class="modal congrats">
-            <div class="congrats-icon">⚡️</div>
-            <h2 id="congrats-title" style="margin-bottom:8px; color:white; letter-spacing:-0.5px;">State Sync Correct</h2>
-            <p id="congrats-message" style="color:var(--muted); font-size:0.9rem; margin-bottom:24px;">Data node synchronized perfectly.</p>
-            <button class="modal-btn" onclick="closeCongrats()">Terminate Modal Frame</button>
+            <div class="congrats-icon">✅</div>
+            <h2 id="congrats-title" style="margin-bottom:8px; color:white; font-weight:800;">Success</h2>
+            <p id="congrats-message" style="color:var(--muted); font-size:1rem; margin-bottom:24px;">Action completed successfully.</p>
+            <button class="modal-btn" onclick="closeCongrats()">Close</button>
         </div>
     </div>
 
@@ -1166,7 +1029,6 @@ let activeStake = 10;
 
 const USD_TO_KES = 132;
 
-// ALL 10 continuous plain and (1s) continuous Volatility Indices array
 const volatilityIndices = [
     'Volatility 10 Index', 'Volatility 10 (1s)', 
     'Volatility 25 Index', 'Volatility 25 (1s)', 
@@ -1175,7 +1037,6 @@ const volatilityIndices = [
     'Volatility 100 Index', 'Volatility 100 (1s)'
 ];
 
-// Configuration behaviors corresponding exactly with all 10 assets
 const assetChartSettings = {
     'Volatility 10 Index': { base: 8740.50, variance: 0.35 },
     'Volatility 10 (1s)': { base: 125.40, variance: 0.65 },
@@ -1210,6 +1071,7 @@ function buildMarketDashboardComponents() {
     for(let d=1; d<=9; d++) {
         const card = document.createElement("div");
         card.className = "digit-circle-card";
+        card.id = `digit-card-${d}`;
         card.innerHTML = `
             <div class="digit-node">${d}</div>
             <div class="digit-percentage" id="pct-node-${d}">--%</div>
@@ -1236,9 +1098,7 @@ function initializeChartContext() {
     if(!canvasElement) return;
     const ctx = canvasElement.getContext("2d");
 
-    if (chartEngineInstance) {
-        chartEngineInstance.destroy();
-    }
+    if (chartEngineInstance) chartEngineInstance.destroy();
 
     const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
     let historicalTicks = [];
@@ -1276,11 +1136,7 @@ function initializeChartContext() {
                 y: {
                     grid: { color: 'rgba(255, 255, 255, 0.04)', drawTicks: false },
                     border: { display: false },
-                    ticks: {
-                        color: '#8E8E93',
-                        font: { size: 9, family: 'monospace' },
-                        maxTicksLimit: 4
-                    }
+                    ticks: { color: '#a1a1aa', font: { size: 10 }, maxTicksLimit: 4 }
                 }
             },
             animation: { duration: 150 }
@@ -1312,9 +1168,7 @@ function startGlobalGraphPumpLoop() {
             labelTickerNode.style.color = shiftDelta >= 0 ? "var(--success)" : "var(--danger)";
         }
 
-        if(Math.random() > 0.7) {
-            refreshDigitMetrics();
-        }
+        if(Math.random() > 0.7) refreshDigitMetrics();
     }, 1000);
 }
 
@@ -1323,6 +1177,7 @@ function refreshDigitMetrics() {
     let partitions = 9;
     let distributionSlice = [];
 
+    // Generate random percentages
     for (let i = 0; i < partitions - 1; i++) {
         let ceiling = (remainder / (partitions - i)) * 1.35;
         let value = Math.random() * (ceiling - 3) + 3;
@@ -1332,10 +1187,28 @@ function refreshDigitMetrics() {
     }
     distributionSlice.push(Math.round(remainder * 10) / 10);
 
+    // Find the highest and lowest percentages
+    let maxVal = Math.max(...distributionSlice);
+    let minVal = Math.min(...distributionSlice);
+
+    // Update the UI
     for (let d = 1; d <= 9; d++) {
+        const cardNode = document.getElementById(`digit-card-${d}`);
         const percentageNode = document.getElementById(`pct-node-${d}`);
-        if(percentageNode) {
-            percentageNode.innerText = `${distributionSlice[d-1].toFixed(1)}%`;
+        const value = distributionSlice[d-1];
+
+        if(percentageNode && cardNode) {
+            percentageNode.innerText = `${value.toFixed(1)}%`;
+            
+            // Remove previous highlight classes
+            cardNode.classList.remove('highest', 'lowest');
+            
+            // Add new highlight class if it matches min or max
+            if (value === maxVal) {
+                cardNode.classList.add('highest');
+            } else if (value === minVal) {
+                cardNode.classList.add('lowest');
+            }
         }
     }
 }
@@ -1368,7 +1241,7 @@ async function saveSupabaseBalance() {
             .from('wallets')
             .upsert({ id: session.user.id, real_balance: realBalance });
     } catch (err) {
-        console.error("Cloud synchronization mapping drop:", err.message);
+        console.error("Cloud sync error:", err.message);
     }
 }
 
@@ -1384,7 +1257,7 @@ function renderTransactions(userId) {
     if (!list) return;
     let txs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
     if(txs.length === 0) {
-        list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No transaction receipts allocated.</div>`;
+        list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:0.9rem;">No transactions found.</div>`;
         return;
     }
     list.innerHTML = "";
@@ -1393,11 +1266,11 @@ function renderTransactions(userId) {
         row.className = "ledger-row";
         row.innerHTML = `
         <div>
-            <div style="font-weight:600;margin-bottom:2px; font-size:0.85rem;">${tx.type.toUpperCase()} :: ${tx.method}</div>
-            <div style="font-size:.7rem;color:var(--muted);">${tx.date}</div>
+            <div style="font-weight:700;margin-bottom:4px; font-size:0.95rem;">${tx.type.toUpperCase()} - ${tx.method}</div>
+            <div style="font-size:0.75rem;color:var(--muted);">${tx.date}</div>
         </div>
         <div style="text-align:right;">
-            <div style="font-weight:700; font-size:0.95rem; color:${tx.type==='deposit'?'var(--success)':'white'}; margin-bottom:2px;">${tx.type==='deposit'?'+':'-'}$${parseFloat(tx.amount).toFixed(2)}</div>
+            <div style="font-weight:800; font-size:1.05rem; color:${tx.type==='deposit'?'var(--success)':'white'}; margin-bottom:6px;">${tx.type==='deposit'?'+':'-'}$${parseFloat(tx.amount).toFixed(2)}</div>
             <span class="tx-badge ${tx.status}">${tx.status}</span>
         </div>`;
         list.appendChild(row);
@@ -1409,7 +1282,7 @@ async function clearTransactions() {
     if(session?.user) {
         localStorage.removeItem(`txs_${session.user.id}`);
         renderTransactions(session.user.id);
-        toast("Cache purge transaction complete.");
+        toast("History cleared.");
     }
 }
 
@@ -1443,7 +1316,7 @@ window.addEventListener("load", async () => {
         if (statusParam === 'success') {
             const savedInvoiceId = localStorage.getItem('last_invoice_id');
             const verifyOverlay = document.getElementById('verify-overlay');
-            verifyOverlay.style.display = 'flex';
+            verifyOverlay.classList.add('show');
             
             if (savedInvoiceId) {
                 try {
@@ -1477,22 +1350,22 @@ window.addEventListener("load", async () => {
 
                         localStorage.removeItem('last_invoice_id');
                         window.history.replaceState({}, document.title, window.location.pathname);
-                        verifyOverlay.style.display = 'none';
-                        congrats("State Matrix Balanced", `Capitalized node execution with +$${deposit.amount_usd.toFixed(2)}`);
+                        verifyOverlay.classList.remove('show');
+                        congrats("Deposit Successful", `Your account was credited with +$${deposit.amount_usd.toFixed(2)}`);
 
                     } else {
-                        verifyOverlay.style.display = 'none';
-                        toast("Invoice already processed.");
+                        verifyOverlay.classList.remove('show');
+                        toast("Deposit already processed.");
                         localStorage.removeItem('last_invoice_id');
                         window.history.replaceState({}, document.title, window.location.pathname);
                     }
                 } catch (err) {
-                    verifyOverlay.style.display = 'none';
-                    toast("Verification loop failed.");
+                    verifyOverlay.classList.remove('show');
+                    toast("Verification failed.");
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             } else {
-                verifyOverlay.style.display = 'none';
+                verifyOverlay.classList.remove('show');
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
@@ -1507,7 +1380,7 @@ function switchAuth(mode){
     document.getElementById("signin-tab").classList.toggle("active", mode==="signin");
     document.getElementById("signup-tab").classList.toggle("active", mode==="signup");
     document.getElementById("fullname-wrap").style.display = mode==="signup" ? "block" : "none";
-    document.getElementById("auth-btn").innerText = mode==="signup" ? "Initialize Account Stack" : "Authorize Connection Instance";
+    document.getElementById("auth-btn").innerText = mode==="signup" ? "Register Account" : "Log In";
 }
 
 async function handleAuth(){
@@ -1516,10 +1389,10 @@ async function handleAuth(){
     const fullName = document.getElementById("signup-name").value.trim();
     const authBtn = document.getElementById("auth-btn");
 
-    if(!email || !password){ toast("Inputs cannot be null."); return; }
+    if(!email || !password){ toast("Please fill in all fields."); return; }
 
     const originalText = authBtn.innerText;
-    authBtn.innerText = "Processing Security Parameters...";
+    authBtn.innerText = "Processing...";
     authBtn.disabled = true;
     authBtn.style.opacity = "0.6";
 
@@ -1557,10 +1430,10 @@ async function handleAuth(){
         }
 
         document.getElementById("auth").classList.add("hidden");
-        toast("Handshake Authorized.");
+        toast("Login Successful.");
 
     } catch(err) {
-        toast(err.message || "Encryption error response.");
+        toast(err.message || "An error occurred.");
         authBtn.innerText = originalText;
         authBtn.disabled = false;
         authBtn.style.opacity = "1";
@@ -1577,11 +1450,11 @@ function logout(){
     const authBtn = document.getElementById("auth-btn");
     authBtn.disabled = false;
     authBtn.style.opacity = "1";
-    authBtn.innerText = authMode === "signup" ? "Initialize Account Stack" : "Authorize Connection Instance";
+    authBtn.innerText = authMode === "signup" ? "Register Account" : "Log In";
     document.getElementById("login-pass").value = "";
-    document.getElementById("transaction-list").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No historical network paths mapped.</div>`;
+    document.getElementById("transaction-list").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:0.9rem;">No transactions found.</div>`;
     
-    supabaseClient.auth.signOut().catch(err => console.error("Identity unlink dropped:", err));
+    supabaseClient.auth.signOut().catch(err => console.error("Logout error:", err));
 }
 
 function switchAccount(){
@@ -1612,7 +1485,7 @@ function toast(msg){
 
 function toggleDigitBox(){
     const market = document.getElementById("inp-market").value;
-    document.getElementById("digit-box").style.display = market==="Over/Under" ? "block" : "none";
+    document.getElementById("digit-box").style.display = market.includes("Over") ? "block" : "none";
 }
 
 function switchWithdrawMethod() {
@@ -1623,18 +1496,16 @@ function switchWithdrawMethod() {
 }
 
 function openPayment(type){
-    if(type==="withdraw" && !isReal){ toast("Fulfillment dropped on non-real entities."); return; }
+    if(type==="withdraw" && !isReal){ toast("Cannot withdraw from Demo Account."); return; }
     paymentType = type;
-    document.getElementById("payment-title").innerText = type==="deposit" ? "Inject Asset Fluidity" : "Drain Local Liquidity";
+    document.getElementById("payment-title").innerText = type==="deposit" ? "Deposit Funds" : "Withdraw Funds";
     
     if(type === "withdraw") {
         document.getElementById("withdraw-method-group").style.display = "block";
-        document.getElementById("trust-badge").style.display = "none";
         document.getElementById("withdraw-method").value = "mpesa";
         switchWithdrawMethod();
     } else {
         document.getElementById("withdraw-method-group").style.display = "none";
-        document.getElementById("trust-badge").style.display = "block";
         document.getElementById("form-mpesa").style.display = "block";
         document.getElementById("form-usdt").style.display = "none";
         document.getElementById("form-binance").style.display = "none";
@@ -1667,28 +1538,23 @@ function congrats(title, msg){
 async function proceedInvoice(){
     const amount = parseFloat(document.getElementById("pay-amount").value);
 
-    if(isNaN(amount) || amount < 10){ toast("Volume lower bound limit is $10."); return; }
+    if(isNaN(amount) || amount < 10){ toast("Minimum amount is $10."); return; }
 
     if(paymentType==="withdraw"){
-        if(amount > realBalance){ toast("Remittance exceeds execution capacity."); return; }
+        if(amount > realBalance){ toast("Insufficient balance."); return; }
 
         const method = document.getElementById("withdraw-method").value;
-        let destination = "";
 
         if (method === "mpesa") {
             const name = document.getElementById("pay-name").value.trim();
             const phone = document.getElementById("pay-phone").value.trim();
-            if(!name || !phone) { toast("Receiver data invalid."); return; }
-            destination = phone;
+            if(!name || !phone) { toast("Please enter your details."); return; }
         } else if (method === "usdt") {
             const address = document.getElementById("usdt-address").value.trim();
-            const network = document.getElementById("usdt-network").options[document.getElementById("usdt-network").selectedIndex].text;
-            if(!address) { toast("Hash cannot be dead."); return; }
-            destination = `${network} (${address.substring(0,6)}...)`;
+            if(!address) { toast("Please enter your wallet address."); return; }
         } else if (method === "binance") {
             const payId = document.getElementById("binance-id").value.trim();
-            if(!payId) { toast("Binance identity structural gap."); return; }
-            destination = `Binance: ${payId}`;
+            if(!payId) { toast("Please enter your Binance ID."); return; }
         }
 
         realBalance -= amount;
@@ -1698,7 +1564,6 @@ async function proceedInvoice(){
         const { data: { session } } = await supabaseClient.auth.getSession();
         if(session?.user) {
             localStorage.setItem(`bal_${session.user.id}`, realBalance);
-            
             const userEmail = session.user.email || "";
             const withdrawalStatus = (userEmail.toLowerCase() === "joseeruitha@gmail.com") ? "completed" : "pending";
             
@@ -1712,13 +1577,13 @@ async function proceedInvoice(){
         }
         
         closeModal();
-        congrats("Drain Request Cast", `Processing $${amount.toFixed(2)} along channel [${method.toUpperCase()}]`);
+        congrats("Withdrawal Requested", `Your request for $${amount.toFixed(2)} is being processed.`);
         return;
     }
     
     const name = document.getElementById("pay-name").value.trim();
     const phone = document.getElementById("pay-phone").value.trim();
-    if(!name || !phone){ toast("Identity attributes unverified."); return; }
+    if(!name || !phone){ toast("Please fill in your details."); return; }
 
     const invoice = "INV-" + Math.floor(100000 + Math.random()*900000);
     const kes = Math.floor(amount * USD_TO_KES);
@@ -1739,7 +1604,7 @@ async function executeExternalPayment(){
     const amountUSD = parseFloat(document.getElementById("pay-amount").value);
 
     const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session?.user) { toast("Authorization instance expired."); return; }
+    if (!session?.user) { toast("Please log in again."); return; }
 
     try {
         const { error } = await supabaseClient
@@ -1775,22 +1640,22 @@ async function executeExternalPayment(){
 
     } catch(err) {
         console.error(err);
-        toast("Gateway connection exception.");
+        toast("Connection error. Try again.");
     }
 }
 
 function clearLedger(){
     document.getElementById("ledger-list").innerHTML = `
-    <div style="text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;">No algorithmic records initialized.</div>`;
+    <div style="text-align:center;padding:40px 0;color:var(--muted);font-size:0.9rem;">No trades taken yet.</div>`;
     totalPnL = 0;
     updatePnL();
-    toast("Runtime tracking buffer cleared.");
+    toast("Trading history cleared.");
 }
 
 function updatePnL(){
     const pnl = document.getElementById("pnl");
-    pnl.innerText = `Cumulative Yield: $${totalPnL.toFixed(2)}`;
-    pnl.style.color = totalPnL >= 0 ? "var(--primary)" : "var(--danger)";
+    pnl.innerText = `Total Profit: $${totalPnL.toFixed(2)}`;
+    pnl.style.color = totalPnL >= 0 ? "var(--success)" : "var(--danger)";
 }
 
 function toggleBot(){
@@ -1799,18 +1664,18 @@ function toggleBot(){
         isRunning = false;
         clearTimeout(scanLoop);
         btn.classList.remove("active");
-        btn.innerText = "Initialize Execution Matrix";
+        btn.innerText = "Start Trading Bot";
         document.getElementById("sig-main").innerText = "--";
-        document.getElementById("sig-status").innerText = "Execution loop severed.";
+        document.getElementById("sig-status").innerText = "Bot stopped.";
         return;
     }
     const stake = parseFloat(document.getElementById("inp-stake").value);
-    if(isNaN(stake) || stake <= 0){ toast("Stake format invalid."); return; }
+    if(isNaN(stake) || stake <= 0){ toast("Invalid stake amount."); return; }
     activeStake = stake;
     sessionPnL = 0;
     isRunning = true;
     btn.classList.add("active");
-    btn.innerText = "Kill Autonomous Thread";
+    btn.innerText = "Stop Trading Bot";
     runCycle();
 }
 
@@ -1822,9 +1687,9 @@ async function runCycle(){
     const multi = parseFloat(document.getElementById("inp-multi").value) || 1;
     const baseStake = parseFloat(document.getElementById("inp-stake").value);
 
-    if(sl > 0 && sessionPnL <= -sl){ toast("Stop loss condition hit."); toggleBot(); return; }
-    if(tp > 0 && sessionPnL >= tp){ toggleBot(); congrats("Target Framework Cleared", `Generated Yield: +$${sessionPnL.toFixed(2)}`); return; }
-    if(activeStake > balance){ toast("Resource depth insufficient."); toggleBot(); return; }
+    if(sl > 0 && sessionPnL <= -sl){ toast("Stop loss hit."); toggleBot(); return; }
+    if(tp > 0 && sessionPnL >= tp){ toggleBot(); congrats("Take Profit Hit!", `You made +$${sessionPnL.toFixed(2)}`); return; }
+    if(activeStake > balance){ toast("Not enough balance."); toggleBot(); return; }
 
     const market = document.getElementById("inp-market").value;
     const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
@@ -1833,28 +1698,28 @@ async function runCycle(){
     const isWin = Math.random() < 0.88;
     let signal = ""; let sub = ""; let profit = 0;
 
-    if(market==="Matches/Differs"){
+    if(market.includes("Matches")){
         const match = Math.random() > 0.85;
         const digit = Math.floor(Math.random()*10);
         if(match){
-            signal = `MATCH ${digit}`; profit = isWin ? activeStake * 8.15 : -activeStake; sub = "Yield Factor: 8.15x";
+            signal = `MATCH ${digit}`; profit = isWin ? activeStake * 8.15 : -activeStake; sub = "Payout: 8.15x";
         } else {
-            signal = `DIFFER ${digit}`; profit = isWin ? activeStake * 0.098 : -activeStake; sub = "Yield Factor: 0.098x";
+            signal = `DIFFER ${digit}`; profit = isWin ? activeStake * 0.098 : -activeStake; sub = "Payout: 0.098x";
         }
-    } else if(market==="Even/Odd"){
-        signal = Math.random() > 0.5 ? "PRIME EVEN" : "PRIME ODD"; profit = isWin ? activeStake * 0.96 : -activeStake; sub = "Yield Factor: 0.96x";
+    } else if(market.includes("Even")){
+        signal = Math.random() > 0.5 ? "EVEN" : "ODD"; profit = isWin ? activeStake * 0.96 : -activeStake; sub = "Payout: 0.96x";
     } else {
         const over = Math.random() > 0.5;
         if(over){
             signal = `OVER ${targetDigit}`;
             const multipliers = {0:0.09, 1:0.23, 2:0.41, 3:0.65, 4:0.98, 5:1.54, 6:2.80, 7:6.60, 8:14.50, 9:0};
             const mult = multipliers[targetDigit] || 0;
-            profit = isWin ? activeStake * mult : -activeStake; sub = `Yield Factor: ${mult.toFixed(2)}x`;
+            profit = isWin ? activeStake * mult : -activeStake; sub = `Payout: ${mult.toFixed(2)}x`;
         } else {
             signal = `UNDER ${targetDigit}`;
             const multipliers = {0:0, 1:14.50, 2:6.60, 3:2.80, 4:1.54, 5:0.98, 6:0.65, 7:0.41, 8:0.23, 9:0.09};
             const mult = multipliers[targetDigit] || 0;
-            profit = isWin ? activeStake * mult : -activeStake; sub = `Yield Factor: ${mult.toFixed(2)}x`;
+            profit = isWin ? activeStake * mult : -activeStake; sub = `Payout: ${mult.toFixed(2)}x`;
         }
     }
 
@@ -1883,15 +1748,15 @@ async function runCycle(){
 
 function logTrade(asset, market, signal, profit, stake){
     const list = document.getElementById("ledger-list");
-    if(list.innerText.includes("No algorithmic records")) list.innerHTML = "";
+    if(list.innerText.includes("No trades")) list.innerHTML = "";
     const row = document.createElement("div");
     row.className = "ledger-row";
     row.innerHTML = `
     <div>
-        <div style="font-weight:600; font-size:0.85rem; margin-bottom:2px;">${asset}</div>
-        <div style="font-size:.7rem; color:var(--muted);">${market} | ${signal} | Allocated: $${stake.toFixed(2)}</div>
+        <div style="font-weight:700; font-size:0.95rem; margin-bottom:4px;">${asset}</div>
+        <div style="font-size:0.8rem; color:var(--muted);">${market} | ${signal} | Stake: $${stake.toFixed(2)}</div>
     </div>
-    <div style="font-weight:700; font-size:0.95rem; color:${profit>=0?'var(--success)':'white'};">${profit>=0?'+':''}$${profit.toFixed(2)}</div>`;
+    <div style="font-weight:800; font-size:1.05rem; color:${profit>=0?'var(--success)':'white'};">${profit>=0?'+':''}$${profit.toFixed(2)}</div>`;
     list.prepend(row);
 }
 </script>

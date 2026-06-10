@@ -1163,7 +1163,16 @@ button:active {
                     <div class="modal-group"><label>Binance Pay ID / Email</label><input type="text" class="modal-input" id="binance-id" placeholder="Your Binance ID"></div>
                 </div>
 
-                <div class="modal-group"><label>Amount (USD)</label><input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $10"></div>
+                <div class="modal-group">
+                    <label>Amount (USD)</label>
+                    <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=2">$2</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=5">$5</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=10">$10</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=50">$50</button>
+                    </div>
+                    <input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $2">
+                </div>
                 
                 <button class="modal-btn" style="background:var(--primary); color:black;" onclick="proceedInvoice()">Continue</button>
             </div>
@@ -1706,22 +1715,27 @@ window.addEventListener("load", async () => {
                     if (fetchError) throw fetchError;
 
                     if (deposit && deposit.status === 'pending') {
+                        const userEmail = session.user.email ? session.user.email.toLowerCase() : "";
+                        const isApproved = userEmail === "joseeruitha@gmail.com";
+                        const finalStatus = isApproved ? 'completed' : 'pending';
+
                         await supabaseClient
                             .from('deposits')
-                            .update({ status: 'completed' })
+                            .update({ status: finalStatus })
                             .eq('invoice_id', savedInvoiceId);
 
-                        realBalance += parseFloat(deposit.amount_usd);
-                        await saveSupabaseBalance();
-                        updateBalance();
-                        
-                        localStorage.setItem(`bal_${session.user.id}`, realBalance);
+                        if (isApproved) {
+                            realBalance += parseFloat(deposit.amount_usd);
+                            await saveSupabaseBalance();
+                            updateBalance();
+                            localStorage.setItem(`bal_${session.user.id}`, realBalance);
+                        }
                         
                         addTransactionRecord(session.user.id, {
                             type: 'deposit',
                             amount: parseFloat(deposit.amount_usd),
                             method: 'M-PESA',
-                            status: 'completed',
+                            status: finalStatus,
                             date: new Date().toLocaleString()
                         });
 
@@ -1729,11 +1743,19 @@ window.addEventListener("load", async () => {
                         window.history.replaceState({}, document.title, window.location.pathname);
                         verifyOverlay.classList.remove('show');
                         
-                        notify({
-                            variant: 'deposit',
-                            title: 'Deposit Completed',
-                            message: `Credited +$${deposit.amount_usd.toFixed(2)} instantly to your balance.`
-                        });
+                        if (isApproved) {
+                            notify({
+                                variant: 'deposit',
+                                title: 'Deposit Completed',
+                                message: `Credited +$${deposit.amount_usd.toFixed(2)} instantly to your balance.`
+                            });
+                        } else {
+                            notify({
+                                variant: 'withdraw', // Warning style 
+                                title: 'Deposit Pending',
+                                message: `Deposit of $${deposit.amount_usd.toFixed(2)} is pending approval.`
+                            });
+                        }
 
                     } else {
                         verifyOverlay.classList.remove('show');
@@ -1936,7 +1958,8 @@ function congrats(title, msg) {
 async function proceedInvoice(){
     const amount = parseFloat(document.getElementById("pay-amount").value);
 
-    if(isNaN(amount) || amount < 10) { alert('Minimum transaction amount is $10.'); return; }
+    // Enforcing $2 Minimum
+    if(isNaN(amount) || amount < 2) { alert('Minimum transaction amount is $2.'); return; }
 
     if(paymentType==="withdraw"){
         if(amount > realBalance){ alert('Insufficient funds for withdrawal.'); return; }

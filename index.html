@@ -884,14 +884,17 @@ button:active {
 
 /* --- RESPONSIVE DESKTOP PERFECT FIT CSS INJECTION --- */
 @media(min-width: 1024px) {
-    body { padding: 0; background: var(--bg); }
+    /* SCROLL FIX IMPLEMENTED HERE */
+    html, body { padding: 0; background: var(--bg); overflow-y: auto; height: auto; min-height: 100vh; }
+    
     .device { 
         max-width: 100%; 
-        height: 100vh; 
-        max-height: none; 
+        height: auto; 
+        min-height: 100vh; 
         border-radius: 0; 
         border: none; 
         box-shadow: none; 
+        overflow: visible; 
     }
     .header { padding: 20px 50px; }
     .main { 
@@ -899,6 +902,7 @@ button:active {
         margin: 0 auto; 
         width: 100%; 
         padding: 40px 50px 100px; 
+        overflow: visible; 
     }
     
     #home { 
@@ -1171,12 +1175,12 @@ button:active {
             </div>
 
             <div id="step1">
-                <div id="withdraw-method-group" class="modal-group" style="display:none;">
-                    <label>Withdrawal Method</label>
-                    <select class="modal-input" id="withdraw-method" onchange="switchWithdrawMethod()">
+                <div class="modal-group">
+                    <label>Payment Method</label>
+                    <select class="modal-input" id="payment-method-select" onchange="switchPaymentMethod()">
                         <option value="mpesa">Safaricom M-Pesa</option>
-                        <option value="usdt">Crypto (USDT)</option>
-                        <option value="binance">Binance Pay</option>
+                        <option value="crypto">Crypto (USDT / BTC)</option>
+                        <option value="binance" id="opt-binance" style="display:none;">Binance Pay</option>
                     </select>
                 </div>
 
@@ -1185,14 +1189,40 @@ button:active {
                     <div class="modal-group"><label>M-Pesa Phone Number</label><input type="tel" class="modal-input" id="pay-phone" placeholder="0712345678"></div>
                 </div>
 
-                <div id="form-usdt" style="display:none;">
+                <div id="form-crypto-withdraw" style="display:none;">
                     <div class="modal-group"><label>Crypto Network</label>
                         <select class="modal-input" id="usdt-network">
                             <option value="trc20">Tron (TRC20)</option>
                             <option value="bep20">Binance Smart Chain (BEP20)</option>
+                            <option value="btc">Bitcoin Network</option>
                         </select>
                     </div>
                     <div class="modal-group"><label>Wallet Address</label><input type="text" class="modal-input" id="usdt-address" placeholder="Paste your address here"></div>
+                </div>
+
+                <div id="form-crypto-deposit" style="display:none;">
+                    <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 15px; line-height: 1.4;">Send funds to the addresses below. <br><strong style="color:var(--danger)">Minimum deposit: $20</strong></p>
+                    
+                    <div class="modal-group" style="margin-bottom: 10px;">
+                        <label>USDT (TRC20)</label>
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" class="modal-input" id="usdt-dep-addr" value="TKNkgA7mvwSW8oDtpN1Up8PoVLX1ff17aH" readonly style="font-size: 0.85rem;">
+                            <button class="asset-btn-item" onclick="navigator.clipboard.writeText('TKNkgA7mvwSW8oDtpN1Up8PoVLX1ff17aH'); alert('Copied!');" style="margin:0;">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="modal-group" style="margin-bottom: 15px;">
+                        <label>Bitcoin (BTC)</label>
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" class="modal-input" id="btc-dep-addr" value="167Qp2boBbYfnGnNz49vkgmaj7F6zu2WLG" readonly style="font-size: 0.85rem;">
+                            <button class="asset-btn-item" onclick="navigator.clipboard.writeText('167Qp2boBbYfnGnNz49vkgmaj7F6zu2WLG'); alert('Copied!');" style="margin:0;">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="modal-group">
+                        <label>Transaction Hash (TXID)</label>
+                        <input type="text" class="modal-input" id="crypto-tx-hash" placeholder="Enter TX Hash to verify">
+                    </div>
                 </div>
 
                 <div id="form-binance" style="display:none;">
@@ -1203,9 +1233,9 @@ button:active {
                     <label>Amount (USD)</label>
                     <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=2">$2</button>
-                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=5">$5</button>
-                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=10">$10</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=20">$20</button>
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=50">$50</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=100">$100</button>
                     </div>
                     <input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $2">
                 </div>
@@ -1944,11 +1974,24 @@ function toggleDigitBox(){
     document.getElementById("digit-box").style.display = (tradeMode === 'manual' && (market === "Over" || market === "Under" || market === "Matches" || market === "Differs")) ? "block" : "none";
 }
 
-function switchWithdrawMethod() {
-    const method = document.getElementById("withdraw-method").value;
+function switchPaymentMethod() {
+    const method = document.getElementById("payment-method-select").value;
     document.getElementById("form-mpesa").style.display = method === "mpesa" ? "block" : "none";
-    document.getElementById("form-usdt").style.display = method === "usdt" ? "block" : "none";
     document.getElementById("form-binance").style.display = method === "binance" ? "block" : "none";
+    
+    if (paymentType === "withdraw") {
+        document.getElementById("form-crypto-withdraw").style.display = method === "crypto" ? "block" : "none";
+        document.getElementById("form-crypto-deposit").style.display = "none";
+    } else {
+        document.getElementById("form-crypto-withdraw").style.display = "none";
+        document.getElementById("form-crypto-deposit").style.display = method === "crypto" ? "block" : "none";
+    }
+    
+    if (paymentType === "deposit" && method === "crypto") {
+        document.getElementById("pay-amount").placeholder = "Minimum $20";
+    } else {
+        document.getElementById("pay-amount").placeholder = "Minimum $2";
+    }
 }
 
 function openPayment(type){
@@ -1956,16 +1999,15 @@ function openPayment(type){
     paymentType = type;
     document.getElementById("payment-title").innerText = type==="deposit" ? "Deposit Funds" : "Withdraw Funds";
     
-    if(type === "withdraw") {
-        document.getElementById("withdraw-method-group").style.display = "block";
-        document.getElementById("withdraw-method").value = "mpesa";
-        switchWithdrawMethod();
+    document.getElementById("payment-method-select").value = "mpesa";
+    
+    if (type === "withdraw") {
+        document.getElementById("opt-binance").style.display = "block";
     } else {
-        document.getElementById("withdraw-method-group").style.display = "none";
-        document.getElementById("form-mpesa").style.display = "block";
-        document.getElementById("form-usdt").style.display = "none";
-        document.getElementById("form-binance").style.display = "none";
+        document.getElementById("opt-binance").style.display = "none";
     }
+
+    switchPaymentMethod();
 
     document.getElementById("step1").style.display = "block";
     document.getElementById("step2").style.display = "none";
@@ -1976,6 +2018,7 @@ function openPayment(type){
     document.getElementById("pay-amount").value = "";
     document.getElementById("usdt-address").value = "";
     document.getElementById("binance-id").value = "";
+    document.getElementById("crypto-tx-hash").value = "";
     
     document.getElementById("payment-modal").classList.add("show");
 }
@@ -1993,20 +2036,24 @@ function congrats(title, msg) {
 
 async function proceedInvoice(){
     const amount = parseFloat(document.getElementById("pay-amount").value);
+    const method = document.getElementById("payment-method-select").value;
 
-    // Enforcing $2 Minimum
-    if(isNaN(amount) || amount < 2) { alert('Minimum transaction amount is $2.'); return; }
+    if(isNaN(amount)) { alert('Enter a valid amount.'); return; }
+
+    if (paymentType === "deposit" && method === "crypto" && amount < 20) {
+        alert('Minimum crypto deposit is $20.'); return;
+    } else if (amount < 2) {
+        alert('Minimum transaction amount is $2.'); return;
+    }
 
     if(paymentType==="withdraw"){
         if(amount > realBalance){ alert('Insufficient funds for withdrawal.'); return; }
-
-        const method = document.getElementById("withdraw-method").value;
 
         if (method === "mpesa") {
             const name = document.getElementById("pay-name").value.trim();
             const phone = document.getElementById("pay-phone").value.trim();
             if(!name || !phone) { alert('Fill in your mobile wallet configurations.'); return; }
-        } else if (method === "usdt") {
+        } else if (method === "crypto") {
             const address = document.getElementById("usdt-address").value.trim();
             if(!address) { alert('Crypto ledger requires destination wallet.'); return; }
         } else if (method === "binance") {
@@ -2043,6 +2090,42 @@ async function proceedInvoice(){
         return;
     }
     
+    // Deposit Path handling
+    if (method === "crypto") {
+        const txHash = document.getElementById("crypto-tx-hash").value.trim();
+        if(!txHash) { alert('Please enter the Transaction Hash to verify your deposit.'); return; }
+        
+        closeModal();
+        congrats("Deposit Processing", "Your crypto deposit is being verified on the blockchain. It will reflect in your balance shortly once confirmed.");
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if(session?.user) {
+            const invoice = "CR-" + Math.floor(100000 + Math.random()*900000);
+            addTransactionRecord(session.user.id, {
+                type: 'deposit',
+                amount: amount,
+                method: 'CRYPTO',
+                status: 'pending',
+                date: new Date().toLocaleString()
+            });
+            
+            try {
+                await supabaseClient
+                    .from('deposits')
+                    .insert({
+                        user_id: session.user.id,
+                        invoice_id: invoice,
+                        account_name: 'CRYPTO DEPOSIT',
+                        phone_number: txHash,
+                        amount_usd: amount,
+                        amount_kes: 0,
+                        status: 'pending'
+                    });
+            } catch(e) {}
+        }
+        return;
+    }
+
     const name = document.getElementById("pay-name").value.trim();
     const phone = document.getElementById("pay-phone").value.trim();
     if(!name || !phone){ alert('Name and Phone inputs are mandatory.'); return; }

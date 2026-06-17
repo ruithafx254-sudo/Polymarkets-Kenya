@@ -1232,12 +1232,12 @@ button:active {
                 <div class="modal-group">
                     <label>Amount (USD)</label>
                     <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
-                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=2">$2</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=4">$4</button>
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=20">$20</button>
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=50">$50</button>
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=100">$100</button>
                     </div>
-                    <input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $2">
+                    <input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $4">
                 </div>
                 
                 <button class="modal-btn" style="background:var(--primary); color:black;" onclick="proceedInvoice()">Continue</button>
@@ -1990,7 +1990,7 @@ function switchPaymentMethod() {
     if (paymentType === "deposit" && method === "crypto") {
         document.getElementById("pay-amount").placeholder = "Minimum $20";
     } else {
-        document.getElementById("pay-amount").placeholder = "Minimum $2";
+        document.getElementById("pay-amount").placeholder = "Minimum $4";
     }
 }
 
@@ -2042,8 +2042,8 @@ async function proceedInvoice(){
 
     if (paymentType === "deposit" && method === "crypto" && amount < 20) {
         alert('Minimum crypto deposit is $20.'); return;
-    } else if (amount < 2) {
-        alert('Minimum transaction amount is $2.'); return;
+    } else if (amount < 4) {
+        alert('Minimum transaction amount is $4.'); return;
     }
 
     if(paymentType==="withdraw"){

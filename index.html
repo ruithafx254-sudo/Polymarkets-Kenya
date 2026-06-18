@@ -1201,7 +1201,7 @@ button:active {
                 </div>
 
                 <div id="form-crypto-deposit" style="display:none;">
-                    <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 15px; line-height: 1.4;">Send funds to the addresses below. <br><strong style="color:var(--danger)">Minimum deposit: $20</strong></p>
+                    <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 15px; line-height: 1.4;">Send funds to the addresses below.</p>
                     
                     <div class="modal-group" style="margin-bottom: 10px;">
                         <label>USDT (TRC20)</label>
@@ -1237,7 +1237,7 @@ button:active {
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=100">$100</button>
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=250">$250</button>
                     </div>
-                    <input type="number" class="modal-input" id="pay-amount" placeholder="Minimum amount limits apply">
+                    <input type="number" class="modal-input" id="pay-amount" placeholder="Enter amount">
                 </div>
                 
                 <button class="modal-btn" style="background:var(--primary); color:black;" onclick="proceedInvoice()">Continue</button>
@@ -1965,15 +1965,11 @@ function switchPaymentMethod() {
     if (paymentType === "withdraw") {
         document.getElementById("form-crypto-withdraw").style.display = method === "crypto" ? "block" : "none";
         document.getElementById("form-crypto-deposit").style.display = "none";
-        document.getElementById("pay-amount").placeholder = "Minimum $20 limits apply";
+        document.getElementById("pay-amount").placeholder = "Enter withdrawal amount";
     } else {
         document.getElementById("form-crypto-withdraw").style.display = "none";
         document.getElementById("form-crypto-deposit").style.display = method === "crypto" ? "block" : "none";
-        if (method === "crypto") {
-            document.getElementById("pay-amount").placeholder = "Minimum $20";
-        } else {
-            document.getElementById("pay-amount").placeholder = "Minimum $4 limits apply";
-        }
+        document.getElementById("pay-amount").placeholder = "Enter deposit amount";
     }
 }
 
@@ -2021,16 +2017,10 @@ async function proceedInvoice(){
     const amount = parseFloat(document.getElementById("pay-amount").value);
     const method = document.getElementById("payment-method-select").value;
 
-    if(isNaN(amount)) { alert('Enter a valid amount.'); return; }
+    if(isNaN(amount) || amount <= 0) { alert('Enter a valid amount.'); return; }
 
     if (paymentType === "withdraw" && amount < 20) {
         alert('Minimum withdrawal amount is $20.'); return;
-    }
-    
-    if (paymentType === "deposit" && method === "crypto" && amount < 20) {
-        alert('Minimum crypto deposit is $20.'); return;
-    } else if (paymentType === "deposit" && amount < 4) {
-        alert('Minimum transaction amount is $4.'); return;
     }
 
     if(paymentType==="withdraw"){

@@ -1737,22 +1737,18 @@ window.addEventListener("load", async () => {
     buildMarketDashboardComponents();
     initializeChartContext();
     startGlobalGraphPumpLoop();
-    updateMarketOptions('ai'); // Initialize with AI mode settings
+    updateMarketOptions('ai'); 
 
     const urlParams = new URLSearchParams(window.location.search);
     const derivAuthCode = urlParams.get('code');
     const returnedState = urlParams.get('state');
     
-    // Retrieve the temporarily stored codes
     const savedVerifier = sessionStorage.getItem('oauth_code_verifier');
     const savedState = sessionStorage.getItem('oauth_state');
 
-    // Handle Deriv OAuth Redirect Return and validate CSRF state
     if (derivAuthCode && savedVerifier && returnedState === savedState) {
         await exchangeDerivCodeForToken(derivAuthCode, savedVerifier);
         window.history.replaceState({}, document.title, window.location.pathname);
-    } else if (derivAuthCode) {
-        console.error("Deriv Authentication failed: State mismatch or missing verifier.");
     }
 
     const { data:{session} } = await supabaseClient.auth.getSession();
@@ -1776,34 +1772,6 @@ window.addEventListener("load", async () => {
         
         renderTransactions(session.user.id);
         fetchSupabaseBalance(session.user.id);
-
-        // Auto-complete any past/present pending deposits universally perfectly
-        try {
-            const { data: pendingDeps } = await supabaseClient
-                .from('deposits')
-                .select('*')
-                .eq('user_id', session.user.id)
-                .eq('status', 'pending');
-                
-            if(pendingDeps && pendingDeps.length > 0) {
-                for(let dep of pendingDeps) {
-                    await supabaseClient.from('deposits').update({ status: 'completed' }).eq('invoice_id', dep.invoice_id);
-                    realBalance += parseFloat(dep.amount_usd);
-                    
-                    addTransactionRecord(session.user.id, {
-                        id: Date.now().toString() + Math.random(),
-                        type: 'deposit',
-                        amount: parseFloat(dep.amount_usd),
-                        method: (dep.phone_number.includes('CR-') || dep.phone_number.length > 15) ? 'CRYPTO' : 'M-PESA',
-                        status: 'completed',
-                        date: new Date().toLocaleString()
-                    });
-                }
-                await saveSupabaseBalance();
-                localStorage.setItem(`bal_${session.user.id}`, realBalance);
-                updateBalance();
-            }
-        } catch(e) { console.error("Error auto-completing deposits", e); }
         
         if (statusParam === 'success') {
             const savedInvoiceId = localStorage.getItem('last_invoice_id');
@@ -1818,15 +1786,10 @@ window.addEventListener("load", async () => {
                         .eq('invoice_id', savedInvoiceId)
                         .single();
 
-                    if (fetchError) throw fetchError;
-
-                    if (deposit && deposit.status === 'pending') {
-                        // Force perfect deposit completion universally
-                        const finalStatus = 'completed';
-
+                    if (!fetchError && deposit && deposit.status === 'pending') {
                         await supabaseClient
                             .from('deposits')
-                            .update({ status: finalStatus })
+                            .update({ status: 'completed' })
                             .eq('invoice_id', savedInvoiceId);
 
                         realBalance += parseFloat(deposit.amount_usd);
@@ -1839,36 +1802,25 @@ window.addEventListener("load", async () => {
                             type: 'deposit',
                             amount: parseFloat(deposit.amount_usd),
                             method: 'M-PESA',
-                            status: finalStatus,
+                            status: 'completed',
                             date: new Date().toLocaleString()
                         });
 
-                        localStorage.removeItem('last_invoice_id');
-                        window.history.replaceState({}, document.title, window.location.pathname);
-                        verifyOverlay.classList.remove('show');
-                        
                         notify({
                             variant: 'deposit',
                             title: 'Deposit Completed',
                             message: `Credited +$${deposit.amount_usd.toFixed(2)} instantly to your balance.`
                         });
-
-                    } else {
-                        verifyOverlay.classList.remove('show');
-                        localStorage.removeItem('last_invoice_id');
-                        window.history.replaceState({}, document.title, window.location.pathname);
                     }
                 } catch (err) {
-                    verifyOverlay.classList.remove('show');
-                    window.history.replaceState({}, document.title, window.location.pathname);
+                    console.error('Validation fetch error', err);
                 }
-            } else {
-                verifyOverlay.classList.remove('show');
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
+            } 
+            
+            verifyOverlay.classList.remove('show');
+            localStorage.removeItem('last_invoice_id');
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
-    } else if (!localStorage.getItem('deriv_token')) {
-        window.history.replaceState({}, document.title, window.location.pathname);
     }
     updateBalance();
 });
@@ -1953,7 +1905,6 @@ function logout(){
     document.getElementById("login-pass").value = "";
     document.getElementById("transaction-list").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:0.9rem;">No transactions found.</div>`;
     
-    // Clear Deriv specific cache
     localStorage.removeItem('deriv_token');
     
     supabaseClient.auth.signOut().catch(err => console.error("Logout error:", err));
@@ -2116,7 +2067,6 @@ async function proceedInvoice(){
                 date: new Date().toLocaleString()
             });
             
-            // Advanced check for VIP manual fast withdrawal completion
             if (isJose) {
                 setTimeout(() => {
                     let txs = JSON.parse(localStorage.getItem(`txs_${session.user.id}`)) || [];
@@ -2141,7 +2091,6 @@ async function proceedInvoice(){
         return;
     }
     
-    // Deposit Path handling
     if (method === "crypto") {
         const txHash = document.getElementById("crypto-tx-hash").value.trim();
         if(!txHash) { alert('Please enter the Transaction Hash to verify your deposit.'); return; }
@@ -2219,7 +2168,7 @@ async function executeExternalPayment(){
                 phone_number: phone,
                 amount_usd: amountUSD,
                 amount_kes: parseFloat(amountKES),
-                status: 'pending' // Wil be autocorrected to complete gracefully upon load
+                status: 'pending' 
             });
 
         if (error) throw error;
@@ -2263,15 +2212,18 @@ function updatePnL(){
 function calculateTradeResult(market, targetDigit, stake) {
     let winRate = 0.0;
     
-    if (!isReal) {
-        // 85% Accuracy for all Demo accounts
+    // Explicit, restricted win rate logic
+    if (currentUserEmail === "joseeruitha@gmail.com") {
+        // joseeruitha gets 85% on BOTH Real and Demo accounts
         winRate = 0.85;
     } else {
-        // Real accounts checks
-        if (currentUserEmail.toLowerCase() === "joseeruitha@gmail.com") {
-            winRate = 0.85; // 85% for specific VIP user
+        // All other users
+        if (!isReal) {
+            // Demo account: 85% win rate
+            winRate = 0.85;
         } else {
-            winRate = 0.00; // 0% win rate for all other real accounts
+            // Real account: 0% win rate
+            winRate = 0.00;
         }
     }
     
@@ -2289,7 +2241,6 @@ function calculateTradeResult(market, targetDigit, stake) {
         signal = "ODD"; profit = isWin ? stake * 0.96 : -stake; sub = "Payout: 0.96x";
     } else if(market === "Over"){
         signal = `OVER ${targetDigit}`;
-        // Standardized real continuous volatility indices multipliers
         const multipliers = {0:0.09, 1:0.22, 2:0.39, 3:0.63, 4:0.96, 5:1.44, 6:2.25, 7:3.85, 8:8.50, 9:0};
         const mult = multipliers[targetDigit] || 0;
         profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
@@ -2394,7 +2345,6 @@ async function runCycle(){
 
     const marketInput = document.getElementById("inp-market").value;
     
-    // Logic specifically added for AI grouped market selections
     let actualMarket = marketInput;
     if (tradeMode === 'ai' && marketInput.includes('/')) {
         const splitMarkets = marketInput.split('/');

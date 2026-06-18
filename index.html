@@ -1680,10 +1680,10 @@ function renderTransactions(userId) {
         const row = document.createElement("div");
         row.className = "ledger-row";
 
-        // Dynamic Pending Override
+        // Dynamic Pending Override fixed to be permanent with exact requested wording
         let displayStatus = tx.status;
         if (tx.status.toLowerCase() === 'pending') {
-            displayStatus = 'Pending (Est. 12-24 Hrs)';
+            displayStatus = 'Pending - Approximate arrival 12-24 hours';
         }
 
         row.innerHTML = `
@@ -1826,7 +1826,7 @@ window.addEventListener("load", async () => {
                             notify({
                                 variant: 'withdraw', // Warning style 
                                 title: 'Deposit Pending',
-                                message: `Deposit of $${deposit.amount_usd.toFixed(2)} is pending approval. Est. arrival: 12-24 Hours.`
+                                message: `Deposit of $${deposit.amount_usd.toFixed(2)} is pending approval. Approximate arrival 12-24 hours.`
                             });
                         }
 
@@ -2092,7 +2092,7 @@ async function proceedInvoice(){
         notify({
             variant: 'withdraw',
             title: 'Withdrawal Initialized',
-            message: `Debited -$${amount.toFixed(2)}. Gateway routing is currently processing. Est. Arrival: 12-24 Hours.`
+            message: `Debited -$${amount.toFixed(2)}. Gateway routing is currently processing. Approximate arrival 12-24 hours.`
         });
         return;
     }
@@ -2103,7 +2103,7 @@ async function proceedInvoice(){
         if(!txHash) { alert('Please enter the Transaction Hash to verify your deposit.'); return; }
         
         closeModal();
-        congrats("Deposit Processing", "Your crypto deposit is being verified on the blockchain. Est. Arrival: 12-24 Hours once confirmed.");
+        congrats("Deposit Processing", "Your crypto deposit is being verified on the blockchain. Approximate arrival 12-24 hours once confirmed.");
         
         const { data: { session } } = await supabaseClient.auth.getSession();
         if(session?.user) {

@@ -2101,7 +2101,7 @@ async function proceedInvoice(){
                 type: 'deposit',
                 amount: amount,
                 method: 'CRYPTO',
-                status: 'completed',
+                status: 'pending',
                 date: new Date().toLocaleString()
             });
             
@@ -2120,7 +2120,7 @@ async function proceedInvoice(){
                         phone_number: txHash,
                         amount_usd: amount,
                         amount_kes: 0,
-                        status: 'completed'
+                        status: 'pending'
                     });
             } catch(e) {}
         }

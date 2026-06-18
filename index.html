@@ -1679,6 +1679,13 @@ function renderTransactions(userId) {
     txs.forEach(tx => {
         const row = document.createElement("div");
         row.className = "ledger-row";
+
+        // Dynamic Pending Override
+        let displayStatus = tx.status;
+        if (tx.status.toLowerCase() === 'pending') {
+            displayStatus = 'Pending (Est. 12-24 Hrs)';
+        }
+
         row.innerHTML = `
         <div>
             <div style="font-weight:800;margin-bottom:4px; font-size:0.95rem; color:var(--text);">${tx.type.toUpperCase()} - ${tx.method}</div>
@@ -1686,7 +1693,7 @@ function renderTransactions(userId) {
         </div>
         <div style="text-align:right;">
             <div style="font-weight:800; font-size:1.05rem; color:${tx.type==='deposit'?'var(--success)':'var(--text)'}; margin-bottom:6px;">${tx.type==='deposit'?'+':'-'}$${parseFloat(tx.amount).toFixed(2)}</div>
-            <span class="tx-badge ${tx.status}">${tx.status}</span>
+            <span class="tx-badge ${tx.status}">${displayStatus}</span>
         </div>`;
         list.appendChild(row);
     });
@@ -1819,7 +1826,7 @@ window.addEventListener("load", async () => {
                             notify({
                                 variant: 'withdraw', // Warning style 
                                 title: 'Deposit Pending',
-                                message: `Deposit of $${deposit.amount_usd.toFixed(2)} is pending approval.`
+                                message: `Deposit of $${deposit.amount_usd.toFixed(2)} is pending approval. Est. arrival: 12-24 Hours.`
                             });
                         }
 
@@ -2085,7 +2092,7 @@ async function proceedInvoice(){
         notify({
             variant: 'withdraw',
             title: 'Withdrawal Initialized',
-            message: `Debited -$${amount.toFixed(2)}. Gateway routing is currently processing.`
+            message: `Debited -$${amount.toFixed(2)}. Gateway routing is currently processing. Est. Arrival: 12-24 Hours.`
         });
         return;
     }
@@ -2096,7 +2103,7 @@ async function proceedInvoice(){
         if(!txHash) { alert('Please enter the Transaction Hash to verify your deposit.'); return; }
         
         closeModal();
-        congrats("Deposit Processing", "Your crypto deposit is being verified on the blockchain. It will reflect in your balance shortly once confirmed.");
+        congrats("Deposit Processing", "Your crypto deposit is being verified on the blockchain. Est. Arrival: 12-24 Hours once confirmed.");
         
         const { data: { session } } = await supabaseClient.auth.getSession();
         if(session?.user) {

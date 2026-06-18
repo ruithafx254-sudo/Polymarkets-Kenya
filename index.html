@@ -2090,7 +2090,7 @@ async function proceedInvoice(){
         if(!txHash) { alert('Please enter the Transaction Hash to verify your deposit.'); return; }
         
         closeModal();
-        congrats("Deposit Processing", "Your crypto deposit completed and fully verified on the blockchain.");
+        congrats("Deposit Processing", "Your crypto deposit is currently pending verification on the blockchain.");
         
         const { data: { session } } = await supabaseClient.auth.getSession();
         if(session?.user) {
@@ -2104,11 +2104,6 @@ async function proceedInvoice(){
                 status: 'pending',
                 date: new Date().toLocaleString()
             });
-            
-            realBalance += amount;
-            updateBalance();
-            await saveSupabaseBalance();
-            localStorage.setItem(`bal_${session.user.id}`, realBalance);
             
             try {
                 await supabaseClient

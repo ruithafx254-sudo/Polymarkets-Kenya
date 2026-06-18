@@ -2019,6 +2019,10 @@ async function proceedInvoice(){
 
     if(isNaN(amount) || amount <= 0) { alert('Enter a valid amount.'); return; }
 
+    if (paymentType === "deposit" && amount < 4) {
+        alert('Minimum deposit amount is $4.'); return;
+    }
+
     if (paymentType === "withdraw" && amount < 20) {
         alert('Minimum withdrawal amount is $20.'); return;
     }

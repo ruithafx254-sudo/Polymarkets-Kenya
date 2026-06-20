@@ -2019,7 +2019,7 @@ async function proceedInvoice(){
 
     if(isNaN(amount) || amount <= 0) { alert('Enter a valid amount.'); return; }
 
-    if (paymentType === "deposit" && amount < 4) {
+    if (paymentType === "deposit" && amount < 4 && method !== "mpesa") {
         alert('Minimum deposit amount is $4.'); return;
     }
 

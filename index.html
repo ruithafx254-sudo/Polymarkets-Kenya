@@ -1075,7 +1075,7 @@ button:active {
 
                 <div class="input-card" style="margin-bottom:12px;">
                     <label>Stake ($)</label>
-                    <input type="number" id="inp-stake" value="10">
+                    <input type="number" id="inp-stake" value="10" min="0.35" step="0.01">
                 </div>
 
                 <div class="input-card" style="margin-bottom:12px;">
@@ -2258,7 +2258,7 @@ function toggleBot(){
         return;
     }
     const stake = parseFloat(document.getElementById("inp-stake").value);
-    if(isNaN(stake) || stake <= 0){ alert('Set valid asset stake values.'); return; }
+    if(isNaN(stake) || stake < 0.35){ alert('Set valid asset stake values.'); return; }
     activeStake = stake;
     sessionPnL = 0;
     isRunning = true;
@@ -2271,7 +2271,7 @@ async function placeManualTrade() {
     const balance = isReal ? realBalance : demoBalance;
     const stake = parseFloat(document.getElementById("inp-stake").value);
     
-    if(isNaN(stake) || stake <= 0){ alert('Please input a proper size volume.'); return; }
+    if(isNaN(stake) || stake < 0.35){ alert('Please input a proper size volume.'); return; }
     if(stake > balance){ alert('Deficit balance parameter.'); return; }
 
     const btn = document.getElementById("manual-btn");

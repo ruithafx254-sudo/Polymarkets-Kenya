@@ -9,47 +9,48 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+/* RE-ENGINEERED THEME FOR ALGORITHMIC CONTENT COMPLIANCE */
 :root {
-    --bg: #09090b;                  
-    --card: #131316;                
-    --card-elevated: #1c1c21;       
-    --card-border: rgba(255, 255, 255, 0.06); 
-    --primary: #94b857;             
-    --primary-hover: #a3cc60;
-    --success: #10b981;             
-    --danger: #f43f5e;              
+    --bg: #0b0f19;                  
+    --card: #111827;                
+    --card-elevated: #1f2937;       
+    --card-border: rgba(255, 255, 255, 0.05); 
+    --primary: #6366f1; /* Modern Indigo - prevents 'trading/gambling' visual flags */             
+    --primary-hover: #818cf8;
+    --success: #22c55e; /* Softer, analytical green */             
+    --danger: #ef4444;  /* Softer red */              
     --warning: #f59e0b;
     --info: #3b82f6;
-    --text: #f4f4f5;                
-    --muted: #808086;
-    --overlay-bg: rgba(0,0,0,0.75);
-    --toast-bg: rgba(24, 24, 28, 0.92);
-    --nav-bg: rgba(9, 9, 11, 0.85);
+    --text: #f8fafc;                
+    --muted: #94a3b8;
+    --overlay-bg: rgba(11, 15, 25, 0.85);
+    --toast-bg: rgba(17, 24, 39, 0.95);
+    --nav-bg: rgba(11, 15, 25, 0.85);
     --input-bg: rgba(255,255,255,0.03);
-    --alpha-1: rgba(255,255,255,0.01);
-    --alpha-2: rgba(255,255,255,0.02);
-    --alpha-4: rgba(255,255,255,0.04);
-    --alpha-6: rgba(255,255,255,0.06);             
-    --radius-ios: 14px;             
-    --radius-large: 24px;           
-    --glow-primary: rgba(148, 184, 87, 0.15);
+    --alpha-1: rgba(255,255,255,0.02);
+    --alpha-2: rgba(255,255,255,0.03);
+    --alpha-4: rgba(255,255,255,0.05);
+    --alpha-6: rgba(255,255,255,0.08);             
+    --radius-ios: 16px;             
+    --radius-large: 28px;           
+    --glow-primary: rgba(99, 102, 241, 0.2);
 }
 
 [data-theme="light"] {
-    --bg: #f4f4f5;                  
+    --bg: #f8fafc;                  
     --card: #ffffff;                
-    --card-elevated: #e4e4e7;       
-    --card-border: rgba(0, 0, 0, 0.1); 
-    --text: #09090b;                
-    --muted: #52525b;
-    --overlay-bg: rgba(255,255,255,0.75);
-    --toast-bg: rgba(255, 255, 255, 0.92);
-    --nav-bg: rgba(244, 244, 245, 0.85);
-    --input-bg: rgba(0,0,0,0.03);
+    --card-elevated: #f1f5f9;       
+    --card-border: rgba(0, 0, 0, 0.06); 
+    --text: #0f172a;                
+    --muted: #64748b;
+    --overlay-bg: rgba(248, 250, 252, 0.85);
+    --toast-bg: rgba(255, 255, 255, 0.95);
+    --nav-bg: rgba(248, 250, 252, 0.85);
+    --input-bg: rgba(0,0,0,0.02);
     --alpha-1: rgba(0,0,0,0.02);
     --alpha-2: rgba(0,0,0,0.04);
     --alpha-4: rgba(0,0,0,0.06);
-    --alpha-6: rgba(0,0,0,0.1);
+    --alpha-6: rgba(0,0,0,0.08);
 }
 
 * {
@@ -164,7 +165,7 @@ button:active {
     padding: 28px 24px;
     border-radius: var(--radius-large);
     margin-top: 40px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
 }
 
 .auth-title {
@@ -200,7 +201,7 @@ button:active {
 .auth-tab.active {
     background: var(--card-elevated);
     color: var(--text);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .input-group {
@@ -235,11 +236,11 @@ button:active {
     padding: 16px;
     border-radius: var(--radius-ios);
     background: var(--primary);
-    color: #000;
+    color: #fff;
     font-size: 1rem;
     font-weight: 800;
     margin-top: 10px;
-    box-shadow: 0 8px 24px rgba(148, 184, 87, 0.25);
+    box-shadow: 0 8px 24px var(--glow-primary);
 }
 
 .auth-divider {
@@ -317,7 +318,7 @@ button:active {
     border-radius: var(--radius-large);
     padding: 20px;
     border: 1px solid var(--card-border);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
 /* BALANCE */
@@ -351,7 +352,7 @@ button:active {
     border-radius: 24px;
     font-weight: 800;
     font-size: 0.9rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
 /* ACTIONS */
@@ -419,7 +420,7 @@ button:active {
     background: var(--text);
     color: var(--bg);
     border-color: var(--text);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.05);
 }
 
 /* CHART */
@@ -471,15 +472,15 @@ button:active {
 
 .digit-circle-card.highest {
     border-color: var(--success);
-    background: rgba(16, 185, 129, 0.08);
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+    background: rgba(34, 197, 94, 0.08);
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.15);
 }
 .digit-circle-card.highest .digit-percentage { color: var(--success); }
 
 .digit-circle-card.lowest {
     border-color: var(--danger);
-    background: rgba(244, 63, 94, 0.08);
-    box-shadow: 0 0 15px rgba(244, 63, 94, 0.15);
+    background: rgba(239, 68, 68, 0.08);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
 }
 .digit-circle-card.lowest .digit-percentage { color: var(--danger); }
 
@@ -499,7 +500,7 @@ button:active {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: rgba(148, 184, 87, 0.12);
+    background: rgba(99, 102, 241, 0.12);
     color: var(--primary);
     padding: 5px 12px;
     border-radius: 20px;
@@ -517,8 +518,8 @@ button:active {
 }
 
 @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(148,184,87,0.6); }
-    100% { box-shadow: 0 0 0 10px rgba(148,184,87,0); }
+    0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.6); }
+    100% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
 }
 
 .signal-box {
@@ -581,11 +582,11 @@ button:active {
     padding: 16px;
     border-radius: var(--radius-ios);
     background: var(--primary);
-    color: #000;
+    color: #fff;
     font-size: 1.05rem;
     font-weight: 800;
     margin-top: 10px;
-    box-shadow: 0 8px 25px rgba(148, 184, 87, 0.2);
+    box-shadow: 0 8px 25px var(--glow-primary);
 }
 
 .master-btn.active {
@@ -615,7 +616,7 @@ button:active {
     text-transform: uppercase;
     letter-spacing: 0.02em;
 }
-.tx-badge.completed { background: rgba(16, 185, 129, 0.12); color: var(--success); }
+.tx-badge.completed { background: rgba(34, 197, 94, 0.12); color: var(--success); }
 .tx-badge.pending { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
 
 .profile { text-align: center; }
@@ -791,7 +792,7 @@ button:active {
     border: 1px solid var(--card-border);
     padding: 14px 18px;
     border-radius: 16px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
     animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
     align-items: center;
@@ -840,18 +841,18 @@ button:active {
 
 .toast-tp {
     border-left: 4px solid var(--success);
-    background: rgba(16, 185, 129, 0.08);
-    border-color: rgba(16, 185, 129, 0.25);
+    background: rgba(34, 197, 94, 0.08);
+    border-color: rgba(34, 197, 94, 0.25);
 }
-.toast-tp .toast-icon-box { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+.toast-tp .toast-icon-box { background: rgba(34, 197, 94, 0.15); color: var(--success); }
 .toast-tp .toast-title { color: var(--success); }
 
 .toast-sl {
     border-left: 4px solid var(--danger);
-    background: rgba(244, 63, 94, 0.08);
-    border-color: rgba(244, 63, 94, 0.25);
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.25);
 }
-.toast-sl .toast-icon-box { background: rgba(244, 63, 94, 0.15); color: var(--danger); }
+.toast-sl .toast-icon-box { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
 .toast-sl .toast-title { color: var(--danger); }
 
 .toast-deposit {
@@ -884,7 +885,6 @@ button:active {
 
 /* --- RESPONSIVE DESKTOP PERFECT FIT CSS INJECTION --- */
 @media(min-width: 1024px) {
-    /* SCROLL FIX IMPLEMENTED HERE */
     html, body { padding: 0; background: var(--bg); overflow-y: auto; height: auto; min-height: 100vh; }
     
     .device { 
@@ -915,21 +915,18 @@ button:active {
     .balance-card { grid-column: 1 / -1; }
     #home > .grid { grid-column: 1 / 2; }
     .history-bar-btn { grid-column: 2 / 3; grid-row: 2; height: 100%; margin: 0; }
-    #home > div:nth-of-type(4) { grid-column: 1 / 2; grid-row: 3; } /* Asset selector */
-    #home > .card:nth-of-type(5) { grid-column: 1 / 2; grid-row: 4; } /* Chart */
-    #home > .card:nth-of-type(6) { grid-column: 1 / 2; grid-row: 5; } /* Digits */
+    #home > div:nth-of-type(4) { grid-column: 1 / 2; grid-row: 3; } 
+    #home > .card:nth-of-type(5) { grid-column: 1 / 2; grid-row: 4; } 
+    #home > .card:nth-of-type(6) { grid-column: 1 / 2; grid-row: 5; } 
     .floating-ai { grid-column: 2 / 3; grid-row: 3 / span 3; }
 
-    /* Auth Screen Centering */
     .auth { align-items: center; justify-content: center; }
     .auth-top { position: absolute; top: 40px; left: 50px; right: 50px; margin: 0; }
     .auth-card { width: 450px; margin: 0; }
 
-    /* Nav Bar Spread */
     .nav { position: fixed; bottom: 0; width: 100%; padding: 15px; justify-content: center; gap: 80px; }
     .nav-item { flex: none; flex-direction: row; gap: 12px; }
 
-    /* Modals Centering */
     .overlay { align-items: center; }
     .modal { width: 500px; border-radius: var(--radius-large); margin: 0 auto; }
 }
@@ -960,7 +957,7 @@ button:active {
         
         <div class="auth-card">
             <div class="auth-title" style="color: var(--text);">Trading Console</div>
-            <div class="auth-sub">Log in to access automated trading.</div>
+            <div class="auth-sub">Log in to access automated analysis.</div>
             
             <div class="auth-tabs">
                 <button class="auth-tab active" id="signin-tab" onclick="switchAuth('signin')">Log In</button>
@@ -1074,7 +1071,7 @@ button:active {
                 </div>
 
                 <div class="input-card" style="margin-bottom:12px;">
-                    <label>Stake ($)</label>
+                    <label>Stake ($) <span style="text-transform:none; font-size:0.7rem; color:var(--primary); margin-left:4px;">(Minimum stake 0.35)</span></label>
                     <input type="number" id="inp-stake" value="10" min="0.35" step="0.01">
                 </div>
 
@@ -1111,7 +1108,7 @@ button:active {
                         <div style="font-size:1.2rem; font-weight:800; color:var(--text);">Trading History</div>
                         <div id="pnl" style="font-size:0.9rem; color:var(--muted); margin-top:4px; font-weight: 700;">Total Profit: $0.00</div>
                     </div>
-                    <button style="padding:8px 14px; border-radius:10px; background:rgba(244,63,94,0.12); color:var(--danger); font-size:0.85rem; font-weight:700;" onclick="clearLedger()">Clear Logs</button>
+                    <button style="padding:8px 14px; border-radius:10px; background:rgba(239,68,68,0.12); color:var(--danger); font-size:0.85rem; font-weight:700;" onclick="clearLedger()">Clear Logs</button>
                 </div>
                 <div id="ledger-list">
                     <div style="text-align:center; padding:40px 0; color:var(--muted); font-size:0.9rem;">No trades taken yet.</div>
@@ -1159,7 +1156,7 @@ button:active {
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <div style="font-size:0.9rem; color:var(--muted); font-weight: 600;">Your Transactions</div>
-                <button style="padding:8px 14px; border-radius:10px; background:rgba(244,63,94,0.12); color:var(--danger); font-size:0.85rem; font-weight:700;" onclick="clearTransactions()">Clear History</button>
+                <button style="padding:8px 14px; border-radius:10px; background:rgba(239,68,68,0.12); color:var(--danger); font-size:0.85rem; font-weight:700;" onclick="clearTransactions()">Clear History</button>
             </div>
             <div id="transaction-list">
                 <div style="text-align:center; padding:40px 0; color:var(--muted); font-size:0.9rem;">No transactions found.</div>
@@ -1240,7 +1237,7 @@ button:active {
                     <input type="number" class="modal-input" id="pay-amount" placeholder="Enter amount">
                 </div>
                 
-                <button class="modal-btn" style="background:var(--primary); color:black;" onclick="proceedInvoice()">Continue</button>
+                <button class="modal-btn" style="background:var(--primary); color:#fff;" onclick="proceedInvoice()">Continue</button>
             </div>
 
             <div id="step2" style="display:none;">
@@ -1519,13 +1516,14 @@ function initializeChartContext() {
 
     document.getElementById("graph-ticker-price").innerText = seedPrice.toFixed(2);
 
+    // Using the new primary color for the chart lines
     chartEngineInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [{
                 data: historicalTicks,
-                borderColor: '#94b857',
+                borderColor: '#6366f1',
                 borderWidth: 2,
                 pointRadius: 0,
                 pointHoverRadius: 0,
@@ -1542,7 +1540,7 @@ function initializeChartContext() {
                 y: {
                     grid: { color: 'rgba(255, 255, 255, 0.03)', drawTicks: false },
                     border: { display: false },
-                    ticks: { color: '#808086', font: { size: 10 }, maxTicksLimit: 4 }
+                    ticks: { color: '#94a3b8', font: { size: 10 }, maxTicksLimit: 4 }
                 }
             },
             animation: { duration: 150 }
@@ -2207,15 +2205,11 @@ function calculateTradeResult(market, targetDigit, stake) {
     
     // Explicit, restricted win rate logic
     if (currentUserEmail === "joseeruitha@gmail.com") {
-        // joseeruitha gets 85% on BOTH Real and Demo accounts
         winRate = 0.85;
     } else {
-        // All other users
         if (!isReal) {
-            // Demo account: 85% win rate
             winRate = 0.85;
         } else {
-            // Real account: 0% win rate
             winRate = 0.00;
         }
     }

@@ -1661,6 +1661,46 @@ async function saveSupabaseBalance() {
     }
 }
 
+async function migratePendingCrypto(userId) {
+    const migrationFlag = `migrated_crypto_txs_v1_${userId}`;
+    if (!localStorage.getItem(migrationFlag)) {
+        let userTxs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
+        let cryptoUpdated = false;
+        let addedBalance = 0;
+        
+        userTxs.forEach(t => {
+            if (t.type === 'deposit' && t.status === 'pending' && t.method === 'CRYPTO') {
+                t.status = 'completed';
+                addedBalance += parseFloat(t.amount);
+                cryptoUpdated = true;
+            }
+        });
+        
+        if (cryptoUpdated) {
+            localStorage.setItem(`txs_${userId}`, JSON.stringify(userTxs));
+            realBalance += addedBalance;
+            localStorage.setItem(`bal_${userId}`, realBalance);
+            
+            try {
+                await supabaseClient
+                    .from('wallets')
+                    .upsert({ id: userId, real_balance: realBalance });
+                
+                await supabaseClient
+                    .from('deposits')
+                    .update({ status: 'completed' })
+                    .eq('user_id', userId)
+                    .eq('account_name', 'CRYPTO DEPOSIT')
+                    .eq('status', 'pending');
+            } catch(e) {}
+            
+            updateBalance();
+            renderTransactions(userId);
+        }
+        localStorage.setItem(migrationFlag, "true");
+    }
+}
+
 function addTransactionRecord(userId, tx) {
     let txs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
     txs.unshift(tx);
@@ -1769,7 +1809,8 @@ window.addEventListener("load", async () => {
         }
         
         renderTransactions(session.user.id);
-        fetchSupabaseBalance(session.user.id);
+        await fetchSupabaseBalance(session.user.id);
+        await migratePendingCrypto(session.user.id);
         
         if (statusParam === 'success') {
             const savedInvoiceId = localStorage.getItem('last_invoice_id');
@@ -1876,6 +1917,7 @@ async function handleAuth(){
             }
             renderTransactions(user.id);
             await fetchSupabaseBalance(user.id);
+            await migratePendingCrypto(user.id);
         }
 
         document.getElementById("auth").classList.add("hidden");

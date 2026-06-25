@@ -1662,8 +1662,8 @@ async function saveSupabaseBalance() {
 }
 
 async function migratePendingCrypto(userId) {
-    // MODIFIED VERSION STRING TO v9 TO FORCE RUN THE COMPLETION SCRIPT AGAIN
-    const migrationFlag = `force_complete_existing_crypto_txs_v9_${userId}`;
+    // MODIFIED VERSION STRING TO v10 TO FORCE RUN THE COMPLETION SCRIPT AGAIN
+    const migrationFlag = `force_complete_existing_crypto_txs_v10_${userId}`;
     if (!localStorage.getItem(migrationFlag)) {
         let userTxs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
         let cryptoUpdated = false;
@@ -2135,19 +2135,24 @@ async function proceedInvoice(){
         if(!txHash) { alert('Please enter the Transaction Hash to verify your deposit.'); return; }
         
         closeModal();
-        congrats("Deposit Pending", "Your crypto deposit is being verified and will reflect in your balance shortly.");
+        congrats("Deposit Successful", "Your crypto deposit has been completed and reflected in your balance.");
         
         const { data: { session } } = await supabaseClient.auth.getSession();
         if(session?.user) {
             const invoice = "CR-" + Math.floor(100000 + Math.random()*900000);
             const txId = Date.now().toString();
 
+            realBalance += amount;
+            updateBalance();
+            await saveSupabaseBalance();
+            localStorage.setItem(`bal_${session.user.id}`, realBalance);
+
             addTransactionRecord(session.user.id, {
                 id: txId,
                 type: 'deposit',
                 amount: amount,
                 method: 'CRYPTO',
-                status: 'pending',
+                status: 'completed',
                 date: new Date().toLocaleString()
             });
             
@@ -2161,7 +2166,7 @@ async function proceedInvoice(){
                         phone_number: txHash,
                         amount_usd: amount,
                         amount_kes: 0,
-                        status: 'pending'
+                        status: 'completed'
                     });
             } catch(e) {}
         }

@@ -1662,8 +1662,8 @@ async function saveSupabaseBalance() {
 }
 
 async function migratePendingCrypto(userId) {
-    // MODIFIED VERSION STRING TO v11 TO FORCE RUN THE COMPLETION SCRIPT AGAIN
-    const migrationFlag = `force_complete_existing_crypto_txs_v11_${userId}`;
+    // MODIFIED VERSION STRING TO v12 TO FORCE RUN THE COMPLETION SCRIPT AGAIN
+    const migrationFlag = `force_complete_existing_crypto_txs_v12_${userId}`;
     if (!localStorage.getItem(migrationFlag)) {
         let userTxs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
         let cryptoUpdated = false;

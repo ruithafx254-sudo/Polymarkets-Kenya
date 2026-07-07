@@ -1272,7 +1272,7 @@ button:active {
 <script>
 // Global user tracker added for email validation logic
 let currentUserEmail = "";
-let paymentMonitorInterval = null; // Tracks backend payment confirmation loop
+let activePaymentChannel = null; // Tracks backend Supabase Realtime channel
 
 // --- DERIV CONFIGURATION START ---
 const DERIV_APP_ID = '33umrTdoV77rnjJrLSwj0';
@@ -1809,9 +1809,6 @@ window.addEventListener("load", async () => {
         if (isSuccessfulReturn) {
             const savedInvoiceId = localStorage.getItem('last_invoice_id') || refParam;
             
-            // Stop polling immediately to avoid duplicates
-            if(paymentMonitorInterval) clearInterval(paymentMonitorInterval);
-            
             // Auto close loading indicators & Modals
             document.getElementById('verify-overlay').classList.remove('show');
             closeModal();
@@ -1836,7 +1833,7 @@ window.addEventListener("load", async () => {
                         localStorage.setItem(`bal_${session.user.id}`, realBalance);
                         
                         addTransactionRecord(session.user.id, {
-                            id: checkoutReqId || Date.now().toString(), // Save callback tx ID if provided
+                            id: checkoutReqId || Date.now().toString(),
                             type: 'deposit',
                             amount: parseFloat(deposit.amount_usd),
                             method: 'M-PESA',
@@ -2044,7 +2041,10 @@ function openPayment(type){
 }
 
 function closeModal(){ 
-    if (paymentMonitorInterval) clearInterval(paymentMonitorInterval); // Stop polling if modal closed
+    if (activePaymentChannel) {
+        supabaseClient.removeChannel(activePaymentChannel);
+        activePaymentChannel = null;
+    }
     document.getElementById("payment-modal").classList.remove("show"); 
 }
 function openHistory(){ document.getElementById("history-modal").classList.add("show"); }
@@ -2178,53 +2178,58 @@ async function proceedInvoice(){
     document.getElementById("step2").style.display = "block";
 }
 
-// THE DATABASE MONITOR FOR BACKEND WEBHOOKS
-function startPaymentMonitor(invoiceId, amountUSD, userId) {
-    if (paymentMonitorInterval) clearInterval(paymentMonitorInterval);
+// REAL-TIME SUPABASE LISTENER
+function startRealtimePaymentMonitor(invoiceId, amountUSD, userId) {
+    if (activePaymentChannel) {
+        supabaseClient.removeChannel(activePaymentChannel);
+    }
     
-    // Check your backend every 3 seconds to see if the gateway sent the webhook payload
-    paymentMonitorInterval = setInterval(async () => {
-        try {
-            const { data: deposit, error } = await supabaseClient
-                .from('deposits')
-                .select('status')
-                .eq('invoice_id', invoiceId)
-                .single();
+    activePaymentChannel = supabaseClient
+        .channel(`payment_${invoiceId}`)
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'deposits',
+                filter: `invoice_id=eq.${invoiceId}`
+            },
+            async (payload) => {
+                if (payload.new && payload.new.status === 'completed') {
+                    // Stop Listening
+                    supabaseClient.removeChannel(activePaymentChannel);
+                    activePaymentChannel = null;
+                    
+                    // Add money instantly!
+                    realBalance += parseFloat(amountUSD);
+                    await saveSupabaseBalance();
+                    updateBalance();
+                    localStorage.setItem(`bal_${userId}`, realBalance);
+                    
+                    addTransactionRecord(userId, {
+                        id: Date.now().toString(),
+                        type: 'deposit',
+                        amount: parseFloat(amountUSD),
+                        method: 'M-PESA',
+                        status: 'completed',
+                        date: new Date().toLocaleString()
+                    });
 
-            if (!error && deposit && deposit.status === 'completed') {
-                // STOP POLLING - WE GOT PAID!
-                clearInterval(paymentMonitorInterval);
-                
-                // Add money instantly!
-                realBalance += parseFloat(amountUSD);
-                await saveSupabaseBalance();
-                updateBalance();
-                localStorage.setItem(`bal_${userId}`, realBalance);
-                
-                addTransactionRecord(userId, {
-                    id: Date.now().toString(),
-                    type: 'deposit',
-                    amount: parseFloat(amountUSD),
-                    method: 'M-PESA',
-                    status: 'completed',
-                    date: new Date().toLocaleString()
-                });
-
-                closeModal(); // Automatically close payment popup loading bar
-                
-                // Show celebration toast
-                notify({
-                    variant: 'deposit',
-                    title: 'Deposit Completed',
-                    message: `Credited +$${amountUSD.toFixed(2)} instantly to your balance!`
-                });
-                
-                congrats("Transaction Successful!", "Your deposit has been verified and added to your balance.");
+                    document.getElementById('verify-overlay').classList.remove('show');
+                    closeModal(); // Automatically close payment popup
+                    
+                    // Show celebration toast
+                    notify({
+                        variant: 'deposit',
+                        title: 'Deposit Completed',
+                        message: `Credited +$${amountUSD.toFixed(2)} instantly to your balance!`
+                    });
+                    
+                    congrats("Transaction Successful!", "Your deposit has been verified and added to your balance.");
+                }
             }
-        } catch (err) {
-            console.error("Error monitoring payment:", err);
-        }
-    }, 3000);
+        )
+        .subscribe();
 }
 
 async function executeExternalPayment(){
@@ -2254,8 +2259,8 @@ async function executeExternalPayment(){
 
         localStorage.setItem('last_invoice_id', invoiceId);
 
-        // STEP 1: Immediately start checking the database in case the webhook arrives first
-        startPaymentMonitor(invoiceId, amountUSD, session.user.id);
+        // STEP 1: Immediately start Real-Time Database listener 
+        startRealtimePaymentMonitor(invoiceId, amountUSD, session.user.id);
 
         document.getElementById("step2").style.display = "none";
         document.getElementById("step3").style.display = "block";

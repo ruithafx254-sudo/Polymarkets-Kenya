@@ -1273,6 +1273,10 @@ button:active {
 // Global user tracker added for email validation logic
 let currentUserEmail = "";
 
+// --- PAYMENT API CONFIGURATION START ---
+const PAYMENT_API_KEY = "INSERT_API_KEY_FROM_IMAGE_HERE"; // Replace with the API key from your uploaded image
+// --- PAYMENT API CONFIGURATION END ---
+
 // --- DERIV CONFIGURATION START ---
 const DERIV_APP_ID = '33umrTdoV77rnjJrLSwj0';
 const DERIV_REDIRECT_URI = 'https://ruithafx254-sudo.github.io/Polymarkets-Kenya/';
@@ -2060,14 +2064,6 @@ async function proceedInvoice(){
 
     if(isNaN(amount) || amount <= 0) { alert('Enter a valid amount.'); return; }
 
-    if (paymentType === "deposit") {
-        if (method === "crypto" && amount < 20) {
-            alert('Minimum deposit amount for Crypto is $20.'); return;
-        } else if (amount < 4) {
-            alert('Minimum deposit amount is $4.'); return;
-        }
-    }
-
     if (paymentType === "withdraw" && amount < 20) {
         alert('Minimum withdrawal amount is $20.'); return;
     }
@@ -2208,25 +2204,17 @@ async function executeExternalPayment(){
 
         if (error) throw error;
 
-        // UPDATED CALLBACK TO MOCK UPESIPAY JSON RETURN PAYLOAD
         const callbackUrl = encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?merchant_request_id=b8fb-4e61-a3fe-85258dc5409f&checkout_request_id=ws_CO_24062026133240993796345959&status=success');
         
-        // REPLACED LIPWA URL WITH UPESIPAY URL
-        const upesipayURL =
-        `https://upesipay.com/m/QY572` +
-        `?amount=${amountKES}` +
-        `&phone=${encodeURIComponent(phone)}` +
-        `&name=${encodeURIComponent(name)}` +
-        `&reference=${encodeURIComponent(invoiceId)}` +
-        `&success_url=${callbackUrl}`;
+        // REPLACED WITH API KEY GATEWAY LOGIC
+        const gatewayURL = `https://api.paymentgateway.com/charge?apikey=${PAYMENT_API_KEY}&amount=${amountKES}&phone=${encodeURIComponent(phone)}&name=${encodeURIComponent(name)}&reference=${encodeURIComponent(invoiceId)}&success_url=${callbackUrl}`;
 
         localStorage.setItem('last_invoice_id', invoiceId);
 
         document.getElementById("step2").style.display = "none";
         document.getElementById("step3").style.display = "block";
         
-        // PUSH ROUTE THROUGH UPESIPAY
-        window.location.href = upesipayURL; 
+        window.location.href = gatewayURL; 
 
     } catch(err) {
         console.error(err);

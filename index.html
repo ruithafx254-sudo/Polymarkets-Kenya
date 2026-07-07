@@ -1273,6 +1273,7 @@ button:active {
 // Global user tracker added for email validation logic
 let currentUserEmail = "";
 let activePaymentChannel = null; // Tracks backend Supabase Realtime channel
+let dbScannerInterval = null; // Background manual scanner
 
 // --- DERIV CONFIGURATION START ---
 const DERIV_APP_ID = '33umrTdoV77rnjJrLSwj0';
@@ -1778,7 +1779,6 @@ window.addEventListener("load", async () => {
 
     const { data:{session} } = await supabaseClient.auth.getSession();
 
-    // FRONTEND REDIRECT HANDLER (AUTO-CLOSE & UPDATE ON SUCCESS)
     const statusParam = urlParams.get('status');
     const refParam = urlParams.get('reference') || urlParams.get('ref') || urlParams.get('invoice_id');
     const checkoutReqId = urlParams.get('checkout_request_id');
@@ -1803,30 +1803,28 @@ window.addEventListener("load", async () => {
         await fetchSupabaseBalance(session.user.id);
         await migratePendingCrypto(session.user.id);
         
-        // This instantly catches the success callback in the URL when gateway redirects user back.
+        // --- REDIRECT SUCCESS HANDLER ---
         const isSuccessfulReturn = statusParam === 'success' || statusParam === 'completed' || statusParam === 'paid' || statusParam === 'PAID';
+        const activeInvoiceToProcess = localStorage.getItem('last_invoice_id') || refParam;
 
-        if (isSuccessfulReturn) {
-            const savedInvoiceId = localStorage.getItem('last_invoice_id') || refParam;
-            
-            // Auto close loading indicators & Modals
+        if (isSuccessfulReturn && activeInvoiceToProcess) {
             document.getElementById('verify-overlay').classList.remove('show');
             closeModal();
+            try {
+                const { data: deposit, error: fetchError } = await supabaseClient
+                    .from('deposits')
+                    .select('user_id, amount_usd, status')
+                    .eq('invoice_id', activeInvoiceToProcess)
+                    .single();
 
-            if (savedInvoiceId) {
-                try {
-                    const { data: deposit, error: fetchError } = await supabaseClient
+                if (!fetchError && deposit && deposit.status === 'pending') {
+                    // Update database first
+                    const { error: updateError } = await supabaseClient
                         .from('deposits')
-                        .select('user_id, amount_usd, status')
-                        .eq('invoice_id', savedInvoiceId)
-                        .single();
+                        .update({ status: 'completed' })
+                        .eq('invoice_id', activeInvoiceToProcess);
 
-                    if (!fetchError && deposit && deposit.status === 'pending') {
-                        await supabaseClient
-                            .from('deposits')
-                            .update({ status: 'completed' })
-                            .eq('invoice_id', savedInvoiceId);
-
+                    if (!updateError) {
                         realBalance += parseFloat(deposit.amount_usd);
                         await saveSupabaseBalance();
                         updateBalance();
@@ -1841,22 +1839,62 @@ window.addEventListener("load", async () => {
                             date: new Date().toLocaleString()
                         });
 
-                        notify({
-                            variant: 'deposit',
-                            title: 'Deposit Completed',
-                            message: `Credited +$${deposit.amount_usd.toFixed(2)} instantly to your balance.`
-                        });
-                        
+                        notify({ variant: 'deposit', title: 'Deposit Completed', message: `Credited +$${deposit.amount_usd.toFixed(2)} instantly!` });
                         congrats("Transaction Successful!", "Your deposit has been verified and added to your balance.");
                     }
-                } catch (err) {
-                    console.error('Validation fetch error', err);
                 }
-            } 
+            } catch (err) { console.error('Validation fetch error', err); }
             
             localStorage.removeItem('last_invoice_id');
-            // Erase the callback parameters so the URL looks clean
             window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        // --- BACKGROUND DB SCANNER (Runs if transaction is pending and they didn't get redirect-completed) ---
+        const pendingInvoice = localStorage.getItem('last_invoice_id');
+        if (pendingInvoice && !isSuccessfulReturn) {
+            document.getElementById('verify-overlay').classList.add('show');
+            let scanAttempts = 0;
+            
+            dbScannerInterval = setInterval(async () => {
+                scanAttempts++;
+                if (scanAttempts > 100) { // Timeout after ~5 minutes
+                    clearInterval(dbScannerInterval);
+                    document.getElementById('verify-overlay').classList.remove('show');
+                    localStorage.removeItem('last_invoice_id');
+                    return;
+                }
+                
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('deposits')
+                        .select('status, amount_usd')
+                        .eq('invoice_id', pendingInvoice)
+                        .single();
+                    
+                    if (data && (data.status === 'completed' || data.status === 'paid')) {
+                        clearInterval(dbScannerInterval);
+                        
+                        realBalance += parseFloat(data.amount_usd);
+                        await saveSupabaseBalance();
+                        updateBalance();
+                        localStorage.setItem(`bal_${session.user.id}`, realBalance);
+                        
+                        addTransactionRecord(session.user.id, {
+                            id: Date.now().toString(),
+                            type: 'deposit',
+                            amount: parseFloat(data.amount_usd),
+                            method: 'M-PESA',
+                            status: 'completed',
+                            date: new Date().toLocaleString()
+                        });
+
+                        document.getElementById('verify-overlay').classList.remove('show');
+                        localStorage.removeItem('last_invoice_id');
+                        notify({ variant: 'deposit', title: 'Deposit Completed', message: `Credited +$${data.amount_usd.toFixed(2)} instantly!` });
+                        congrats("Transaction Successful!", "Your deposit has been verified and added to your balance.");
+                    }
+                } catch (err) { console.error("Scanner error", err); }
+            }, 3000); // Polling every 3 seconds to catch the success bar state
         }
     }
     updateBalance();
@@ -2195,12 +2233,16 @@ function startRealtimePaymentMonitor(invoiceId, amountUSD, userId) {
                 filter: `invoice_id=eq.${invoiceId}`
             },
             async (payload) => {
-                if (payload.new && payload.new.status === 'completed') {
+                if (payload.new && (payload.new.status === 'completed' || payload.new.status === 'paid')) {
                     // Stop Listening
                     supabaseClient.removeChannel(activePaymentChannel);
                     activePaymentChannel = null;
                     
-                    // Add money instantly!
+                    // Clear the background polling scanner
+                    if(dbScannerInterval) clearInterval(dbScannerInterval);
+                    localStorage.removeItem('last_invoice_id');
+                    
+                    // Add money instantly
                     realBalance += parseFloat(amountUSD);
                     await saveSupabaseBalance();
                     updateBalance();
@@ -2270,7 +2312,7 @@ async function executeExternalPayment(){
         const callbackUrl = encodeURIComponent(`${baseUrl}?status=success&invoice_id=${invoiceId}`);
         const gatewayURL = `https://upesipay.com/m/QY572?amount=${amountKES}&phone=${encodeURIComponent(phone)}&name=${encodeURIComponent(name)}&reference=${encodeURIComponent(invoiceId)}&redirect_url=${callbackUrl}&return_url=${callbackUrl}&callback_url=${callbackUrl}`;
         
-        // Navigate to STK Push / Payment gateway (avoids popup blockers and allows proper redirect)
+        // Navigate to STK Push / Payment gateway
         window.location.href = gatewayURL; 
 
     } catch(err) {

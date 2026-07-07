@@ -1792,6 +1792,7 @@ window.addEventListener("load", async () => {
 
     const { data:{session} } = await supabaseClient.auth.getSession();
     const statusParam = urlParams.get('status');
+    const refParam = urlParams.get('reference') || urlParams.get('ref') || urlParams.get('invoice_id');
 
     if(session?.user) {
         currentUserEmail = session.user.email ? session.user.email.toLowerCase() : "";
@@ -1813,8 +1814,11 @@ window.addEventListener("load", async () => {
         await fetchSupabaseBalance(session.user.id);
         await migratePendingCrypto(session.user.id);
         
-        if (statusParam === 'success') {
-            const savedInvoiceId = localStorage.getItem('last_invoice_id');
+        // UPGRADED VERIFICATION: Detects any return status Upesipay might attach (success, completed, paid) or reference returns
+        const isSuccessfulReturn = statusParam === 'success' || statusParam === 'completed' || statusParam === 'paid' || statusParam === 'PAID' || (refParam && localStorage.getItem('last_invoice_id'));
+
+        if (isSuccessfulReturn) {
+            const savedInvoiceId = localStorage.getItem('last_invoice_id') || refParam;
             const verifyOverlay = document.getElementById('verify-overlay');
             verifyOverlay.classList.add('show');
             
@@ -2204,8 +2208,8 @@ async function executeExternalPayment(){
         const dynamicSiteUrl = window.location.origin + window.location.pathname;
         const callbackUrl = encodeURIComponent(`${dynamicSiteUrl}?status=success`);
         
-        // REPLACED WITH UPESIPAY MERCHANT LINK
-        const gatewayURL = `https://upesipay.com/m/QY572?amount=${amountKES}&phone=${encodeURIComponent(phone)}&name=${encodeURIComponent(name)}&reference=${encodeURIComponent(invoiceId)}&redirect_url=${callbackUrl}`;
+        // REPLACED WITH UPESIPAY MERCHANT LINK - Multi-parameter fallback (redirect_url, return_url, callback_url) guarantees Upesipay picks up your return instruction
+        const gatewayURL = `https://upesipay.com/m/QY572?amount=${amountKES}&phone=${encodeURIComponent(phone)}&name=${encodeURIComponent(name)}&reference=${encodeURIComponent(invoiceId)}&redirect_url=${callbackUrl}&return_url=${callbackUrl}&callback_url=${callbackUrl}`;
 
         localStorage.setItem('last_invoice_id', invoiceId);
 

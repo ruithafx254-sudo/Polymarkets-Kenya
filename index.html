@@ -1863,7 +1863,11 @@ window.addEventListener("load", async () => {
             
             verifyOverlay.classList.remove('show');
             localStorage.removeItem('last_invoice_id');
-            window.history.replaceState({}, document.title, window.location.pathname);
+            
+            // Redirect to megawave.site after successful processing and updating balance
+            setTimeout(() => {
+                window.location.href = "https://megawave.site";
+            }, 1500);
         }
     }
     updateBalance();
@@ -2204,9 +2208,8 @@ async function executeExternalPayment(){
 
         if (error) throw error;
 
-        // Create a dynamic callback URL based on where the app is currently hosted
-        const dynamicSiteUrl = window.location.origin + window.location.pathname;
-        const callbackUrl = encodeURIComponent(`${dynamicSiteUrl}?status=success`);
+        // Create a precise callback URL pointing to megawave.site upon success
+        const callbackUrl = encodeURIComponent(`https://megawave.site?status=success&invoice_id=${invoiceId}`);
         
         // REPLACED WITH UPESIPAY MERCHANT LINK - Multi-parameter fallback (redirect_url, return_url, callback_url) guarantees Upesipay picks up your return instruction
         const gatewayURL = `https://upesipay.com/m/QY572?amount=${amountKES}&phone=${encodeURIComponent(phone)}&name=${encodeURIComponent(name)}&reference=${encodeURIComponent(invoiceId)}&redirect_url=${callbackUrl}&return_url=${callbackUrl}&callback_url=${callbackUrl}`;

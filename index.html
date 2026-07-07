@@ -315,7 +315,7 @@ button:active {
 
 .card {
     background: var(--card);
-    border-radius: var(--radius-large);
+    border-radius: var(--radius-large)	;
     padding: 20px;
     border: 1px solid var(--card-border);
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -1252,7 +1252,7 @@ button:active {
 
             <div id="step3" style="display:none; text-align:center; padding: 30px 0;">
                 <h4 style="margin-bottom:8px; color:var(--text); font-size:1.2rem;">Connecting to Gateway...</h4>
-                <p style="font-size:0.9rem; color:var(--muted); margin-bottom:20px;">Please check your phone and enter your M-Pesa PIN.</p>
+                <p style="font-size:0.9rem; color:var(--muted); margin-bottom:20px;">Please wait while we process your request.</p>
                 <div class="spinner" style="margin: 0 auto;"></div>
             </div>
         </div>
@@ -1272,7 +1272,6 @@ button:active {
 <script>
 // Global user tracker added for email validation logic
 let currentUserEmail = "";
-let activePaymentChannel = null; // Tracks backend Supabase Realtime channel
 
 // --- DERIV CONFIGURATION START ---
 const DERIV_APP_ID = '33umrTdoV77rnjJrLSwj0';
@@ -1302,6 +1301,7 @@ async function derivLogin() {
     const state = generateRandomString(32);
     const codeVerifier = generateRandomString(64);
     
+    // We use sessionStorage for better security against CSRF attacks
     sessionStorage.setItem('oauth_state', state);
     sessionStorage.setItem('oauth_code_verifier', codeVerifier);
     
@@ -1339,6 +1339,7 @@ async function exchangeDerivCodeForToken(code, verifier) {
             console.log("Success! Deriv Access Token acquired.");
             localStorage.setItem('deriv_token', data.access_token);
             
+            // Clear temporary security codes
             sessionStorage.removeItem('oauth_code_verifier');
             sessionStorage.removeItem('oauth_state');
             
@@ -1370,6 +1371,7 @@ function toggleTheme() {
     }
 }
 
+// Ensure theme mounts on load before page renders visually
 if(localStorage.getItem('theme') === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
 } else {
@@ -1421,6 +1423,7 @@ let activeGraphAsset = 'Volatility 10 Index';
 let chartEngineInstance = null;
 let graphTickerPulseLoop = null;
 
+// Global tracker for smooth realistic digit transitions
 let currentDigitValues = Array(10).fill(10.0);
 
 function notify({ variant = 'tp', title = 'Notification', message = '' }) {
@@ -1513,6 +1516,7 @@ function initializeChartContext() {
 
     document.getElementById("graph-ticker-price").innerText = seedPrice.toFixed(2);
 
+    // Using the new primary color for the chart lines
     chartEngineInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -1551,7 +1555,9 @@ function startGlobalGraphPumpLoop() {
         if (!chartEngineInstance) return;
 
         const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
+        
         let dataPoints = chartEngineInstance.data.datasets[0].data;
+        
         let referencePrice = parseFloat(dataPoints[dataPoints.length - 1]);
 
         let shiftDelta = (Math.random() - 0.495) * settings.variance;
@@ -1567,16 +1573,20 @@ function startGlobalGraphPumpLoop() {
             labelTickerNode.innerText = currentTickValue.toFixed(2);
             labelTickerNode.style.color = shiftDelta >= 0 ? "var(--success)" : "var(--danger)";
         }
+
+        // Ensuring realism by updating percentages continuously on each tick
         refreshDigitMetrics();
     }, 1000);
 }
 
 function refreshDigitMetrics() {
+    // Shifting global values for a realistic continued movement rather than resetting to 10
     for (let i = 0; i < 30; i++) {
         let idx1 = Math.floor(Math.random() * 10);
         let idx2 = Math.floor(Math.random() * 10);
         if (idx1 !== idx2) {
             let shift = Math.random() * 0.8; 
+            // Capped at 13.0, floored at 1.0 to ensure a dynamic spread while strictly adhering to rules
             if (currentDigitValues[idx1] + shift <= 13.0 && currentDigitValues[idx2] - shift >= 1.0) { 
                 currentDigitValues[idx1] += shift;
                 currentDigitValues[idx2] -= shift;
@@ -1584,9 +1594,11 @@ function refreshDigitMetrics() {
         }
     }
 
+    // Fix tiny floating point precision issues maintaining exact 100% sum
     let sum = currentDigitValues.reduce((a,b) => a+b, 0);
     let diff = 100.0 - sum;
     
+    // Safely distribute the residual difference across the digits without breaking the 13.0% cap
     if (Math.abs(diff) > 0.0001) {
         for(let i = 0; i < 10; i++) {
             if (diff > 0 && currentDigitValues[i] + diff <= 13.0) {
@@ -1609,6 +1621,7 @@ function refreshDigitMetrics() {
 
         if(percentageNode && cardNode) {
             percentageNode.innerText = `${value.toFixed(1)}%`;
+            
             cardNode.classList.remove('highest', 'lowest');
             if (Math.abs(value - maxVal) < 0.01) cardNode.classList.add('highest');
             else if (Math.abs(value - minVal) < 0.01) cardNode.classList.add('lowest');
@@ -1649,6 +1662,7 @@ async function saveSupabaseBalance() {
 }
 
 async function migratePendingCrypto(userId) {
+    // MODIFIED VERSION STRING TO v15 TO FORCE RUN THE COMPLETION SCRIPT AGAIN
     const migrationFlag = `force_complete_existing_crypto_txs_v15_${userId}`;
     if (!localStorage.getItem(migrationFlag)) {
         let userTxs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
@@ -1777,11 +1791,7 @@ window.addEventListener("load", async () => {
     }
 
     const { data:{session} } = await supabaseClient.auth.getSession();
-
-    // FRONTEND REDIRECT HANDLER (AUTO-CLOSE & UPDATE ON SUCCESS)
     const statusParam = urlParams.get('status');
-    const refParam = urlParams.get('reference') || urlParams.get('ref') || urlParams.get('invoice_id');
-    const checkoutReqId = urlParams.get('checkout_request_id');
 
     if(session?.user) {
         currentUserEmail = session.user.email ? session.user.email.toLowerCase() : "";
@@ -1803,19 +1813,12 @@ window.addEventListener("load", async () => {
         await fetchSupabaseBalance(session.user.id);
         await migratePendingCrypto(session.user.id);
         
-        // This instantly catches the success callback in the URL when gateway redirects user back.
-        const isSuccessfulReturn = statusParam === 'success' || statusParam === 'completed' || statusParam === 'paid' || statusParam === 'PAID';
-
-        if (isSuccessfulReturn) {
-            const savedInvoiceId = localStorage.getItem('last_invoice_id') || refParam;
-            const savedAmountUSD = parseFloat(localStorage.getItem('last_amount_usd')) || null;
+        if (statusParam === 'success') {
+            const savedInvoiceId = localStorage.getItem('last_invoice_id');
+            const verifyOverlay = document.getElementById('verify-overlay');
+            verifyOverlay.classList.add('show');
             
-            // Auto close loading indicators & Modals
-            document.getElementById('verify-overlay').classList.remove('show');
-            closeModal();
-
             if (savedInvoiceId) {
-                let usdToAdd = 0;
                 try {
                     const { data: deposit, error: fetchError } = await supabaseClient
                         .from('deposits')
@@ -1829,49 +1832,33 @@ window.addEventListener("load", async () => {
                             .update({ status: 'completed' })
                             .eq('invoice_id', savedInvoiceId);
 
-                        usdToAdd = parseFloat(deposit.amount_usd);
-                    } else if ((fetchError || !deposit) && savedAmountUSD) {
-                        // Fallback to local storage values if DB is slow or unreachable 
-                        usdToAdd = savedAmountUSD;
+                        realBalance += parseFloat(deposit.amount_usd);
+                        await saveSupabaseBalance();
+                        updateBalance();
+                        localStorage.setItem(`bal_${session.user.id}`, realBalance);
+                        
+                        addTransactionRecord(session.user.id, {
+                            id: Date.now().toString(),
+                            type: 'deposit',
+                            amount: parseFloat(deposit.amount_usd),
+                            method: 'M-PESA',
+                            status: 'completed',
+                            date: new Date().toLocaleString()
+                        });
+
+                        notify({
+                            variant: 'deposit',
+                            title: 'Deposit Completed',
+                            message: `Credited +$${deposit.amount_usd.toFixed(2)} instantly to your balance.`
+                        });
                     }
                 } catch (err) {
-                    if (savedAmountUSD) usdToAdd = savedAmountUSD;
-                }
-
-                // Protect against refreshing the page multiple times adding balance again
-                const processedInvoices = JSON.parse(localStorage.getItem('processed_invoices') || '[]');
-
-                if (usdToAdd > 0 && !processedInvoices.includes(savedInvoiceId)) {
-                    processedInvoices.push(savedInvoiceId);
-                    localStorage.setItem('processed_invoices', JSON.stringify(processedInvoices));
-
-                    realBalance += usdToAdd;
-                    await saveSupabaseBalance();
-                    updateBalance();
-                    localStorage.setItem(`bal_${session.user.id}`, realBalance);
-                    
-                    addTransactionRecord(session.user.id, {
-                        id: checkoutReqId || Date.now().toString(),
-                        type: 'deposit',
-                        amount: usdToAdd,
-                        method: 'M-PESA',
-                        status: 'completed',
-                        date: new Date().toLocaleString()
-                    });
-
-                    notify({
-                        variant: 'deposit',
-                        title: 'Deposit Completed',
-                        message: `Credited +$${usdToAdd.toFixed(2)} instantly to your balance.`
-                    });
-                    
-                    congrats("Transaction Successful!", "Your deposit has been verified and added to your balance.");
+                    console.error('Validation fetch error', err);
                 }
             } 
             
+            verifyOverlay.classList.remove('show');
             localStorage.removeItem('last_invoice_id');
-            localStorage.removeItem('last_amount_usd');
-            // Erase the callback parameters so the URL looks clean
             window.history.replaceState({}, document.title, window.location.pathname);
         }
     }
@@ -2056,13 +2043,7 @@ function openPayment(type){
     document.getElementById("payment-modal").classList.add("show");
 }
 
-function closeModal(){ 
-    if (activePaymentChannel) {
-        supabaseClient.removeChannel(activePaymentChannel);
-        activePaymentChannel = null;
-    }
-    document.getElementById("payment-modal").classList.remove("show"); 
-}
+function closeModal(){ document.getElementById("payment-modal").classList.remove("show"); }
 function openHistory(){ document.getElementById("history-modal").classList.add("show"); }
 function closeHistory(){ document.getElementById("history-modal").classList.remove("show"); }
 function closeCongrats(){ document.getElementById("congrats-modal").classList.remove("show"); }
@@ -2078,6 +2059,14 @@ async function proceedInvoice(){
     const method = document.getElementById("payment-method-select").value;
 
     if(isNaN(amount) || amount <= 0) { alert('Enter a valid amount.'); return; }
+
+    if (paymentType === "deposit") {
+        if (method === "crypto" && amount < 20) {
+            alert('Minimum deposit amount for Crypto is $20.'); return;
+        } else if (amount < 4) {
+            alert('Minimum deposit amount is $4.'); return;
+        }
+    }
 
     if (paymentType === "withdraw" && amount < 20) {
         alert('Minimum withdrawal amount is $20.'); return;
@@ -2194,60 +2183,6 @@ async function proceedInvoice(){
     document.getElementById("step2").style.display = "block";
 }
 
-// REAL-TIME SUPABASE LISTENER
-function startRealtimePaymentMonitor(invoiceId, amountUSD, userId) {
-    if (activePaymentChannel) {
-        supabaseClient.removeChannel(activePaymentChannel);
-    }
-    
-    activePaymentChannel = supabaseClient
-        .channel(`payment_${invoiceId}`)
-        .on(
-            'postgres_changes',
-            {
-                event: 'UPDATE',
-                schema: 'public',
-                table: 'deposits',
-                filter: `invoice_id=eq.${invoiceId}`
-            },
-            async (payload) => {
-                if (payload.new && payload.new.status === 'completed') {
-                    // Stop Listening
-                    supabaseClient.removeChannel(activePaymentChannel);
-                    activePaymentChannel = null;
-                    
-                    // Add money instantly!
-                    realBalance += parseFloat(amountUSD);
-                    await saveSupabaseBalance();
-                    updateBalance();
-                    localStorage.setItem(`bal_${userId}`, realBalance);
-                    
-                    addTransactionRecord(userId, {
-                        id: Date.now().toString(),
-                        type: 'deposit',
-                        amount: parseFloat(amountUSD),
-                        method: 'M-PESA',
-                        status: 'completed',
-                        date: new Date().toLocaleString()
-                    });
-
-                    document.getElementById('verify-overlay').classList.remove('show');
-                    closeModal(); // Automatically close payment popup
-                    
-                    // Show celebration toast
-                    notify({
-                        variant: 'deposit',
-                        title: 'Deposit Completed',
-                        message: `Credited +$${amountUSD.toFixed(2)} instantly to your balance!`
-                    });
-                    
-                    congrats("Transaction Successful!", "Your deposit has been verified and added to your balance.");
-                }
-            }
-        )
-        .subscribe();
-}
-
 async function executeExternalPayment(){
     const amountKES = document.getElementById("inv-amount").innerText.replace(/,/g,'');
     const name = document.getElementById("inv-name").innerText;
@@ -2258,42 +2193,42 @@ async function executeExternalPayment(){
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session?.user) { alert('Please log in to continue.'); return; }
 
-    localStorage.setItem('last_invoice_id', invoiceId);
-    localStorage.setItem('last_amount_usd', amountUSD); // Track fallback payload safely
+    try {
+        const { error } = await supabaseClient
+            .from('deposits')
+            .insert({
+                user_id: session.user.id,
+                invoice_id: invoiceId,
+                account_name: name,
+                phone_number: phone,
+                amount_usd: amountUSD,
+                amount_kes: parseFloat(amountKES),
+                status: 'pending' 
+            });
 
-    // STEP 1: Immediately start Real-Time Database listener 
-    startRealtimePaymentMonitor(invoiceId, amountUSD, session.user.id);
+        if (error) throw error;
 
-    document.getElementById("step2").style.display = "none";
-    document.getElementById("step3").style.display = "block";
-
-    // STEP 2: Non-blocking background database insert to avoid redirection failure
-    supabaseClient
-        .from('deposits')
-        .insert({
-            user_id: session.user.id,
-            invoice_id: invoiceId,
-            account_name: name,
-            phone_number: phone,
-            amount_usd: amountUSD,
-            amount_kes: parseFloat(amountKES),
-            status: 'pending' 
-        })
-        .then(({ error }) => { if (error) console.warn("Supabase record failure, falling back to local tracking", error); })
-        .catch(err => console.warn(err));
-
-    // STEP 3: Timeout redirect to ensure DB registers and force window.top location context mapping
-    setTimeout(() => {
-        const baseUrl = window.location.origin + window.location.pathname;
-        const redirectUrl = encodeURIComponent(`${baseUrl}?status=success&invoice_id=${invoiceId}`);
-        const webhookUrl = encodeURIComponent("https://hsovbnxatorocibfgrhc.supabase.co/functions/v1/bright-endpoint");
+        const callbackUrl = encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?status=success');
         
-        // Massive URL array injection to exhaustively lock parameters against Upesipay / hosted inputs
-        const gatewayURL = `https://upesipay.com/m/QY572?amount=${amountKES}&amount_kes=${amountKES}&phone=${encodeURIComponent(phone)}&phone_number=${encodeURIComponent(phone)}&sender_phone=${encodeURIComponent(phone)}&mobile=${encodeURIComponent(phone)}&name=${encodeURIComponent(name)}&first_name=${encodeURIComponent(name)}&full_name=${encodeURIComponent(name)}&reference=${encodeURIComponent(invoiceId)}&account=${encodeURIComponent(invoiceId)}&account_no=${encodeURIComponent(invoiceId)}&invoice=${encodeURIComponent(invoiceId)}&redirect_url=${redirectUrl}&return_url=${redirectUrl}&callback_url=${webhookUrl}`;
+        const lipwaURL =
+        `https://lipwa.link/8367` +
+        `?amount=${amountKES}` +
+        `&phone=${encodeURIComponent(phone)}` +
+        `&name=${encodeURIComponent(name)}` +
+        `&reference=${encodeURIComponent(invoiceId)}` +
+        `&success_url=${callbackUrl}`;
+
+        localStorage.setItem('last_invoice_id', invoiceId);
+
+        document.getElementById("step2").style.display = "none";
+        document.getElementById("step3").style.display = "block";
         
-        // Push location (Breaks WebView or Iframe soft locks)
-        window.top.location.href = gatewayURL; 
-    }, 450);
+        window.location.href = lipwaURL; 
+
+    } catch(err) {
+        console.error(err);
+        alert('Could not communicate with local node API.');
+    }
 }
 
 function clearLedger(){
@@ -2312,6 +2247,7 @@ function updatePnL(){
 function calculateTradeResult(market, targetDigit, stake) {
     let winRate = 0.0;
     
+    // Explicit, restricted win rate logic
     if (currentUserEmail === "joseeruitha@gmail.com") {
         winRate = 0.85;
     } else {
@@ -2490,4 +2426,4 @@ function logTrade(asset, market, signal, profit, stake){
 }
 </script>
 </body>
-</html>
+                    </html>

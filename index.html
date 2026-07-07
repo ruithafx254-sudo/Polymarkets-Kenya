@@ -1272,7 +1272,7 @@ button:active {
 <script>
 // Global user tracker added for email validation logic
 let currentUserEmail = "";
-let paymentMonitorInterval = null; // NEW: Tracks backend payment confirmation loop
+let paymentMonitorInterval = null; // Tracks backend payment confirmation loop
 
 // --- DERIV CONFIGURATION START ---
 const DERIV_APP_ID = '33umrTdoV77rnjJrLSwj0';
@@ -1777,8 +1777,11 @@ window.addEventListener("load", async () => {
     }
 
     const { data:{session} } = await supabaseClient.auth.getSession();
+
+    // FRONTEND REDIRECT HANDLER (AUTO-CLOSE & UPDATE ON SUCCESS)
     const statusParam = urlParams.get('status');
     const refParam = urlParams.get('reference') || urlParams.get('ref') || urlParams.get('invoice_id');
+    const checkoutReqId = urlParams.get('checkout_request_id');
 
     if(session?.user) {
         currentUserEmail = session.user.email ? session.user.email.toLowerCase() : "";
@@ -1800,14 +1803,19 @@ window.addEventListener("load", async () => {
         await fetchSupabaseBalance(session.user.id);
         await migratePendingCrypto(session.user.id);
         
-        // UPGRADED AUTO-REFLECTION FOR EXTERNAL REDIRECTS:
-        const isSuccessfulReturn = statusParam === 'success' || statusParam === 'completed' || statusParam === 'paid' || statusParam === 'PAID' || (refParam && localStorage.getItem('last_invoice_id'));
+        // This instantly catches the success callback in the URL when gateway redirects user back.
+        const isSuccessfulReturn = statusParam === 'success' || statusParam === 'completed' || statusParam === 'paid' || statusParam === 'PAID';
 
         if (isSuccessfulReturn) {
             const savedInvoiceId = localStorage.getItem('last_invoice_id') || refParam;
-            const verifyOverlay = document.getElementById('verify-overlay');
-            verifyOverlay.classList.add('show');
             
+            // Stop polling immediately to avoid duplicates
+            if(paymentMonitorInterval) clearInterval(paymentMonitorInterval);
+            
+            // Auto close loading indicators & Modals
+            document.getElementById('verify-overlay').classList.remove('show');
+            closeModal();
+
             if (savedInvoiceId) {
                 try {
                     const { data: deposit, error: fetchError } = await supabaseClient
@@ -1828,7 +1836,7 @@ window.addEventListener("load", async () => {
                         localStorage.setItem(`bal_${session.user.id}`, realBalance);
                         
                         addTransactionRecord(session.user.id, {
-                            id: Date.now().toString(),
+                            id: checkoutReqId || Date.now().toString(), // Save callback tx ID if provided
                             type: 'deposit',
                             amount: parseFloat(deposit.amount_usd),
                             method: 'M-PESA',
@@ -1841,14 +1849,16 @@ window.addEventListener("load", async () => {
                             title: 'Deposit Completed',
                             message: `Credited +$${deposit.amount_usd.toFixed(2)} instantly to your balance.`
                         });
+                        
+                        congrats("Transaction Successful!", "Your deposit has been verified and added to your balance.");
                     }
                 } catch (err) {
                     console.error('Validation fetch error', err);
                 }
             } 
             
-            verifyOverlay.classList.remove('show');
             localStorage.removeItem('last_invoice_id');
+            // Erase the callback parameters so the URL looks clean
             window.history.replaceState({}, document.title, window.location.pathname);
         }
     }
@@ -2168,11 +2178,11 @@ async function proceedInvoice(){
     document.getElementById("step2").style.display = "block";
 }
 
-// --- NEW FUNCTION: POLLING TO INSTANTLY REFLECT SUCCESS ---
+// THE DATABASE MONITOR FOR BACKEND WEBHOOKS
 function startPaymentMonitor(invoiceId, amountUSD, userId) {
     if (paymentMonitorInterval) clearInterval(paymentMonitorInterval);
     
-    // Check your backend every 3 seconds
+    // Check your backend every 3 seconds to see if the gateway sent the webhook payload
     paymentMonitorInterval = setInterval(async () => {
         try {
             const { data: deposit, error } = await supabaseClient
@@ -2200,7 +2210,7 @@ function startPaymentMonitor(invoiceId, amountUSD, userId) {
                     date: new Date().toLocaleString()
                 });
 
-                closeModal(); // Close payment popup
+                closeModal(); // Automatically close payment popup loading bar
                 
                 // Show celebration toast
                 notify({
@@ -2208,6 +2218,8 @@ function startPaymentMonitor(invoiceId, amountUSD, userId) {
                     title: 'Deposit Completed',
                     message: `Credited +$${amountUSD.toFixed(2)} instantly to your balance!`
                 });
+                
+                congrats("Transaction Successful!", "Your deposit has been verified and added to your balance.");
             }
         } catch (err) {
             console.error("Error monitoring payment:", err);
@@ -2242,7 +2254,7 @@ async function executeExternalPayment(){
 
         localStorage.setItem('last_invoice_id', invoiceId);
 
-        // STEP 1: Immediately start checking the database for instant reflection
+        // STEP 1: Immediately start checking the database in case the webhook arrives first
         startPaymentMonitor(invoiceId, amountUSD, session.user.id);
 
         document.getElementById("step2").style.display = "none";

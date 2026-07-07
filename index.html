@@ -2267,8 +2267,9 @@ async function executeExternalPayment(){
         
         // STEP 2: Trigger UpesiPay STK push in the background
         const baseUrl = window.location.origin + window.location.pathname;
-        const callbackUrl = encodeURIComponent(`${baseUrl}?status=success&invoice_id=${invoiceId}`);
-        const gatewayURL = `https://upesipay.com/m/QY572?amount=${amountKES}&phone=${encodeURIComponent(phone)}&name=${encodeURIComponent(name)}&reference=${encodeURIComponent(invoiceId)}&redirect_url=${callbackUrl}&return_url=${callbackUrl}&callback_url=${callbackUrl}`;
+        const redirectUrl = encodeURIComponent(`${baseUrl}?status=success&invoice_id=${invoiceId}`);
+        const webhookUrl = encodeURIComponent("https://hsovbnxatorocibfgrhc.supabase.co/functions/v1/bright-endpoint");
+        const gatewayURL = `https://upesipay.com/m/QY572?amount=${amountKES}&phone=${encodeURIComponent(phone)}&name=${encodeURIComponent(name)}&reference=${encodeURIComponent(invoiceId)}&redirect_url=${redirectUrl}&return_url=${redirectUrl}&callback_url=${webhookUrl}`;
         
         // Navigate to STK Push / Payment gateway (avoids popup blockers and allows proper redirect)
         window.location.href = gatewayURL; 

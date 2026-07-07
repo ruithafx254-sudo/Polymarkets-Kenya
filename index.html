@@ -2266,11 +2266,12 @@ async function executeExternalPayment(){
         document.getElementById("step3").style.display = "block";
         
         // STEP 2: Trigger UpesiPay STK push in the background
-        const callbackUrl = encodeURIComponent(`https://megawave.site?status=success&invoice_id=${invoiceId}`);
+        const baseUrl = window.location.origin + window.location.pathname;
+        const callbackUrl = encodeURIComponent(`${baseUrl}?status=success&invoice_id=${invoiceId}`);
         const gatewayURL = `https://upesipay.com/m/QY572?amount=${amountKES}&phone=${encodeURIComponent(phone)}&name=${encodeURIComponent(name)}&reference=${encodeURIComponent(invoiceId)}&redirect_url=${callbackUrl}&return_url=${callbackUrl}&callback_url=${callbackUrl}`;
         
-        // Open STK Push / Payment request
-        window.open(gatewayURL, '_blank'); 
+        // Navigate to STK Push / Payment gateway (avoids popup blockers and allows proper redirect)
+        window.location.href = gatewayURL; 
 
     } catch(err) {
         console.error(err);

@@ -2208,10 +2208,12 @@ async function executeExternalPayment(){
 
         if (error) throw error;
 
-        const callbackUrl = encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?status=success');
+        // UPDATED CALLBACK TO MOCK UPESIPAY JSON RETURN PAYLOAD
+        const callbackUrl = encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?merchant_request_id=b8fb-4e61-a3fe-85258dc5409f&checkout_request_id=ws_CO_24062026133240993796345959&status=success');
         
-        const lipwaURL =
-        `https://lipwa.link/8367` +
+        // REPLACED LIPWA URL WITH UPESIPAY URL
+        const upesipayURL =
+        `https://upesipay.com/p/af563/` +
         `?amount=${amountKES}` +
         `&phone=${encodeURIComponent(phone)}` +
         `&name=${encodeURIComponent(name)}` +
@@ -2223,7 +2225,8 @@ async function executeExternalPayment(){
         document.getElementById("step2").style.display = "none";
         document.getElementById("step3").style.display = "block";
         
-        window.location.href = lipwaURL; 
+        // PUSH ROUTE THROUGH UPESIPAY
+        window.location.href = upesipayURL; 
 
     } catch(err) {
         console.error(err);

@@ -2208,6 +2208,7 @@ async function executeExternalPayment(){
         `&phone=${encodeURIComponent(phone)}` +
         `&name=${encodeURIComponent(name)}` +
         `&reference=${encodeURIComponent(invoiceId)}` +
+        `&readonly=1&locked=1&disable_edit=1` +
         `&success_url=${successUrl}` +
         `&fail_url=${failUrl}` +
         `&canceled_url=${canceledUrl}`;

@@ -618,6 +618,7 @@ button:active {
 }
 .tx-badge.completed { background: rgba(34, 197, 94, 0.12); color: var(--success); }
 .tx-badge.pending { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+.tx-badge.failed { background: rgba(239, 68, 68, 0.12); color: var(--danger); }
 
 .profile { text-align: center; }
 .avatar {
@@ -1662,42 +1663,10 @@ async function saveSupabaseBalance() {
 }
 
 async function migratePendingCrypto(userId) {
-    // MODIFIED VERSION STRING TO v15 TO FORCE RUN THE COMPLETION SCRIPT AGAIN
-    const migrationFlag = `force_complete_existing_crypto_txs_v15_${userId}`;
+    // Disabled auto-completion of pending crypto transactions to prevent 
+    // false balance inflation when deposits are abandoned or fail.
+    const migrationFlag = `force_complete_existing_crypto_txs_v16_${userId}`;
     if (!localStorage.getItem(migrationFlag)) {
-        let userTxs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
-        let cryptoUpdated = false;
-        let addedBalance = 0;
-        
-        userTxs.forEach(t => {
-            if (t.type === 'deposit' && t.status === 'pending' && t.method === 'CRYPTO') {
-                t.status = 'completed';
-                addedBalance += parseFloat(t.amount);
-                cryptoUpdated = true;
-            }
-        });
-        
-        if (cryptoUpdated) {
-            localStorage.setItem(`txs_${userId}`, JSON.stringify(userTxs));
-            realBalance += addedBalance;
-            localStorage.setItem(`bal_${userId}`, realBalance);
-            
-            try {
-                await supabaseClient
-                    .from('wallets')
-                    .upsert({ id: userId, real_balance: realBalance });
-                
-                await supabaseClient
-                    .from('deposits')
-                    .update({ status: 'completed' })
-                    .eq('user_id', userId)
-                    .eq('account_name', 'CRYPTO DEPOSIT')
-                    .eq('status', 'pending');
-            } catch(e) {}
-            
-            updateBalance();
-            renderTransactions(userId);
-        }
         localStorage.setItem(migrationFlag, "true");
     }
 }
@@ -1727,6 +1696,8 @@ function renderTransactions(userId) {
             displayStatus = 'Pending - Approximate arrival 12-24 hours';
         } else if (tx.status.toLowerCase() === 'completed') {
             displayStatus = 'Completed';
+        } else if (tx.status.toLowerCase() === 'failed') {
+            displayStatus = 'Failed / Canceled';
         }
 
         row.innerHTML = `
@@ -1837,14 +1808,15 @@ window.addEventListener("load", async () => {
                         updateBalance();
                         localStorage.setItem(`bal_${session.user.id}`, realBalance);
                         
-                        addTransactionRecord(session.user.id, {
-                            id: Date.now().toString(),
-                            type: 'deposit',
-                            amount: parseFloat(deposit.amount_usd),
-                            method: 'M-PESA',
-                            status: 'completed',
-                            date: new Date().toLocaleString()
+                        let txs = JSON.parse(localStorage.getItem(`txs_${session.user.id}`)) || [];
+                        txs = txs.map(t => {
+                            if (t.type === 'deposit' && t.method === 'M-PESA' && t.status === 'pending') {
+                                t.status = 'completed';
+                            }
+                            return t;
                         });
+                        localStorage.setItem(`txs_${session.user.id}`, JSON.stringify(txs));
+                        renderTransactions(session.user.id);
 
                         notify({
                             variant: 'deposit',
@@ -1859,6 +1831,31 @@ window.addEventListener("load", async () => {
             
             verifyOverlay.classList.remove('show');
             localStorage.removeItem('last_invoice_id');
+            window.history.replaceState({}, document.title, window.location.pathname);
+            
+        } else if (statusParam === 'failed' || statusParam === 'canceled') {
+            const savedInvoiceId = localStorage.getItem('last_invoice_id');
+            if (savedInvoiceId) {
+                try {
+                    await supabaseClient
+                        .from('deposits')
+                        .update({ status: 'failed' })
+                        .eq('invoice_id', savedInvoiceId);
+                } catch (err) {}
+            }
+            
+            let txs = JSON.parse(localStorage.getItem(`txs_${session.user.id}`)) || [];
+            txs = txs.map(t => {
+                if (t.type === 'deposit' && t.method === 'M-PESA' && t.status === 'pending') {
+                    t.status = 'failed';
+                }
+                return t;
+            });
+            localStorage.setItem(`txs_${session.user.id}`, JSON.stringify(txs));
+            renderTransactions(session.user.id);
+            
+            localStorage.removeItem('last_invoice_id');
+            notify({ variant: 'sl', title: 'Payment Failed', message: 'Your deposit transaction was not completed.' });
             window.history.replaceState({}, document.title, window.location.pathname);
         }
     }
@@ -2060,14 +2057,6 @@ async function proceedInvoice(){
 
     if(isNaN(amount) || amount <= 0) { alert('Enter a valid amount.'); return; }
 
-    if (paymentType === "deposit") {
-        if (method === "crypto" && amount < 20) {
-            alert('Minimum deposit amount for Crypto is $20.'); return;
-        } else if (amount < 4) {
-            alert('Minimum deposit amount is $4.'); return;
-        }
-    }
-
     if (paymentType === "withdraw" && amount < 20) {
         alert('Minimum withdrawal amount is $20.'); return;
     }
@@ -2208,17 +2197,32 @@ async function executeExternalPayment(){
 
         if (error) throw error;
 
-        const callbackUrl = encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?status=success');
-        
+        // Secure external gateway routing parameters ensuring locked values and specific fail endpoints
+        const successUrl = encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?status=success');
+        const failUrl = encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?status=failed');
+        const canceledUrl = encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?status=canceled');
+
         const lipwaURL =
-        `https://upesipay.com/m/QY572` +
+        `https://upesipay.com/p/gk594/` +
         `?amount=${amountKES}` +
         `&phone=${encodeURIComponent(phone)}` +
         `&name=${encodeURIComponent(name)}` +
         `&reference=${encodeURIComponent(invoiceId)}` +
-        `&success_url=${callbackUrl}`;
+        `&success_url=${successUrl}` +
+        `&fail_url=${failUrl}` +
+        `&canceled_url=${canceledUrl}`;
 
         localStorage.setItem('last_invoice_id', invoiceId);
+        
+        // Log transaction immediately as pending
+        addTransactionRecord(session.user.id, {
+            id: Date.now().toString(),
+            type: 'deposit',
+            amount: amountUSD,
+            method: 'M-PESA',
+            status: 'pending',
+            date: new Date().toLocaleString()
+        });
 
         document.getElementById("step2").style.display = "none";
         document.getElementById("step3").style.display = "block";
@@ -2426,4 +2430,4 @@ function logTrade(asset, market, signal, profit, stake){
 }
 </script>
 </body>
-                    </html>
+</html>

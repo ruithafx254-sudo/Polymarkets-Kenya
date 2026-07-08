@@ -2202,7 +2202,7 @@ async function executeExternalPayment(){
         const failUrl = encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?status=failed');
         const canceledUrl = encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?status=canceled');
 
-        // Added multiple common URL parameters to attempt locking UI fields in the gateway
+        // Combined precise input values and forced non-editable parameters for standard gateway processors
         const lipwaURL =
         `https://upesipay.com/p/hc454/` +
         `?amount=${amountKES}` +
@@ -2212,7 +2212,7 @@ async function executeExternalPayment(){
         `&customer_name=${encodeURIComponent(name)}` +
         `&reference=${encodeURIComponent(invoiceId)}` +
         `&account_no=${encodeURIComponent(invoiceId)}` +
-        `&readonly=1&locked=1&disable_edit=1&editable=false&lock_amount=true&is_locked=true` +
+        `&readonly=1&locked=1&disable_edit=1&editable=false&lock_amount=true&is_locked=true&lock_phone=true&lock_name=true&editable_fields=none` +
         `&success_url=${successUrl}` +
         `&fail_url=${failUrl}` +
         `&canceled_url=${canceledUrl}`;

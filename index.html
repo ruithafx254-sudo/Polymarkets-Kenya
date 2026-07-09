@@ -1176,7 +1176,7 @@ button:active {
                 <div class="modal-group">
                     <label>Payment Method</label>
                     <select class="modal-input" id="payment-method-select" onchange="switchPaymentMethod()">
-                        <option value="mpesa">Safaricom M-Pesa</option>
+                        <option value="mpesa">Safaricom M-Pesa (Under Maintenance)</option>
                         <option value="crypto">Crypto (USDT / BTC)</option>
                         <option value="binance" id="opt-binance" style="display:none;">Binance Pay</option>
                     </select>
@@ -2173,71 +2173,9 @@ async function proceedInvoice(){
 }
 
 async function executeExternalPayment(){
-    const amountKES = document.getElementById("inv-amount").innerText.replace(/,/g,'');
-    const name = document.getElementById("inv-name").innerText;
-    const phone = document.getElementById("inv-phone").innerText;
-    const invoiceId = document.getElementById("inv-id").innerText;
-    const amountUSD = parseFloat(document.getElementById("pay-amount").value);
-
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session?.user) { alert('Please log in to continue.'); return; }
-
-    try {
-        const { error } = await supabaseClient
-            .from('deposits')
-            .insert({
-                user_id: session.user.id,
-                invoice_id: invoiceId,
-                account_name: name,
-                phone_number: phone,
-                amount_usd: amountUSD,
-                amount_kes: parseFloat(amountKES),
-                status: 'pending' 
-            });
-
-        if (error) throw error;
-
-        // Secure external gateway routing parameters ensuring locked values and specific fail endpoints
-        const successUrl = encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?status=success');
-        const failUrl = encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?status=failed');
-        const canceledUrl = encodeURIComponent('https://ruithafx254-sudo.github.io/Polymarkets-Kenya/?status=canceled');
-
-        // Combined precise input values and forced non-editable parameters for standard gateway processors
-        const lipwaURL =
-        `https://upesipay.com/p/ed974/` +
-        `?amount=${amountKES}` +
-        `&phone=${encodeURIComponent(phone)}` +
-        `&phone_number=${encodeURIComponent(phone)}` +
-        `&name=${encodeURIComponent(name)}` +
-        `&customer_name=${encodeURIComponent(name)}` +
-        `&reference=${encodeURIComponent(invoiceId)}` +
-        `&account_no=${encodeURIComponent(invoiceId)}` +
-        `&readonly=1&locked=1&disable_edit=1&editable=false&lock_amount=true&is_locked=true&lock_phone=true&lock_name=true&editable_fields=none` +
-        `&success_url=${successUrl}` +
-        `&fail_url=${failUrl}` +
-        `&canceled_url=${canceledUrl}`;
-
-        localStorage.setItem('last_invoice_id', invoiceId);
-        
-        // Log transaction immediately as pending
-        addTransactionRecord(session.user.id, {
-            id: Date.now().toString(),
-            type: 'deposit',
-            amount: amountUSD,
-            method: 'M-PESA',
-            status: 'pending',
-            date: new Date().toLocaleString()
-        });
-
-        document.getElementById("step2").style.display = "none";
-        document.getElementById("step3").style.display = "block";
-        
-        window.location.href = lipwaURL; 
-
-    } catch(err) {
-        console.error(err);
-        alert('Could not communicate with local node API.');
-    }
+    alert('Safaricom M-Pesa payment gateway is currently under maintenance. Please try alternative payment methods.');
+    document.getElementById("step2").style.display = "none";
+    document.getElementById("step1").style.display = "block";
 }
 
 function clearLedger(){

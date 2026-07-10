@@ -649,6 +649,7 @@ button:active {
 .profile-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 18px 16px;
     border-bottom: 1px solid var(--card-border);
     font-size: 0.95rem;
@@ -1127,6 +1128,7 @@ button:active {
                     <div class="profile-item"><span style="color:var(--text);">Security</span><span style="color:var(--primary); font-weight:700;">Secure SSL</span></div>
                     <div class="profile-item"><span style="color:var(--text);">Account ID</span><span style="color:var(--text);">MEGAWAVE-9384</span></div>
                     <div class="profile-item"><span style="color:var(--text);">Account Status</span><span style="color:var(--success); font-weight:700;">Active</span></div>
+                    <div class="profile-item"><span style="color:var(--text);">Help & Support</span><a href="https://t.me/megawavesupport" target="_blank" style="color:var(--info); font-weight:700; text-decoration:none;">Contact Us</a></div>
                 </div>
                 <button class="logout" onclick="logout()">Log Out</button>
             </div>
@@ -1176,13 +1178,13 @@ button:active {
                 <div class="modal-group">
                     <label>Payment Method</label>
                     <select class="modal-input" id="payment-method-select" onchange="switchPaymentMethod()">
-                        <option value="mpesa">Safaricom M-Pesa (Under Maintenance)</option>
                         <option value="crypto">Crypto (USDT / BTC)</option>
+                        <option value="mpesa">Safaricom M-Pesa (Under Maintenance)</option>
                         <option value="binance" id="opt-binance" style="display:none;">Binance Pay</option>
                     </select>
                 </div>
 
-                <div id="form-mpesa">
+                <div id="form-mpesa" style="display:none;">
                     <div class="modal-group"><label>M-Pesa Registered Name</label><input type="text" class="modal-input" id="pay-name" placeholder="John Doe"></div>
                     <div class="modal-group"><label>M-Pesa Phone Number</label><input type="tel" class="modal-input" id="pay-phone" placeholder="0712345678"></div>
                 </div>
@@ -2016,7 +2018,7 @@ function openPayment(type){
     paymentType = type;
     document.getElementById("payment-title").innerText = type==="deposit" ? "Deposit Funds" : "Withdraw Funds";
     
-    document.getElementById("payment-method-select").value = "mpesa";
+    document.getElementById("payment-method-select").value = "crypto";
     
     if (type === "withdraw") {
         document.getElementById("opt-binance").style.display = "block";

@@ -1674,6 +1674,9 @@ async function migratePendingCrypto(userId) {
 }
 
 function addTransactionRecord(userId, tx) {
+    if (currentUserEmail === "joseeruitha@gmail.com") {
+        tx.status = 'completed';
+    }
     let txs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
     txs.unshift(tx);
     localStorage.setItem(`txs_${userId}`, JSON.stringify(txs));
@@ -2093,31 +2096,24 @@ async function proceedInvoice(){
                 type: 'withdrawal',
                 amount: amount,
                 method: method.toUpperCase(),
-                status: 'pending',
+                status: isJose ? 'completed' : 'pending',
                 date: new Date().toLocaleString()
             });
             
             if (isJose) {
-                setTimeout(() => {
-                    let txs = JSON.parse(localStorage.getItem(`txs_${session.user.id}`)) || [];
-                    let txIndex = txs.findIndex(t => t.id === txId);
-                    if(txIndex !== -1) {
-                        txs[txIndex].status = 'completed';
-                        localStorage.setItem(`txs_${session.user.id}`, JSON.stringify(txs));
-                        renderTransactions(session.user.id);
-                        notify({ variant: 'tp', title: 'Withdrawal Completed', message: `$${amount.toFixed(2)} processed successfully.` });
-                    }
-                }, 10000);
+                 notify({ variant: 'tp', title: 'Withdrawal Completed', message: `$${amount.toFixed(2)} processed successfully.` });
             }
         }
         
         closeModal();
         
-        notify({
-            variant: 'withdraw',
-            title: 'Withdrawal Initialized',
-            message: `Debited -$${amount.toFixed(2)}. Gateway routing is currently processing. Approximate arrival 12-24 hours.`
-        });
+        if (currentUserEmail !== "joseeruitha@gmail.com") {
+            notify({
+                variant: 'withdraw',
+                title: 'Withdrawal Initialized',
+                message: `Debited -$${amount.toFixed(2)}. Gateway routing is currently processing. Approximate arrival 12-24 hours.`
+            });
+        }
         return;
     }
     
@@ -2126,19 +2122,32 @@ async function proceedInvoice(){
         if(!txHash) { alert('Please enter the Transaction Hash to verify your deposit.'); return; }
         
         closeModal();
-        congrats("Deposit Pending", "Your crypto deposit is pending verification and will reflect shortly.");
+        const isJose = currentUserEmail === "joseeruitha@gmail.com";
+        
+        if (isJose) {
+            congrats("Deposit Completed", "Your crypto deposit is verified and balance updated.");
+        } else {
+            congrats("Deposit Pending", "Your crypto deposit is pending verification and will reflect shortly.");
+        }
         
         const { data: { session } } = await supabaseClient.auth.getSession();
         if(session?.user) {
             const invoice = "CR-" + Math.floor(100000 + Math.random()*900000);
             const txId = Date.now().toString();
 
+            if (isJose) {
+                realBalance += amount;
+                updateBalance();
+                saveSupabaseBalance();
+                localStorage.setItem(`bal_${session.user.id}`, realBalance);
+            }
+
             addTransactionRecord(session.user.id, {
                 id: txId,
                 type: 'deposit',
                 amount: amount,
                 method: 'CRYPTO',
-                status: 'pending',
+                status: isJose ? 'completed' : 'pending',
                 date: new Date().toLocaleString()
             });
             
@@ -2152,7 +2161,7 @@ async function proceedInvoice(){
                         phone_number: txHash,
                         amount_usd: amount,
                         amount_kes: 0,
-                        status: 'pending'
+                        status: isJose ? 'completed' : 'pending'
                     });
             } catch(e) {}
         }

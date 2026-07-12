@@ -1007,11 +1007,6 @@ button:active {
         </div>
     </header>
 
-    <div style="background: rgba(59, 130, 246, 0.1); border-bottom: 1px solid rgba(59, 130, 246, 0.2); color: var(--info); padding: 12px 20px; font-size: 0.85rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
-        <span>ℹ️ Note: Our new 24-hour Live Support is now available to all users! Go to your Profile to contact us.</span>
-        <span onclick="this.parentElement.style.display='none'" style="cursor:pointer; font-size: 1.2rem; margin-left: 10px; line-height: 1;">×</span>
-    </div>
-
     <div class="main">
 
         <div class="view active" id="home">
@@ -1237,12 +1232,12 @@ button:active {
                 <div class="modal-group">
                     <label>Amount (USD)</label>
                     <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
-                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=4">$4</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=20">$20</button>
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=50">$50</button>
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=100">$100</button>
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=250">$250</button>
                     </div>
-                    <input type="number" class="modal-input" id="pay-amount" placeholder="Enter amount">
+                    <input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $20" style="box-shadow: 0 0 12px rgba(99, 102, 241, 0.3); border-color: rgba(99, 102, 241, 0.5);">
                 </div>
                 
                 <button class="modal-btn" style="background:var(--primary); color:#fff;" onclick="proceedInvoice()">Continue</button>
@@ -2062,7 +2057,7 @@ async function proceedInvoice(){
     const amount = parseFloat(document.getElementById("pay-amount").value);
     const method = document.getElementById("payment-method-select").value;
 
-    if(isNaN(amount) || amount < 4) { alert('Minimum amount is $4.'); return; }
+    if(isNaN(amount) || amount < 20) { alert('Minimum amount is $20.'); return; }
 
     if (paymentType === "withdraw" && amount < 20) {
         alert('Minimum withdrawal amount is $20.'); return;
@@ -2380,4 +2375,4 @@ function logTrade(asset, market, signal, profit, stake){
 }
 </script>
 </body>
-                    </html>
+</html>

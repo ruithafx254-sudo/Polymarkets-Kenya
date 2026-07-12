@@ -1018,6 +1018,15 @@ button:active {
 
         <div class="view active" id="home">
             
+            <div id="official-disclaimer" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-large); padding: 16px; position: relative; display: flex; gap: 12px; align-items: flex-start; margin-bottom: 4px;">
+                <div style="background: rgba(245, 158, 11, 0.15); color: var(--warning); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">⚠️</div>
+                <div style="flex: 1;">
+                    <div style="color: var(--warning); font-size: 0.85rem; font-weight: 800; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em;">Official Channel Disclaimer</div>
+                    <div style="color: var(--muted); font-size: 0.8rem; line-height: 1.5; font-weight: 500;">Trading financial markets and synthetic indices carries a high level of risk and may not be suitable for all investors. The analysis and tools provided are for educational purposes only.</div>
+                </div>
+                <button onclick="document.getElementById('official-disclaimer').style.display='none'" style="background: transparent; color: var(--muted); font-size: 1.6rem; line-height: 1; margin-top: -4px; padding: 0;" title="Dismiss">×</button>
+            </div>
+
             <div class="card balance-card">
                 <div>
                     <div class="balance-title">Account Balance</div>

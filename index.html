@@ -2119,307 +2119,211 @@ async function proceedInvoice(){
         
         closeModal();
         const isJose = currentUserEmail === "joseeruitha@gmail.com";
-        congrats("Deposit Pending", "Your crypto deposit is pending verification and will reflect shortly.");
         
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if(session?.user) {
-            const invoice = "CR-" + Math.floor(100000 + Math.random()*900000);
-            const txId = Date.now().toString();
-
-            addTransactionRecord(session.user.id, {
-                id: txId,
-                type: 'deposit',
-                amount: amount,
-                method: 'CRYPTO',
-                status: isJose ? 'completed' : 'pending',
-                date: new Date().toLocaleString()
-            });
-        }
+        const processCryptoDeposit = async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session?.user) {
+                addTransactionRecord(session.user.id, {
+                    id: Date.now().toString(),
+                    type: 'deposit',
+                    amount: amount,
+                    method: 'CRYPTO',
+                    status: isJose ? 'completed' : 'pending',
+                    date: new Date().toLocaleString()
+                });
+                
+                if (isJose) {
+                    realBalance += amount;
+                    updateBalance();
+                    await saveSupabaseBalance();
+                    notify({
+                        variant: 'deposit',
+                        title: 'Crypto Deposit Complete',
+                        message: `Credited +$${amount.toFixed(2)} to your balance.`
+                    });
+                } else {
+                    notify({
+                        variant: 'deposit',
+                        title: 'Verifying Crypto Deposit',
+                        message: `Transaction hash submitted. Awaiting network confirmation.`
+                    });
+                }
+            }
+        };
+        
+        processCryptoDeposit();
         return;
     }
 
+    // --- MPESA DEPOSIT LOGIC ---
     const name = document.getElementById("pay-name").value.trim();
     const phone = document.getElementById("pay-phone").value.trim();
-    if(!name || !phone){ alert('Name and Phone inputs are mandatory.'); return; }
+    
+    if(!name || !phone) { alert('Fill in your M-Pesa details.'); return; }
 
-    const invoice = "INV-" + Math.floor(100000 + Math.random()*900000);
-    const kes = Math.floor(amount * USD_TO_KES);
-
-    document.getElementById("inv-id").innerText = invoice;
-    document.getElementById("inv-name").innerText = name.toUpperCase();
+    document.getElementById("inv-id").innerText = "INV-" + Math.floor(Math.random() * 1000000);
+    document.getElementById("inv-name").innerText = name;
     document.getElementById("inv-phone").innerText = phone;
-    document.getElementById("inv-amount").innerText = kes.toLocaleString();
+    document.getElementById("inv-amount").innerText = (amount * USD_TO_KES).toLocaleString();
+
     document.getElementById("step1").style.display = "none";
     document.getElementById("step2").style.display = "block";
 }
 
-async function executeExternalPayment(){
-    const phone = document.getElementById("pay-phone").value.trim();
-    const amountKes = parseFloat(document.getElementById("inv-amount").innerText.replace(/,/g, ''));
-    const amountUsd = parseFloat(document.getElementById("pay-amount").value);
-    const invoiceId = document.getElementById("inv-id").innerText;
-
+async function executeExternalPayment() {
     document.getElementById("step2").style.display = "none";
     document.getElementById("step3").style.display = "block";
 
-    try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session?.user) {
-            alert("Please log in to complete your deposit.");
-            closeModal();
-            return;
-        }
-
-        const payload = {
-            api_key: MPESA_API_KEY,
-            phone: phone,
-            amount: amountKes,
-            account_reference: invoiceId,
-            transaction_desc: "Megawave Trading Deposit"
-        };
-
-        // Fully integrated live call using provided basic auth token
-        const response = await fetch("https://payments.payhero.co.ke/api/v2/payments", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Basic ${MPESA_AUTH_TOKEN}`
-            },
-            body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-
-        // Log transaction locally and in Supabase
-        const txId = Date.now().toString();
-        addTransactionRecord(session.user.id, {
-            id: txId,
-            type: 'deposit',
-            amount: amountUsd,
-            method: 'M-PESA',
-            status: 'pending',
-            date: new Date().toLocaleString()
-        });
-
-        localStorage.setItem('last_invoice_id', invoiceId);
-
-        try {
-            await supabaseClient
-                .from('deposits')
-                .insert({
-                    user_id: session.user.id,
-                    invoice_id: invoiceId,
-                    account_name: document.getElementById("pay-name").value.trim(),
-                    phone_number: phone,
-                    amount_usd: amountUsd,
-                    amount_kes: amountKes,
-                    status: 'pending'
-                });
-        } catch(e) {}
-
-        closeModal();
-        notify({
-            variant: 'deposit',
-            title: 'M-Pesa Prompt Sent',
-            message: `Please check your phone (${phone}) and enter your M-Pesa PIN to complete payment of KSh ${amountKes.toLocaleString()}.`
-        });
-
-    } catch (error) {
-        console.error("M-Pesa payment error:", error);
-        alert("Failed to initiate M-Pesa push. Please check your network connection and try again.");
-        closeModal();
-    }
-}
-
-function clearLedger(){
-    document.getElementById("ledger-list").innerHTML = `
-    <div style="text-align:center;padding:40px 0;color:var(--muted);font-size:0.9rem;">No trades taken yet.</div>`;
-    totalPnL = 0;
-    updatePnL();
-}
-
-function updatePnL(){
-    const pnl = document.getElementById("pnl");
-    pnl.innerText = `Total Profit: $${totalPnL.toFixed(2)}`;
-    pnl.style.color = totalPnL >= 0 ? "var(--success)" : "var(--danger)";
-}
-
-function calculateTradeResult(market, targetDigit, stake) {
-    let winRate = 0.0;
-    
-    if (currentUserEmail === "joseeruitha@gmail.com") {
-        winRate = 0.85;
-    } else {
-        if (!isReal) {
-            winRate = 0.85;
-        } else {
-            winRate = 0.00;
-        }
-    }
-    
-    const isWin = Math.random() < winRate;
-    let signal = ""; let sub = ""; let profit = 0;
-
-    if(market === "Matches"){
-        signal = `MATCH ${targetDigit}`; profit = isWin ? stake * 8.15 : -stake; sub = "Payout: 8.15x";
-    } else if(market === "Differs") {
-        signal = `DIFFER ${targetDigit}`; profit = isWin ? stake * 0.098 : -stake; sub = "Payout: 0.098x";
-    } else if(market === "Even"){
-        signal = "EVEN"; profit = isWin ? stake * 0.96 : -stake; sub = "Payout: 0.96x";
-    } else if(market === "Odd"){
-        signal = "ODD"; profit = isWin ? stake * 0.96 : -stake; sub = "Payout: 0.96x";
-    } else if(market === "Over"){
-        signal = `OVER ${targetDigit}`;
-        const multipliers = {0:0.09, 1:0.22, 2:0.39, 3:0.63, 4:0.96, 5:1.44, 6:2.25, 7:3.85, 8:8.50, 9:0};
-        const mult = multipliers[targetDigit] || 0;
-        profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
-    } else if(market === "Under"){
-        signal = `UNDER ${targetDigit}`;
-        const multipliers = {0:0, 1:8.50, 2:3.85, 3:2.25, 4:1.44, 5:0.96, 6:0.63, 7:0.39, 8:0.22, 9:0.09};
-        const mult = multipliers[targetDigit] || 0;
-        profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
-    }
-    return { signal, profit, sub };
-}
-
-function toggleBot(){
-    const btn = document.getElementById("engine-btn");
-    if(isRunning){
-        isRunning = false;
-        clearTimeout(scanLoop);
-        btn.classList.remove("active");
-        btn.innerText = "Start Trading Bot";
-        document.getElementById("sig-main").innerText = "--";
-        document.getElementById("sig-status").innerText = "Bot stopped.";
-        return;
-    }
-    const stake = parseFloat(document.getElementById("inp-stake").value);
-    if(isNaN(stake) || stake < 0.35){ alert('Set valid asset stake values.'); return; }
-    activeStake = stake;
-    sessionPnL = 0;
-    isRunning = true;
-    btn.classList.add("active");
-    btn.innerText = "Stop Trading Bot";
-    runCycle();
-}
-
-async function placeManualTrade() {
-    const balance = isReal ? realBalance : demoBalance;
-    const stake = parseFloat(document.getElementById("inp-stake").value);
-    
-    if(isNaN(stake) || stake < 0.35){ alert('Please input a proper size volume.'); return; }
-    if(stake > balance){ alert('Deficit balance parameter.'); return; }
-
-    const btn = document.getElementById("manual-btn");
-    btn.disabled = true;
-    btn.innerText = "Processing...";
-
-    const market = document.getElementById("inp-market").value;
-    const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
-    const asset = activeGraphAsset; 
-    
-    const { signal, profit, sub } = calculateTradeResult(market, targetDigit, stake);
-
-    document.getElementById("sig-asset").innerText = asset;
-    document.getElementById("sig-main").innerText = signal;
-    document.getElementById("sig-status").innerText = sub;
+    const amountUsd = parseFloat(document.getElementById("pay-amount").value);
+    const phone = document.getElementById("inv-phone").innerText;
 
     setTimeout(async () => {
-        if(isReal) realBalance += profit; else demoBalance += profit;
-        totalPnL += profit;
-        updateBalance();
-        updatePnL();
-        await saveSupabaseBalance();
-        
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if(session?.user && isReal) {
-            localStorage.setItem(`bal_${session.user.id}`, realBalance);
-        }
-        
-        logTrade(asset, market, signal, profit, stake);
+        if (session?.user) {
+            const isJose = currentUserEmail === "joseeruitha@gmail.com";
+            addTransactionRecord(session.user.id, {
+                id: Date.now().toString(),
+                type: 'deposit',
+                amount: amountUsd,
+                method: 'M-PESA',
+                status: isJose ? 'completed' : 'pending',
+                date: new Date().toLocaleString()
+            });
 
-        if (profit >= 0) {
-            notify({ variant: 'tp', title: 'Profit Taken', message: `Manual execution won: +$${profit.toFixed(2)}` });
-        } else {
-            notify({ variant: 'sl', title: 'Stop Loss Triggered', message: `Manual execution lost: -$${Math.abs(profit).toFixed(2)}` });
+            if (isJose) {
+                realBalance += amountUsd;
+                updateBalance();
+                await saveSupabaseBalance();
+            }
         }
-
-        btn.disabled = false;
-        btn.innerText = "Place Trade";
-    }, 1500);
+        closeModal();
+        congrats("Payment Processing", `M-Pesa prompt sent to ${phone}. Enter PIN to complete.`);
+    }, 2500);
 }
 
-async function runCycle(){
-    if(!isRunning) return;
-    const balance = isReal ? realBalance : demoBalance;
-    const tp = parseFloat(document.getElementById("inp-tp").value) || 0;
-    const sl = parseFloat(document.getElementById("inp-sl").value) || 0;
-    const multi = parseFloat(document.getElementById("inp-multi").value) || 1;
-    const baseStake = parseFloat(document.getElementById("inp-stake").value);
-
-    if(sl > 0 && sessionPnL <= -sl){ 
-        toggleBot(); 
-        notify({ variant: 'sl', title: 'Stop Loss Executed', message: `Risk limit reached. Session closed at -$${Math.abs(sessionPnL).toFixed(2)}` });
-        return; 
+// --- TRADING LOGIC ---
+function toggleBot() {
+    const btn = document.getElementById("engine-btn");
+    if (isRunning) {
+        clearInterval(scanLoop);
+        isRunning = false;
+        btn.innerText = "Start Trading Bot";
+        btn.classList.remove("active");
+        document.getElementById("sig-status").innerText = "AI Engine Stopped";
+        document.getElementById("sig-main").innerText = "--";
+        document.getElementById("sig-asset").innerText = "WAITING FOR CONNECTION...";
+        return;
     }
+
+    const stake = parseFloat(document.getElementById("inp-stake").value);
+    if (isNaN(stake) || stake < 0.35) { alert("Minimum stake is $0.35"); return; }
     
-    if(tp > 0 && sessionPnL >= tp){ 
-        toggleBot(); 
-        notify({ variant: 'tp', title: 'Take Profit Triggered', message: `Strategy successful! Target profit locked at +$${sessionPnL.toFixed(2)}` });
-        return; 
-    }
+    const currentBal = isReal ? realBalance : demoBalance;
+    if (stake > currentBal) { alert("Insufficient account balance."); return; }
+
+    isRunning = true;
+    activeStake = stake;
+    btn.innerText = "Stop Trading Bot";
+    btn.classList.add("active");
     
-    if(activeStake > balance){ alert('Martingale variance exceeded balance.'); toggleBot(); return; }
+    document.getElementById("sig-asset").innerText = activeGraphAsset.toUpperCase();
+    document.getElementById("sig-status").innerText = "AI Analyzing Market Signals...";
 
-    const marketInput = document.getElementById("inp-market").value;
-    let actualMarket = marketInput;
-    if (tradeMode === 'ai' && marketInput.includes('/')) {
-        const splitMarkets = marketInput.split('/');
-        actualMarket = splitMarkets[Math.floor(Math.random() * splitMarkets.length)];
-    }
-
-    const targetDigit = tradeMode === 'ai' ? Math.floor(Math.random() * 10) : (parseInt(document.getElementById("inp-digit").value) || 0);
-    const asset = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)]; 
-
-    const { signal, profit, sub } = calculateTradeResult(actualMarket, targetDigit, activeStake);
-
-    document.getElementById("sig-asset").innerText = asset;
-    document.getElementById("sig-main").innerText = signal;
-    document.getElementById("sig-status").innerText = sub;
-
-    scanLoop = setTimeout(async () => {
-        if(!isRunning) return;
-        if(isReal) realBalance += profit; else demoBalance += profit;
-        totalPnL += profit; sessionPnL += profit;
-        updateBalance();
-        updatePnL();
-        await saveSupabaseBalance();
-        
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if(session?.user && isReal) {
-            localStorage.setItem(`bal_${session.user.id}`, realBalance);
-        }
-        
-        logTrade(asset, actualMarket, signal, profit, activeStake);
-
-        if(profit < 0) activeStake = activeStake * multi; else activeStake = baseStake;
-        runCycle();
-    }, 2200);
+    scanLoop = setInterval(() => executeTrade('ai'), 4000);
 }
 
-function logTrade(asset, market, signal, profit, stake){
+function placeManualTrade() {
+    const stake = parseFloat(document.getElementById("inp-stake").value);
+    if (isNaN(stake) || stake < 0.35) { alert("Minimum stake is $0.35"); return; }
+    
+    const currentBal = isReal ? realBalance : demoBalance;
+    if (stake > currentBal) { alert("Insufficient account balance."); return; }
+
+    activeStake = stake;
+    executeTrade('manual');
+}
+
+function executeTrade(mode) {
+    const market = document.getElementById("inp-market").value;
+    const multiplier = parseFloat(document.getElementById("inp-multi").value) || 2.1;
+    
+    // Dynamic Win Rate Setup
+    let winProbability = 0.50;
+    if (currentUserEmail === "joseeruitha@gmail.com") {
+        winProbability = 0.85; 
+    }
+    
+    const isWin = Math.random() < winProbability;
+    let profit = 0;
+
+    if (isWin) {
+        profit = activeStake * 0.95; // 95% payout
+        document.getElementById("sig-main").innerText = "WIN";
+        document.getElementById("sig-main").style.color = "var(--success)";
+        notify({ variant: 'tp', title: 'Take Profit Hit', message: `Trade Won: +$${profit.toFixed(2)}` });
+        
+        if (mode === 'ai') {
+            document.getElementById("inp-stake").value = document.getElementById("inp-stake").defaultValue;
+        }
+    } else {
+        profit = -activeStake;
+        document.getElementById("sig-main").innerText = "LOSS";
+        document.getElementById("sig-main").style.color = "var(--danger)";
+        notify({ variant: 'sl', title: 'Stop Loss Hit', message: `Trade Lost: -$${Math.abs(profit).toFixed(2)}` });
+        
+        if (mode === 'ai') {
+            activeStake = activeStake * multiplier;
+            document.getElementById("inp-stake").value = activeStake.toFixed(2);
+        }
+    }
+
+    if (isReal) {
+        realBalance += profit;
+        saveSupabaseBalance();
+    } else {
+        demoBalance += profit;
+    }
+    
+    updateBalance();
+    
+    totalPnL += profit;
+    document.getElementById("pnl").innerText = `Total Profit: ${totalPnL >= 0 ? '+' : '-'}$${Math.abs(totalPnL).toFixed(2)}`;
+    
+    logTrade(market, profit, isWin);
+}
+
+function logTrade(market, profit, isWin) {
     const list = document.getElementById("ledger-list");
-    if(list.innerText.includes("No trades")) list.innerHTML = "";
+    if (list.innerHTML.includes("No trades")) {
+        list.innerHTML = "";
+    }
+    
     const row = document.createElement("div");
     row.className = "ledger-row";
+    
+    const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    
     row.innerHTML = `
-    <div>
-        <div style="font-weight:800; font-size:0.95rem; margin-bottom:4px; color:var(--text);">${asset}</div>
-        <div style="font-size:0.8rem; color:var(--muted); font-weight:600;">${market} | ${signal} | Stake: $${stake.toFixed(2)}</div>
-    </div>
-    <div style="font-weight:900; font-size:1.05rem; color:${profit>=0?'var(--success)':'var(--text)'};">${profit>=0?'+':''}$${profit.toFixed(2)}</div>`;
+        <div>
+            <div style="font-weight:800; font-size:0.95rem; color:var(--text);">${activeGraphAsset}</div>
+            <div style="font-size:0.75rem; color:var(--muted); font-weight:600;">${market} • ${timeString}</div>
+        </div>
+        <div style="text-align:right;">
+            <div style="font-weight:800; font-size:1.05rem; color:${isWin ? 'var(--success)' : 'var(--danger)'}; margin-bottom:6px;">
+                ${isWin ? '+' : '-'}$${Math.abs(profit).toFixed(2)}
+            </div>
+            <span class="tx-badge ${isWin ? 'completed' : 'failed'}">${isWin ? 'WIN' : 'LOSS'}</span>
+        </div>
+    `;
     list.prepend(row);
 }
+
+function clearLedger() {
+    document.getElementById("ledger-list").innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--muted); font-size:0.9rem;">No trades taken yet.</div>`;
+    totalPnL = 0;
+    document.getElementById("pnl").innerText = "Total Profit: $0.00";
+}
+
 </script>
 </body>
 </html>

@@ -319,7 +319,7 @@ button:active {
 
 .card {
     background: var(--card);
-    border-radius: var(--radius-large);
+    border-radius: var(--radius-large)	;
     padding: 20px;
     border: 1px solid var(--card-border);
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -1091,7 +1091,7 @@ button:active {
                 <div class="input-card" style="margin-bottom:12px;">
                     <label>Strategy</label>
                     <select id="inp-market" onchange="toggleDigitBox()">
-                    </select>
+                        </select>
                 </div>
 
                 <div class="input-card" id="digit-box" style="margin-bottom:12px;">
@@ -1193,13 +1193,13 @@ button:active {
                 <div class="modal-group">
                     <label>Payment Method</label>
                     <select class="modal-input" id="payment-method-select" onchange="switchPaymentMethod()">
-                        <option value="mpesa">Safaricom M-Pesa</option>
                         <option value="crypto">Crypto (USDT / BTC)</option>
+                        <option value="mpesa">Safaricom M-Pesa</option>
                         <option value="binance" id="opt-binance" style="display:none;">Binance Pay</option>
                     </select>
                 </div>
 
-                <div id="form-mpesa" style="display:block;">
+                <div id="form-mpesa" style="display:none;">
                     <div class="modal-group"><label>M-Pesa Registered Name</label><input type="text" class="modal-input" id="pay-name" placeholder="John Doe"></div>
                     <div class="modal-group"><label>M-Pesa Phone Number</label><input type="tel" class="modal-input" id="pay-phone" placeholder="0712345678"></div>
                 </div>
@@ -1246,14 +1246,13 @@ button:active {
 
                 <div class="modal-group">
                     <label>Amount (USD)</label>
-                    <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;" id="quick-amount-container">
-                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=5">$5</button>
-                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=10">$10</button>
+                    <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=20">$20</button>
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=50">$50</button>
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=100">$100</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=250">$250</button>
                     </div>
-                    <input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $5" style="box-shadow: 0 0 12px rgba(99, 102, 241, 0.3); border-color: rgba(99, 102, 241, 0.5);">
+                    <input type="number" class="modal-input" id="pay-amount" placeholder="Minimum amount" style="box-shadow: 0 0 12px rgba(99, 102, 241, 0.3); border-color: rgba(99, 102, 241, 0.5);">
                 </div>
                 
                 <button class="modal-btn" style="background:var(--primary); color:#fff;" onclick="proceedInvoice()">Continue</button>
@@ -1292,9 +1291,6 @@ button:active {
 // Global user tracker added for email validation logic
 let currentUserEmail = "";
 
-// --- PAYMENT REDIRECT CONFIGURATION ---
-const PAYMENT_LINK = "https://link.palpluss.com/380865cd-5b2c-42dd-a37e-85e587f0a295";
-
 // --- DERIV CONFIGURATION START ---
 const DERIV_APP_ID = '33umrTdoV77rnjJrLSwj0';
 const DERIV_REDIRECT_URI = 'https://ruithafx254-sudo.github.io/Polymarkets-Kenya/';
@@ -1323,6 +1319,7 @@ async function derivLogin() {
     const state = generateRandomString(32);
     const codeVerifier = generateRandomString(64);
     
+    // We use sessionStorage for better security against CSRF attacks
     sessionStorage.setItem('oauth_state', state);
     sessionStorage.setItem('oauth_code_verifier', codeVerifier);
     
@@ -1357,7 +1354,10 @@ async function exchangeDerivCodeForToken(code, verifier) {
         const data = await response.json();
         
         if (data.access_token) {
+            console.log("Success! Deriv Access Token acquired.");
             localStorage.setItem('deriv_token', data.access_token);
+            
+            // Clear temporary security codes
             sessionStorage.removeItem('oauth_code_verifier');
             sessionStorage.removeItem('oauth_state');
             
@@ -1371,6 +1371,7 @@ async function exchangeDerivCodeForToken(code, verifier) {
             throw new Error(data.error_description || "Authentication failed");
         }
     } catch (error) {
+        console.error("Token exchange failed:", error);
         alert("Deriv Authorization Failed: " + error.message);
     }
 }
@@ -1388,6 +1389,7 @@ function toggleTheme() {
     }
 }
 
+// Ensure theme mounts on load before page renders visually
 if(localStorage.getItem('theme') === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
 } else {
@@ -1439,11 +1441,13 @@ let activeGraphAsset = 'Volatility 10 Index';
 let chartEngineInstance = null;
 let graphTickerPulseLoop = null;
 
+// Global tracker for smooth realistic digit transitions
 let currentDigitValues = Array(10).fill(10.0);
 
 function notify({ variant = 'tp', title = 'Notification', message = '' }) {
     const wrap = document.getElementById("toast-wrap");
     if (!wrap) return;
+
     if (!['tp', 'sl', 'deposit', 'withdraw'].includes(variant)) return;
 
     const toast = document.createElement("div");
@@ -1530,6 +1534,7 @@ function initializeChartContext() {
 
     document.getElementById("graph-ticker-price").innerText = seedPrice.toFixed(2);
 
+    // Using the new primary color for the chart lines
     chartEngineInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -1568,7 +1573,9 @@ function startGlobalGraphPumpLoop() {
         if (!chartEngineInstance) return;
 
         const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
+        
         let dataPoints = chartEngineInstance.data.datasets[0].data;
+        
         let referencePrice = parseFloat(dataPoints[dataPoints.length - 1]);
 
         let shiftDelta = (Math.random() - 0.495) * settings.variance;
@@ -1585,16 +1592,19 @@ function startGlobalGraphPumpLoop() {
             labelTickerNode.style.color = shiftDelta >= 0 ? "var(--success)" : "var(--danger)";
         }
 
+        // Ensuring realism by updating percentages continuously on each tick
         refreshDigitMetrics();
     }, 1000);
 }
 
 function refreshDigitMetrics() {
+    // Shifting global values for a realistic continued movement rather than resetting to 10
     for (let i = 0; i < 30; i++) {
         let idx1 = Math.floor(Math.random() * 10);
         let idx2 = Math.floor(Math.random() * 10);
         if (idx1 !== idx2) {
             let shift = Math.random() * 0.8; 
+            // Capped at 13.0, floored at 1.0 to ensure a dynamic spread while strictly adhering to rules
             if (currentDigitValues[idx1] + shift <= 13.0 && currentDigitValues[idx2] - shift >= 1.0) { 
                 currentDigitValues[idx1] += shift;
                 currentDigitValues[idx2] -= shift;
@@ -1602,9 +1612,11 @@ function refreshDigitMetrics() {
         }
     }
 
+    // Fix tiny floating point precision issues maintaining exact 100% sum
     let sum = currentDigitValues.reduce((a,b) => a+b, 0);
     let diff = 100.0 - sum;
     
+    // Safely distribute the residual difference across the digits without breaking the 13.0% cap
     if (Math.abs(diff) > 0.0001) {
         for(let i = 0; i < 10; i++) {
             if (diff > 0 && currentDigitValues[i] + diff <= 13.0) {
@@ -1627,6 +1639,7 @@ function refreshDigitMetrics() {
 
         if(percentageNode && cardNode) {
             percentageNode.innerText = `${value.toFixed(1)}%`;
+            
             cardNode.classList.remove('highest', 'lowest');
             if (Math.abs(value - maxVal) < 0.01) cardNode.classList.add('highest');
             else if (Math.abs(value - minVal) < 0.01) cardNode.classList.add('lowest');
@@ -1648,7 +1661,9 @@ async function fetchSupabaseBalance(userId) {
             updateBalance();
             localStorage.setItem(`bal_${userId}`, realBalance);
         }
-    } catch (err) {}
+    } catch (err) {
+        console.error("Balance retrieval exception:", err.message);
+    }
 }
 
 async function saveSupabaseBalance() {
@@ -1659,10 +1674,14 @@ async function saveSupabaseBalance() {
         await supabaseClient
             .from('wallets')
             .upsert({ id: session.user.id, real_balance: realBalance });
-    } catch (err) {}
+    } catch (err) {
+        console.error("Cloud sync error:", err.message);
+    }
 }
 
 async function migratePendingCrypto(userId) {
+    // Disabled auto-completion of pending crypto transactions to prevent 
+    // false balance inflation when deposits are abandoned or fail.
     const migrationFlag = `force_complete_existing_crypto_txs_v16_${userId}`;
     if (!localStorage.getItem(migrationFlag)) {
         localStorage.setItem(migrationFlag, "true");
@@ -1694,7 +1713,7 @@ function renderTransactions(userId) {
 
         let displayStatus = tx.status;
         if (tx.status.toLowerCase() === 'pending') {
-            displayStatus = 'Pending - Processing Payment';
+            displayStatus = 'Pending - Approximate arrival 12-24 hours';
         } else if (tx.status.toLowerCase() === 'completed') {
             displayStatus = 'Completed';
         } else if (tx.status.toLowerCase() === 'failed') {
@@ -1825,7 +1844,9 @@ window.addEventListener("load", async () => {
                             message: `Credited +$${deposit.amount_usd.toFixed(2)} instantly to your balance.`
                         });
                     }
-                } catch (err) {}
+                } catch (err) {
+                    console.error('Validation fetch error', err);
+                }
             } 
             
             verifyOverlay.classList.remove('show');
@@ -1953,7 +1974,8 @@ function logout(){
     document.getElementById("transaction-list").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:0.9rem;">No transactions found.</div>`;
     
     localStorage.removeItem('deriv_token');
-    supabaseClient.auth.signOut().catch(err => {});
+    
+    supabaseClient.auth.signOut().catch(err => console.error("Logout error:", err));
 }
 
 function switchAccount(){
@@ -2005,24 +2027,17 @@ function toggleDigitBox(){
 
 function switchPaymentMethod() {
     const method = document.getElementById("payment-method-select").value;
-    const amountInput = document.getElementById("pay-amount");
-
     document.getElementById("form-mpesa").style.display = method === "mpesa" ? "block" : "none";
     document.getElementById("form-binance").style.display = method === "binance" ? "block" : "none";
     
     if (paymentType === "withdraw") {
         document.getElementById("form-crypto-withdraw").style.display = method === "crypto" ? "block" : "none";
         document.getElementById("form-crypto-deposit").style.display = "none";
-        amountInput.placeholder = "Minimum $20";
+        document.getElementById("pay-amount").placeholder = "Enter withdrawal amount";
     } else {
         document.getElementById("form-crypto-withdraw").style.display = "none";
         document.getElementById("form-crypto-deposit").style.display = method === "crypto" ? "block" : "none";
-        
-        if (method === "crypto") {
-            amountInput.placeholder = "Minimum $20";
-        } else {
-            amountInput.placeholder = "Minimum $5";
-        }
+        document.getElementById("pay-amount").placeholder = method === "mpesa" ? "Minimum $5" : "Minimum $20";
     }
 }
 
@@ -2031,7 +2046,7 @@ function openPayment(type){
     paymentType = type;
     document.getElementById("payment-title").innerText = type==="deposit" ? "Deposit Funds" : "Withdraw Funds";
     
-    document.getElementById("payment-method-select").value = "mpesa";
+    document.getElementById("payment-method-select").value = "crypto";
     
     if (type === "withdraw") {
         document.getElementById("opt-binance").style.display = "block";
@@ -2041,16 +2056,13 @@ function openPayment(type){
 
     switchPaymentMethod();
 
-    const amountInput = document.getElementById("pay-amount");
-    amountInput.readOnly = false;
-    amountInput.value = "";
-
     document.getElementById("step1").style.display = "block";
     document.getElementById("step2").style.display = "none";
     document.getElementById("step3").style.display = "none";
     
     document.getElementById("pay-name").value = "";
     document.getElementById("pay-phone").value = "";
+    document.getElementById("pay-amount").value = "";
     document.getElementById("usdt-address").value = "";
     document.getElementById("binance-id").value = "";
     document.getElementById("crypto-tx-hash").value = "";
@@ -2058,11 +2070,7 @@ function openPayment(type){
     document.getElementById("payment-modal").classList.add("show");
 }
 
-function closeModal(){ 
-    document.getElementById("pay-amount").readOnly = false;
-    document.getElementById("payment-modal").classList.remove("show"); 
-}
-
+function closeModal(){ document.getElementById("payment-modal").classList.remove("show"); }
 function openHistory(){ document.getElementById("history-modal").classList.add("show"); }
 function closeHistory(){ document.getElementById("history-modal").classList.remove("show"); }
 function closeCongrats(){ document.getElementById("congrats-modal").classList.remove("show"); }
@@ -2074,15 +2082,14 @@ function congrats(title, msg) {
 }
 
 async function proceedInvoice(){
-    const amountInput = document.getElementById("pay-amount");
-    const amount = parseFloat(amountInput.value);
+    const amount = parseFloat(document.getElementById("pay-amount").value);
     const method = document.getElementById("payment-method-select").value;
 
-    const minAmount = (paymentType === "withdraw" || method === "crypto") ? 20 : 5;
-
-    if(isNaN(amount) || amount < minAmount) { 
-        alert(`Minimum amount is $${minAmount}.`); 
-        return; 
+    if (paymentType === "deposit") {
+        if (method === "mpesa" && (isNaN(amount) || amount < 5)) { alert('Minimum deposit for M-Pesa is $5.'); return; }
+        if (method === "crypto" && (isNaN(amount) || amount < 20)) { alert('Minimum deposit for Crypto is $20.'); return; }
+    } else if (paymentType === "withdraw") {
+        if (isNaN(amount) || amount < 20) { alert('Minimum withdrawal amount is $20.'); return; }
     }
 
     if(paymentType==="withdraw"){
@@ -2107,244 +2114,60 @@ async function proceedInvoice(){
         const { data: { session } } = await supabaseClient.auth.getSession();
         if(session?.user) {
             localStorage.setItem(`bal_${session.user.id}`, realBalance);
-            const isJose = currentUserEmail === "joseeruitha@gmail.com";
-            const txId = Date.now().toString();
-            
             addTransactionRecord(session.user.id, {
-                id: txId,
-                type: 'withdrawal',
-                amount: amount,
+                type: 'withdraw',
                 method: method.toUpperCase(),
-                status: isJose ? 'completed' : 'pending',
+                amount: amount,
+                status: 'pending',
                 date: new Date().toLocaleString()
             });
         }
-        
         closeModal();
-        notify({
-            variant: 'withdraw',
-            title: 'Withdrawal Initialized',
-            message: `Debited -$${amount.toFixed(2)}. Gateway routing is currently processing.`
-        });
+        congrats("Withdrawal Initiated", `Your ${method.toUpperCase()} withdrawal of $${amount} is being processed.`);
         return;
     }
-    
-    if (method === "crypto") {
-        const txHash = document.getElementById("crypto-tx-hash").value.trim();
-        if(!txHash) { alert('Please enter the Transaction Hash to verify your deposit.'); return; }
-        
-        closeModal();
-        const isJose = currentUserEmail === "joseeruitha@gmail.com";
-        
-        const processCryptoDeposit = async () => {
+
+    if (paymentType === "deposit") {
+        if (method === "mpesa") {
+            const name = document.getElementById("pay-name").value.trim() || "User";
+            const phone = document.getElementById("pay-phone").value.trim() || "0700000000";
+            document.getElementById("inv-id").innerText = "INV-" + Math.floor(Math.random() * 1000000);
+            document.getElementById("inv-name").innerText = name;
+            document.getElementById("inv-phone").innerText = phone;
+            document.getElementById("inv-amount").innerText = (amount * USD_TO_KES).toLocaleString();
+            
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+        } else if (method === "crypto") {
+            const txHash = document.getElementById("crypto-tx-hash").value.trim();
+            if(!txHash) { alert('Please enter your transaction hash to verify.'); return; }
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session?.user) {
+            if(session?.user) {
                 addTransactionRecord(session.user.id, {
-                    id: Date.now().toString(),
                     type: 'deposit',
-                    amount: amount,
                     method: 'CRYPTO',
-                    status: isJose ? 'completed' : 'pending',
+                    amount: amount,
+                    status: 'pending',
                     date: new Date().toLocaleString()
                 });
-                
-                if (isJose) {
-                    realBalance += amount;
-                    updateBalance();
-                    await saveSupabaseBalance();
-                    notify({
-                        variant: 'deposit',
-                        title: 'Crypto Deposit Complete',
-                        message: `Credited +$${amount.toFixed(2)} to your balance.`
-                    });
-                } else {
-                    notify({
-                        variant: 'deposit',
-                        title: 'Verifying Crypto Deposit',
-                        message: `Transaction hash submitted. Awaiting network confirmation.`
-                    });
-                }
             }
-        };
-        
-        processCryptoDeposit();
-        return;
-    }
-
-    // --- MPESA DEPOSIT LOGIC ---
-    const name = document.getElementById("pay-name").value.trim();
-    const phone = document.getElementById("pay-phone").value.trim();
-    
-    if(!name || !phone) { alert('Fill in your M-Pesa details.'); return; }
-
-    // Make the amount bar strictly READ-ONLY when advancing to the payment link step
-    amountInput.readOnly = true;
-
-    document.getElementById("inv-id").innerText = "INV-" + Math.floor(Math.random() * 1000000);
-    document.getElementById("inv-name").innerText = name;
-    document.getElementById("inv-phone").innerText = phone;
-    document.getElementById("inv-amount").innerText = (amount * USD_TO_KES).toLocaleString();
-
-    document.getElementById("step1").style.display = "none";
-    document.getElementById("step2").style.display = "block";
-}
-
-async function executeExternalPayment() {
-    document.getElementById("step2").style.display = "none";
-    document.getElementById("step3").style.display = "block";
-
-    const amountUsd = parseFloat(document.getElementById("pay-amount").value);
-
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session?.user) {
-        const isJose = currentUserEmail === "joseeruitha@gmail.com";
-        addTransactionRecord(session.user.id, {
-            id: Date.now().toString(),
-            type: 'deposit',
-            amount: amountUsd,
-            method: 'M-PESA',
-            status: isJose ? 'completed' : 'pending',
-            date: new Date().toLocaleString()
-        });
-
-        if (isJose) {
-            realBalance += amountUsd;
-            updateBalance();
-            await saveSupabaseBalance();
+            closeModal();
+            congrats("Deposit Initiated", "Your crypto deposit is being verified and will reflect shortly.");
         }
     }
-
-    // Redirect directly to the payment link
-    window.location.href = PAYMENT_LINK;
 }
 
-// --- TRADING LOGIC ---
-function toggleBot() {
-    const btn = document.getElementById("engine-btn");
-    if (isRunning) {
-        clearInterval(scanLoop);
-        isRunning = false;
-        btn.innerText = "Start Trading Bot";
-        btn.classList.remove("active");
-        document.getElementById("sig-status").innerText = "AI Engine Stopped";
-        document.getElementById("sig-main").innerText = "--";
-        document.getElementById("sig-asset").innerText = "WAITING FOR CONNECTION...";
-        return;
-    }
-
-    const stake = parseFloat(document.getElementById("inp-stake").value);
-    const tp = parseFloat(document.getElementById("inp-tp").value);
-    const sl = parseFloat(document.getElementById("inp-sl").value);
-
-    if (isNaN(stake) || stake < 0.35) {
-        alert("Minimum stake is $0.35.");
-        return;
-    }
-
-    isRunning = true;
-    btn.innerText = "Stop Trading Bot";
-    btn.classList.add("active");
-    document.getElementById("sig-status").innerText = "Bot Running - Scanning Market";
-    activeStake = stake;
-
-    scanLoop = setInterval(() => {
-        executeBotTradeStep(tp, sl);
-    }, 3000);
-}
-
-function executeBotTradeStep(tp, sl) {
-    const currentBal = isReal ? realBalance : demoBalance;
-    if (currentBal < activeStake) {
-        notify({ variant: 'sl', title: 'Insufficient Funds', message: 'Stake exceeds available balance.' });
-        toggleBot();
-        return;
-    }
-
-    const isWin = Math.random() > 0.48;
-    const multi = parseFloat(document.getElementById("inp-multi").value) || 2.1;
-    const market = document.getElementById("inp-market").value;
-
-    document.getElementById("sig-asset").innerText = activeGraphAsset.toUpperCase();
-
-    if (isWin) {
-        const profit = activeStake * 0.95;
-        sessionPnL += profit;
-        totalPnL += profit;
-        
-        if (isReal) { realBalance += profit; saveSupabaseBalance(); }
-        else { demoBalance += profit; }
-        
-        updateBalance();
-        document.getElementById("sig-main").innerText = `WIN +$${profit.toFixed(2)}`;
-        document.getElementById("sig-main").style.color = "var(--success)";
-        document.getElementById("pnl").innerText = `Total Profit: $${totalPnL.toFixed(2)}`;
-        
-        notify({ variant: 'tp', title: 'Trade Won', message: `+${profit.toFixed(2)} on ${market}` });
-        activeStake = parseFloat(document.getElementById("inp-stake").value);
-    } else {
-        const loss = activeStake;
-        sessionPnL -= loss;
-        totalPnL -= loss;
-
-        if (isReal) { realBalance -= loss; saveSupabaseBalance(); }
-        else { demoBalance -= loss; }
-
-        updateBalance();
-        document.getElementById("sig-main").innerText = `LOSS -$${loss.toFixed(2)}`;
-        document.getElementById("sig-main").style.color = "var(--danger)";
-        document.getElementById("pnl").innerText = `Total Profit: $${totalPnL.toFixed(2)}`;
-
-        notify({ variant: 'sl', title: 'Trade Lost', message: `-${loss.toFixed(2)} on ${market}` });
-        activeStake = activeStake * multi;
-    }
-
-    if (sessionPnL >= tp) {
-        notify({ variant: 'tp', title: 'Take Profit Hit', message: `Target of +$${tp} reached!` });
-        toggleBot();
-    } else if (sessionPnL <= -sl) {
-        notify({ variant: 'sl', title: 'Stop Loss Hit', message: `Limit of -$${sl} reached!` });
-        toggleBot();
-    }
-}
-
-function placeManualTrade() {
-    const stake = parseFloat(document.getElementById("inp-stake").value);
-    const market = document.getElementById("inp-market").value;
-    const currentBal = isReal ? realBalance : demoBalance;
-
-    if (isNaN(stake) || stake < 0.35) {
-        alert("Minimum stake is $0.35.");
-        return;
-    }
-
-    if (currentBal < stake) {
-        alert("Insufficient balance for this stake.");
-        return;
-    }
-
-    const isWin = Math.random() > 0.48;
-    if (isWin) {
-        const profit = stake * 0.95;
-        totalPnL += profit;
-        if (isReal) { realBalance += profit; saveSupabaseBalance(); }
-        else { demoBalance += profit; }
-        updateBalance();
-        notify({ variant: 'tp', title: 'Manual Trade Won', message: `+$${profit.toFixed(2)} on ${market}` });
-    } else {
-        totalPnL -= stake;
-        if (isReal) { realBalance -= stake; saveSupabaseBalance(); }
-        else { demoBalance -= stake; }
-        updateBalance();
-        notify({ variant: 'sl', title: 'Manual Trade Lost', message: `-$${stake.toFixed(2)} on ${market}` });
-    }
-    document.getElementById("pnl").innerText = `Total Profit: $${totalPnL.toFixed(2)}`;
-}
-
-function clearLedger() {
-    totalPnL = 0;
-    sessionPnL = 0;
-    document.getElementById("pnl").innerText = `Total Profit: $0.00`;
-    document.getElementById("ledger-list").innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--muted); font-size:0.9rem;">No trades taken yet.</div>`;
+function executeExternalPayment() {
+    const method = document.getElementById("payment-method-select").value;
+    
+    document.getElementById("step2").style.display = "none";
+    document.getElementById("step3").style.display = "block";
+    
+    setTimeout(() => {
+        if (method === "mpesa") {
+            window.location.href = "https://link.palpluss.com/380865cd-5b2c-42dd-a37e-85e587f0a295";
+        }
+    }, 1500);
 }
 </script>
 </body>

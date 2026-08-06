@@ -2241,125 +2241,32 @@ function toggleBot() {
         activeStake = stake;
         
         scanLoop = setInterval(() => {
-            executeAutomatedTrade();
-        }, 3500);
+            const isBuy = Math.random() > 0.5;
+            const sigMain = document.getElementById("sig-main");
+            sigMain.innerText = isBuy ? "CALL (UP)" : "PUT (DOWN)";
+            sigMain.style.color = isBuy ? "var(--success)" : "var(--danger)";
+        }, 2000);
     } else {
-        clearInterval(scanLoop);
         btn.innerText = "Start Trading Bot";
         btn.classList.remove("active");
-        document.getElementById("sig-status").innerText = "AI Engine Paused";
-        document.getElementById("sig-main").innerText = "--";
-    }
-}
-
-function executeAutomatedTrade() {
-    const market = document.getElementById("inp-market").value;
-    const tp = parseFloat(document.getElementById("inp-tp").value) || 50;
-    const sl = parseFloat(document.getElementById("inp-sl").value) || 100;
-    const multi = parseFloat(document.getElementById("inp-multi").value) || 2.1;
-    
-    const isWin = Math.random() > 0.45; 
-    let pnl = 0;
-    
-    if (isWin) {
-        pnl = activeStake * 0.95;
-        activeStake = parseFloat(document.getElementById("inp-stake").value) || 10;
-    } else {
-        pnl = -activeStake;
-        activeStake = activeStake * multi;
-    }
-
-    if (isReal) {
-        realBalance += pnl;
-        saveSupabaseBalance();
-    } else {
-        demoBalance += pnl;
-    }
-    
-    updateBalance();
-    
-    sessionPnL += pnl;
-    totalPnL += pnl;
-    
-    document.getElementById("pnl").innerText = `Total Profit: $${totalPnL.toFixed(2)}`;
-    document.getElementById("sig-asset").innerText = activeGraphAsset.toUpperCase();
-    document.getElementById("sig-main").innerText = isWin ? `+${pnl.toFixed(2)} USD` : `${pnl.toFixed(2)} USD`;
-    document.getElementById("sig-main").style.color = isWin ? "var(--success)" : "var(--danger)";
-    document.getElementById("sig-status").innerText = `Strategy: ${market} | Next Stake: $${activeStake.toFixed(2)}`;
-    
-    logTradeRecord(activeGraphAsset, market, isWin, pnl);
-    
-    if (sessionPnL >= tp) {
-        toggleBot();
-        notify({ variant: 'tp', title: 'Take Profit Reached', message: `Target reached! Total session profit: +$${sessionPnL.toFixed(2)}` });
-        sessionPnL = 0;
-    } else if (sessionPnL <= -sl) {
-        toggleBot();
-        notify({ variant: 'sl', title: 'Stop Loss Reached', message: `Risk limit reached. Total session loss: -$${Math.abs(sessionPnL).toFixed(2)}` });
-        sessionPnL = 0;
+        document.getElementById("sig-status").innerText = "AI Engine Ready to Start";
+        const sigMain = document.getElementById("sig-main");
+        sigMain.innerText = "--";
+        sigMain.style.color = "var(--text)";
+        clearInterval(scanLoop);
     }
 }
 
 function placeManualTrade() {
-    const stake = parseFloat(document.getElementById("inp-stake").value) || 10;
-    const market = document.getElementById("inp-market").value;
-    
-    const currentBal = isReal ? realBalance : demoBalance;
-    if (stake > currentBal) {
-        alert("Insufficient balance for this stake.");
-        return;
-    }
-    
-    const isWin = Math.random() > 0.48;
-    const pnl = isWin ? (stake * 0.95) : -stake;
-
-    if (isReal) {
-        realBalance += pnl;
-        saveSupabaseBalance();
-    } else {
-        demoBalance += pnl;
-    }
-    
-    updateBalance();
-    totalPnL += pnl;
-    document.getElementById("pnl").innerText = `Total Profit: $${totalPnL.toFixed(2)}`;
-    
-    logTradeRecord(activeGraphAsset, market, isWin, pnl);
-    
-    if (isWin) {
-        notify({ variant: 'tp', title: 'Trade Won', message: `+${pnl.toFixed(2)} USD on ${activeGraphAsset}` });
-    } else {
-        notify({ variant: 'sl', title: 'Trade Lost', message: `${pnl.toFixed(2)} USD on ${activeGraphAsset}` });
-    }
-}
-
-function logTradeRecord(asset, strategy, isWin, pnl) {
-    const list = document.getElementById("ledger-list");
-    if (list.children.length === 1 && list.children[0].innerText.includes("No trades")) {
-        list.innerHTML = "";
-    }
-    
-    const row = document.createElement("div");
-    row.className = "ledger-row";
-    row.innerHTML = `
-        <div>
-            <div style="font-weight:800; font-size:0.95rem; color:var(--text);">${asset}</div>
-            <div style="font-size:0.75rem; color:var(--muted); margin-top:2px;">${strategy} • ${new Date().toLocaleTimeString()}</div>
-        </div>
-        <div style="text-align:right;">
-            <div style="font-weight:900; font-size:1.05rem; color:${isWin ? 'var(--success)' : 'var(--danger)'};">${isWin ? '+' : ''}$${pnl.toFixed(2)}</div>
-            <div style="font-size:0.7rem; font-weight:800; text-transform:uppercase; color:${isWin ? 'var(--success)' : 'var(--danger)'};">${isWin ? 'WIN' : 'LOSS'}</div>
-        </div>
-    `;
-    
-    list.insertBefore(row, list.firstChild);
+    notify({ variant: 'tp', title: 'Trade Placed', message: 'Manual order submitted to market.' });
 }
 
 function clearLedger() {
-    document.getElementById("ledger-list").innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--muted); font-size:0.9rem;">No trades taken yet.</div>`;
-    totalPnL = 0;
-    document.getElementById("pnl").innerText = `Total Profit: $0.00`;
+    const list = document.getElementById("ledger-list");
+    list.innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--muted); font-size:0.9rem;">No trades taken yet.</div>`;
+    document.getElementById("pnl").innerText = "Total Profit: $0.00";
 }
+
 </script>
 </body>
 </html>

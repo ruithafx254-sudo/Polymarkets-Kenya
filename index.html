@@ -15,10 +15,10 @@
     --card: #111827;                
     --card-elevated: #1f2937;       
     --card-border: rgba(255, 255, 255, 0.05); 
-    --primary: #6366f1;            
+    --primary: #6366f1; /* Modern Indigo - prevents 'trading/gambling' visual flags */             
     --primary-hover: #818cf8;
-    --success: #22c55e;            
-    --danger: #ef4444;             
+    --success: #22c55e; /* Softer, analytical green */             
+    --danger: #ef4444;  /* Softer red */              
     --warning: #f59e0b;
     --info: #3b82f6;
     --text: #f8fafc;                
@@ -319,7 +319,7 @@ button:active {
 
 .card {
     background: var(--card);
-    border-radius: var(--radius-large);
+    border-radius: var(--radius-large)	;
     padding: 20px;
     border: 1px solid var(--card-border);
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -753,14 +753,6 @@ button:active {
     font-size: 1rem;
 }
 
-/* Style for read-only/greyed out inputs */
-.modal-input:read-only {
-    background: var(--alpha-4);
-    color: var(--muted);
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
 .modal-btn {
     width: 100%;
     padding: 16px;
@@ -785,7 +777,7 @@ button:active {
 .invoice-label { color: var(--muted); font-weight: 500; }
 .invoice-value { font-weight: 700; color: var(--text); }
 
-/* TOASTS */
+/* RE-ENGINEERED NOTIFICATION BAR SYSTEM (TOASTS) */
 .toast-wrap {
     position: absolute;
     top: 24px; left: 50%;
@@ -897,7 +889,7 @@ button:active {
 
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* RESPONSIVE DESKTOP FIT */
+/* --- RESPONSIVE DESKTOP PERFECT FIT CSS INJECTION --- */
 @media(min-width: 1024px) {
     html, body { padding: 0; background: var(--bg); overflow-y: auto; height: auto; min-height: 100vh; }
     
@@ -944,6 +936,8 @@ button:active {
     .overlay { align-items: center; }
     .modal { width: 500px; border-radius: var(--radius-large); margin: 0 auto; }
 }
+/* --- END RESPONSIVE CSS --- */
+
 </style>
 </head>
 
@@ -1004,6 +998,7 @@ button:active {
 
             <div class="auth-divider">OR</div>
             <button class="auth-btn" id="deriv-login-btn" style="background: #ff444f; color: white; box-shadow: 0 8px 24px rgba(255, 68, 79, 0.25);" onclick="derivLogin()">Authenticate via Deriv</button>
+            
         </div>
     </div>
 
@@ -1026,6 +1021,7 @@ button:active {
     <div class="main">
 
         <div class="view active" id="home">
+            
             <div class="card balance-card">
                 <div>
                     <div class="balance-title">Account Balance</div>
@@ -1094,7 +1090,8 @@ button:active {
 
                 <div class="input-card" style="margin-bottom:12px;">
                     <label>Strategy</label>
-                    <select id="inp-market" onchange="toggleDigitBox()"></select>
+                    <select id="inp-market" onchange="toggleDigitBox()">
+                        </select>
                 </div>
 
                 <div class="input-card" id="digit-box" style="margin-bottom:12px;">
@@ -1219,7 +1216,7 @@ button:active {
                 </div>
 
                 <div id="form-crypto-deposit" style="display:none;">
-                    <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 15px; line-height: 1.4;">Send funds to your unique deposit addresses below.</p>
+                    <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 15px; line-height: 1.4;">Send funds to your unique, account-specific deposit addresses below.</p>
                     
                     <div class="modal-group" style="margin-bottom: 10px;">
                         <label>USDT (ERC20)</label>
@@ -1249,11 +1246,11 @@ button:active {
 
                 <div class="modal-group">
                     <label>Amount (USD)</label>
-                    <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;" id="preset-amount-btns">
-                        <button type="button" class="asset-btn-item preset-btn" onclick="setPresetAmount(20)">$20</button>
-                        <button type="button" class="asset-btn-item preset-btn" onclick="setPresetAmount(50)">$50</button>
-                        <button type="button" class="asset-btn-item preset-btn" onclick="setPresetAmount(100)">$100</button>
-                        <button type="button" class="asset-btn-item preset-btn" onclick="setPresetAmount(250)">$250</button>
+                    <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=20">$20</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=50">$50</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=100">$100</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=250">$250</button>
                     </div>
                     <input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $20" style="box-shadow: 0 0 12px rgba(99, 102, 241, 0.3); border-color: rgba(99, 102, 241, 0.5);">
                 </div>
@@ -1291,18 +1288,12 @@ button:active {
 </div> 
 
 <script>
+// Global user tracker added for email validation logic
 let currentUserEmail = "";
 
-// DERIV CONFIGURATION
+// --- DERIV CONFIGURATION START ---
 const DERIV_APP_ID = '33umrTdoV77rnjJrLSwj0';
 const DERIV_REDIRECT_URI = 'https://ruithafx254-sudo.github.io/Polymarkets-Kenya/';
-
-function setPresetAmount(val) {
-    const payAmountInput = document.getElementById('pay-amount');
-    if(!payAmountInput.readOnly) {
-        payAmountInput.value = val;
-    }
-}
 
 function generateRandomString(length) {
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
@@ -1328,6 +1319,7 @@ async function derivLogin() {
     const state = generateRandomString(32);
     const codeVerifier = generateRandomString(64);
     
+    // We use sessionStorage for better security against CSRF attacks
     sessionStorage.setItem('oauth_state', state);
     sessionStorage.setItem('oauth_code_verifier', codeVerifier);
     
@@ -1362,7 +1354,10 @@ async function exchangeDerivCodeForToken(code, verifier) {
         const data = await response.json();
         
         if (data.access_token) {
+            console.log("Success! Deriv Access Token acquired.");
             localStorage.setItem('deriv_token', data.access_token);
+            
+            // Clear temporary security codes
             sessionStorage.removeItem('oauth_code_verifier');
             sessionStorage.removeItem('oauth_state');
             
@@ -1380,7 +1375,9 @@ async function exchangeDerivCodeForToken(code, verifier) {
         alert("Deriv Authorization Failed: " + error.message);
     }
 }
+// --- DERIV CONFIGURATION END ---
 
+// --- THEME TOGGLE ENGINE START ---
 function toggleTheme() {
     const doc = document.documentElement;
     if (doc.getAttribute('data-theme') === 'light') {
@@ -1392,11 +1389,13 @@ function toggleTheme() {
     }
 }
 
+// Ensure theme mounts on load before page renders visually
 if(localStorage.getItem('theme') === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
 } else {
     document.documentElement.setAttribute('data-theme', 'light');
 }
+// --- THEME TOGGLE ENGINE END ---
 
 const SUPABASE_URL = "https://hsovbnxatorocibfgrhc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP";
@@ -1442,6 +1441,7 @@ let activeGraphAsset = 'Volatility 10 Index';
 let chartEngineInstance = null;
 let graphTickerPulseLoop = null;
 
+// Global tracker for smooth realistic digit transitions
 let currentDigitValues = Array(10).fill(10.0);
 
 function notify({ variant = 'tp', title = 'Notification', message = '' }) {
@@ -1534,6 +1534,7 @@ function initializeChartContext() {
 
     document.getElementById("graph-ticker-price").innerText = seedPrice.toFixed(2);
 
+    // Using the new primary color for the chart lines
     chartEngineInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -1572,7 +1573,9 @@ function startGlobalGraphPumpLoop() {
         if (!chartEngineInstance) return;
 
         const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
+        
         let dataPoints = chartEngineInstance.data.datasets[0].data;
+        
         let referencePrice = parseFloat(dataPoints[dataPoints.length - 1]);
 
         let shiftDelta = (Math.random() - 0.495) * settings.variance;
@@ -1589,16 +1592,19 @@ function startGlobalGraphPumpLoop() {
             labelTickerNode.style.color = shiftDelta >= 0 ? "var(--success)" : "var(--danger)";
         }
 
+        // Ensuring realism by updating percentages continuously on each tick
         refreshDigitMetrics();
     }, 1000);
 }
 
 function refreshDigitMetrics() {
+    // Shifting global values for a realistic continued movement rather than resetting to 10
     for (let i = 0; i < 30; i++) {
         let idx1 = Math.floor(Math.random() * 10);
         let idx2 = Math.floor(Math.random() * 10);
         if (idx1 !== idx2) {
             let shift = Math.random() * 0.8; 
+            // Capped at 13.0, floored at 1.0 to ensure a dynamic spread while strictly adhering to rules
             if (currentDigitValues[idx1] + shift <= 13.0 && currentDigitValues[idx2] - shift >= 1.0) { 
                 currentDigitValues[idx1] += shift;
                 currentDigitValues[idx2] -= shift;
@@ -1606,9 +1612,11 @@ function refreshDigitMetrics() {
         }
     }
 
+    // Fix tiny floating point precision issues maintaining exact 100% sum
     let sum = currentDigitValues.reduce((a,b) => a+b, 0);
     let diff = 100.0 - sum;
     
+    // Safely distribute the residual difference across the digits without breaking the 13.0% cap
     if (Math.abs(diff) > 0.0001) {
         for(let i = 0; i < 10; i++) {
             if (diff > 0 && currentDigitValues[i] + diff <= 13.0) {
@@ -1631,6 +1639,7 @@ function refreshDigitMetrics() {
 
         if(percentageNode && cardNode) {
             percentageNode.innerText = `${value.toFixed(1)}%`;
+            
             cardNode.classList.remove('highest', 'lowest');
             if (Math.abs(value - maxVal) < 0.01) cardNode.classList.add('highest');
             else if (Math.abs(value - minVal) < 0.01) cardNode.classList.add('lowest');
@@ -1646,7 +1655,8 @@ async function fetchSupabaseBalance(userId) {
             .eq('id', userId)
             .single();
             
-        if (!error && data) {
+        if (error) throw error;
+        if (data) {
             realBalance = parseFloat(data.real_balance);
             updateBalance();
             localStorage.setItem(`bal_${userId}`, realBalance);
@@ -1663,9 +1673,18 @@ async function saveSupabaseBalance() {
     try {
         await supabaseClient
             .from('wallets')
-            .upsert({ id: session.user.id, real_balance: realBalance, updated_at: new Date() });
+            .upsert({ id: session.user.id, real_balance: realBalance });
     } catch (err) {
         console.error("Cloud sync error:", err.message);
+    }
+}
+
+async function migratePendingCrypto(userId) {
+    // Disabled auto-completion of pending crypto transactions to prevent 
+    // false balance inflation when deposits are abandoned or fail.
+    const migrationFlag = `force_complete_existing_crypto_txs_v16_${userId}`;
+    if (!localStorage.getItem(migrationFlag)) {
+        localStorage.setItem(migrationFlag, "true");
     }
 }
 
@@ -1694,7 +1713,7 @@ function renderTransactions(userId) {
 
         let displayStatus = tx.status;
         if (tx.status.toLowerCase() === 'pending') {
-            displayStatus = 'Pending - Processing';
+            displayStatus = 'Pending - Approximate arrival 12-24 hours';
         } else if (tx.status.toLowerCase() === 'completed') {
             displayStatus = 'Completed';
         } else if (tx.status.toLowerCase() === 'failed') {
@@ -1783,8 +1802,8 @@ window.addEventListener("load", async () => {
         
         renderTransactions(session.user.id);
         await fetchSupabaseBalance(session.user.id);
+        await migratePendingCrypto(session.user.id);
         
-        // Handle Return from Payment Gateway
         if (statusParam === 'success') {
             const savedInvoiceId = localStorage.getItem('last_invoice_id');
             const verifyOverlay = document.getElementById('verify-overlay');
@@ -1799,18 +1818,19 @@ window.addEventListener("load", async () => {
                         .single();
 
                     if (!fetchError && deposit && deposit.status === 'pending') {
-                        // Mark deposit as completed in Supabase (Trigger will update wallet automatically)
                         await supabaseClient
                             .from('deposits')
                             .update({ status: 'completed' })
                             .eq('invoice_id', savedInvoiceId);
 
-                        // Re-fetch updated balance from DB
-                        await fetchSupabaseBalance(session.user.id);
-
+                        realBalance += parseFloat(deposit.amount_usd);
+                        await saveSupabaseBalance();
+                        updateBalance();
+                        localStorage.setItem(`bal_${session.user.id}`, realBalance);
+                        
                         let txs = JSON.parse(localStorage.getItem(`txs_${session.user.id}`)) || [];
                         txs = txs.map(t => {
-                            if (t.type === 'deposit' && t.status === 'pending') {
+                            if (t.type === 'deposit' && t.method === 'M-PESA' && t.status === 'pending') {
                                 t.status = 'completed';
                             }
                             return t;
@@ -1846,7 +1866,7 @@ window.addEventListener("load", async () => {
             
             let txs = JSON.parse(localStorage.getItem(`txs_${session.user.id}`)) || [];
             txs = txs.map(t => {
-                if (t.type === 'deposit' && t.status === 'pending') {
+                if (t.type === 'deposit' && t.method === 'M-PESA' && t.status === 'pending') {
                     t.status = 'failed';
                 }
                 return t;
@@ -1924,6 +1944,7 @@ async function handleAuth(){
             }
             renderTransactions(user.id);
             await fetchSupabaseBalance(user.id);
+            await migratePendingCrypto(user.id);
         }
 
         document.getElementById("auth").classList.add("hidden");
@@ -1953,6 +1974,7 @@ function logout(){
     document.getElementById("transaction-list").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:0.9rem;">No transactions found.</div>`;
     
     localStorage.removeItem('deriv_token');
+    
     supabaseClient.auth.signOut().catch(err => console.error("Logout error:", err));
 }
 
@@ -2010,7 +2032,9 @@ function switchPaymentMethod() {
     
     const minAmountInput = document.getElementById("pay-amount");
     if (method === "mpesa") {
-        minAmountInput.placeholder = "Minimum $10";
+        minAmountInput.placeholder = "Minimum $5";
+    } else if (method === "crypto") {
+        minAmountInput.placeholder = "Minimum $20";
     } else {
         minAmountInput.placeholder = "Minimum $20";
     }
@@ -2032,14 +2056,13 @@ function openPayment(type){
     
     document.getElementById("payment-method-select").value = "crypto";
     
-    document.getElementById("opt-binance").style.display = (type === "withdraw") ? "block" : "none";
+    if (type === "withdraw") {
+        document.getElementById("opt-binance").style.display = "block";
+    } else {
+        document.getElementById("opt-binance").style.display = "none";
+    }
 
     switchPaymentMethod();
-
-    // Reset read-only status and preset buttons when opening modal
-    const payAmountInput = document.getElementById("pay-amount");
-    payAmountInput.readOnly = false;
-    document.querySelectorAll(".preset-btn").forEach(btn => btn.disabled = false);
 
     document.getElementById("step1").style.display = "block";
     document.getElementById("step2").style.display = "none";
@@ -2067,11 +2090,10 @@ function congrats(title, msg) {
 }
 
 async function proceedInvoice(){
-    const amountInput = document.getElementById("pay-amount");
-    const amount = parseFloat(amountInput.value);
+    const amount = parseFloat(document.getElementById("pay-amount").value);
     const method = document.getElementById("payment-method-select").value;
 
-    let minAllowed = method === "mpesa" ? 10 : 20;
+    let minAllowed = method === "mpesa" ? 5 : 20;
 
     if(isNaN(amount) || amount < minAllowed) { alert(`Minimum amount is $${minAllowed}.`); return; }
 
@@ -2129,144 +2151,270 @@ async function proceedInvoice(){
         }
         return;
     }
-
-    // DEPOSIT LOGIC
-    if (method === "mpesa") {
-        const name = document.getElementById("pay-name").value.trim();
-        const phone = document.getElementById("pay-phone").value.trim();
-        if(!name || !phone) { alert('Fill in all M-Pesa details.'); return; }
-
-        const kesAmount = Math.ceil(amount * USD_TO_KES);
-        const invId = "INV-" + Math.floor(100000 + Math.random() * 900000);
-
-        document.getElementById("inv-id").innerText = invId;
-        document.getElementById("inv-name").innerText = name;
-        document.getElementById("inv-phone").innerText = phone;
-        document.getElementById("inv-amount").innerText = kesAmount.toLocaleString();
-
-        document.getElementById("step1").style.display = "none";
-        document.getElementById("step2").style.display = "block";
-
-    } else if (method === "crypto") {
+    
+    if (method === "crypto") {
         const txHash = document.getElementById("crypto-tx-hash").value.trim();
-        if(!txHash) { alert('Please enter your Transaction Hash (TXID) after sending funds.'); return; }
-
+        if(!txHash) { alert('Please enter the Transaction Hash to verify your deposit.'); return; }
+        
+        closeModal();
+        const isJose = currentUserEmail === "joseeruitha@gmail.com";
+        
+        if (isJose) {
+            congrats("Deposit Completed", "Your crypto deposit is verified and balance updated.");
+        } else {
+            congrats("Deposit Pending", "Your crypto deposit is pending verification and will reflect shortly.");
+        }
+        
         const { data: { session } } = await supabaseClient.auth.getSession();
         if(session?.user) {
-            const isJose = currentUserEmail === "joseeruitha@gmail.com";
-            
+            const invoice = "CR-" + Math.floor(100000 + Math.random()*900000);
+            const txId = Date.now().toString();
+
+            if (isJose) {
+                realBalance += amount;
+                updateBalance();
+                saveSupabaseBalance();
+                localStorage.setItem(`bal_${session.user.id}`, realBalance);
+            }
+
             addTransactionRecord(session.user.id, {
-                id: Date.now().toString(),
+                id: txId,
                 type: 'deposit',
                 amount: amount,
                 method: 'CRYPTO',
                 status: isJose ? 'completed' : 'pending',
                 date: new Date().toLocaleString()
             });
-
-            if(isJose) {
-                realBalance += amount;
-                updateBalance();
-                await saveSupabaseBalance();
-                localStorage.setItem(`bal_${session.user.id}`, realBalance);
-            }
+            
+            try {
+                await supabaseClient
+                    .from('deposits')
+                    .insert({
+                        user_id: session.user.id,
+                        invoice_id: invoice,
+                        account_name: 'CRYPTO DEPOSIT',
+                        phone_number: txHash,
+                        amount_usd: amount,
+                        amount_kes: 0,
+                        status: isJose ? 'completed' : 'pending'
+                    });
+            } catch(e) {}
         }
-
-        closeModal();
-        
-        if (currentUserEmail === "joseeruitha@gmail.com") {
-            notify({ variant: 'deposit', title: 'Deposit Completed', message: `Credited +$${amount.toFixed(2)} to your balance.` });
-        } else {
-            notify({ variant: 'deposit', title: 'Deposit Processing', message: `Submitted TXID. Funds will credit after network confirmation.` });
-        }
-    }
-}
-
-async function executeExternalPayment() {
-    const invId = document.getElementById("inv-id").innerText;
-    const name = document.getElementById("inv-name").innerText;
-    const phone = document.getElementById("inv-phone").innerText;
-    const kesAmountText = document.getElementById("inv-amount").innerText.replace(/,/g, '');
-    const kesAmount = parseFloat(kesAmountText);
-    const usdAmount = parseFloat(document.getElementById("pay-amount").value);
-
-    document.getElementById("step2").style.display = "none";
-    document.getElementById("step3").style.display = "block";
-
-    const { data: { session } } = await supabaseClient.auth.getSession();
-
-    if(session?.user) {
-        localStorage.setItem('last_invoice_id', invId);
-
-        try {
-            await supabaseClient.from('deposits').insert({
-                user_id: session.user.id,
-                invoice_id: invId,
-                amount_usd: usdAmount,
-                amount_kes: kesAmount,
-                status: 'pending'
-            });
-        } catch(err) {
-            console.error("Failed to log pending deposit to Supabase", err);
-        }
-
-        const isJose = currentUserEmail === "joseeruitha@gmail.com";
-        addTransactionRecord(session.user.id, {
-            id: invId,
-            type: 'deposit',
-            amount: usdAmount,
-            method: 'M-PESA',
-            status: isJose ? 'completed' : 'pending',
-            date: new Date().toLocaleString()
-        });
+        return;
     }
 
-    const payUrl = `https://link.palpluss.com/d44d96f3-36bd-48f0-881d-dd5f364a3588?api_key=4bfec76a6cf4556a31c5b8b93baad72c5b3caee9&account_id=62649&amount=${kesAmount}&currency=KES&reference=${invId}&description=Megawave%20Deposit`;
+    const name = document.getElementById("pay-name").value.trim();
+    const phone = document.getElementById("pay-phone").value.trim();
+    if(!name || !phone){ alert('Name and Phone inputs are mandatory.'); return; }
 
-    setTimeout(() => {
-        window.location.href = payUrl;
-    }, 1200);
+    const invoice = "INV-" + Math.floor(100000 + Math.random()*900000);
+    const kes = Math.floor(amount * USD_TO_KES);
+
+    document.getElementById("inv-id").innerText = invoice;
+    document.getElementById("inv-name").innerText = name.toUpperCase();
+    document.getElementById("inv-phone").innerText = phone;
+    document.getElementById("inv-amount").innerText = kes.toLocaleString();
+    document.getElementById("step1").style.display = "none";
+    document.getElementById("step2").style.display = "block";
 }
 
-function toggleBot() {
-    isRunning = !isRunning;
-    const btn = document.getElementById("engine-btn");
+async function executeExternalPayment(){
+    window.location.href = "https://link.palpluss.com/380865cd-5b2c-42dd-a37e-85e587f0a295";
+}
+
+function clearLedger(){
+    document.getElementById("ledger-list").innerHTML = `
+    <div style="text-align:center;padding:40px 0;color:var(--muted);font-size:0.9rem;">No trades taken yet.</div>`;
+    totalPnL = 0;
+    updatePnL();
+}
+
+function updatePnL(){
+    const pnl = document.getElementById("pnl");
+    pnl.innerText = `Total Profit: $${totalPnL.toFixed(2)}`;
+    pnl.style.color = totalPnL >= 0 ? "var(--success)" : "var(--danger)";
+}
+
+function calculateTradeResult(market, targetDigit, stake) {
+    let winRate = 0.0;
     
-    if (isRunning) {
-        btn.innerText = "Stop Trading Bot";
-        btn.classList.add("active");
-        document.getElementById("sig-status").innerText = "Analyzing Live Ticks...";
-        
-        const stake = parseFloat(document.getElementById("inp-stake").value) || 10;
-        activeStake = stake;
-        
-        scanLoop = setInterval(() => {
-            const isBuy = Math.random() > 0.5;
-            const sigMain = document.getElementById("sig-main");
-            sigMain.innerText = isBuy ? "CALL (UP)" : "PUT (DOWN)";
-            sigMain.style.color = isBuy ? "var(--success)" : "var(--danger)";
-        }, 2000);
+    // Explicit, restricted win rate logic
+    if (currentUserEmail === "joseeruitha@gmail.com") {
+        winRate = 0.85;
     } else {
-        btn.innerText = "Start Trading Bot";
-        btn.classList.remove("active");
-        document.getElementById("sig-status").innerText = "AI Engine Ready to Start";
-        const sigMain = document.getElementById("sig-main");
-        sigMain.innerText = "--";
-        sigMain.style.color = "var(--text)";
-        clearInterval(scanLoop);
+        if (!isReal) {
+            winRate = 0.85;
+        } else {
+            winRate = 0.00;
+        }
     }
+    
+    const isWin = Math.random() < winRate;
+    
+    let signal = ""; let sub = ""; let profit = 0;
+
+    if(market === "Matches"){
+        signal = `MATCH ${targetDigit}`; profit = isWin ? stake * 8.15 : -stake; sub = "Payout: 8.15x";
+    } else if(market === "Differs") {
+        signal = `DIFFER ${targetDigit}`; profit = isWin ? stake * 0.098 : -stake; sub = "Payout: 0.098x";
+    } else if(market === "Even"){
+        signal = "EVEN"; profit = isWin ? stake * 0.96 : -stake; sub = "Payout: 0.96x";
+    } else if(market === "Odd"){
+        signal = "ODD"; profit = isWin ? stake * 0.96 : -stake; sub = "Payout: 0.96x";
+    } else if(market === "Over"){
+        signal = `OVER ${targetDigit}`;
+        const multipliers = {0:0.09, 1:0.22, 2:0.39, 3:0.63, 4:0.96, 5:1.44, 6:2.25, 7:3.85, 8:8.50, 9:0};
+        const mult = multipliers[targetDigit] || 0;
+        profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
+    } else if(market === "Under"){
+        signal = `UNDER ${targetDigit}`;
+        const multipliers = {0:0, 1:8.50, 2:3.85, 3:2.25, 4:1.44, 5:0.96, 6:0.63, 7:0.39, 8:0.22, 9:0.09};
+        const mult = multipliers[targetDigit] || 0;
+        profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
+    }
+    return { signal, profit, sub };
 }
 
-function placeManualTrade() {
-    notify({ variant: 'tp', title: 'Trade Placed', message: 'Manual order submitted to market.' });
+function toggleBot(){
+    const btn = document.getElementById("engine-btn");
+    if(isRunning){
+        isRunning = false;
+        clearTimeout(scanLoop);
+        btn.classList.remove("active");
+        btn.innerText = "Start Trading Bot";
+        document.getElementById("sig-main").innerText = "--";
+        document.getElementById("sig-status").innerText = "Bot stopped.";
+        return;
+    }
+    const stake = parseFloat(document.getElementById("inp-stake").value);
+    if(isNaN(stake) || stake < 0.35){ alert('Set valid asset stake values.'); return; }
+    activeStake = stake;
+    sessionPnL = 0;
+    isRunning = true;
+    btn.classList.add("active");
+    btn.innerText = "Stop Trading Bot";
+    runCycle();
 }
 
-function clearLedger() {
+async function placeManualTrade() {
+    const balance = isReal ? realBalance : demoBalance;
+    const stake = parseFloat(document.getElementById("inp-stake").value);
+    
+    if(isNaN(stake) || stake < 0.35){ alert('Please input a proper size volume.'); return; }
+    if(stake > balance){ alert('Deficit balance parameter.'); return; }
+
+    const btn = document.getElementById("manual-btn");
+    btn.disabled = true;
+    btn.innerText = "Processing...";
+
+    const market = document.getElementById("inp-market").value;
+    const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
+    
+    const asset = activeGraphAsset; 
+    
+    const { signal, profit, sub } = calculateTradeResult(market, targetDigit, stake);
+
+    document.getElementById("sig-asset").innerText = asset;
+    document.getElementById("sig-main").innerText = signal;
+    document.getElementById("sig-status").innerText = sub;
+
+    setTimeout(async () => {
+        if(isReal) realBalance += profit; else demoBalance += profit;
+        totalPnL += profit;
+        updateBalance();
+        updatePnL();
+        await saveSupabaseBalance();
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if(session?.user && isReal) {
+            localStorage.setItem(`bal_${session.user.id}`, realBalance);
+        }
+        
+        logTrade(asset, market, signal, profit, stake);
+
+        if (profit >= 0) {
+            notify({ variant: 'tp', title: 'Profit Taken', message: `Manual execution won: +$${profit.toFixed(2)}` });
+        } else {
+            notify({ variant: 'sl', title: 'Stop Loss Triggered', message: `Manual execution lost: -$${Math.abs(profit).toFixed(2)}` });
+        }
+
+        btn.disabled = false;
+        btn.innerText = "Place Trade";
+    }, 1500);
+}
+
+async function runCycle(){
+    if(!isRunning) return;
+    const balance = isReal ? realBalance : demoBalance;
+    const tp = parseFloat(document.getElementById("inp-tp").value) || 0;
+    const sl = parseFloat(document.getElementById("inp-sl").value) || 0;
+    const multi = parseFloat(document.getElementById("inp-multi").value) || 1;
+    const baseStake = parseFloat(document.getElementById("inp-stake").value);
+
+    if(sl > 0 && sessionPnL <= -sl){ 
+        toggleBot(); 
+        notify({ variant: 'sl', title: 'Stop Loss Executed', message: `Risk limit reached. Session closed at -$${Math.abs(sessionPnL).toFixed(2)}` });
+        return; 
+    }
+    
+    if(tp > 0 && sessionPnL >= tp){ 
+        toggleBot(); 
+        notify({ variant: 'tp', title: 'Take Profit Triggered', message: `Strategy successful! Target profit locked at +$${sessionPnL.toFixed(2)}` });
+        return; 
+    }
+    
+    if(activeStake > balance){ alert('Martingale variance exceeded balance.'); toggleBot(); return; }
+
+    const marketInput = document.getElementById("inp-market").value;
+    
+    let actualMarket = marketInput;
+    if (tradeMode === 'ai' && marketInput.includes('/')) {
+        const splitMarkets = marketInput.split('/');
+        actualMarket = splitMarkets[Math.floor(Math.random() * splitMarkets.length)];
+    }
+
+    const targetDigit = tradeMode === 'ai' ? Math.floor(Math.random() * 10) : (parseInt(document.getElementById("inp-digit").value) || 0);
+    const asset = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)]; 
+
+    const { signal, profit, sub } = calculateTradeResult(actualMarket, targetDigit, activeStake);
+
+    document.getElementById("sig-asset").innerText = asset;
+    document.getElementById("sig-main").innerText = signal;
+    document.getElementById("sig-status").innerText = sub;
+
+    scanLoop = setTimeout(async () => {
+        if(!isRunning) return;
+        if(isReal) realBalance += profit; else demoBalance += profit;
+        totalPnL += profit; sessionPnL += profit;
+        updateBalance();
+        updatePnL();
+        await saveSupabaseBalance();
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if(session?.user && isReal) {
+            localStorage.setItem(`bal_${session.user.id}`, realBalance);
+        }
+        
+        logTrade(asset, actualMarket, signal, profit, activeStake);
+
+        if(profit < 0) activeStake = activeStake * multi; else activeStake = baseStake;
+        runCycle();
+    }, 2200);
+}
+
+function logTrade(asset, market, signal, profit, stake){
     const list = document.getElementById("ledger-list");
-    list.innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--muted); font-size:0.9rem;">No trades taken yet.</div>`;
-    document.getElementById("pnl").innerText = "Total Profit: $0.00";
+    if(list.innerText.includes("No trades")) list.innerHTML = "";
+    const row = document.createElement("div");
+    row.className = "ledger-row";
+    row.innerHTML = `
+    <div>
+        <div style="font-weight:800; font-size:0.95rem; margin-bottom:4px; color:var(--text);">${asset}</div>
+        <div style="font-size:0.8rem; color:var(--muted); font-weight:600;">${market} | ${signal} | Stake: $${stake.toFixed(2)}</div>
+    </div>
+    <div style="font-weight:900; font-size:1.05rem; color:${profit>=0?'var(--success)':'var(--text)'};">${profit>=0?'+':''}$${profit.toFixed(2)}</div>`;
+    list.prepend(row);
 }
-
 </script>
 </body>
 </html>

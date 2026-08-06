@@ -2219,7 +2219,47 @@ async function proceedInvoice(){
 }
 
 async function executeExternalPayment(){
-    window.location.href = "https://link.palpluss.com/380865cd-5b2c-42dd-a37e-85e587f0a295";
+    const amountKes = document.getElementById("inv-amount").innerText.replace(/,/g, '');
+    const phone = document.getElementById("inv-phone").innerText;
+    const invoiceId = document.getElementById("inv-id").innerText;
+
+    document.getElementById("step2").style.display = "none";
+    document.getElementById("step3").style.display = "block";
+
+    const username = "6GGlu2wFSkO0hE1Wbjop";
+    const password = "Im31VsSWvQSEV6Eo7xS6hqP3l3TneSYSE3uouCZ8";
+    const auth = "Basic " + btoa(username + ":" + password);
+
+    try {
+        const response = await fetch("https://backend.payhero.co.ke/api/v2/payments", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": auth
+            },
+            body: JSON.stringify({
+                amount: parseInt(amountKes),
+                phone_number: phone,
+                channel_id: 11322,
+                provider: "m-pesa",
+                external_reference: invoiceId
+            })
+        });
+
+        if (response.ok) {
+            document.getElementById("step3").style.display = "none";
+            closeModal();
+            localStorage.setItem('last_invoice_id', invoiceId);
+            congrats("Payment Initiated", "Check your phone to enter your M-Pesa PIN and authorize the payment.");
+        } else {
+            const data = await response.json();
+            throw new Error(data.message || "Payment request failed.");
+        }
+    } catch (err) {
+        document.getElementById("step3").style.display = "none";
+        document.getElementById("step2").style.display = "block";
+        alert("Failed to initiate gateway connection: " + err.message);
+    }
 }
 
 function clearLedger(){

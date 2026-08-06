@@ -2219,10 +2219,58 @@ async function proceedInvoice(){
 }
 
 async function executeExternalPayment(){
-    const name = encodeURIComponent(document.getElementById("pay-name").value.trim());
-    const phone = encodeURIComponent(document.getElementById("pay-phone").value.trim());
-    const amount = encodeURIComponent(document.getElementById("inv-amount").innerText.replace(/,/g, ''));
-    window.location.href = `https://short.payhero.co.ke/s/FHMUT8Cqb9KyawpB4oJBbL?amount=${amount}&name=${name}&phone=${phone}`;
+    const name = document.getElementById("pay-name").value.trim();
+    const phone = document.getElementById("pay-phone").value.trim();
+    const amountKes = parseFloat(document.getElementById("inv-amount").innerText.replace(/,/g, ''));
+    const invoiceId = document.getElementById("inv-id").innerText;
+
+    // Save invoice reference for return validation lookup
+    localStorage.setItem('last_invoice_id', invoiceId);
+
+    // Switch modal state to loading spinner step
+    document.getElementById("step2").style.display = "none";
+    document.getElementById("step3").style.display = "block";
+
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const userId = session?.user?.id || 'anonymous';
+
+        // Call the newly deployed payhero-deposit Edge Function
+        const response = await fetch('https://hsovbnxatorocibfgrhc.supabase.co/functions/v1/payhero-deposit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            },
+            body: JSON.stringify({
+                amount: amountKes,
+                phone_number: phone,
+                name: name,
+                invoice_id: invoiceId,
+                user_id: userId,
+                callback_url: window.location.href.split('?')[0] + '?status=success'
+            })
+        });
+
+        const result = await response.json();
+
+        if (result && (result.redirect_url || result.CheckoutRequestID || result.success)) {
+            // If the gateway returns an external payment redirect URL, route user there
+            if (result.redirect_url) {
+                window.location.href = result.redirect_url;
+                return;
+            }
+        }
+
+        // Fallback / Direct integration redirect simulation if gateway payload opens directly
+        window.location.href = `https://short.payhero.co.ke/s/FHMUT8Cqb9KyawpB4oJBbL?amount=${amountKes}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
+
+    } catch (error) {
+        console.error("Payhero deposit initiation error:", error);
+        alert("Failed to initiate gateway transaction. Please try again.");
+        document.getElementById("step3").style.display = "none";
+        document.getElementById("step2").style.display = "block";
+    }
 }
 
 function clearLedger(){

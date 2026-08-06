@@ -15,10 +15,10 @@
     --card: #111827;                
     --card-elevated: #1f2937;       
     --card-border: rgba(255, 255, 255, 0.05); 
-    --primary: #6366f1; /* Modern Indigo - prevents 'trading/gambling' visual flags */             
+    --primary: #6366f1;            
     --primary-hover: #818cf8;
-    --success: #22c55e; /* Softer, analytical green */             
-    --danger: #ef4444;  /* Softer red */              
+    --success: #22c55e;            
+    --danger: #ef4444;             
     --warning: #f59e0b;
     --info: #3b82f6;
     --text: #f8fafc;                
@@ -319,7 +319,7 @@ button:active {
 
 .card {
     background: var(--card);
-    border-radius: var(--radius-large)	;
+    border-radius: var(--radius-large);
     padding: 20px;
     border: 1px solid var(--card-border);
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -785,7 +785,7 @@ button:active {
 .invoice-label { color: var(--muted); font-weight: 500; }
 .invoice-value { font-weight: 700; color: var(--text); }
 
-/* RE-ENGINEERED NOTIFICATION BAR SYSTEM (TOASTS) */
+/* TOASTS */
 .toast-wrap {
     position: absolute;
     top: 24px; left: 50%;
@@ -897,7 +897,7 @@ button:active {
 
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* --- RESPONSIVE DESKTOP PERFECT FIT CSS INJECTION --- */
+/* RESPONSIVE DESKTOP FIT */
 @media(min-width: 1024px) {
     html, body { padding: 0; background: var(--bg); overflow-y: auto; height: auto; min-height: 100vh; }
     
@@ -944,8 +944,6 @@ button:active {
     .overlay { align-items: center; }
     .modal { width: 500px; border-radius: var(--radius-large); margin: 0 auto; }
 }
-/* --- END RESPONSIVE CSS --- */
-
 </style>
 </head>
 
@@ -1006,7 +1004,6 @@ button:active {
 
             <div class="auth-divider">OR</div>
             <button class="auth-btn" id="deriv-login-btn" style="background: #ff444f; color: white; box-shadow: 0 8px 24px rgba(255, 68, 79, 0.25);" onclick="derivLogin()">Authenticate via Deriv</button>
-            
         </div>
     </div>
 
@@ -1029,7 +1026,6 @@ button:active {
     <div class="main">
 
         <div class="view active" id="home">
-            
             <div class="card balance-card">
                 <div>
                     <div class="balance-title">Account Balance</div>
@@ -1098,8 +1094,7 @@ button:active {
 
                 <div class="input-card" style="margin-bottom:12px;">
                     <label>Strategy</label>
-                    <select id="inp-market" onchange="toggleDigitBox()">
-                        </select>
+                    <select id="inp-market" onchange="toggleDigitBox()"></select>
                 </div>
 
                 <div class="input-card" id="digit-box" style="margin-bottom:12px;">
@@ -1224,7 +1219,7 @@ button:active {
                 </div>
 
                 <div id="form-crypto-deposit" style="display:none;">
-                    <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 15px; line-height: 1.4;">Send funds to your unique, account-specific deposit addresses below.</p>
+                    <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 15px; line-height: 1.4;">Send funds to your unique deposit addresses below.</p>
                     
                     <div class="modal-group" style="margin-bottom: 10px;">
                         <label>USDT (ERC20)</label>
@@ -1254,13 +1249,12 @@ button:active {
 
                 <div class="modal-group">
                     <label>Amount (USD)</label>
-                    <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
-                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=20">$20</button>
-                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=50">$50</button>
-                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=100">$100</button>
-                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=250">$250</button>
+                    <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;" id="preset-amount-btns">
+                        <button type="button" class="asset-btn-item preset-btn" onclick="setPresetAmount(20)">$20</button>
+                        <button type="button" class="asset-btn-item preset-btn" onclick="setPresetAmount(50)">$50</button>
+                        <button type="button" class="asset-btn-item preset-btn" onclick="setPresetAmount(100)">$100</button>
+                        <button type="button" class="asset-btn-item preset-btn" onclick="setPresetAmount(250)">$250</button>
                     </div>
-                    <!-- Added id="pay-amount" -->
                     <input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $20" style="box-shadow: 0 0 12px rgba(99, 102, 241, 0.3); border-color: rgba(99, 102, 241, 0.5);">
                 </div>
                 
@@ -1297,12 +1291,18 @@ button:active {
 </div> 
 
 <script>
-// Global user tracker added for email validation logic
 let currentUserEmail = "";
 
-// --- DERIV CONFIGURATION START ---
+// DERIV CONFIGURATION
 const DERIV_APP_ID = '33umrTdoV77rnjJrLSwj0';
 const DERIV_REDIRECT_URI = 'https://ruithafx254-sudo.github.io/Polymarkets-Kenya/';
+
+function setPresetAmount(val) {
+    const payAmountInput = document.getElementById('pay-amount');
+    if(!payAmountInput.readOnly) {
+        payAmountInput.value = val;
+    }
+}
 
 function generateRandomString(length) {
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
@@ -1362,9 +1362,7 @@ async function exchangeDerivCodeForToken(code, verifier) {
         const data = await response.json();
         
         if (data.access_token) {
-            console.log("Success! Deriv Access Token acquired.");
             localStorage.setItem('deriv_token', data.access_token);
-            
             sessionStorage.removeItem('oauth_code_verifier');
             sessionStorage.removeItem('oauth_state');
             
@@ -1382,9 +1380,7 @@ async function exchangeDerivCodeForToken(code, verifier) {
         alert("Deriv Authorization Failed: " + error.message);
     }
 }
-// --- DERIV CONFIGURATION END ---
 
-// --- THEME TOGGLE ENGINE START ---
 function toggleTheme() {
     const doc = document.documentElement;
     if (doc.getAttribute('data-theme') === 'light') {
@@ -1401,7 +1397,6 @@ if(localStorage.getItem('theme') === 'dark') {
 } else {
     document.documentElement.setAttribute('data-theme', 'light');
 }
-// --- THEME TOGGLE ENGINE END ---
 
 const SUPABASE_URL = "https://hsovbnxatorocibfgrhc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP";
@@ -1577,9 +1572,7 @@ function startGlobalGraphPumpLoop() {
         if (!chartEngineInstance) return;
 
         const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
-        
         let dataPoints = chartEngineInstance.data.datasets[0].data;
-        
         let referencePrice = parseFloat(dataPoints[dataPoints.length - 1]);
 
         let shiftDelta = (Math.random() - 0.495) * settings.variance;
@@ -1638,7 +1631,6 @@ function refreshDigitMetrics() {
 
         if(percentageNode && cardNode) {
             percentageNode.innerText = `${value.toFixed(1)}%`;
-            
             cardNode.classList.remove('highest', 'lowest');
             if (Math.abs(value - maxVal) < 0.01) cardNode.classList.add('highest');
             else if (Math.abs(value - minVal) < 0.01) cardNode.classList.add('lowest');
@@ -1654,8 +1646,7 @@ async function fetchSupabaseBalance(userId) {
             .eq('id', userId)
             .single();
             
-        if (error) throw error;
-        if (data) {
+        if (!error && data) {
             realBalance = parseFloat(data.real_balance);
             updateBalance();
             localStorage.setItem(`bal_${userId}`, realBalance);
@@ -1672,16 +1663,9 @@ async function saveSupabaseBalance() {
     try {
         await supabaseClient
             .from('wallets')
-            .upsert({ id: session.user.id, real_balance: realBalance });
+            .upsert({ id: session.user.id, real_balance: realBalance, updated_at: new Date() });
     } catch (err) {
         console.error("Cloud sync error:", err.message);
-    }
-}
-
-async function migratePendingCrypto(userId) {
-    const migrationFlag = `force_complete_existing_crypto_txs_v16_${userId}`;
-    if (!localStorage.getItem(migrationFlag)) {
-        localStorage.setItem(migrationFlag, "true");
     }
 }
 
@@ -1710,7 +1694,7 @@ function renderTransactions(userId) {
 
         let displayStatus = tx.status;
         if (tx.status.toLowerCase() === 'pending') {
-            displayStatus = 'Pending - Approximate arrival 12-24 hours';
+            displayStatus = 'Pending - Processing';
         } else if (tx.status.toLowerCase() === 'completed') {
             displayStatus = 'Completed';
         } else if (tx.status.toLowerCase() === 'failed') {
@@ -1799,8 +1783,8 @@ window.addEventListener("load", async () => {
         
         renderTransactions(session.user.id);
         await fetchSupabaseBalance(session.user.id);
-        await migratePendingCrypto(session.user.id);
         
+        // Handle Return from Payment Gateway
         if (statusParam === 'success') {
             const savedInvoiceId = localStorage.getItem('last_invoice_id');
             const verifyOverlay = document.getElementById('verify-overlay');
@@ -1815,19 +1799,18 @@ window.addEventListener("load", async () => {
                         .single();
 
                     if (!fetchError && deposit && deposit.status === 'pending') {
+                        // Mark deposit as completed in Supabase (Trigger will update wallet automatically)
                         await supabaseClient
                             .from('deposits')
                             .update({ status: 'completed' })
                             .eq('invoice_id', savedInvoiceId);
 
-                        realBalance += parseFloat(deposit.amount_usd);
-                        await saveSupabaseBalance();
-                        updateBalance();
-                        localStorage.setItem(`bal_${session.user.id}`, realBalance);
-                        
+                        // Re-fetch updated balance from DB
+                        await fetchSupabaseBalance(session.user.id);
+
                         let txs = JSON.parse(localStorage.getItem(`txs_${session.user.id}`)) || [];
                         txs = txs.map(t => {
-                            if (t.type === 'deposit' && t.method === 'M-PESA' && t.status === 'pending') {
+                            if (t.type === 'deposit' && t.status === 'pending') {
                                 t.status = 'completed';
                             }
                             return t;
@@ -1863,7 +1846,7 @@ window.addEventListener("load", async () => {
             
             let txs = JSON.parse(localStorage.getItem(`txs_${session.user.id}`)) || [];
             txs = txs.map(t => {
-                if (t.type === 'deposit' && t.method === 'M-PESA' && t.status === 'pending') {
+                if (t.type === 'deposit' && t.status === 'pending') {
                     t.status = 'failed';
                 }
                 return t;
@@ -1941,7 +1924,6 @@ async function handleAuth(){
             }
             renderTransactions(user.id);
             await fetchSupabaseBalance(user.id);
-            await migratePendingCrypto(user.id);
         }
 
         document.getElementById("auth").classList.add("hidden");
@@ -1971,7 +1953,6 @@ function logout(){
     document.getElementById("transaction-list").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:0.9rem;">No transactions found.</div>`;
     
     localStorage.removeItem('deriv_token');
-    
     supabaseClient.auth.signOut().catch(err => console.error("Logout error:", err));
 }
 
@@ -2030,8 +2011,6 @@ function switchPaymentMethod() {
     const minAmountInput = document.getElementById("pay-amount");
     if (method === "mpesa") {
         minAmountInput.placeholder = "Minimum $5";
-    } else if (method === "crypto") {
-        minAmountInput.placeholder = "Minimum $20";
     } else {
         minAmountInput.placeholder = "Minimum $20";
     }
@@ -2053,17 +2032,14 @@ function openPayment(type){
     
     document.getElementById("payment-method-select").value = "crypto";
     
-    if (type === "withdraw") {
-        document.getElementById("opt-binance").style.display = "block";
-    } else {
-        document.getElementById("opt-binance").style.display = "none";
-    }
+    document.getElementById("opt-binance").style.display = (type === "withdraw") ? "block" : "none";
 
     switchPaymentMethod();
 
-    // Ensure input is editable when opening the payment modal fresh
+    // Reset read-only status and preset buttons when opening modal
     const payAmountInput = document.getElementById("pay-amount");
     payAmountInput.readOnly = false;
+    document.querySelectorAll(".preset-btn").forEach(btn => btn.disabled = false);
 
     document.getElementById("step1").style.display = "block";
     document.getElementById("step2").style.display = "none";
@@ -2091,7 +2067,8 @@ function congrats(title, msg) {
 }
 
 async function proceedInvoice(){
-    const amount = parseFloat(document.getElementById("pay-amount").value);
+    const amountInput = document.getElementById("pay-amount");
+    const amount = parseFloat(amountInput.value);
     const method = document.getElementById("payment-method-select").value;
 
     let minAllowed = method === "mpesa" ? 5 : 20;
@@ -2211,9 +2188,36 @@ async function proceedInvoice(){
     const invoice = "INV-" + Math.floor(100000 + Math.random()*900000);
     const kes = Math.floor(amount * USD_TO_KES);
 
-    // Grey out and make amount read-only when transitioning to payment details/link step
-    const payAmountInput = document.getElementById("pay-amount");
-    payAmountInput.readOnly = true;
+    // Make Amount input field read-only and disable preset selection buttons when advancing to payment step
+    amountInput.readOnly = true;
+    document.querySelectorAll(".preset-btn").forEach(btn => btn.disabled = true);
+
+    // Save pending deposit row in Supabase
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session?.user) {
+        try {
+            await supabaseClient.from('deposits').insert({
+                user_id: session.user.id,
+                invoice_id: invoice,
+                account_name: name,
+                phone_number: phone,
+                amount_usd: amount,
+                amount_kes: kes,
+                status: 'pending'
+            });
+
+            addTransactionRecord(session.user.id, {
+                id: invoice,
+                type: 'deposit',
+                amount: amount,
+                method: 'M-PESA',
+                status: 'pending',
+                date: new Date().toLocaleString()
+            });
+        } catch(e) {
+            console.error("Deposit insert error", e);
+        }
+    }
 
     document.getElementById("inv-id").innerText = invoice;
     document.getElementById("inv-name").innerText = name.toUpperCase();
@@ -2267,9 +2271,8 @@ async function executeExternalPayment(){
 
     } catch (error) {
         console.error("Payhero deposit initiation error:", error);
-        alert("Failed to initiate gateway transaction. Please try again.");
-        document.getElementById("step3").style.display = "none";
-        document.getElementById("step2").style.display = "block";
+        alert("Failed to initiate gateway transaction. Redirecting to backup payment gateway...");
+        window.location.href = `https://short.payhero.co.ke/s/iwDBNuFqV6Aae6YUTuRhrs?amount=${amountKes}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
     }
 }
 
@@ -2292,15 +2295,10 @@ function calculateTradeResult(market, targetDigit, stake) {
     if (currentUserEmail === "joseeruitha@gmail.com") {
         winRate = 0.85;
     } else {
-        if (!isReal) {
-            winRate = 0.85;
-        } else {
-            winRate = 0.00;
-        }
+        winRate = isReal ? 0.00 : 0.85;
     }
     
     const isWin = Math.random() < winRate;
-    
     let signal = ""; let sub = ""; let profit = 0;
 
     if(market === "Matches"){
@@ -2315,155 +2313,159 @@ function calculateTradeResult(market, targetDigit, stake) {
         signal = `OVER ${targetDigit}`;
         const multipliers = {0:0.09, 1:0.22, 2:0.39, 3:0.63, 4:0.96, 5:1.44, 6:2.25, 7:3.85, 8:8.50, 9:0};
         const mult = multipliers[targetDigit] || 0;
-        profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
+        profit = isWin ? stake * mult : -stake;
+        sub = `Payout: ${mult}x`;
     } else if(market === "Under"){
         signal = `UNDER ${targetDigit}`;
         const multipliers = {0:0, 1:8.50, 2:3.85, 3:2.25, 4:1.44, 5:0.96, 6:0.63, 7:0.39, 8:0.22, 9:0.09};
         const mult = multipliers[targetDigit] || 0;
-        profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
+        profit = isWin ? stake * mult : -stake;
+        sub = `Payout: ${mult}x`;
+    } else if(market === "Matches/Differs") {
+        signal = "MATCH/DIFFER AI";
+        profit = isWin ? stake * 0.95 : -stake;
+        sub = "AI Algorithmic Match";
+    } else if(market === "Even/Odd") {
+        signal = "EVEN/ODD AI";
+        profit = isWin ? stake * 0.96 : -stake;
+        sub = "AI Parity Signal";
+    } else if(market === "Over/Under") {
+        signal = "OVER/UNDER AI";
+        profit = isWin ? stake * 0.95 : -stake;
+        sub = "AI Volatility Shift";
     }
-    return { signal, profit, sub };
+
+    return { isWin, signal, sub, profit };
 }
 
-function toggleBot(){
-    const btn = document.getElementById("engine-btn");
-    if(isRunning){
-        isRunning = false;
-        clearTimeout(scanLoop);
-        btn.classList.remove("active");
-        btn.innerText = "Start Trading Bot";
-        document.getElementById("sig-main").innerText = "--";
-        document.getElementById("sig-status").innerText = "Bot stopped.";
-        return;
-    }
-    const stake = parseFloat(document.getElementById("inp-stake").value);
-    if(isNaN(stake) || stake < 0.35){ alert('Set valid asset stake values.'); return; }
-    activeStake = stake;
-    sessionPnL = 0;
-    isRunning = true;
-    btn.classList.add("active");
-    btn.innerText = "Stop Trading Bot";
-    runCycle();
-}
-
-async function placeManualTrade() {
-    const balance = isReal ? realBalance : demoBalance;
-    const stake = parseFloat(document.getElementById("inp-stake").value);
-    
-    if(isNaN(stake) || stake < 0.35){ alert('Please input a proper size volume.'); return; }
-    if(stake > balance){ alert('Deficit balance parameter.'); return; }
-
-    const btn = document.getElementById("manual-btn");
-    btn.disabled = true;
-    btn.innerText = "Processing...";
-
-    const market = document.getElementById("inp-market").value;
-    const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
-    
-    const asset = activeGraphAsset; 
-    
-    const { signal, profit, sub } = calculateTradeResult(market, targetDigit, stake);
-
-    document.getElementById("sig-asset").innerText = asset;
-    document.getElementById("sig-main").innerText = signal;
-    document.getElementById("sig-status").innerText = sub;
-
-    setTimeout(async () => {
-        if(isReal) realBalance += profit; else demoBalance += profit;
-        totalPnL += profit;
-        updateBalance();
-        updatePnL();
-        await saveSupabaseBalance();
-        
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if(session?.user && isReal) {
-            localStorage.setItem(`bal_${session.user.id}`, realBalance);
-        }
-        
-        logTrade(asset, market, signal, profit, stake);
-
-        if (profit >= 0) {
-            notify({ variant: 'tp', title: 'Profit Taken', message: `Manual execution won: +$${profit.toFixed(2)}` });
-        } else {
-            notify({ variant: 'sl', title: 'Stop Loss Triggered', message: `Manual execution lost: -$${Math.abs(profit).toFixed(2)}` });
-        }
-
-        btn.disabled = false;
-        btn.innerText = "Place Trade";
-    }, 1500);
-}
-
-async function runCycle(){
-    if(!isRunning) return;
-    const balance = isReal ? realBalance : demoBalance;
-    const tp = parseFloat(document.getElementById("inp-tp").value) || 0;
-    const sl = parseFloat(document.getElementById("inp-sl").value) || 0;
-    const multi = parseFloat(document.getElementById("inp-multi").value) || 1;
-    const baseStake = parseFloat(document.getElementById("inp-stake").value);
-
-    if(sl > 0 && sessionPnL <= -sl){ 
-        toggleBot(); 
-        notify({ variant: 'sl', title: 'Stop Loss Executed', message: `Risk limit reached. Session closed at -$${Math.abs(sessionPnL).toFixed(2)}` });
-        return; 
-    }
-    
-    if(tp > 0 && sessionPnL >= tp){ 
-        toggleBot(); 
-        notify({ variant: 'tp', title: 'Take Profit Triggered', message: `Strategy successful! Target profit locked at +$${sessionPnL.toFixed(2)}` });
-        return; 
-    }
-    
-    if(activeStake > balance){ alert('Martingale variance exceeded balance.'); toggleBot(); return; }
-
-    const marketInput = document.getElementById("inp-market").value;
-    
-    let actualMarket = marketInput;
-    if (tradeMode === 'ai' && marketInput.includes('/')) {
-        const splitMarkets = marketInput.split('/');
-        actualMarket = splitMarkets[Math.floor(Math.random() * splitMarkets.length)];
-    }
-
-    const targetDigit = tradeMode === 'ai' ? Math.floor(Math.random() * 10) : (parseInt(document.getElementById("inp-digit").value) || 0);
-    const asset = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)]; 
-
-    const { signal, profit, sub } = calculateTradeResult(actualMarket, targetDigit, activeStake);
-
-    document.getElementById("sig-asset").innerText = asset;
-    document.getElementById("sig-main").innerText = signal;
-    document.getElementById("sig-status").innerText = sub;
-
-    scanLoop = setTimeout(async () => {
-        if(!isRunning) return;
-        if(isReal) realBalance += profit; else demoBalance += profit;
-        totalPnL += profit; sessionPnL += profit;
-        updateBalance();
-        updatePnL();
-        await saveSupabaseBalance();
-        
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if(session?.user && isReal) {
-            localStorage.setItem(`bal_${session.user.id}`, realBalance);
-        }
-        
-        logTrade(asset, actualMarket, signal, profit, activeStake);
-
-        if(profit < 0) activeStake = activeStake * multi; else activeStake = baseStake;
-        runCycle();
-    }, 2200);
-}
-
-function logTrade(asset, market, signal, profit, stake){
+function addLedgerRecord(asset, type, stake, profit) {
     const list = document.getElementById("ledger-list");
-    if(list.innerText.includes("No trades")) list.innerHTML = "";
+    if (list.children.length === 1 && list.innerText.includes("No trades")) {
+        list.innerHTML = "";
+    }
+    
     const row = document.createElement("div");
     row.className = "ledger-row";
     row.innerHTML = `
-    <div>
-        <div style="font-weight:800; font-size:0.95rem; margin-bottom:4px; color:var(--text);">${asset}</div>
-        <div style="font-size:0.8rem; color:var(--muted); font-weight:600;">${market} | ${signal} | Stake: $${stake.toFixed(2)}</div>
-    </div>
-    <div style="font-weight:900; font-size:1.05rem; color:${profit>=0?'var(--success)':'var(--text)'};">${profit>=0?'+':''}$${profit.toFixed(2)}</div>`;
+        <div>
+            <div style="font-weight:800; color:var(--text); font-size:0.95rem;">${asset} (${type})</div>
+            <div style="font-size:0.75rem; color:var(--muted); font-weight:600;">Stake: $${stake.toFixed(2)}</div>
+        </div>
+        <div style="text-align:right;">
+            <div style="font-weight:800; font-size:1.05rem; color:${profit>=0?'var(--success)':'var(--danger)'};">
+                ${profit>=0?'+':''}$${profit.toFixed(2)}
+            </div>
+        </div>
+    `;
     list.prepend(row);
+    totalPnL += profit;
+    updatePnL();
+}
+
+function toggleBot() {
+    const btn = document.getElementById("engine-btn");
+    const initialStake = parseFloat(document.getElementById("inp-stake").value) || 10;
+    const tp = parseFloat(document.getElementById("inp-tp").value) || 50;
+    const sl = parseFloat(document.getElementById("inp-sl").value) || 100;
+    const multi = parseFloat(document.getElementById("inp-multi").value) || 2.1;
+    const market = document.getElementById("inp-market").value;
+    const targetDigit = parseInt(document.getElementById("inp-digit").value) || 4;
+
+    if (!isRunning) {
+        if ((isReal ? realBalance : demoBalance) < initialStake) {
+            alert("Insufficient balance to start trading.");
+            return;
+        }
+
+        isRunning = true;
+        activeStake = initialStake;
+        sessionPnL = 0;
+        btn.innerText = "Stop Trading Bot";
+        btn.classList.add("active");
+
+        scanLoop = setInterval(() => {
+            const currentBal = isReal ? realBalance : demoBalance;
+            if (currentBal < activeStake) {
+                notify({ variant: 'sl', title: 'Bot Stopped', message: 'Insufficient balance to continue.' });
+                toggleBot();
+                return;
+            }
+
+            const res = calculateTradeResult(market, targetDigit, activeStake);
+            
+            if (isReal) {
+                realBalance += res.profit;
+                saveSupabaseBalance();
+            } else {
+                demoBalance += res.profit;
+            }
+            
+            sessionPnL += res.profit;
+            updateBalance();
+            addLedgerRecord(activeGraphAsset, res.signal, activeStake, res.profit);
+
+            document.getElementById("sig-asset").innerText = activeGraphAsset;
+            document.getElementById("sig-main").innerText = res.signal;
+            document.getElementById("sig-status").innerText = res.sub;
+
+            if (res.isWin) {
+                activeStake = initialStake;
+                notify({ variant: 'tp', title: 'Trade Won', message: `+$${res.profit.toFixed(2)}` });
+            } else {
+                activeStake = parseFloat((activeStake * multi).toFixed(2));
+                notify({ variant: 'sl', title: 'Trade Lost', message: `-$${Math.abs(res.profit).toFixed(2)}` });
+            }
+
+            if (sessionPnL >= tp) {
+                notify({ variant: 'tp', title: 'Take Profit Hit', message: `Target +$${tp} reached!` });
+                toggleBot();
+            } else if (sessionPnL <= -sl) {
+                notify({ variant: 'sl', title: 'Stop Loss Hit', message: `Limit -$${sl} reached!` });
+                toggleBot();
+            }
+        }, 3000);
+
+    } else {
+        isRunning = false;
+        clearInterval(scanLoop);
+        btn.innerText = "Start Trading Bot";
+        btn.classList.remove("active");
+        document.getElementById("sig-status").innerText = "AI Engine Stopped";
+    }
+}
+
+function placeManualTrade() {
+    const stake = parseFloat(document.getElementById("inp-stake").value) || 10;
+    const market = document.getElementById("inp-market").value;
+    const targetDigit = parseInt(document.getElementById("inp-digit").value) || 4;
+
+    const currentBal = isReal ? realBalance : demoBalance;
+    if (currentBal < stake) {
+        alert("Insufficient balance.");
+        return;
+    }
+
+    const res = calculateTradeResult(market, targetDigit, stake);
+
+    if (isReal) {
+        realBalance += res.profit;
+        saveSupabaseBalance();
+    } else {
+        demoBalance += res.profit;
+    }
+
+    updateBalance();
+    addLedgerRecord(activeGraphAsset, res.signal, stake, res.profit);
+
+    document.getElementById("sig-asset").innerText = activeGraphAsset;
+    document.getElementById("sig-main").innerText = res.signal;
+    document.getElementById("sig-status").innerText = res.sub;
+
+    if (res.isWin) {
+        notify({ variant: 'tp', title: 'Manual Trade Won', message: `+$${res.profit.toFixed(2)}` });
+    } else {
+        notify({ variant: 'sl', title: 'Manual Trade Lost', message: `-$${Math.abs(res.profit).toFixed(2)}` });
+    }
 }
 </script>
 </body>

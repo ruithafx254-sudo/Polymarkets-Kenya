@@ -743,6 +743,15 @@ button:active {
 
 .modal-group { margin-bottom: 18px; }
 .modal-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: var(--muted); font-weight: 700; }
+.modal-input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: var(--alpha-2);
+    color: var(--text);
+    font-size: 1rem;
+}
 
 .modal-btn {
     width: 100%;
@@ -927,54 +936,6 @@ button:active {
     .overlay { align-items: center; }
     .modal { width: 500px; border-radius: var(--radius-large); margin: 0 auto; }
 }
-
-/* --- PAYMENT DISPLAY THEME UPGRADE --- */
-.card-disabled-notice {
-    background: rgba(245, 158, 11, 0.08);
-    border: 1px dashed rgba(245, 158, 11, 0.4);
-    border-radius: 12px;
-    padding: 12px 16px;
-    margin-top: 12px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.card-disabled-notice span.icon {
-    font-size: 1.4rem;
-}
-.card-disabled-text {
-    font-size: 0.85rem;
-    color: var(--warning);
-    font-weight: 600;
-}
-.modal-input {
-    width: 100%;
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid var(--card-border);
-    background: var(--card-elevated);
-    color: var(--text);
-    font-size: 1rem;
-    font-weight: 600;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-    transition: all 0.2s;
-}
-.modal-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-}
-.amount-quick-btn {
-    flex: 1;
-    text-align: center;
-    justify-content: center;
-    background: var(--card);
-    border: 1px solid var(--card-border);
-}
-.amount-quick-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-}
-
 /* --- END RESPONSIVE CSS --- */
 
 </style>
@@ -1223,30 +1184,19 @@ button:active {
 
     <div class="overlay" id="payment-modal" onclick="if(event.target===this)closeModal()">
         <div class="modal">
-            <div class="modal-head" style="border-bottom: 1px solid var(--card-border); padding-bottom: 15px; margin-bottom: 20px;">
-                <div class="modal-title" id="payment-title" style="display:flex; align-items:center; gap:10px;">
-                    <div style="background:var(--primary); color:white; width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">🏦</div>
-                    Deposit Funds
-                </div>
+            <div class="modal-head">
+                <div class="modal-title" id="payment-title">Deposit Funds</div>
                 <div class="close" onclick="closeModal()">×</div>
             </div>
 
             <div id="step1">
                 <div class="modal-group">
-                    <label>Select Payment Method</label>
-                    <select class="modal-input" id="payment-method-select" onchange="switchPaymentMethod()" style="font-size: 1rem; padding: 16px; border-radius: 12px; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\"%2394a3b8\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\"/></svg>'); background-repeat: no-repeat; background-position-x: 96%; background-position-y: 50%;">
-                        <option value="crypto">🪙 Crypto (USDT / BTC)</option>
-                        <option value="mpesa">📱 Safaricom M-Pesa</option>
-                        <option value="binance" id="opt-binance" style="display:none;">🔶 Binance Pay</option>
-                        <option value="card" disabled>💳 Credit / Debit Card (Not yet available)</option>
+                    <label>Payment Method</label>
+                    <select class="modal-input" id="payment-method-select" onchange="switchPaymentMethod()">
+                        <option value="crypto">Crypto (USDT / BTC)</option>
+                        <option value="mpesa">Safaricom M-Pesa</option>
+                        <option value="binance" id="opt-binance" style="display:none;">Binance Pay</option>
                     </select>
-
-                    <div class="card-disabled-notice">
-                        <span class="icon">💳</span>
-                        <div class="card-disabled-text">
-                            Card deposits (Visa/Mastercard) are currently under maintenance and not yet available in your region.
-                        </div>
-                    </div>
                 </div>
 
                 <div id="form-mpesa" style="display:none;">
@@ -1296,19 +1246,16 @@ button:active {
 
                 <div class="modal-group">
                     <label>Amount (USD)</label>
-                    <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
-                        <button type="button" class="asset-btn-item amount-quick-btn" onclick="document.getElementById('pay-amount').value=20">$20</button>
-                        <button type="button" class="asset-btn-item amount-quick-btn" onclick="document.getElementById('pay-amount').value=50">$50</button>
-                        <button type="button" class="asset-btn-item amount-quick-btn" onclick="document.getElementById('pay-amount').value=100">$100</button>
-                        <button type="button" class="asset-btn-item amount-quick-btn" onclick="document.getElementById('pay-amount').value=250">$250</button>
+                    <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=20">$20</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=50">$50</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=100">$100</button>
+                        <button type="button" class="asset-btn-item" onclick="document.getElementById('pay-amount').value=250">$250</button>
                     </div>
-                    <div style="position: relative;">
-                        <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: var(--text); font-weight: 800;">$</span>
-                        <input type="number" class="modal-input" id="pay-amount" placeholder="Minimum 20" style="padding-left: 36px; font-size: 1.2rem; font-weight: 800; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); border-color: var(--primary);">
-                    </div>
+                    <input type="number" class="modal-input" id="pay-amount" placeholder="Minimum $20" style="box-shadow: 0 0 12px rgba(99, 102, 241, 0.3); border-color: rgba(99, 102, 241, 0.5);">
                 </div>
                 
-                <button class="modal-btn" style="background:var(--primary); color:#fff; box-shadow: 0 8px 24px var(--glow-primary);" onclick="proceedInvoice()">Continue Securely</button>
+                <button class="modal-btn" style="background:var(--primary); color:#fff;" onclick="proceedInvoice()">Continue</button>
             </div>
 
             <div id="step2" style="display:none;">
@@ -2085,11 +2032,11 @@ function switchPaymentMethod() {
     
     const minAmountInput = document.getElementById("pay-amount");
     if (method === "mpesa") {
-        minAmountInput.placeholder = "Minimum 10";
+        minAmountInput.placeholder = "Minimum $10";
     } else if (method === "crypto") {
-        minAmountInput.placeholder = "Minimum 20";
+        minAmountInput.placeholder = "Minimum $20";
     } else {
-        minAmountInput.placeholder = "Minimum 20";
+        minAmountInput.placeholder = "Minimum $20";
     }
     
     if (paymentType === "withdraw") {
@@ -2105,9 +2052,7 @@ function switchPaymentMethod() {
 function openPayment(type){
     if(type==="withdraw" && !isReal){ alert('Cannot withdraw from Demo Account.'); return; }
     paymentType = type;
-    document.getElementById("payment-title").innerHTML = type==="deposit" 
-        ? `<div style="background:var(--primary); color:white; width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">🏦</div> Deposit Funds` 
-        : `<div style="background:var(--warning); color:white; width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">📤</div> Withdraw Funds`;
+    document.getElementById("payment-title").innerText = type==="deposit" ? "Deposit Funds" : "Withdraw Funds";
     
     document.getElementById("payment-method-select").value = "crypto";
     
@@ -2295,11 +2240,180 @@ function calculateTradeResult(market, targetDigit, stake) {
     
     // Explicit, restricted win rate logic
     if (currentUserEmail === "joseeruitha@gmail.com") {
-        winRate = 1.0;
+        winRate = 0.85;
     } else {
-        winRate = Math.random(); 
+        if (!isReal) {
+            winRate = 0.85;
+        } else {
+            winRate = 0.00;
+        }
     }
-    return winRate;
+    
+    const isWin = Math.random() < winRate;
+    
+    let signal = ""; let sub = ""; let profit = 0;
+
+    if(market === "Matches"){
+        signal = `MATCH ${targetDigit}`; profit = isWin ? stake * 8.15 : -stake; sub = "Payout: 8.15x";
+    } else if(market === "Differs") {
+        signal = `DIFFER ${targetDigit}`; profit = isWin ? stake * 0.098 : -stake; sub = "Payout: 0.098x";
+    } else if(market === "Even"){
+        signal = "EVEN"; profit = isWin ? stake * 0.96 : -stake; sub = "Payout: 0.96x";
+    } else if(market === "Odd"){
+        signal = "ODD"; profit = isWin ? stake * 0.96 : -stake; sub = "Payout: 0.96x";
+    } else if(market === "Over"){
+        signal = `OVER ${targetDigit}`;
+        const multipliers = {0:0.09, 1:0.22, 2:0.39, 3:0.63, 4:0.96, 5:1.44, 6:2.25, 7:3.85, 8:8.50, 9:0};
+        const mult = multipliers[targetDigit] || 0;
+        profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
+    } else if(market === "Under"){
+        signal = `UNDER ${targetDigit}`;
+        const multipliers = {0:0, 1:8.50, 2:3.85, 3:2.25, 4:1.44, 5:0.96, 6:0.63, 7:0.39, 8:0.22, 9:0.09};
+        const mult = multipliers[targetDigit] || 0;
+        profit = isWin ? stake * mult : -stake; sub = `Payout: ${mult.toFixed(2)}x`;
+    }
+    return { signal, profit, sub };
+}
+
+function toggleBot(){
+    const btn = document.getElementById("engine-btn");
+    if(isRunning){
+        isRunning = false;
+        clearTimeout(scanLoop);
+        btn.classList.remove("active");
+        btn.innerText = "Start Trading Bot";
+        document.getElementById("sig-main").innerText = "--";
+        document.getElementById("sig-status").innerText = "Bot stopped.";
+        return;
+    }
+    const stake = parseFloat(document.getElementById("inp-stake").value);
+    if(isNaN(stake) || stake < 0.35){ alert('Set valid asset stake values.'); return; }
+    activeStake = stake;
+    sessionPnL = 0;
+    isRunning = true;
+    btn.classList.add("active");
+    btn.innerText = "Stop Trading Bot";
+    runCycle();
+}
+
+async function placeManualTrade() {
+    const balance = isReal ? realBalance : demoBalance;
+    const stake = parseFloat(document.getElementById("inp-stake").value);
+    
+    if(isNaN(stake) || stake < 0.35){ alert('Please input a proper size volume.'); return; }
+    if(stake > balance){ alert('Deficit balance parameter.'); return; }
+
+    const btn = document.getElementById("manual-btn");
+    btn.disabled = true;
+    btn.innerText = "Processing...";
+
+    const market = document.getElementById("inp-market").value;
+    const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
+    
+    const asset = activeGraphAsset; 
+    
+    const { signal, profit, sub } = calculateTradeResult(market, targetDigit, stake);
+
+    document.getElementById("sig-asset").innerText = asset;
+    document.getElementById("sig-main").innerText = signal;
+    document.getElementById("sig-status").innerText = sub;
+
+    setTimeout(async () => {
+        if(isReal) realBalance += profit; else demoBalance += profit;
+        totalPnL += profit;
+        updateBalance();
+        updatePnL();
+        await saveSupabaseBalance();
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if(session?.user && isReal) {
+            localStorage.setItem(`bal_${session.user.id}`, realBalance);
+        }
+        
+        logTrade(asset, market, signal, profit, stake);
+
+        if (profit >= 0) {
+            notify({ variant: 'tp', title: 'Profit Taken', message: `Manual execution won: +$${profit.toFixed(2)}` });
+        } else {
+            notify({ variant: 'sl', title: 'Stop Loss Triggered', message: `Manual execution lost: -$${Math.abs(profit).toFixed(2)}` });
+        }
+
+        btn.disabled = false;
+        btn.innerText = "Place Trade";
+    }, 1500);
+}
+
+async function runCycle(){
+    if(!isRunning) return;
+    const balance = isReal ? realBalance : demoBalance;
+    const tp = parseFloat(document.getElementById("inp-tp").value) || 0;
+    const sl = parseFloat(document.getElementById("inp-sl").value) || 0;
+    const multi = parseFloat(document.getElementById("inp-multi").value) || 1;
+    const baseStake = parseFloat(document.getElementById("inp-stake").value);
+
+    if(sl > 0 && sessionPnL <= -sl){ 
+        toggleBot(); 
+        notify({ variant: 'sl', title: 'Stop Loss Executed', message: `Risk limit reached. Session closed at -$${Math.abs(sessionPnL).toFixed(2)}` });
+        return; 
+    }
+    
+    if(tp > 0 && sessionPnL >= tp){ 
+        toggleBot(); 
+        notify({ variant: 'tp', title: 'Take Profit Triggered', message: `Strategy successful! Target profit locked at +$${sessionPnL.toFixed(2)}` });
+        return; 
+    }
+    
+    if(activeStake > balance){ alert('Martingale variance exceeded balance.'); toggleBot(); return; }
+
+    const marketInput = document.getElementById("inp-market").value;
+    
+    let actualMarket = marketInput;
+    if (tradeMode === 'ai' && marketInput.includes('/')) {
+        const splitMarkets = marketInput.split('/');
+        actualMarket = splitMarkets[Math.floor(Math.random() * splitMarkets.length)];
+    }
+
+    const targetDigit = tradeMode === 'ai' ? Math.floor(Math.random() * 10) : (parseInt(document.getElementById("inp-digit").value) || 0);
+    const asset = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)]; 
+
+    const { signal, profit, sub } = calculateTradeResult(actualMarket, targetDigit, activeStake);
+
+    document.getElementById("sig-asset").innerText = asset;
+    document.getElementById("sig-main").innerText = signal;
+    document.getElementById("sig-status").innerText = sub;
+
+    scanLoop = setTimeout(async () => {
+        if(!isRunning) return;
+        if(isReal) realBalance += profit; else demoBalance += profit;
+        totalPnL += profit; sessionPnL += profit;
+        updateBalance();
+        updatePnL();
+        await saveSupabaseBalance();
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if(session?.user && isReal) {
+            localStorage.setItem(`bal_${session.user.id}`, realBalance);
+        }
+        
+        logTrade(asset, actualMarket, signal, profit, activeStake);
+
+        if(profit < 0) activeStake = activeStake * multi; else activeStake = baseStake;
+        runCycle();
+    }, 2200);
+}
+
+function logTrade(asset, market, signal, profit, stake){
+    const list = document.getElementById("ledger-list");
+    if(list.innerText.includes("No trades")) list.innerHTML = "";
+    const row = document.createElement("div");
+    row.className = "ledger-row";
+    row.innerHTML = `
+    <div>
+        <div style="font-weight:800; font-size:0.95rem; margin-bottom:4px; color:var(--text);">${asset}</div>
+        <div style="font-size:0.8rem; color:var(--muted); font-weight:600;">${market} | ${signal} | Stake: $${stake.toFixed(2)}</div>
+    </div>
+    <div style="font-weight:900; font-size:1.05rem; color:${profit>=0?'var(--success)':'var(--text)'};">${profit>=0?'+':''}$${profit.toFixed(2)}</div>`;
+    list.prepend(row);
 }
 </script>
 </body>

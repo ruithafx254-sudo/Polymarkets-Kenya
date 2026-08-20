@@ -2032,7 +2032,7 @@ function switchPaymentMethod() {
     
     const minAmountInput = document.getElementById("pay-amount");
     if (method === "mpesa") {
-        minAmountInput.placeholder = "Minimum $10";
+        minAmountInput.placeholder = "Minimum $5";
     } else if (method === "crypto") {
         minAmountInput.placeholder = "Minimum $20";
     } else {
@@ -2093,7 +2093,7 @@ async function proceedInvoice(){
     const amount = parseFloat(document.getElementById("pay-amount").value);
     const method = document.getElementById("payment-method-select").value;
 
-    let minAllowed = method === "mpesa" ? 10 : 20;
+    let minAllowed = method === "mpesa" ? 5 : 20;
 
     if(isNaN(amount) || amount < minAllowed) { alert(`Minimum amount is $${minAllowed}.`); return; }
 
@@ -2219,7 +2219,7 @@ async function proceedInvoice(){
 }
 
 async function executeExternalPayment(){
-    window.location.href = "https://link.palpluss.com/d44d96f3-36bd-48f0-881d-dd5f364a3588";
+    window.location.href = "https://link.palpluss.com/cfdeea03-0384-44c3-99a7-1ab295139eb4";
 }
 
 function clearLedger(){

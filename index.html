@@ -1680,8 +1680,6 @@ async function saveSupabaseBalance() {
 }
 
 async function migratePendingCrypto(userId) {
-    // Disabled auto-completion of pending crypto transactions to prevent 
-    // false balance inflation when deposits are abandoned or fail.
     const migrationFlag = `force_complete_existing_crypto_txs_v16_${userId}`;
     if (!localStorage.getItem(migrationFlag)) {
         localStorage.setItem(migrationFlag, "true");
@@ -2218,8 +2216,39 @@ async function proceedInvoice(){
     document.getElementById("step2").style.display = "block";
 }
 
-async function executeExternalPayment(){
-    window.location.href = "https://link.palpluss.com/cfdeea03-0384-44c3-99a7-1ab295139eb4";
+async function executeExternalPayment() {
+    const phone = document.getElementById("pay-phone").value.trim();
+    const amount = parseFloat(document.getElementById("pay-amount").value);
+
+    document.getElementById("step2").style.display = "none";
+    document.getElementById("step3").style.display = "block";
+
+    try {
+        const response = await fetch('/.netlify/functions/pay', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: amount, phone: phone })
+        });
+        
+        const data = await response.json();
+        
+        document.getElementById("step3").style.display = "none";
+        closeModal();
+
+        if (response.ok) {
+            notify({
+                variant: 'deposit',
+                title: 'STK Push Triggered',
+                message: 'Please check your phone to complete the M-Pesa payment.'
+            });
+        } else {
+            throw new Error(data.error || 'Payment gateway failed');
+        }
+    } catch (err) {
+        document.getElementById("step3").style.display = "none";
+        closeModal();
+        alert('Payment Error: ' + err.message);
+    }
 }
 
 function clearLedger(){

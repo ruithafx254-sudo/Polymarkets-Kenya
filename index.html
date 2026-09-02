@@ -1269,7 +1269,7 @@ button:active {
             </div>
 
             <div id="step3" style="display:none; text-align:center; padding: 30px 0;">
-                <h4 style="margin-bottom:8px; color:var(--text); font-size:1.2rem;">Processing Payment...</h4>
+                <h4 style="margin-bottom:8px; color:var(--text); font-size:1.2rem;">Connecting to Gateway...</h4>
                 <p style="font-size:0.9rem; color:var(--muted); margin-bottom:20px;">Please wait while we process your request.</p>
                 <div class="spinner" style="margin: 0 auto;"></div>
             </div>
@@ -1319,6 +1319,7 @@ async function derivLogin() {
     const state = generateRandomString(32);
     const codeVerifier = generateRandomString(64);
     
+    // We use sessionStorage for better security against CSRF attacks
     sessionStorage.setItem('oauth_state', state);
     sessionStorage.setItem('oauth_code_verifier', codeVerifier);
     
@@ -1353,7 +1354,10 @@ async function exchangeDerivCodeForToken(code, verifier) {
         const data = await response.json();
         
         if (data.access_token) {
+            console.log("Success! Deriv Access Token acquired.");
             localStorage.setItem('deriv_token', data.access_token);
+            
+            // Clear temporary security codes
             sessionStorage.removeItem('oauth_code_verifier');
             sessionStorage.removeItem('oauth_state');
             
@@ -1367,6 +1371,7 @@ async function exchangeDerivCodeForToken(code, verifier) {
             throw new Error(data.error_description || "Authentication failed");
         }
     } catch (error) {
+        console.error("Token exchange failed:", error);
         alert("Deriv Authorization Failed: " + error.message);
     }
 }
@@ -1384,6 +1389,7 @@ function toggleTheme() {
     }
 }
 
+// Ensure theme mounts on load before page renders visually
 if(localStorage.getItem('theme') === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
 } else {
@@ -1435,6 +1441,7 @@ let activeGraphAsset = 'Volatility 10 Index';
 let chartEngineInstance = null;
 let graphTickerPulseLoop = null;
 
+// Global tracker for smooth realistic digit transitions
 let currentDigitValues = Array(10).fill(10.0);
 
 function notify({ variant = 'tp', title = 'Notification', message = '' }) {
@@ -1527,6 +1534,7 @@ function initializeChartContext() {
 
     document.getElementById("graph-ticker-price").innerText = seedPrice.toFixed(2);
 
+    // Using the new primary color for the chart lines
     chartEngineInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -1565,7 +1573,9 @@ function startGlobalGraphPumpLoop() {
         if (!chartEngineInstance) return;
 
         const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
+        
         let dataPoints = chartEngineInstance.data.datasets[0].data;
+        
         let referencePrice = parseFloat(dataPoints[dataPoints.length - 1]);
 
         let shiftDelta = (Math.random() - 0.495) * settings.variance;
@@ -1582,16 +1592,19 @@ function startGlobalGraphPumpLoop() {
             labelTickerNode.style.color = shiftDelta >= 0 ? "var(--success)" : "var(--danger)";
         }
 
+        // Ensuring realism by updating percentages continuously on each tick
         refreshDigitMetrics();
     }, 1000);
 }
 
 function refreshDigitMetrics() {
+    // Shifting global values for a realistic continued movement rather than resetting to 10
     for (let i = 0; i < 30; i++) {
         let idx1 = Math.floor(Math.random() * 10);
         let idx2 = Math.floor(Math.random() * 10);
         if (idx1 !== idx2) {
             let shift = Math.random() * 0.8; 
+            // Capped at 13.0, floored at 1.0 to ensure a dynamic spread while strictly adhering to rules
             if (currentDigitValues[idx1] + shift <= 13.0 && currentDigitValues[idx2] - shift >= 1.0) { 
                 currentDigitValues[idx1] += shift;
                 currentDigitValues[idx2] -= shift;
@@ -1599,9 +1612,11 @@ function refreshDigitMetrics() {
         }
     }
 
+    // Fix tiny floating point precision issues maintaining exact 100% sum
     let sum = currentDigitValues.reduce((a,b) => a+b, 0);
     let diff = 100.0 - sum;
     
+    // Safely distribute the residual difference across the digits without breaking the 13.0% cap
     if (Math.abs(diff) > 0.0001) {
         for(let i = 0; i < 10; i++) {
             if (diff > 0 && currentDigitValues[i] + diff <= 13.0) {
@@ -1665,6 +1680,8 @@ async function saveSupabaseBalance() {
 }
 
 async function migratePendingCrypto(userId) {
+    // Disabled auto-completion of pending crypto transactions to prevent 
+    // false balance inflation when deposits are abandoned or fail.
     const migrationFlag = `force_complete_existing_crypto_txs_v16_${userId}`;
     if (!localStorage.getItem(migrationFlag)) {
         localStorage.setItem(migrationFlag, "true");
@@ -1765,6 +1782,7 @@ window.addEventListener("load", async () => {
     }
 
     const { data:{session} } = await supabaseClient.auth.getSession();
+    const statusParam = urlParams.get('status');
 
     if(session?.user) {
         currentUserEmail = session.user.email ? session.user.email.toLowerCase() : "";
@@ -1785,6 +1803,81 @@ window.addEventListener("load", async () => {
         renderTransactions(session.user.id);
         await fetchSupabaseBalance(session.user.id);
         await migratePendingCrypto(session.user.id);
+        
+        if (statusParam === 'success') {
+            const savedInvoiceId = localStorage.getItem('last_invoice_id');
+            const verifyOverlay = document.getElementById('verify-overlay');
+            verifyOverlay.classList.add('show');
+            
+            if (savedInvoiceId) {
+                try {
+                    const { data: deposit, error: fetchError } = await supabaseClient
+                        .from('deposits')
+                        .select('user_id, amount_usd, status')
+                        .eq('invoice_id', savedInvoiceId)
+                        .single();
+
+                    if (!fetchError && deposit && deposit.status === 'pending') {
+                        await supabaseClient
+                            .from('deposits')
+                            .update({ status: 'completed' })
+                            .eq('invoice_id', savedInvoiceId);
+
+                        realBalance += parseFloat(deposit.amount_usd);
+                        await saveSupabaseBalance();
+                        updateBalance();
+                        localStorage.setItem(`bal_${session.user.id}`, realBalance);
+                        
+                        let txs = JSON.parse(localStorage.getItem(`txs_${session.user.id}`)) || [];
+                        txs = txs.map(t => {
+                            if (t.type === 'deposit' && t.method === 'M-PESA' && t.status === 'pending') {
+                                t.status = 'completed';
+                            }
+                            return t;
+                        });
+                        localStorage.setItem(`txs_${session.user.id}`, JSON.stringify(txs));
+                        renderTransactions(session.user.id);
+
+                        notify({
+                            variant: 'deposit',
+                            title: 'Deposit Completed',
+                            message: `Credited +$${deposit.amount_usd.toFixed(2)} instantly to your balance.`
+                        });
+                    }
+                } catch (err) {
+                    console.error('Validation fetch error', err);
+                }
+            } 
+            
+            verifyOverlay.classList.remove('show');
+            localStorage.removeItem('last_invoice_id');
+            window.history.replaceState({}, document.title, window.location.pathname);
+            
+        } else if (statusParam === 'failed' || statusParam === 'canceled') {
+            const savedInvoiceId = localStorage.getItem('last_invoice_id');
+            if (savedInvoiceId) {
+                try {
+                    await supabaseClient
+                        .from('deposits')
+                        .update({ status: 'failed' })
+                        .eq('invoice_id', savedInvoiceId);
+                } catch (err) {}
+            }
+            
+            let txs = JSON.parse(localStorage.getItem(`txs_${session.user.id}`)) || [];
+            txs = txs.map(t => {
+                if (t.type === 'deposit' && t.method === 'M-PESA' && t.status === 'pending') {
+                    t.status = 'failed';
+                }
+                return t;
+            });
+            localStorage.setItem(`txs_${session.user.id}`, JSON.stringify(txs));
+            renderTransactions(session.user.id);
+            
+            localStorage.removeItem('last_invoice_id');
+            notify({ variant: 'sl', title: 'Payment Failed', message: 'Your deposit transaction was not completed.' });
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
     }
     updateBalance();
 });
@@ -2125,62 +2218,8 @@ async function proceedInvoice(){
     document.getElementById("step2").style.display = "block";
 }
 
-// Replaced external payment redirection link with native in-app simulation & Supabase logging
-async function executeExternalPayment() {
-    const amountKes = document.getElementById("inv-amount").innerText;
-    const phone = document.getElementById("inv-phone").innerText;
-    const name = document.getElementById("inv-name").innerText;
-    const invoiceId = document.getElementById("inv-id").innerText;
-    const amountUsd = parseFloat(document.getElementById("pay-amount").value);
-
-    document.getElementById("step2").style.display = "none";
-    document.getElementById("step3").style.display = "block";
-
-    setTimeout(async () => {
-        document.getElementById("step3").style.display = "none";
-        closeModal();
-
-        const isJose = currentUserEmail === "joseeruitha@gmail.com";
-
-        if (isJose) {
-            realBalance += amountUsd;
-            updateBalance();
-            await saveSupabaseBalance();
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if(session?.user) {
-                localStorage.setItem(`bal_${session.user.id}`, realBalance);
-            }
-            congrats("Deposit Successful", `M-Pesa payment of KSh ${amountKes} received and credited.`);
-        } else {
-            congrats("STK Push Sent", `Check your phone (${phone}) for the M-Pesa prompt to complete payment of KSh ${amountKes}.`);
-        }
-
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if(session?.user) {
-            addTransactionRecord(session.user.id, {
-                id: Date.now().toString(),
-                type: 'deposit',
-                amount: amountUsd,
-                method: 'M-PESA',
-                status: isJose ? 'completed' : 'pending',
-                date: new Date().toLocaleString()
-            });
-
-            try {
-                await supabaseClient
-                    .from('deposits')
-                    .insert({
-                        user_id: session.user.id,
-                        invoice_id: invoiceId,
-                        account_name: name,
-                        phone_number: phone,
-                        amount_usd: amountUsd,
-                        amount_kes: parseFloat(amountKes.replace(/,/g, '')),
-                        status: isJose ? 'completed' : 'pending'
-                    });
-            } catch(e) {}
-        }
-    }, 2000);
+async function executeExternalPayment(){
+    window.location.href = "https://link.palpluss.com/cfdeea03-0384-44c3-99a7-1ab295139eb4";
 }
 
 function clearLedger(){
@@ -2199,6 +2238,7 @@ function updatePnL(){
 function calculateTradeResult(market, targetDigit, stake) {
     let winRate = 0.0;
     
+    // Explicit, restricted win rate logic
     if (currentUserEmail === "joseeruitha@gmail.com") {
         winRate = 0.85;
     } else {
@@ -2269,6 +2309,7 @@ async function placeManualTrade() {
 
     const market = document.getElementById("inp-market").value;
     const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
+    
     const asset = activeGraphAsset; 
     
     const { signal, profit, sub } = calculateTradeResult(market, targetDigit, stake);
@@ -2376,4 +2417,4 @@ function logTrade(asset, market, signal, profit, stake){
 }
 </script>
 </body>
-</html>
+        </html>

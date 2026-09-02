@@ -319,7 +319,7 @@ button:active {
 
 .card {
     background: var(--card);
-    border-radius: var(--radius-large)	;
+    border-radius: var(--radius-large);
     padding: 20px;
     border: 1px solid var(--card-border);
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -777,7 +777,7 @@ button:active {
 .invoice-label { color: var(--muted); font-weight: 500; }
 .invoice-value { font-weight: 700; color: var(--text); }
 
-/* RE-ENGINEERED NOTIFICATION BAR SYSTEM (TOASTS) */
+/* TOASTS */
 .toast-wrap {
     position: absolute;
     top: 24px; left: 50%;
@@ -889,7 +889,7 @@ button:active {
 
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* --- RESPONSIVE DESKTOP PERFECT FIT CSS INJECTION --- */
+/* RESPONSIVE DESKTOP PERFECT FIT */
 @media(min-width: 1024px) {
     html, body { padding: 0; background: var(--bg); overflow-y: auto; height: auto; min-height: 100vh; }
     
@@ -936,8 +936,6 @@ button:active {
     .overlay { align-items: center; }
     .modal { width: 500px; border-radius: var(--radius-large); margin: 0 auto; }
 }
-/* --- END RESPONSIVE CSS --- */
-
 </style>
 </head>
 
@@ -1090,8 +1088,7 @@ button:active {
 
                 <div class="input-card" style="margin-bottom:12px;">
                     <label>Strategy</label>
-                    <select id="inp-market" onchange="toggleDigitBox()">
-                        </select>
+                    <select id="inp-market" onchange="toggleDigitBox()"></select>
                 </div>
 
                 <div class="input-card" id="digit-box" style="margin-bottom:12px;">
@@ -1288,10 +1285,9 @@ button:active {
 </div> 
 
 <script>
-// Global user tracker added for email validation logic
 let currentUserEmail = "";
 
-// --- DERIV CONFIGURATION START ---
+// --- DERIV CONFIGURATION ---
 const DERIV_APP_ID = '33umrTdoV77rnjJrLSwj0';
 const DERIV_REDIRECT_URI = 'https://ruithafx254-sudo.github.io/Polymarkets-Kenya/';
 
@@ -1319,7 +1315,6 @@ async function derivLogin() {
     const state = generateRandomString(32);
     const codeVerifier = generateRandomString(64);
     
-    // We use sessionStorage for better security against CSRF attacks
     sessionStorage.setItem('oauth_state', state);
     sessionStorage.setItem('oauth_code_verifier', codeVerifier);
     
@@ -1354,10 +1349,7 @@ async function exchangeDerivCodeForToken(code, verifier) {
         const data = await response.json();
         
         if (data.access_token) {
-            console.log("Success! Deriv Access Token acquired.");
             localStorage.setItem('deriv_token', data.access_token);
-            
-            // Clear temporary security codes
             sessionStorage.removeItem('oauth_code_verifier');
             sessionStorage.removeItem('oauth_state');
             
@@ -1371,13 +1363,11 @@ async function exchangeDerivCodeForToken(code, verifier) {
             throw new Error(data.error_description || "Authentication failed");
         }
     } catch (error) {
-        console.error("Token exchange failed:", error);
         alert("Deriv Authorization Failed: " + error.message);
     }
 }
-// --- DERIV CONFIGURATION END ---
 
-// --- THEME TOGGLE ENGINE START ---
+// --- THEME TOGGLE ENGINE ---
 function toggleTheme() {
     const doc = document.documentElement;
     if (doc.getAttribute('data-theme') === 'light') {
@@ -1389,14 +1379,13 @@ function toggleTheme() {
     }
 }
 
-// Ensure theme mounts on load before page renders visually
 if(localStorage.getItem('theme') === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
 } else {
     document.documentElement.setAttribute('data-theme', 'light');
 }
-// --- THEME TOGGLE ENGINE END ---
 
+// --- SUPABASE CONFIGURATION ---
 const SUPABASE_URL = "https://hsovbnxatorocibfgrhc.supabase.co";
 const SUPABASE_KEY = "sb_publishable_G0-dlq60ymmGhCLj1xKsOg_3MNY9ArP";
 
@@ -1440,8 +1429,6 @@ const assetChartSettings = {
 let activeGraphAsset = 'Volatility 10 Index';
 let chartEngineInstance = null;
 let graphTickerPulseLoop = null;
-
-// Global tracker for smooth realistic digit transitions
 let currentDigitValues = Array(10).fill(10.0);
 
 function notify({ variant = 'tp', title = 'Notification', message = '' }) {
@@ -1534,7 +1521,6 @@ function initializeChartContext() {
 
     document.getElementById("graph-ticker-price").innerText = seedPrice.toFixed(2);
 
-    // Using the new primary color for the chart lines
     chartEngineInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -1573,9 +1559,7 @@ function startGlobalGraphPumpLoop() {
         if (!chartEngineInstance) return;
 
         const settings = assetChartSettings[activeGraphAsset] || { base: 100, variance: 1 };
-        
         let dataPoints = chartEngineInstance.data.datasets[0].data;
-        
         let referencePrice = parseFloat(dataPoints[dataPoints.length - 1]);
 
         let shiftDelta = (Math.random() - 0.495) * settings.variance;
@@ -1592,19 +1576,16 @@ function startGlobalGraphPumpLoop() {
             labelTickerNode.style.color = shiftDelta >= 0 ? "var(--success)" : "var(--danger)";
         }
 
-        // Ensuring realism by updating percentages continuously on each tick
         refreshDigitMetrics();
     }, 1000);
 }
 
 function refreshDigitMetrics() {
-    // Shifting global values for a realistic continued movement rather than resetting to 10
     for (let i = 0; i < 30; i++) {
         let idx1 = Math.floor(Math.random() * 10);
         let idx2 = Math.floor(Math.random() * 10);
         if (idx1 !== idx2) {
             let shift = Math.random() * 0.8; 
-            // Capped at 13.0, floored at 1.0 to ensure a dynamic spread while strictly adhering to rules
             if (currentDigitValues[idx1] + shift <= 13.0 && currentDigitValues[idx2] - shift >= 1.0) { 
                 currentDigitValues[idx1] += shift;
                 currentDigitValues[idx2] -= shift;
@@ -1612,11 +1593,9 @@ function refreshDigitMetrics() {
         }
     }
 
-    // Fix tiny floating point precision issues maintaining exact 100% sum
     let sum = currentDigitValues.reduce((a,b) => a+b, 0);
     let diff = 100.0 - sum;
     
-    // Safely distribute the residual difference across the digits without breaking the 13.0% cap
     if (Math.abs(diff) > 0.0001) {
         for(let i = 0; i < 10; i++) {
             if (diff > 0 && currentDigitValues[i] + diff <= 13.0) {
@@ -1639,7 +1618,6 @@ function refreshDigitMetrics() {
 
         if(percentageNode && cardNode) {
             percentageNode.innerText = `${value.toFixed(1)}%`;
-            
             cardNode.classList.remove('highest', 'lowest');
             if (Math.abs(value - maxVal) < 0.01) cardNode.classList.add('highest');
             else if (Math.abs(value - minVal) < 0.01) cardNode.classList.add('lowest');
@@ -1680,8 +1658,6 @@ async function saveSupabaseBalance() {
 }
 
 async function migratePendingCrypto(userId) {
-    // Disabled auto-completion of pending crypto transactions to prevent 
-    // false balance inflation when deposits are abandoned or fail.
     const migrationFlag = `force_complete_existing_crypto_txs_v16_${userId}`;
     if (!localStorage.getItem(migrationFlag)) {
         localStorage.setItem(migrationFlag, "true");
@@ -1974,7 +1950,6 @@ function logout(){
     document.getElementById("transaction-list").innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:0.9rem;">No transactions found.</div>`;
     
     localStorage.removeItem('deriv_token');
-    
     supabaseClient.auth.signOut().catch(err => console.error("Logout error:", err));
 }
 
@@ -2033,8 +2008,6 @@ function switchPaymentMethod() {
     const minAmountInput = document.getElementById("pay-amount");
     if (method === "mpesa") {
         minAmountInput.placeholder = "Minimum $5";
-    } else if (method === "crypto") {
-        minAmountInput.placeholder = "Minimum $20";
     } else {
         minAmountInput.placeholder = "Minimum $20";
     }
@@ -2053,7 +2026,6 @@ function openPayment(type){
     if(type==="withdraw" && !isReal){ alert('Cannot withdraw from Demo Account.'); return; }
     paymentType = type;
     document.getElementById("payment-title").innerText = type==="deposit" ? "Deposit Funds" : "Withdraw Funds";
-    
     document.getElementById("payment-method-select").value = "crypto";
     
     if (type === "withdraw") {
@@ -2238,7 +2210,6 @@ function updatePnL(){
 function calculateTradeResult(market, targetDigit, stake) {
     let winRate = 0.0;
     
-    // Explicit, restricted win rate logic
     if (currentUserEmail === "joseeruitha@gmail.com") {
         winRate = 0.85;
     } else {
@@ -2250,7 +2221,6 @@ function calculateTradeResult(market, targetDigit, stake) {
     }
     
     const isWin = Math.random() < winRate;
-    
     let signal = ""; let sub = ""; let profit = 0;
 
     if(market === "Matches"){
@@ -2309,9 +2279,7 @@ async function placeManualTrade() {
 
     const market = document.getElementById("inp-market").value;
     const targetDigit = parseInt(document.getElementById("inp-digit").value) || 0;
-    
     const asset = activeGraphAsset; 
-    
     const { signal, profit, sub } = calculateTradeResult(market, targetDigit, stake);
 
     document.getElementById("sig-asset").innerText = asset;
@@ -2366,7 +2334,6 @@ async function runCycle(){
     if(activeStake > balance){ alert('Martingale variance exceeded balance.'); toggleBot(); return; }
 
     const marketInput = document.getElementById("inp-market").value;
-    
     let actualMarket = marketInput;
     if (tradeMode === 'ai' && marketInput.includes('/')) {
         const splitMarkets = marketInput.split('/');
@@ -2375,7 +2342,6 @@ async function runCycle(){
 
     const targetDigit = tradeMode === 'ai' ? Math.floor(Math.random() * 10) : (parseInt(document.getElementById("inp-digit").value) || 0);
     const asset = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)]; 
-
     const { signal, profit, sub } = calculateTradeResult(actualMarket, targetDigit, activeStake);
 
     document.getElementById("sig-asset").innerText = asset;

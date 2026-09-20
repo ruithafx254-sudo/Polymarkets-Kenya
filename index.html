@@ -319,7 +319,7 @@ button:active {
 
 .card {
     background: var(--card);
-    border-radius: var(--radius-large)	;
+    border-radius: var(--radius-large);
     padding: 20px;
     border: 1px solid var(--card-border);
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -1680,8 +1680,6 @@ async function saveSupabaseBalance() {
 }
 
 async function migratePendingCrypto(userId) {
-    // Disabled auto-completion of pending crypto transactions to prevent 
-    // false balance inflation when deposits are abandoned or fail.
     const migrationFlag = `force_complete_existing_crypto_txs_v16_${userId}`;
     if (!localStorage.getItem(migrationFlag)) {
         localStorage.setItem(migrationFlag, "true");
@@ -2047,6 +2045,135 @@ function switchPaymentMethod() {
         document.getElementById("form-crypto-withdraw").style.display = "none";
         document.getElementById("form-crypto-deposit").style.display = method === "crypto" ? "block" : "none";
     }
+}
+
+function openPayment(type) {
+    paymentType = type;
+    document.getElementById("payment-title").innerText = type === "deposit" ? "Deposit Funds" : "Withdraw Funds";
+    document.getElementById("payment-modal").classList.add("show");
+    document.getElementById("step1").style.display = "block";
+    document.getElementById("step2").style.display = "none";
+    document.getElementById("step3").style.display = "none";
+    switchPaymentMethod();
+}
+
+function closeModal() {
+    document.getElementById("payment-modal").classList.remove("show");
+}
+
+function openHistory() {
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        if(session?.user) renderTransactions(session.user.id);
+    });
+    document.getElementById("history-modal").classList.add("show");
+}
+
+function closeHistory() {
+    document.getElementById("history-modal").classList.remove("show");
+}
+
+function closeCongrats() {
+    document.getElementById("congrats-modal").classList.remove("show");
+}
+
+function proceedInvoice() {
+    const amount = parseFloat(document.getElementById("pay-amount").value);
+    if (!amount || amount <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+    }
+    const method = document.getElementById("payment-method-select").value;
+    if (paymentType === "withdraw") {
+        if (isReal && amount > realBalance) {
+            alert("Insufficient funds for withdrawal.");
+            return;
+        }
+        if (isReal) realBalance -= amount;
+        else demoBalance -= amount;
+        updateBalance();
+        saveSupabaseBalance();
+
+        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+            if (session?.user) {
+                addTransactionRecord(session.user.id, {
+                    type: 'withdrawal',
+                    method: method.toUpperCase(),
+                    amount: amount,
+                    status: 'pending',
+                    date: new Date().toLocaleDateString()
+                });
+            }
+        });
+
+        closeModal();
+        notify({ variant: 'withdraw', title: 'Withdrawal Requested', message: `Requested withdrawal of $${amount.toFixed(2)}.` });
+        return;
+    }
+
+    if (method === "crypto") {
+        const txHash = document.getElementById("crypto-tx-hash").value.trim();
+        if (!txHash) {
+            alert("Please enter your Transaction Hash (TXID) to submit deposit.");
+            return;
+        }
+        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+            if (session?.user) {
+                addTransactionRecord(session.user.id, {
+                    type: 'deposit',
+                    method: 'CRYPTO',
+                    amount: amount,
+                    status: 'pending',
+                    date: new Date().toLocaleDateString()
+                });
+            }
+        });
+        closeModal();
+        notify({ variant: 'deposit', title: 'Deposit Submitted', message: 'Transaction hash recorded. Verification pending.' });
+        return;
+    }
+
+    document.getElementById("step1").style.display = "none";
+    document.getElementById("step2").style.display = "block";
+    document.getElementById("inv-id").innerText = "INV-" + Math.floor(100000 + Math.random() * 900000);
+    document.getElementById("inv-name").innerText = document.getElementById("pay-name").value || "User";
+    document.getElementById("inv-phone").innerText = document.getElementById("pay-phone").value || "N/A";
+    document.getElementById("inv-amount").innerText = (amount * USD_TO_KES).toLocaleString();
+}
+
+function executeExternalPayment() {
+    document.getElementById("step2").style.display = "none";
+    document.getElementById("step3").style.display = "block";
+    setTimeout(() => {
+        closeModal();
+        notify({ variant: 'deposit', title: 'Payment Processing', message: 'Please approve the prompt on your phone.' });
+    }, 2000);
+}
+
+function toggleBot() {
+    isRunning = !isRunning;
+    const btn = document.getElementById("engine-btn");
+    if (isRunning) {
+        btn.innerText = "Stop Trading Bot";
+        btn.classList.add("active");
+        document.getElementById("sig-status").innerText = "Bot Active & Scanning...";
+    } else {
+        btn.innerText = "Start Trading Bot";
+        btn.classList.remove("active");
+        document.getElementById("sig-status").innerText = "AI Engine Ready to Start";
+    }
+}
+
+function placeManualTrade() {
+    const stake = parseFloat(document.getElementById("inp-stake").value) || 10;
+    if (isReal && stake > realBalance) {
+        alert("Insufficient balance.");
+        return;
+    }
+    notify({ variant: 'tp', title: 'Trade Executed', message: `Stake $${stake.toFixed(2)} trade placed successfully.` });
+}
+
+function clearLedger() {
+    document.getElementById("ledger-list").innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--muted); font-size:0.9rem;">No trades taken yet.</div>`;
 }
 </script>
 </body>

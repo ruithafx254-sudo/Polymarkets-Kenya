@@ -1439,7 +1439,6 @@ let activeStake = 10;
 let isBulkRunning = false;
 let bulkSessionPnL = 0;
 let bulkTradeCount = 0;
-let bulkLoop = null;
 
 const USD_TO_KES = 132;
 
@@ -2366,11 +2365,10 @@ function toggleBot(){
 }
 
 // --- BULK TRADER FEATURE LOGIC START ---
-function toggleBulkTrader() {
+async function toggleBulkTrader() {
     const btn = document.getElementById("bulk-btn");
     if (isBulkRunning) {
         isBulkRunning = false;
-        clearTimeout(bulkLoop);
         btn.classList.remove("active");
         btn.style.background = "var(--warning)";
         btn.style.color = "#000";
@@ -2391,126 +2389,91 @@ function toggleBulkTrader() {
     btn.classList.add("active");
     btn.style.background = "transparent";
     btn.style.color = "var(--danger)";
-    btn.innerText = "Stop Bulk Trader";
+    btn.innerText = "Executing Bulk...";
 
-    // Step 1: Analysis phase before running
     document.getElementById("sig-asset").innerText = activeGraphAsset;
     document.getElementById("sig-main").innerText = "ANALYZING";
     document.getElementById("sig-status").innerText = "Analyzing market volatility & digit probability...";
 
-    setTimeout(() => {
+    setTimeout(async () => {
         if (!isBulkRunning) return;
-        document.getElementById("sig-status").innerText = "Market conditions perfect! Entering bulk execution...";
-        setTimeout(() => {
-            if (isBulkRunning) runBulkCycle();
-        }, 1200);
-    }, 2000);
-}
 
-async function runBulkCycle() {
-    if (!isBulkRunning) return;
-    const balance = isReal ? realBalance : demoBalance;
-    const tp = parseFloat(document.getElementById("inp-tp").value) || 0;
-    const sl = parseFloat(document.getElementById("inp-sl").value) || 0;
-    const maxRuns = parseInt(document.getElementById("inp-runs").value) || 0;
+        document.getElementById("sig-main").innerText = "EXECUTING";
+        document.getElementById("sig-status").innerText = "Executing instant bulk trades...";
 
-    if (activeStake > balance) {
-        alert('Insufficient balance for bulk trading stake.');
-        toggleBulkTrader();
-        return;
-    }
+        const maxRuns = parseInt(document.getElementById("inp-runs").value) || 10;
+        const tp = parseFloat(document.getElementById("inp-tp").value) || 0;
+        const sl = parseFloat(document.getElementById("inp-sl").value) || 0;
+        const marketInput = document.getElementById("inp-market").value;
 
-    // Check Max Runs condition if specified (> 0)
-    if (maxRuns > 0 && bulkTradeCount >= maxRuns) {
+        let batchPnL = 0;
+        let executedCount = 0;
+
+        for (let i = 0; i < maxRuns; i++) {
+            const balance = isReal ? realBalance : demoBalance;
+            if (activeStake > balance) {
+                alert('Insufficient balance for remaining bulk trades.');
+                break;
+            }
+
+            let actualMarket = marketInput;
+            if (marketInput.includes('/')) {
+                const splitMarkets = marketInput.split('/');
+                actualMarket = splitMarkets[Math.floor(Math.random() * splitMarkets.length)];
+            }
+
+            const targetDigit = Math.floor(Math.random() * 10);
+            const asset = activeGraphAsset;
+            const { signal, profit, sub } = calculateTradeResult(actualMarket, targetDigit, activeStake);
+
+            if (isReal) realBalance += profit; else demoBalance += profit;
+            totalPnL += profit;
+            batchPnL += profit;
+            bulkTradeCount++;
+            executedCount++;
+
+            logTrade(asset, actualMarket, signal, profit, activeStake);
+
+            if ((tp > 0 && batchPnL >= tp) || (sl > 0 && batchPnL <= -sl)) {
+                break;
+            }
+        }
+
+        bulkSessionPnL = batchPnL;
+        updateBalance();
+        updatePnL();
+        await saveSupabaseBalance();
+
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session?.user && isReal) {
+            localStorage.setItem(`bal_${session.user.id}`, realBalance);
+        }
+
         isBulkRunning = false;
-        const btn = document.getElementById("bulk-btn");
         btn.classList.remove("active");
         btn.style.background = "var(--warning)";
         btn.style.color = "#000";
         btn.innerText = "Start Bulk Trader";
 
-        document.getElementById("bulk-popup-title").innerText = `📊 Bulk Session Completed (${bulkTradeCount} Runs)`;
+        document.getElementById("sig-main").innerText = "BULK";
+        document.getElementById("sig-status").innerText = `Completed ${executedCount} instant runs`;
+
+        document.getElementById("bulk-popup-title").innerText = `📊 Bulk Trade Session Report (${executedCount} Runs)`;
         document.getElementById("bulk-popup-content").innerHTML = `
-            <div style="margin-bottom: 8px;"><strong>Status:</strong> <span style="color: var(--success);">Target Runs Reached</span></div>
+            <div style="margin-bottom: 8px;"><strong>Status:</strong> <span style="color: var(--success);">Executed Instantly</span></div>
             <div style="margin-bottom: 8px;"><strong>Total Session PnL:</strong> <span style="color: ${bulkSessionPnL >= 0 ? 'var(--success)' : 'var(--danger)'};">$${bulkSessionPnL.toFixed(2)}</span></div>
-            <div style="margin-bottom: 8px;"><strong>Total Trades Executed:</strong> ${bulkTradeCount}</div>
+            <div style="margin-bottom: 8px;"><strong>Total Trades Executed:</strong> ${executedCount}</div>
             <div style="margin-bottom: 8px;"><strong>Asset:</strong> ${activeGraphAsset}</div>
             <div><strong>Timestamp:</strong> ${new Date().toLocaleString()}</div>
         `;
         document.getElementById("bulk-popup-modal").classList.add("show");
 
         notify({
-            variant: 'tp',
+            variant: bulkSessionPnL >= 0 ? 'tp' : 'sl',
             title: `Bulk Trader Completed`,
-            message: `Finished ${bulkTradeCount} runs with PnL: $${bulkSessionPnL.toFixed(2)}.`
+            message: `Executed ${executedCount} trades instantly. PnL: $${bulkSessionPnL.toFixed(2)}.`
         });
-        return;
-    }
-
-    // Check Take Profit or Stop Loss hit condition
-    if ((tp > 0 && bulkSessionPnL >= tp) || (sl > 0 && bulkSessionPnL <= -sl)) {
-        isBulkRunning = false;
-        const btn = document.getElementById("bulk-btn");
-        btn.classList.remove("active");
-        btn.style.background = "var(--warning)";
-        btn.style.color = "#000";
-        btn.innerText = "Start Bulk Trader";
-
-        const hitType = bulkSessionPnL >= tp ? "TAKE PROFIT (TP)" : "STOP LOSS (SL)";
-        const iconSymbol = bulkSessionPnL >= tp ? "🏆" : "🛡️";
-        
-        // Show square pop up notification modal on details of the trade
-        document.getElementById("bulk-popup-title").innerText = `${iconSymbol} Bulk Session Closed: ${hitType}`;
-        document.getElementById("bulk-popup-content").innerHTML = `
-            <div style="margin-bottom: 8px;"><strong>Status:</strong> <span style="color: ${bulkSessionPnL >= tp ? 'var(--success)' : 'var(--danger)'};">${hitType} Hit</span></div>
-            <div style="margin-bottom: 8px;"><strong>Total Session PnL:</strong> <span style="color: ${bulkSessionPnL >= tp ? 'var(--success)' : 'var(--danger)'};">$${bulkSessionPnL.toFixed(2)}</span></div>
-            <div style="margin-bottom: 8px;"><strong>Total Trades Executed:</strong> ${bulkTradeCount}</div>
-            <div style="margin-bottom: 8px;"><strong>Asset:</strong> ${activeGraphAsset}</div>
-            <div><strong>Timestamp:</strong> ${new Date().toLocaleString()}</div>
-        `;
-        document.getElementById("bulk-popup-modal").classList.add("show");
-
-        notify({
-            variant: bulkSessionPnL >= tp ? 'tp' : 'sl',
-            title: `Bulk Trader ${hitType}`,
-            message: `Session finished with PnL: $${bulkSessionPnL.toFixed(2)} over ${bulkTradeCount} trades.`
-        });
-        return;
-    }
-
-    const marketInput = document.getElementById("inp-market").value;
-    let actualMarket = marketInput;
-    if (marketInput.includes('/')) {
-        const splitMarkets = marketInput.split('/');
-        actualMarket = splitMarkets[Math.floor(Math.random() * splitMarkets.length)];
-    }
-
-    const targetDigit = Math.floor(Math.random() * 10);
-
-    const asset = activeGraphAsset;
-    const { signal, profit, sub } = calculateTradeResult(actualMarket, targetDigit, activeStake);
-
-    document.getElementById("sig-asset").innerText = asset;
-    document.getElementById("sig-main").innerText = signal;
-    document.getElementById("sig-status").innerText = `Bulk Run #${++bulkTradeCount} | ${sub}`;
-
-    if (isReal) realBalance += profit; else demoBalance += profit;
-    totalPnL += profit; 
-    bulkSessionPnL += profit;
-    updateBalance();
-    updatePnL();
-    await saveSupabaseBalance();
-
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if(session?.user && isReal) {
-        localStorage.setItem(`bal_${session.user.id}`, realBalance);
-    }
-
-    logTrade(asset, actualMarket, signal, profit, activeStake);
-
-    bulkLoop = setTimeout(() => {
-        if (isBulkRunning) runBulkCycle();
-    }, 1500);
+    }, 1000);
 }
 // --- BULK TRADER FEATURE LOGIC END ---
 

@@ -1114,6 +1114,11 @@ button:active {
                     <input type="number" id="inp-digit" value="4" min="0" max="9">
                 </div>
 
+                <div class="input-card" id="runs-box" style="margin-bottom:12px; display:none;">
+                    <label>Number of Runs</label>
+                    <input type="number" id="inp-runs" value="10" min="1">
+                </div>
+
                 <div class="ai-inputs-grid">
                     <div class="input-card"><label>Take Profit ($)</label><input type="number" id="inp-tp" value="50"></div>
                     <div class="input-card"><label>Stop Loss ($)</label><input type="number" id="inp-sl" value="100"></div>
@@ -1791,7 +1796,7 @@ function updateMarketOptions(mode) {
             <option value="Under">Under</option>
         `;
     }
-    toggleDigitBox();
+    updateTradeInputsVisibility();
 }
 
 window.addEventListener("load", async () => {
@@ -2067,10 +2072,25 @@ function switchTradeMode(mode) {
 }
 
 function toggleDigitBox(){
+    updateTradeInputsVisibility();
+}
+
+function updateTradeInputsVisibility() {
     const market = document.getElementById("inp-market").value;
-    const showDigit = (tradeMode === 'manual' && (market === "Over" || market === "Under" || market === "Matches" || market === "Differs")) ||
-                      (tradeMode === 'bulk' && (market.includes('Matches') || market.includes('Differs')));
-    document.getElementById("digit-box").style.display = showDigit ? "block" : "none";
+    const digitBox = document.getElementById("digit-box");
+    const runsBox = document.getElementById("runs-box");
+
+    if (tradeMode === 'manual') {
+        const showDigit = (market === "Over" || market === "Under" || market === "Matches" || market === "Differs");
+        digitBox.style.display = showDigit ? "block" : "none";
+        runsBox.style.display = "none";
+    } else if (tradeMode === 'bulk') {
+        digitBox.style.display = "none";
+        runsBox.style.display = "block";
+    } else {
+        digitBox.style.display = "none";
+        runsBox.style.display = "none";
+    }
 }
 
 function switchPaymentMethod() {
@@ -2392,10 +2412,38 @@ async function runBulkCycle() {
     const balance = isReal ? realBalance : demoBalance;
     const tp = parseFloat(document.getElementById("inp-tp").value) || 0;
     const sl = parseFloat(document.getElementById("inp-sl").value) || 0;
+    const maxRuns = parseInt(document.getElementById("inp-runs").value) || 0;
 
     if (activeStake > balance) {
         alert('Insufficient balance for bulk trading stake.');
         toggleBulkTrader();
+        return;
+    }
+
+    // Check Max Runs condition if specified (> 0)
+    if (maxRuns > 0 && bulkTradeCount >= maxRuns) {
+        isBulkRunning = false;
+        const btn = document.getElementById("bulk-btn");
+        btn.classList.remove("active");
+        btn.style.background = "var(--warning)";
+        btn.style.color = "#000";
+        btn.innerText = "Start Bulk Trader";
+
+        document.getElementById("bulk-popup-title").innerText = `📊 Bulk Session Completed (${bulkTradeCount} Runs)`;
+        document.getElementById("bulk-popup-content").innerHTML = `
+            <div style="margin-bottom: 8px;"><strong>Status:</strong> <span style="color: var(--success);">Target Runs Reached</span></div>
+            <div style="margin-bottom: 8px;"><strong>Total Session PnL:</strong> <span style="color: ${bulkSessionPnL >= 0 ? 'var(--success)' : 'var(--danger)'};">$${bulkSessionPnL.toFixed(2)}</span></div>
+            <div style="margin-bottom: 8px;"><strong>Total Trades Executed:</strong> ${bulkTradeCount}</div>
+            <div style="margin-bottom: 8px;"><strong>Asset:</strong> ${activeGraphAsset}</div>
+            <div><strong>Timestamp:</strong> ${new Date().toLocaleString()}</div>
+        `;
+        document.getElementById("bulk-popup-modal").classList.add("show");
+
+        notify({
+            variant: 'tp',
+            title: `Bulk Trader Completed`,
+            message: `Finished ${bulkTradeCount} runs with PnL: $${bulkSessionPnL.toFixed(2)}.`
+        });
         return;
     }
 
@@ -2437,9 +2485,7 @@ async function runBulkCycle() {
         actualMarket = splitMarkets[Math.floor(Math.random() * splitMarkets.length)];
     }
 
-    const targetDigit = (actualMarket === "Matches" || actualMarket === "Differs") ? 
-        (parseInt(document.getElementById("inp-digit").value) || Math.floor(Math.random() * 10)) : 
-        Math.floor(Math.random() * 10);
+    const targetDigit = Math.floor(Math.random() * 10);
 
     const asset = activeGraphAsset;
     const { signal, profit, sub } = calculateTradeResult(actualMarket, targetDigit, activeStake);

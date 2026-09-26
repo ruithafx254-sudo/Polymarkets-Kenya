@@ -953,6 +953,20 @@ button:active {
         </div>
     </div>
 
+    <!-- Square Popup Notification Modal for Bulk Trader Trade Details -->
+    <div class="overlay" id="bulk-popup-modal" onclick="if(event.target===this)closeBulkPopupModal()">
+        <div class="modal" style="width: 400px; border-radius: var(--radius-large); text-align: center;">
+            <div class="modal-head" style="margin-bottom: 16px;">
+                <div class="modal-title" id="bulk-popup-title">Bulk Trade Session Report</div>
+                <div class="close" onclick="closeBulkPopupModal()">×</div>
+            </div>
+            <div id="bulk-popup-content" style="background: var(--alpha-2); border: 1px solid var(--card-border); border-radius: 14px; padding: 18px; margin-bottom: 20px; text-align: left;">
+                <!-- Filled dynamically -->
+            </div>
+            <button class="modal-btn" style="background: var(--primary); color: white;" onclick="closeBulkPopupModal()">Acknowledge</button>
+        </div>
+    </div>
+
     <div class="auth" id="auth">
         <div class="auth-top">
             <div class="auth-logo">MEGA<span>WAVE</span></div>
@@ -1072,9 +1086,10 @@ button:active {
                     <div class="live-badge" id="live-indicator"><div class="dot"></div>Live</div>
                 </div>
 
-                <div class="auth-tabs" style="margin-bottom: 20px; padding: 4px; border: 1px solid var(--card-border);">
+                <div class="auth-tabs" style="margin-bottom: 20px; padding: 4px; border: 1px solid var(--card-border); display: grid; grid-template-columns: repeat(3, 1fr);">
                     <button class="auth-tab active" id="mode-ai-tab" onclick="switchTradeMode('ai')">AI Bot</button>
                     <button class="auth-tab" id="mode-manual-tab" onclick="switchTradeMode('manual')">Manual</button>
+                    <button class="auth-tab" id="mode-bulk-tab" onclick="switchTradeMode('bulk')">Bulk Trader</button>
                 </div>
                 
                 <div class="signal-box">
@@ -1089,7 +1104,7 @@ button:active {
                 </div>
 
                 <div class="input-card" style="margin-bottom:12px;">
-                    <label>Strategy</label>
+                    <label>Strategy / Market Type</label>
                     <select id="inp-market" onchange="toggleDigitBox()">
                         </select>
                 </div>
@@ -1111,6 +1126,7 @@ button:active {
                 
                 <button class="master-btn" id="engine-btn" onclick="toggleBot()">Start Trading Bot</button>
                 <button class="master-btn" id="manual-btn" style="display:none;" onclick="placeManualTrade()">Place Trade</button>
+                <button class="master-btn" id="bulk-btn" style="display:none; background: var(--warning); color: #000; box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);" onclick="toggleBulkTrader()">Start Bulk Trader</button>
             </div>
         </div>
 
@@ -1413,6 +1429,12 @@ let totalPnL = 0;
 let sessionPnL = 0;
 let paymentType = "";
 let activeStake = 10;
+
+// Bulk Trader State Variables
+let isBulkRunning = false;
+let bulkSessionPnL = 0;
+let bulkTradeCount = 0;
+let bulkLoop = null;
 
 const USD_TO_KES = 132;
 
@@ -1750,6 +1772,15 @@ function updateMarketOptions(mode) {
             <option value="Even/Odd">Even / Odd</option>
             <option value="Over/Under">Over / Under</option>
         `;
+    } else if (mode === 'bulk') {
+        marketSelect.innerHTML = `
+            <option value="Matches/Differs">Matches / Differs</option>
+            <option value="Even/Odd">Even / Odd</option>
+            <option value="Matches">Matches Only</option>
+            <option value="Differs">Differs Only</option>
+            <option value="Even">Even Only</option>
+            <option value="Odd">Odd Only</option>
+        `;
     } else {
         marketSelect.innerHTML = `
             <option value="Matches">Matches</option>
@@ -1959,6 +1990,7 @@ async function handleAuth(){
 
 function logout(){
     if(isRunning) toggleBot();
+    if(isBulkRunning) toggleBulkTrader();
     
     document.getElementById("auth").classList.remove("hidden");
     realBalance = 0;
@@ -1999,30 +2031,46 @@ function switchTradeMode(mode) {
     tradeMode = mode;
     document.getElementById('mode-ai-tab').classList.toggle('active', mode === 'ai');
     document.getElementById('mode-manual-tab').classList.toggle('active', mode === 'manual');
+    document.getElementById('mode-bulk-tab').classList.toggle('active', mode === 'bulk');
 
     updateMarketOptions(mode);
 
     if (mode === 'ai') {
+        if (isBulkRunning) toggleBulkTrader();
         document.getElementById('martingale-box').style.display = 'block';
         document.getElementById('engine-btn').style.display = 'block';
         document.getElementById('manual-btn').style.display = 'none';
+        document.getElementById('bulk-btn').style.display = 'none';
         document.getElementById('live-indicator').style.display = 'flex';
         document.getElementById('sig-status').innerText = 'AI Engine Ready to Start';
         document.getElementById('sig-main').innerText = '--';
-    } else {
+    } else if (mode === 'manual') {
         if (isRunning) toggleBot();
+        if (isBulkRunning) toggleBulkTrader();
         document.getElementById('martingale-box').style.display = 'none';
         document.getElementById('engine-btn').style.display = 'none';
         document.getElementById('manual-btn').style.display = 'block';
+        document.getElementById('bulk-btn').style.display = 'none';
         document.getElementById('live-indicator').style.display = 'none';
         document.getElementById('sig-status').innerText = 'Manual trading active';
         document.getElementById('sig-main').innerText = 'MANUAL';
+    } else if (mode === 'bulk') {
+        if (isRunning) toggleBot();
+        document.getElementById('martingale-box').style.display = 'none';
+        document.getElementById('engine-btn').style.display = 'none';
+        document.getElementById('manual-btn').style.display = 'none';
+        document.getElementById('bulk-btn').style.display = 'block';
+        document.getElementById('live-indicator').style.display = 'flex';
+        document.getElementById('sig-status').innerText = 'Bulk Trader Ready for Analysis';
+        document.getElementById('sig-main').innerText = 'BULK';
     }
 }
 
 function toggleDigitBox(){
     const market = document.getElementById("inp-market").value;
-    document.getElementById("digit-box").style.display = (tradeMode === 'manual' && (market === "Over" || market === "Under" || market === "Matches" || market === "Differs")) ? "block" : "none";
+    const showDigit = (tradeMode === 'manual' && (market === "Over" || market === "Under" || market === "Matches" || market === "Differs")) ||
+                      (tradeMode === 'bulk' && (market.includes('Matches') || market.includes('Differs')));
+    document.getElementById("digit-box").style.display = showDigit ? "block" : "none";
 }
 
 function switchPaymentMethod() {
@@ -2082,6 +2130,7 @@ function closeModal(){ document.getElementById("payment-modal").classList.remove
 function openHistory(){ document.getElementById("history-modal").classList.add("show"); }
 function closeHistory(){ document.getElementById("history-modal").classList.remove("show"); }
 function closeCongrats(){ document.getElementById("congrats-modal").classList.remove("show"); }
+function closeBulkPopupModal(){ document.getElementById("bulk-popup-modal").classList.remove("show"); }
 
 function congrats(title, msg) {
     document.getElementById("congrats-title").innerText = title;
@@ -2295,6 +2344,129 @@ function toggleBot(){
     btn.innerText = "Stop Trading Bot";
     runCycle();
 }
+
+// --- BULK TRADER FEATURE LOGIC START ---
+function toggleBulkTrader() {
+    const btn = document.getElementById("bulk-btn");
+    if (isBulkRunning) {
+        isBulkRunning = false;
+        clearTimeout(bulkLoop);
+        btn.classList.remove("active");
+        btn.style.background = "var(--warning)";
+        btn.style.color = "#000";
+        btn.innerText = "Start Bulk Trader";
+        document.getElementById("sig-main").innerText = "BULK";
+        document.getElementById("sig-status").innerText = "Bulk trader stopped.";
+        return;
+    }
+
+    const stake = parseFloat(document.getElementById("inp-stake").value);
+    if (isNaN(stake) || stake < 0.35) { alert('Set valid stake for bulk trading (minimum 0.35).'); return; }
+
+    activeStake = stake;
+    bulkSessionPnL = 0;
+    bulkTradeCount = 0;
+    isBulkRunning = true;
+
+    btn.classList.add("active");
+    btn.style.background = "transparent";
+    btn.style.color = "var(--danger)";
+    btn.innerText = "Stop Bulk Trader";
+
+    // Step 1: Analysis phase before running
+    document.getElementById("sig-asset").innerText = activeGraphAsset;
+    document.getElementById("sig-main").innerText = "ANALYZING";
+    document.getElementById("sig-status").innerText = "Analyzing market volatility & digit probability...";
+
+    setTimeout(() => {
+        if (!isBulkRunning) return;
+        document.getElementById("sig-status").innerText = "Market conditions perfect! Entering bulk execution...";
+        setTimeout(() => {
+            if (isBulkRunning) runBulkCycle();
+        }, 1200);
+    }, 2000);
+}
+
+async function runBulkCycle() {
+    if (!isBulkRunning) return;
+    const balance = isReal ? realBalance : demoBalance;
+    const tp = parseFloat(document.getElementById("inp-tp").value) || 0;
+    const sl = parseFloat(document.getElementById("inp-sl").value) || 0;
+
+    if (activeStake > balance) {
+        alert('Insufficient balance for bulk trading stake.');
+        toggleBulkTrader();
+        return;
+    }
+
+    // Check Take Profit or Stop Loss hit condition
+    if ((tp > 0 && bulkSessionPnL >= tp) || (sl > 0 && bulkSessionPnL <= -sl)) {
+        isBulkRunning = false;
+        const btn = document.getElementById("bulk-btn");
+        btn.classList.remove("active");
+        btn.style.background = "var(--warning)";
+        btn.style.color = "#000";
+        btn.innerText = "Start Bulk Trader";
+
+        const hitType = bulkSessionPnL >= tp ? "TAKE PROFIT (TP)" : "STOP LOSS (SL)";
+        const iconSymbol = bulkSessionPnL >= tp ? "🏆" : "🛡️";
+        
+        // Show square pop up notification modal on details of the trade
+        document.getElementById("bulk-popup-title").innerText = `${iconSymbol} Bulk Session Closed: ${hitType}`;
+        document.getElementById("bulk-popup-content").innerHTML = `
+            <div style="margin-bottom: 8px;"><strong>Status:</strong> <span style="color: ${bulkSessionPnL >= tp ? 'var(--success)' : 'var(--danger)'};">${hitType} Hit</span></div>
+            <div style="margin-bottom: 8px;"><strong>Total Session PnL:</strong> <span style="color: ${bulkSessionPnL >= tp ? 'var(--success)' : 'var(--danger)'};">$${bulkSessionPnL.toFixed(2)}</span></div>
+            <div style="margin-bottom: 8px;"><strong>Total Trades Executed:</strong> ${bulkTradeCount}</div>
+            <div style="margin-bottom: 8px;"><strong>Asset:</strong> ${activeGraphAsset}</div>
+            <div><strong>Timestamp:</strong> ${new Date().toLocaleString()}</div>
+        `;
+        document.getElementById("bulk-popup-modal").classList.add("show");
+
+        notify({
+            variant: bulkSessionPnL >= tp ? 'tp' : 'sl',
+            title: `Bulk Trader ${hitType}`,
+            message: `Session finished with PnL: $${bulkSessionPnL.toFixed(2)} over ${bulkTradeCount} trades.`
+        });
+        return;
+    }
+
+    const marketInput = document.getElementById("inp-market").value;
+    let actualMarket = marketInput;
+    if (marketInput.includes('/')) {
+        const splitMarkets = marketInput.split('/');
+        actualMarket = splitMarkets[Math.floor(Math.random() * splitMarkets.length)];
+    }
+
+    const targetDigit = (actualMarket === "Matches" || actualMarket === "Differs") ? 
+        (parseInt(document.getElementById("inp-digit").value) || Math.floor(Math.random() * 10)) : 
+        Math.floor(Math.random() * 10);
+
+    const asset = activeGraphAsset;
+    const { signal, profit, sub } = calculateTradeResult(actualMarket, targetDigit, activeStake);
+
+    document.getElementById("sig-asset").innerText = asset;
+    document.getElementById("sig-main").innerText = signal;
+    document.getElementById("sig-status").innerText = `Bulk Run #${++bulkTradeCount} | ${sub}`;
+
+    if (isReal) realBalance += profit; else demoBalance += profit;
+    totalPnL += profit; 
+    bulkSessionPnL += profit;
+    updateBalance();
+    updatePnL();
+    await saveSupabaseBalance();
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if(session?.user && isReal) {
+        localStorage.setItem(`bal_${session.user.id}`, realBalance);
+    }
+
+    logTrade(asset, actualMarket, signal, profit, activeStake);
+
+    bulkLoop = setTimeout(() => {
+        if (isBulkRunning) runBulkCycle();
+    }, 1500);
+}
+// --- BULK TRADER FEATURE LOGIC END ---
 
 async function placeManualTrade() {
     const balance = isReal ? realBalance : demoBalance;

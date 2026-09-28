@@ -2391,15 +2391,15 @@ async function toggleBulkTrader() {
     btn.style.color = "var(--danger)";
     btn.innerText = "Executing Bulk...";
 
-    document.getElementById("sig-asset").innerText = activeGraphAsset;
+    document.getElementById("sig-asset").innerText = "ALL VOLATILITIES";
     document.getElementById("sig-main").innerText = "ANALYZING";
-    document.getElementById("sig-status").innerText = "Analyzing market volatility & digit probability...";
+    document.getElementById("sig-status").innerText = "Analyzing different market volatilities & probabilities...";
 
     setTimeout(async () => {
         if (!isBulkRunning) return;
 
         document.getElementById("sig-main").innerText = "EXECUTING";
-        document.getElementById("sig-status").innerText = "Executing instant bulk trades...";
+        document.getElementById("sig-status").innerText = "Executing trades across different volatilities...";
 
         const maxRuns = parseInt(document.getElementById("inp-runs").value) || 10;
         const tp = parseFloat(document.getElementById("inp-tp").value) || 0;
@@ -2423,7 +2423,10 @@ async function toggleBulkTrader() {
             }
 
             const targetDigit = Math.floor(Math.random() * 10);
-            const asset = activeGraphAsset;
+            // Analyse and execute different volatilities
+            const asset = volatilityIndices[Math.floor(Math.random() * volatilityIndices.length)];
+            document.getElementById("sig-asset").innerText = asset;
+
             const { signal, profit, sub } = calculateTradeResult(actualMarket, targetDigit, activeStake);
 
             if (isReal) realBalance += profit; else demoBalance += profit;
@@ -2456,14 +2459,14 @@ async function toggleBulkTrader() {
         btn.innerText = "Start Bulk Trader";
 
         document.getElementById("sig-main").innerText = "BULK";
-        document.getElementById("sig-status").innerText = `Completed ${executedCount} instant runs`;
+        document.getElementById("sig-status").innerText = `Completed ${executedCount} runs across different volatilities`;
 
-        document.getElementById("bulk-popup-title").innerText = `📊 Bulk Trade Session Report (${executedCount} Runs)`;
+        document.getElementById("bulk-popup-title").innerText = `📊 Multi-Volatility Bulk Trade Report (${executedCount} Runs)`;
         document.getElementById("bulk-popup-content").innerHTML = `
-            <div style="margin-bottom: 8px;"><strong>Status:</strong> <span style="color: var(--success);">Executed Instantly</span></div>
+            <div style="margin-bottom: 8px;"><strong>Status:</strong> <span style="color: var(--success);">Multi-Volatility Executed</span></div>
             <div style="margin-bottom: 8px;"><strong>Total Session PnL:</strong> <span style="color: ${bulkSessionPnL >= 0 ? 'var(--success)' : 'var(--danger)'};">$${bulkSessionPnL.toFixed(2)}</span></div>
             <div style="margin-bottom: 8px;"><strong>Total Trades Executed:</strong> ${executedCount}</div>
-            <div style="margin-bottom: 8px;"><strong>Asset:</strong> ${activeGraphAsset}</div>
+            <div style="margin-bottom: 8px;"><strong>Mode:</strong> Multi-Volatility Analysis</div>
             <div><strong>Timestamp:</strong> ${new Date().toLocaleString()}</div>
         `;
         document.getElementById("bulk-popup-modal").classList.add("show");
@@ -2471,7 +2474,7 @@ async function toggleBulkTrader() {
         notify({
             variant: bulkSessionPnL >= 0 ? 'tp' : 'sl',
             title: `Bulk Trader Completed`,
-            message: `Executed ${executedCount} trades instantly. PnL: $${bulkSessionPnL.toFixed(2)}.`
+            message: `Executed ${executedCount} trades across different volatilities. PnL: $${bulkSessionPnL.toFixed(2)}.`
         });
     }, 7000);
 }

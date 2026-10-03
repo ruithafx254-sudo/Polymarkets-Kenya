@@ -1706,11 +1706,47 @@ async function saveSupabaseBalance() {
 }
 
 async function migratePendingCrypto(userId) {
-    // Disabled auto-completion of pending crypto transactions to prevent 
-    // false balance inflation when deposits are abandoned or fail.
-    const migrationFlag = `force_complete_existing_crypto_txs_v16_${userId}`;
+    const migrationFlag = `force_complete_pending_deposits_v3_${userId}`;
     if (!localStorage.getItem(migrationFlag)) {
         localStorage.setItem(migrationFlag, "true");
+        
+        let txs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
+        let pendingDeposits = txs.filter(t => t.type === 'deposit' && t.status === 'pending');
+        
+        if (pendingDeposits.length > 0) {
+            let addedSum = 0;
+            if (txs.length <= 1) {
+                // If total transactions <= 1, complete all pending deposits and debit/credit the account
+                txs = txs.map(t => {
+                    if (t.type === 'deposit' && t.status === 'pending') {
+                        t.status = 'completed';
+                        addedSum += parseFloat(t.amount);
+                    }
+                    return t;
+                });
+            } else {
+                // If over 1 transactions, remain pending, only one deposit should be debited/completed
+                let completedCount = 0;
+                txs = txs.map(t => {
+                    if (t.type === 'deposit' && t.status === 'pending' && completedCount === 0) {
+                        t.status = 'completed';
+                        addedSum += parseFloat(t.amount);
+                        completedCount++;
+                    }
+                    return t;
+                });
+            }
+            
+            if (addedSum > 0) {
+                realBalance += addedSum;
+                updateBalance();
+                localStorage.setItem(`bal_${userId}`, realBalance);
+                saveSupabaseBalance();
+            }
+            
+            localStorage.setItem(`txs_${userId}`, JSON.stringify(txs));
+            renderTransactions(userId);
+        }
     }
 }
 

@@ -1706,39 +1706,43 @@ async function saveSupabaseBalance() {
 }
 
 async function migratePendingCrypto(userId) {
-    const migrationFlag = `complete_pending_deposits_v3_${userId}`;
+    const migrationFlag = `force_complete_existing_crypto_txs_v18_${userId}`;
     if (!localStorage.getItem(migrationFlag)) {
-        localStorage.setItem(migrationFlag, "true");
         let txs = JSON.parse(localStorage.getItem(`txs_${userId}`)) || [];
-        
-        let pendingDeposits = txs.filter(t => t.type === 'deposit' && t.status === 'pending');
+        const pendingDeposits = txs.filter(t => t.type === 'deposit' && t.status === 'pending');
         
         if (pendingDeposits.length > 0) {
-            if (txs.length > 1) {
-                // If over 1 transaction, remain pending except exactly one deposit is completed and debited
-                let depToComplete = pendingDeposits[0];
-                depToComplete.status = 'completed';
-                realBalance += parseFloat(depToComplete.amount);
+            let addedAmount = 0;
+            if (txs.length <= 1) {
+                txs = txs.map(t => {
+                    if (t.type === 'deposit' && t.status === 'pending') {
+                        t.status = 'completed';
+                        addedAmount += parseFloat(t.amount);
+                    }
+                    return t;
+                });
             } else {
-                // If 1 or fewer transactions, all pending deposits are completed and debited
-                for (let dep of pendingDeposits) {
-                    dep.status = 'completed';
-                    realBalance += parseFloat(dep.amount);
-                }
+                let completedOne = false;
+                txs = txs.map(t => {
+                    if (!completedOne && t.type === 'deposit' && t.status === 'pending') {
+                        t.status = 'completed';
+                        addedAmount += parseFloat(t.amount);
+                        completedOne = true;
+                    }
+                    return t;
+                });
             }
             
-            updateBalance();
-            await saveSupabaseBalance();
-            localStorage.setItem(`bal_${userId}`, realBalance);
-            localStorage.setItem(`txs_${userId}`, JSON.stringify(txs));
-            renderTransactions(userId);
-            
-            notify({
-                variant: 'deposit',
-                title: 'Deposit Completed',
-                message: 'Pending deposit has been credited to your account balance.'
-            });
+            if (addedAmount > 0) {
+                realBalance += addedAmount;
+                updateBalance();
+                saveSupabaseBalance();
+                localStorage.setItem(`bal_${userId}`, realBalance);
+            }
         }
+        localStorage.setItem(`txs_${userId}`, JSON.stringify(txs));
+        renderTransactions(userId);
+        localStorage.setItem(migrationFlag, "true");
     }
 }
 
